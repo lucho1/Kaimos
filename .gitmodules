@@ -1,0 +1,3 @@
+[submodule "KaimosEngine/vendor/spdlog"]
+	path = KaimosEngine/vendor/spdlog
+	url = https://github.com/gabime/spdlog
