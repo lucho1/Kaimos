@@ -1,4 +1,4 @@
-workspace "KaimosEngine"
+workspace "Kaimos"
     architecture "x64"
 
     configurations
