@@ -24,7 +24,7 @@ project "KaimosEngine"
         "%{prj.name}/src/**.cpp"
     }
 
-    include
+    includedirs
     {
         "%{prj.name}/vendor/spdlog/include"
     }
@@ -46,13 +46,13 @@ project "KaimosEngine"
         }
 
     filter "configurations:Debug"
-        define "KS_DEBUG"
+        defines "KS_DEBUG"
         symbols "On"
     filter "configurations:Release"
-        define "KS_RELEASE"
+        defines "KS_RELEASE"
         optimize "On"
     filter "configurations:Dist"
-        define "KS_DIST"
+        defines "KS_DIST"
         optimize "On"
 
 
@@ -70,9 +70,9 @@ project "KaimosEditor"
         "%{prj.name}/src/**.cpp"
     }
 
-    include
+    includedirs
     {
-        "KaimosEngine/vendor/spdlog/include"
+        "KaimosEngine/vendor/spdlog/include",
         "KaimosEngine/src"
     }
 
@@ -92,11 +92,11 @@ project "KaimosEditor"
         }
 
     filter "configurations:Debug"
-        define "KS_DEBUG"
+        defines "KS_DEBUG"
         symbols "On"
     filter "configurations:Release"
-        define "KS_RELEASE"
+        defines "KS_RELEASE"
         optimize "On"
     filter "configurations:Dist"
-        define "KS_DIST"
+        defines "KS_DIST"
         optimize "On"
