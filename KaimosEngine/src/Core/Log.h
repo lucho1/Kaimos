@@ -3,6 +3,7 @@
 
 #include "Core.h"
 #include "spdlog/spdlog.h"
+#include "spdlog/fmt/ostr.h" // To pass events
 
 namespace Kaimos {
 
@@ -16,19 +17,19 @@ namespace Kaimos {
 
 	private:
 
-		static std::shared_ptr<spdlog::logger> s_EngineLogger; //Core Logger
-		static std::shared_ptr<spdlog::logger> s_EditorLogger; //Client Logger
+		static std::shared_ptr<spdlog::logger> s_EngineLogger; // Core Logger
+		static std::shared_ptr<spdlog::logger> s_EditorLogger; // Client Logger
 	};
 }
 
-//Engine/Core Logging Macros
+// Engine/Core Logging Macros
 #define KS_ENGINE_TRACE(...)	::Kaimos::Log::GetEngineLogger()->trace(__VA_ARGS__)
 #define KS_ENGINE_INFO(...)		::Kaimos::Log::GetEngineLogger()->info(__VA_ARGS__)
 #define KS_ENGINE_WARN(...)		::Kaimos::Log::GetEngineLogger()->warn(__VA_ARGS__)
 #define KS_ENGINE_ERROR(...)	::Kaimos::Log::GetEngineLogger()->error(__VA_ARGS__)
 #define KS_ENGINE_CRITICAL(...)	::Kaimos::Log::GetEngineLogger()->critical(__VA_ARGS__)
 
-//Editor/Client Logging Macros
+// Editor/Client Logging Macros
 #define KS_EDITOR_TRACE(...)	::Kaimos::Log::GetEditorLogger()->trace(__VA_ARGS__)
 #define KS_EDITOR_INFO(...)		::Kaimos::Log::GetEditorLogger()->info(__VA_ARGS__)
 #define KS_EDITOR_WARN(...)		::Kaimos::Log::GetEditorLogger()->warn(__VA_ARGS__)

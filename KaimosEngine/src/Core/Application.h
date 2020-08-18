@@ -15,7 +15,7 @@ namespace Kaimos {
 	};
 
 
-	//To be defined in Client (Editor)
+	// To be defined in Client (Editor)
 	Application* CreateApplication();
 }
 

@@ -3,8 +3,8 @@
 
 namespace Kaimos {
 
-	std::shared_ptr<spdlog::logger> Log::s_EngineLogger; //Core Logger
-	std::shared_ptr<spdlog::logger> Log::s_EditorLogger; //Client Logger
+	std::shared_ptr<spdlog::logger> Log::s_EngineLogger; // Core Logger
+	std::shared_ptr<spdlog::logger> Log::s_EditorLogger; // Client Logger
 
 	void Log::Init()
 	{

@@ -35,5 +35,5 @@ int main(int argc, char** argv)
 }
 
 
-#endif //KS_PLATFORM_WINDOWS
-#endif //_ENTRYPOINT_H_
+#endif // KS_PLATFORM_WINDOWS
+#endif // _ENTRYPOINT_H_

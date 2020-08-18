@@ -1,17 +1,20 @@
 #ifndef _KAIMOS_H_
 #define _KAIMOS_H_
 
-//For Kaimos Applications use (clients)
+// For Kaimos Applications use (clients)
 
-// --- Root Libs ---
+// --- Windows/C++ Standard Library ---
 #include <iostream>
 #include <memory>
+#include <functional>
+#include <string>
+#include <sstream>
 
 // --- Engine Basic Stuff ---
-#include "Kaimos/Application.h"
-#include "Kaimos/Log.h"
+#include "Core/Application.h"
+#include "Core/Log.h"
 
 // --- Entry Point ---
-#include "Kaimos/EntryPoint.h"
+#include "Core/EntryPoint.h"
 
 #endif
