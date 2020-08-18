@@ -18,6 +18,9 @@ project "KaimosEngine"
     targetdir ("bin/" .. outputdir .. "/%{prj.name}")
     objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
 
+    pchheader "kspch.h"
+    pchsource "KaimosEngine/src/kspch.cpp"
+
     files
     {
         "%{prj.name}/src/**.h",

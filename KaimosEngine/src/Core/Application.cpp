@@ -1,3 +1,4 @@
+#include "kspch.h"
 #include "Application.h"
 
 namespace Kaimos {

@@ -2,7 +2,6 @@
 #define	_EVENT_H_
 
 #include "Core/Core.h"
-#include "Kaimos.h"
 
 namespace Kaimos {
 

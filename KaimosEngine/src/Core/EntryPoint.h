@@ -9,8 +9,8 @@ extern Kaimos::Application* Kaimos::CreateApplication();
 
 int main(int argc, char** argv)
 {
-	std::cout << "Kaimos Engine Started" << std::endl;
 	Kaimos::Log::Init();
+	KS_ENGINE_INFO("Kaimos Engine Started");
 
 	KS_ENGINE_INFO("Started Engine Logger Successfully");
 	KS_ENGINE_TRACE("-- Engine Logger Test --");
