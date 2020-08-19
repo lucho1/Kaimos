@@ -14,7 +14,7 @@ namespace Kaimos {
 
 	protected:
 
-		KeyEvent(int keycode) {}
+		KeyEvent(int keycode) : m_KeyCode(keycode) {}
 		int m_KeyCode;
 	};
 
