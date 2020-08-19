@@ -16,6 +16,8 @@
 #include <unordered_map>
 #include <unordered_set>
 
+// --- Engine Includes ---
+#include "Core/Log.h"
 
 // --- Windows Include ---
 #ifdef KS_PLATFORM_WINDOWS

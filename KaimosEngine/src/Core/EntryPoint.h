@@ -1,7 +1,6 @@
 #ifndef	_ENTRYPOINT_H_
 #define _ENTRYPOINT_H_
 
-
 #ifdef KS_PLATFORM_WINDOWS
 
 

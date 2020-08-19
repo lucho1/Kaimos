@@ -2,6 +2,7 @@
 #define _APPLICATION_H_
 
 #include "Core.h"
+#include "Window.h"
 
 namespace Kaimos {
 
@@ -12,6 +13,11 @@ namespace Kaimos {
 		virtual ~Application();
 
 		void Run();
+
+	private:
+
+		bool m_Running = true;
+		std::unique_ptr<Window> m_Window; // Having a unique_ptr means we don't have to worry about deleting the Window ourselves on app termination :D
 	};
 
 
