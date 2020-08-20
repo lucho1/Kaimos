@@ -3,6 +3,7 @@
 
 // Temporary Includes (DELETE THEM!)
 #include <glad/glad.h>
+#include "Input.h"
 
 namespace Kaimos {
 
@@ -45,6 +46,9 @@ namespace Kaimos {
 			std::vector<Layer*>::iterator it = m_LayerStack.begin();
 			for (; it != m_LayerStack.end(); ++it)
 				(*it)->OnUpdate();
+
+			auto [x, y] = Input::GetMousePos();
+			KS_ENGINE_TRACE(" {0}, {1}", x, y);
 
 			//for (Layer* layer : m_LayerStack)
 			//	layer->OnUpdate();

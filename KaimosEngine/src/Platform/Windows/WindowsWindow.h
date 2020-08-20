@@ -21,6 +21,8 @@ namespace Kaimos {
 		inline uint GetHeight() const override { return m_Data.Height; }
 		virtual void ShutdownWindow(bool terminateGLFW);
 
+		inline void* GetNativeWindow() const override { return m_Window; }
+
 		// -- Attributes --
 		inline void SetEventCallback(const EventCallbackFn& callback) override { m_Data.EventCallback = callback; }
 		void SetVSync(bool enabled) override;

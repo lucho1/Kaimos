@@ -27,10 +27,13 @@ namespace Kaimos {
 		virtual ~Window() {}
 		virtual void OnUpdate() = 0;
 		
+		// -- Class Methods --
 		virtual uint GetWidth() const = 0;
 		virtual uint GetHeight() const = 0;
 
-		// Attributes
+		virtual void* GetNativeWindow() const = 0;
+
+		// -- Attributes --
 		virtual void SetEventCallback(const EventCallbackFn& callback) = 0;
 		virtual void SetVSync(bool enabled) = 0;
 		virtual bool IsVSync() const = 0;
