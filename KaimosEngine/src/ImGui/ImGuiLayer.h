@@ -24,9 +24,6 @@ namespace Kaimos {
 
 	private:
 
-		// -- Class Methods --
-		void SetEngineUIStyle();
-
 		// -- Events --
 		bool OnMouseButtonPressedEvent(MouseButtonPressedEvent& e);
 		bool OnMouseButtonReleasedEvent(MouseButtonReleasedEvent& e);

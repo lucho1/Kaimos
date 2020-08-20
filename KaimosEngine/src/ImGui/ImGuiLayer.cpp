@@ -43,7 +43,7 @@ namespace Kaimos {
 	void ImGuiLayer::OnAttach()
 	{
 		ImGui::CreateContext();
-		SetEngineUIStyle();
+		ImGui::StyleColorsKaimos(); // TODO: Change this when ImGui Docking gets implemented!!
 
 		ImGuiIO& io = ImGui::GetIO();
 		io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;
@@ -77,13 +77,6 @@ namespace Kaimos {
 
 	void ImGuiLayer::OnDettach()
 	{
-	}
-
-
-	// -- Class Methods --
-	void ImGuiLayer::SetEngineUIStyle()
-	{
-		ImGui::StyleColorsDark();
 	}
 
 
