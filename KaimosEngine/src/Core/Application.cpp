@@ -22,6 +22,7 @@ namespace Kaimos {
 	{
 	}
 
+	// -- Class Methods --
 	void Application::Run()
 	{
 		// -- Event Test --
@@ -31,20 +32,50 @@ namespace Kaimos {
 		else if (e.IsInCategory(EVENT_CATEGORY_INPUT))
 			KS_EDITOR_TRACE(e);
 
-		// -- Pink Window Test --
 		while (m_Running)
 		{
+			// Pink Window Test
 			glClearColor(1, 0, 1, 1);
 			glClear(GL_COLOR_BUFFER_BIT);
+
+			// Layers Update
+			//std::vector<Layer*>::iterator it = m_LayerStack.begin();
+			//for (; it != m_LayerStack.end(); ++it)
+			//	(*it)->OnUpdate();
+
+			for (Layer* layer : m_LayerStack)
+				layer->OnUpdate();
+
 			m_Window->OnUpdate();
 		}
 	}
 
+	// -- Layers --
+	void Application::PushLayer(Layer* layer)
+	{
+		m_LayerStack.PushLayer(layer);
+	}
+
+	void Application::PushOverlay(Layer* layer)
+	{
+		m_LayerStack.PushOverlay(layer);
+	}
+
+	// -- Events --
 	void Application::OnEvent(Event& e)
 	{
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(Application::OnWindowClose)); // If there's a WindowCloseEvent (checked in Dispatch()), dispatcher will call OnWindowClose function (same than a Lambda)
 		KS_ENGINE_TRACE("{0}", e);
+
+		// Layers Events handling
+		//std::vector<Layer*>::iterator it = m_LayerStack.end();
+		for (auto it = m_LayerStack.end(); it != m_LayerStack.begin(); )
+		{
+			(*--it)->OnEvent(e);
+			if (e.IsHandled())
+				break;
+		}
 	}
 
 	bool Application::OnWindowClose(WindowCloseEvent& e)
@@ -52,5 +83,5 @@ namespace Kaimos {
 		m_Running = false;
 		return false;
 	}
-
+	
 }

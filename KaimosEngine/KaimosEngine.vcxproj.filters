@@ -4,6 +4,9 @@
     <Filter Include="Core">
       <UniqueIdentifier>{2EB4837C-1AEB-840D-C3D7-6A10AFED000F}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Core\Layers">
+      <UniqueIdentifier>{2D0BFE82-99C0-7678-22B5-704F8E696D7C}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Events">
       <UniqueIdentifier>{3A8963B1-262B-8E87-0FE6-A1DBFB2615D8}</UniqueIdentifier>
     </Filter>
@@ -23,6 +26,12 @@
     </ClInclude>
     <ClInclude Include="src\Core\EntryPoint.h">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Layers\Layer.h">
+      <Filter>Core\Layers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Layers\LayerStack.h">
+      <Filter>Core\Layers</Filter>
     </ClInclude>
     <ClInclude Include="src\Core\Log.h">
       <Filter>Core</Filter>
@@ -51,6 +60,9 @@
   <ItemGroup>
     <ClCompile Include="src\Core\Application.cpp">
       <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Layers\LayerStack.cpp">
+      <Filter>Core\Layers</Filter>
     </ClCompile>
     <ClCompile Include="src\Core\Log.cpp">
       <Filter>Core</Filter>

@@ -26,7 +26,7 @@ namespace Kaimos {
 
 	WindowsWindow::~WindowsWindow()
 	{
-		Shutdown();
+		Shutdown(true);
 	}
 
 	void WindowsWindow::Init(const WindowProps& props)
@@ -131,9 +131,12 @@ namespace Kaimos {
 		});
 	}
 
-	void WindowsWindow::Shutdown()
+	void WindowsWindow::Shutdown(bool terminateGLFW)
 	{
 		glfwDestroyWindow(m_Window);
+
+		if (terminateGLFW)
+			glfwTerminate();
 	}
 
 	void WindowsWindow::OnUpdate()
