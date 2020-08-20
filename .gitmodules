@@ -4,3 +4,6 @@
 [submodule "KaimosEngine/vendor/GLFW"]
 	path = KaimosEngine/vendor/GLFW
 	url = https://github.com/TheCherno/GLFW
+[submodule "KaimosEngine/vendor/imgui"]
+	path = KaimosEngine/vendor/imgui
+	url = https://github.com/TheCherno/imgui

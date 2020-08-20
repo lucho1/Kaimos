@@ -49,7 +49,6 @@ namespace Kaimos {
 		EVENT_CLASS_CATEGORY(EVENT_CATEGORY_MOUSE | EVENT_CATEGORY_INPUT)
 
 	private:
-
 		float m_XOffset = 0.0f, m_YOffset = 0.0f;
 	};
 

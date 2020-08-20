@@ -3,7 +3,6 @@
 
 #ifdef KS_PLATFORM_WINDOWS
 
-
 extern Kaimos::Application* Kaimos::CreateApplication();
 
 int main(int argc, char** argv)

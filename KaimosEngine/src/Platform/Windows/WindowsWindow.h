@@ -12,21 +12,24 @@ namespace Kaimos {
 
 		WindowsWindow(const WindowProps& props);
 		virtual ~WindowsWindow();
-
+		
+		// -- Layer Methods --
 		void OnUpdate() override;
 
+		// -- Class Methods --
 		inline uint GetWidth() const override { return m_Data.Width; }
 		inline uint GetHeight() const override { return m_Data.Height; }
+		virtual void ShutdownWindow(bool terminateGLFW);
 
-		// Attributes
+		// -- Attributes --
 		inline void SetEventCallback(const EventCallbackFn& callback) override { m_Data.EventCallback = callback; }
 		void SetVSync(bool enabled) override;
-		bool IsVSync() const override;
-		virtual void Shutdown(bool terminateGLFW);
+		bool IsVSync() const override { return m_Data.VSync; }
 
 	private:
 
 		virtual void Init(const WindowProps& props);
+		void SetGLFWEventCallbacks() const;
 
 	private:
 		
@@ -42,7 +45,6 @@ namespace Kaimos {
 		GLFWwindow* m_Window;
 		WindowData m_Data;
 	};
-
 }
 
 #endif

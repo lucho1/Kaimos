@@ -51,6 +51,8 @@ namespace Kaimos {
 
 	class KAIMOS_API AppUpdateEvent : public Event
 	{
+	public:
+
 		AppUpdateEvent() {}
 		EVENT_CLASS_TYPE(APP_UPDATE)
 		EVENT_CLASS_CATEGORY(EVENT_CATEGORY_APPLICATION)
@@ -59,6 +61,8 @@ namespace Kaimos {
 
 	class KAIMOS_API AppRenderEvent : public Event
 	{
+	public:
+
 		AppRenderEvent() {}
 		EVENT_CLASS_TYPE(APP_RENDER)
 		EVENT_CLASS_CATEGORY(EVENT_CATEGORY_APPLICATION)

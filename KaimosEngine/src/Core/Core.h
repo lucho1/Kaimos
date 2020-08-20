@@ -1,9 +1,7 @@
 #ifndef _CORE_H_
 #define _CORE_H_
 
-
 // --- Windows Definitions --
-
 // If windows is the current platform (currently not other platform is available)
 #ifdef KS_PLATFORM_WINDOWS
 	// Build this dll (the current one of Kaimos Engine project, not for other!)
@@ -20,7 +18,7 @@
 
 
 // -- Assertions --
-#ifdef KS_ENABLE_ASSERTS
+#if KS_ENABLE_ASSERTS
 	#define KS_EDITOR_ASSERT(x, ...) { if(!x) { KS_EDITOR_CRITICAL("ASSERION FAILED: {0}", __VA_ARGS__); __debugbreak(); }} // Client/Editor Assert
 	#define KS_ENGINE_ASSERT(x, ...) { if(!x) { KS_ENGINE_CRITICAL("ASSERION FAILED: {0}", __VA_ARGS__); __debugbreak(); }} // Core/Engine Assert
 #else
@@ -31,8 +29,10 @@
 
 // -- General Defines --
 #define BIT(x) (1 << x)
+#define KS_BIND_EVENT_FN(x) std::bind(&x, this, std::placeholders::_1)
 
+// -- Typedefs --
 typedef unsigned int uint;
-
+typedef unsigned short ushort;
 
 #endif //_CORE_H_

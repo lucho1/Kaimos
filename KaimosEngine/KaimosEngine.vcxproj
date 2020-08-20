@@ -79,12 +79,11 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>kspch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>KS_BUILD_DLL;KS_PLATFORM_WINDOWS;KS_DEBUG;KS_ENABLE_ASSERTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;vendor\spdlog\include;vendor\GLFW\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>KS_BUILD_DLL;KS_PLATFORM_WINDOWS;GLFW_INCLUDE_NONE;KS_DEBUG;KS_ENABLE_ASSERTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>src;vendor\spdlog\include;vendor\GLFW\include;vendor\Glad\include;vendor\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
-      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <AdditionalOptions>/MDd %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -94,7 +93,7 @@
       <ImportLibrary>..\bin\Debug-windows-x86_64\KaimosEngine\KaimosEngine.lib</ImportLibrary>
     </Link>
     <PostBuildEvent>
-      <Command>IF EXIST ..\bin\Debug-windows-x86_64\KaimosEngine\KaimosEngine.dll\ (xcopy /Q /E /Y /I ..\bin\Debug-windows-x86_64\KaimosEngine\KaimosEngine.dll ..\bin\Debug-windows-x86_64\KaimosEditor &gt; nul) ELSE (xcopy /Q /Y /I ..\bin\Debug-windows-x86_64\KaimosEngine\KaimosEngine.dll ..\bin\Debug-windows-x86_64\KaimosEditor &gt; nul)</Command>
+      <Command>IF EXIST ..\bin\Debug-windows-x86_64\KaimosEngine\KaimosEngine.dll\ (xcopy /Q /E /Y /I ..\bin\Debug-windows-x86_64\KaimosEngine\KaimosEngine.dll "..\bin\Debug-windows-x86_64\KaimosEditor\" &gt; nul) ELSE (xcopy /Q /Y /I ..\bin\Debug-windows-x86_64\KaimosEngine\KaimosEngine.dll "..\bin\Debug-windows-x86_64\KaimosEditor\" &gt; nul)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -102,15 +101,14 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>kspch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>KS_BUILD_DLL;KS_PLATFORM_WINDOWS;KS_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;vendor\spdlog\include;vendor\GLFW\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>KS_BUILD_DLL;KS_PLATFORM_WINDOWS;GLFW_INCLUDE_NONE;KS_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>src;vendor\spdlog\include;vendor\GLFW\include;vendor\Glad\include;vendor\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <MinimalRebuild>false</MinimalRebuild>
       <StringPooling>true</StringPooling>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <AdditionalOptions>/MD %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -121,7 +119,7 @@
       <ImportLibrary>..\bin\Release-windows-x86_64\KaimosEngine\KaimosEngine.lib</ImportLibrary>
     </Link>
     <PostBuildEvent>
-      <Command>IF EXIST ..\bin\Release-windows-x86_64\KaimosEngine\KaimosEngine.dll\ (xcopy /Q /E /Y /I ..\bin\Release-windows-x86_64\KaimosEngine\KaimosEngine.dll ..\bin\Release-windows-x86_64\KaimosEditor &gt; nul) ELSE (xcopy /Q /Y /I ..\bin\Release-windows-x86_64\KaimosEngine\KaimosEngine.dll ..\bin\Release-windows-x86_64\KaimosEditor &gt; nul)</Command>
+      <Command>IF EXIST ..\bin\Release-windows-x86_64\KaimosEngine\KaimosEngine.dll\ (xcopy /Q /E /Y /I ..\bin\Release-windows-x86_64\KaimosEngine\KaimosEngine.dll "..\bin\Release-windows-x86_64\KaimosEditor\" &gt; nul) ELSE (xcopy /Q /Y /I ..\bin\Release-windows-x86_64\KaimosEngine\KaimosEngine.dll "..\bin\Release-windows-x86_64\KaimosEditor\" &gt; nul)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Dist|x64'">
@@ -129,15 +127,14 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>kspch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>KS_BUILD_DLL;KS_PLATFORM_WINDOWS;KS_DIST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;vendor\spdlog\include;vendor\GLFW\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>KS_BUILD_DLL;KS_PLATFORM_WINDOWS;GLFW_INCLUDE_NONE;KS_DIST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>src;vendor\spdlog\include;vendor\GLFW\include;vendor\Glad\include;vendor\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <MinimalRebuild>false</MinimalRebuild>
       <StringPooling>true</StringPooling>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <AdditionalOptions>/MD %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -148,7 +145,7 @@
       <ImportLibrary>..\bin\Dist-windows-x86_64\KaimosEngine\KaimosEngine.lib</ImportLibrary>
     </Link>
     <PostBuildEvent>
-      <Command>IF EXIST ..\bin\Dist-windows-x86_64\KaimosEngine\KaimosEngine.dll\ (xcopy /Q /E /Y /I ..\bin\Dist-windows-x86_64\KaimosEngine\KaimosEngine.dll ..\bin\Dist-windows-x86_64\KaimosEditor &gt; nul) ELSE (xcopy /Q /Y /I ..\bin\Dist-windows-x86_64\KaimosEngine\KaimosEngine.dll ..\bin\Dist-windows-x86_64\KaimosEditor &gt; nul)</Command>
+      <Command>IF EXIST ..\bin\Dist-windows-x86_64\KaimosEngine\KaimosEngine.dll\ (xcopy /Q /E /Y /I ..\bin\Dist-windows-x86_64\KaimosEngine\KaimosEngine.dll "..\bin\Dist-windows-x86_64\KaimosEditor\" &gt; nul) ELSE (xcopy /Q /Y /I ..\bin\Dist-windows-x86_64\KaimosEngine\KaimosEngine.dll "..\bin\Dist-windows-x86_64\KaimosEditor\" &gt; nul)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -163,7 +160,9 @@
     <ClInclude Include="src\Events\Event.h" />
     <ClInclude Include="src\Events\KeyEvent.h" />
     <ClInclude Include="src\Events\MouseEvent.h" />
+    <ClInclude Include="src\ImGui\ImGuiLayer.h" />
     <ClInclude Include="src\Kaimos.h" />
+    <ClInclude Include="src\Platform\OpenGL\ImGuiOGLRenderer.h" />
     <ClInclude Include="src\Platform\Windows\WindowsWindow.h" />
     <ClInclude Include="src\kspch.h" />
   </ItemGroup>
@@ -171,6 +170,8 @@
     <ClCompile Include="src\Core\Application.cpp" />
     <ClCompile Include="src\Core\Layers\LayerStack.cpp" />
     <ClCompile Include="src\Core\Log.cpp" />
+    <ClCompile Include="src\ImGui\ImGuiLayer.cpp" />
+    <ClCompile Include="src\Platform\OpenGL\ImGuiOGLRenderer.cpp" />
     <ClCompile Include="src\Platform\Windows\WindowsWindow.cpp" />
     <ClCompile Include="src\kspch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
@@ -179,6 +180,12 @@
   <ItemGroup>
     <ProjectReference Include="vendor\GLFW\GLFW.vcxproj">
       <Project>{154B857C-0182-860D-AA6E-6C109684020F}</Project>
+    </ProjectReference>
+    <ProjectReference Include="vendor\Glad\Glad.vcxproj">
+      <Project>{BDD6857C-A90D-870D-52FA-6C103E10030F}</Project>
+    </ProjectReference>
+    <ProjectReference Include="vendor\imgui\ImGui.vcxproj">
+      <Project>{C0FF640D-2C14-8DBE-F595-301E616989EF}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -1,5 +1,6 @@
 workspace "Kaimos"
     architecture "x64"
+    startproject "KaimosEditor"
 
     configurations
     {
@@ -13,6 +14,8 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 -- Include directories relative to Root Folder (or Solution Directory)
 IncludeDir = {}
 IncludeDir["GLFW"] = "KaimosEngine/vendor/GLFW/include"
+IncludeDir["Glad"] = "KaimosEngine/vendor/Glad/include"
+IncludeDir["ImGui"] = "KaimosEngine/vendor/imgui"
 
 -- How To Add a Library: --
 -- Just include it here, on top, as a new IncludeDir, 
@@ -21,13 +24,18 @@ IncludeDir["GLFW"] = "KaimosEngine/vendor/GLFW/include"
 -- needed, such as dlls)
 ---------------------------
 
-include "KaimosEngine/vendor/GLFW" -- Includes GLFW Premake File
+group "Dependencies"
+    include "KaimosEngine/vendor/GLFW" -- Includes GLFW Premake File
+    include "KaimosEngine/vendor/Glad" -- Includes Glad Premake File
+    include "KaimosEngine/vendor/imgui" -- Includes ImGui Premake File
+group ""
 
 -- Kaimos Engine Settings --
 project "KaimosEngine"
     location "KaimosEngine"
     kind "SharedLib"
     language "C++"
+    staticruntime "Off"
     
     -- Directories for target (needed build files) and Obj Files (unwanted build files) --
     targetdir ("bin/" .. outputdir .. "/%{prj.name}")
@@ -49,45 +57,49 @@ project "KaimosEngine"
     {
         "%{prj.name}/src",
         "%{prj.name}/vendor/spdlog/include",
-        "%{IncludeDir.GLFW}"
+        "%{IncludeDir.GLFW}",
+        "%{IncludeDir.Glad}",
+        "%{IncludeDir.ImGui}"
     }
 
     -- Kaimos Engine Project Links --
     links
     {
         "GLFW",
+        "Glad",
+        "ImGui",
         "opengl32.lib"
     }
 
     -- Systems --
     filter "system:windows"
         cppdialect "C++17"
-        staticruntime "On"
         systemversion "latest"
 
         defines
         {
             "KS_BUILD_DLL",
-            "KS_PLATFORM_WINDOWS"
+            "KS_PLATFORM_WINDOWS",
+            "GLFW_INCLUDE_NONE"
         }
 
         postbuildcommands
         {
-            ("{COPY} %{cfg.buildtarget.relpath} ../bin/" .. outputdir .. "/KaimosEditor")
+            ("{COPY} %{cfg.buildtarget.relpath} \"../bin/" .. outputdir .. "/KaimosEditor/\"")
         }
 
     -- Configurations --
     filter "configurations:Debug"
         defines { "KS_DEBUG", "KS_ENABLE_ASSERTS" }
-        buildoptions "/MDd"
+        runtime "Debug"
         symbols "On"
     filter "configurations:Release"
         defines "KS_RELEASE"
-        buildoptions "/MD"
+        runtime "Release"
         optimize "On"
     filter "configurations:Dist"
         defines "KS_DIST"
-        buildoptions "/MD"
+        runtime "Release"
         optimize "On"
 
 
@@ -96,6 +108,7 @@ project "KaimosEditor"
     location "KaimosEditor"
     kind "ConsoleApp"
     language "C++"
+    staticruntime "Off"
 
     targetdir ("bin/" .. outputdir .. "/%{prj.name}")
     objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
@@ -120,7 +133,6 @@ project "KaimosEditor"
     -- Systems --
     filter "system:windows"
         cppdialect "C++17"
-        staticruntime "On"
         systemversion "latest"
 
         defines
@@ -131,13 +143,13 @@ project "KaimosEditor"
     -- Configurations --
     filter "configurations:Debug"
         defines "KS_DEBUG"
-        buildoptions "/MDd"
+        runtime "Debug"
         symbols "On"
     filter "configurations:Release"
         defines "KS_RELEASE"
-        buildoptions "/MD"
+        runtime "Release"
         optimize "On"
     filter "configurations:Dist"
         defines "KS_DIST"
-        buildoptions "/MD"
+        runtime "Release"
         optimize "On"
