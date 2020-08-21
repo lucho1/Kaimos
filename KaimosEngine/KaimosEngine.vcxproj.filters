@@ -71,7 +71,8 @@
     <ClInclude Include="WindowsInput.h">
       <Filter>Platform\Windows</Filter>
     </ClInclude>
-    <ClInclude Include="src\Core\Input.h">
+    <ClInclude Include="src\Core\Input\KaimosInputCodes.h" />
+    <ClInclude Include="src\Core\Input\Input.h">
       <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>

@@ -3,7 +3,7 @@
 
 // Temporary Includes (DELETE THEM!)
 #include <glad/glad.h>
-#include "Input.h"
+#include "Input/Input.h"
 
 namespace Kaimos {
 
@@ -29,12 +29,12 @@ namespace Kaimos {
 	// -- Class Methods --
 	void Application::Run()
 	{
-		// -- Event Test --
-		WindowResizeEvent e(1080, 720);
-		if (e.IsInCategory(EVENT_CATEGORY_APPLICATION))
-			KS_EDITOR_TRACE(e);
-		else if (e.IsInCategory(EVENT_CATEGORY_INPUT))
-			KS_EDITOR_TRACE(e);
+		// -- Events Test --
+		//WindowResizeEvent e(1080, 720);
+		//if (e.IsInCategory(EVENT_CATEGORY_APPLICATION))
+		//	KS_EDITOR_TRACE(e);
+		//else if (e.IsInCategory(EVENT_CATEGORY_INPUT))
+		//	KS_EDITOR_TRACE(e);
 
 		while (m_Running)
 		{
@@ -47,8 +47,9 @@ namespace Kaimos {
 			for (; it != m_LayerStack.end(); ++it)
 				(*it)->OnUpdate();
 
-			auto [x, y] = Input::GetMousePos();
-			KS_ENGINE_TRACE(" {0}, {1}", x, y);
+			// -- Input Test --
+			//auto [x, y] = Input::GetMousePos();
+			//KS_ENGINE_TRACE(" {0}, {1}", x, y);
 
 			//for (Layer* layer : m_LayerStack)
 			//	layer->OnUpdate();
@@ -75,7 +76,7 @@ namespace Kaimos {
 	{
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<WindowCloseEvent>(KS_BIND_EVENT_FN(Application::OnWindowClose)); // If there's a WindowCloseEvent (checked in Dispatch()), dispatcher will call OnWindowClose function (same than a Lambda)
-		KS_ENGINE_TRACE("{0}", e);
+		//KS_ENGINE_TRACE("{0}", e);
 
 		// Layers Events handling
 		//std::vector<Layer*>::iterator it = m_LayerStack.end();

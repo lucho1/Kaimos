@@ -1,7 +1,7 @@
 #ifndef _WINDOWSINPUT_H
 #define _WINDOWSINPUT_H
 
-#include "Core/Input.h"
+#include "Core/Input/Input.h"
 
 namespace Kaimos {
 

@@ -6,6 +6,9 @@
 // --- Engine Basic Stuff ---
 #include "Core/Application.h"
 #include "Core/Layers/Layer.h"
+#include "Core/Input/Input.h"
+#include "Core/Input/KaimosInputCodes.h"
+
 #include "ImGui/ImGuiLayer.h"
 
 // --- Entry Point ---
