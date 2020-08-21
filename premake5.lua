@@ -16,6 +16,7 @@ IncludeDir = {}
 IncludeDir["GLFW"] = "KaimosEngine/vendor/GLFW/include"
 IncludeDir["Glad"] = "KaimosEngine/vendor/Glad/include"
 IncludeDir["ImGui"] = "KaimosEngine/vendor/imgui"
+IncludeDir["glm"] = "KaimosEngine/vendor/glm"
 
 -- How To Add a Library: --
 -- Just include it here, on top, as a new IncludeDir, 
@@ -49,7 +50,9 @@ project "KaimosEngine"
     files
     {
         "%{prj.name}/src/**.h",
-        "%{prj.name}/src/**.cpp"
+        "%{prj.name}/src/**.cpp",
+        "%{prj.name}/vendor/glm/glm/**.hpp",
+        "%{prj.name}/vendor/glm/glm/**.inl"
     }
 
     -- Include Directories to project (to avoid typing a lot in each #include) --
@@ -59,7 +62,8 @@ project "KaimosEngine"
         "%{prj.name}/vendor/spdlog/include",
         "%{IncludeDir.GLFW}",
         "%{IncludeDir.Glad}",
-        "%{IncludeDir.ImGui}"
+        "%{IncludeDir.ImGui}",
+        "%{IncludeDir.glm}"
     }
 
     -- Kaimos Engine Project Links --
@@ -122,7 +126,8 @@ project "KaimosEditor"
     includedirs
     {
         "KaimosEngine/vendor/spdlog/include",
-        "KaimosEngine/src"
+        "KaimosEngine/src",
+        "%{IncludeDir.glm}"
     }
 
     links
