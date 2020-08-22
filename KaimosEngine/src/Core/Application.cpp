@@ -15,6 +15,8 @@ namespace Kaimos {
 		s_Instance = this;
 
 		m_Window = std::unique_ptr<Window>(Window::Create());
+		m_ImGuiLayer = new ImGuiLayer;
+		PushOverlay(m_ImGuiLayer);
 
 		// This will bind the Application::OnEvent function to SetEventCallback(), so the callback when
 		// an event happens will be Application::OnEvent. The placeholder will be replaced by whatever argument
@@ -24,6 +26,7 @@ namespace Kaimos {
 
 	Application::~Application()
 	{
+		delete m_ImGuiLayer;
 	}
 
 	// -- Class Methods --
@@ -46,6 +49,14 @@ namespace Kaimos {
 			std::vector<Layer*>::iterator it = m_LayerStack.begin();
 			for (; it != m_LayerStack.end(); ++it)
 				(*it)->OnUpdate();
+
+			m_ImGuiLayer->Begin();
+
+			it = m_LayerStack.begin();
+			for (; it != m_LayerStack.end(); ++it)
+				(*it)->OnUIRender();
+
+			m_ImGuiLayer->End();
 
 			// -- Input Test --
 			//auto [x, y] = Input::GetMousePos();

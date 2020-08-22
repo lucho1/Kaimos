@@ -17,27 +17,18 @@ namespace Kaimos {
 		~ImGuiLayer();
 
 		// -- Layer Methods --
-		void OnUpdate();
-		void OnEvent(Event& event);
-		void OnAttach();
-		void OnDettach();
+		virtual void OnAttach() override;
+		virtual void OnDetach() override;
+		virtual void OnUIRender() override;
+
+		// -- Class Methods --
+		void Begin();
+		void End();
 
 	private:
 
 		// -- Class Methods --
 		void SetEngineUIStyle() const;
-
-		// -- Events --
-		bool OnMouseButtonPressedEvent(MouseButtonPressedEvent& e);
-		bool OnMouseButtonReleasedEvent(MouseButtonReleasedEvent& e);
-		bool OnMouseMovedEvent(MouseMovedEvent& e);
-		bool OnMouseScrolledEvent(MouseScrolledEvent& e);
-		
-		bool OnKeyTypedEvent(KeyTypedEvent& e);
-		bool OnKeyReleasedEvent(KeyReleasedEvent& e);
-		bool OnKeyPressedEvent(KeyPressedEvent& e);
-		
-		bool OnWindowResizedEvent(WindowResizeEvent& e);
 
 	private:
 

@@ -127,6 +127,7 @@ project "KaimosEditor"
     {
         "KaimosEngine/vendor/spdlog/include",
         "KaimosEngine/src",
+        "%{IncludeDir.ImGui}",
         "%{IncludeDir.glm}"
     }
 

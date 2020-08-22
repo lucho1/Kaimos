@@ -1,5 +1,8 @@
 #include <Kaimos.h>
 
+#include "imgui.h"
+
+
 
 #include <glm/vec3.hpp> // glm::vec3
 #include <glm/vec4.hpp> // glm::vec4
@@ -28,7 +31,7 @@ public:
 		int a = 0;
 	}
 
-	void OnEvent(Kaimos::Event& ev) override
+	virtual void OnEvent(Kaimos::Event& ev) override
 	{
 		//KS_EDITOR_TRACE("LayerTest Event: {0}", ev);
 		if (ev.GetEventType() == Kaimos::EVENT_TYPE::KEY_PRESSED)
@@ -38,12 +41,19 @@ public:
 		}
 	}
 
-	void OnUpdate() override
+	virtual void OnUpdate() override
 	{
 		//KS_EDITOR_INFO("LayerTest Update");
 
 		if (Kaimos::Input::IsKeyPressed(KS_KEY_SPACE))
 			KS_EDITOR_TRACE("SPACE KEY PRESSED");
+	}
+
+	virtual void OnUIRender() override
+	{
+		ImGui::Begin("Test");
+		ImGui::Text("Hello World");
+		ImGui::End();
 	}
 };
 
@@ -55,7 +65,6 @@ public:
 	EditorApp()
 	{
 		PushLayer(new LayerTest());
-		PushOverlay(new Kaimos::ImGuiLayer());
 	}
 
 	~EditorApp() {}

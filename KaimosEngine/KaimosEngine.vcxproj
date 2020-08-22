@@ -164,7 +164,6 @@
     <ClInclude Include="src\Events\MouseEvent.h" />
     <ClInclude Include="src\ImGui\ImGuiLayer.h" />
     <ClInclude Include="src\Kaimos.h" />
-    <ClInclude Include="src\Platform\OpenGL\ImGuiOGLRenderer.h" />
     <ClInclude Include="src\Platform\Windows\WindowsInput.h" />
     <ClInclude Include="src\Platform\Windows\WindowsWindow.h" />
     <ClInclude Include="src\kspch.h" />
@@ -581,8 +580,8 @@
     <ClCompile Include="src\Core\Application.cpp" />
     <ClCompile Include="src\Core\Layers\LayerStack.cpp" />
     <ClCompile Include="src\Core\Log.cpp" />
+    <ClCompile Include="src\ImGui\ImGuiBuild.cpp" />
     <ClCompile Include="src\ImGui\ImGuiLayer.cpp" />
-    <ClCompile Include="src\Platform\OpenGL\ImGuiOGLRenderer.cpp" />
     <ClCompile Include="src\Platform\Windows\WindowsInput.cpp" />
     <ClCompile Include="src\Platform\Windows\WindowsWindow.cpp" />
     <ClCompile Include="src\kspch.cpp">

@@ -17,6 +17,7 @@ namespace Kaimos {
 		virtual void OnAttach() {} // Added to layer stack
 		virtual void OnDetach() {} // Removed from layer stack
 		virtual void OnUpdate() {}
+		virtual void OnUIRender() {}
 		virtual void OnEvent(Event& event) {}
 
 		inline const std::string& GetName() const { return m_Name; }
