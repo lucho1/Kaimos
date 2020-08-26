@@ -15,7 +15,7 @@ namespace Kaimos {
 		s_Instance = this;
 
 		m_Window = std::unique_ptr<Window>(Window::Create());
-		m_ImGuiLayer = new ImGuiLayer;
+		m_ImGuiLayer = new ImGuiLayer; // It will be deleted with all the other layers in the ~LayerStack()
 		PushOverlay(m_ImGuiLayer);
 
 		// This will bind the Application::OnEvent function to SetEventCallback(), so the callback when
@@ -26,7 +26,6 @@ namespace Kaimos {
 
 	Application::~Application()
 	{
-		delete m_ImGuiLayer;
 	}
 
 	// -- Class Methods --
