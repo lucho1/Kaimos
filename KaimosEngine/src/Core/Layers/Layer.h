@@ -7,7 +7,7 @@
 
 namespace Kaimos {
 
-	class KAIMOS_API Layer
+	class Layer
 	{
 	public:
 

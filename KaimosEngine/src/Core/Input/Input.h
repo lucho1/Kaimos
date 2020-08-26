@@ -5,7 +5,7 @@
 
 namespace Kaimos {
 
-	class KAIMOS_API Input
+	class Input
 	{
 	public:
 

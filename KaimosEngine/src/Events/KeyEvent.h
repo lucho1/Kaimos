@@ -5,7 +5,7 @@
 
 namespace Kaimos {
 
-	class KAIMOS_API KeyEvent : public Event
+	class KeyEvent : public Event
 	{
 	public:
 
@@ -19,7 +19,7 @@ namespace Kaimos {
 	};
 
 
-	class KAIMOS_API KeyPressedEvent : public KeyEvent
+	class KeyPressedEvent : public KeyEvent
 	{
 	public:
 
@@ -40,7 +40,7 @@ namespace Kaimos {
 	};
 
 
-	class KAIMOS_API KeyReleasedEvent : public KeyEvent
+	class KeyReleasedEvent : public KeyEvent
 	{
 	public:
 
@@ -57,7 +57,7 @@ namespace Kaimos {
 	};
 
 
-	class KAIMOS_API KeyTypedEvent : public KeyEvent
+	class KeyTypedEvent : public KeyEvent
 	{
 	public:
 

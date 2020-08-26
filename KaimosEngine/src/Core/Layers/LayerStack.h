@@ -5,7 +5,7 @@
 
 namespace Kaimos {
 	
-	class KAIMOS_API LayerStack
+	class LayerStack
 	{
 	public:
 

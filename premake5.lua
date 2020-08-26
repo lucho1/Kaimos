@@ -34,9 +34,10 @@ group ""
 -- Kaimos Engine Settings --
 project "KaimosEngine"
     location "KaimosEngine"
-    kind "SharedLib"
+    kind "StaticLib"
     language "C++"
-    staticruntime "Off"
+    cppdialect "C++17"
+    staticruntime "On"
     
     -- Directories for target (needed build files) and Obj Files (unwanted build files) --
     targetdir ("bin/" .. outputdir .. "/%{prj.name}")
@@ -53,6 +54,12 @@ project "KaimosEngine"
         "%{prj.name}/src/**.cpp",
         "%{prj.name}/vendor/glm/glm/**.hpp",
         "%{prj.name}/vendor/glm/glm/**.inl"
+    }
+
+    -- Definitions for the project (global ones)
+    defines
+    {
+        "_CRT_SECURE_NO_WARNINGS"
     }
 
     -- Include Directories to project (to avoid typing a lot in each #include) --
@@ -77,7 +84,6 @@ project "KaimosEngine"
 
     -- Systems --
     filter "system:windows"
-        cppdialect "C++17"
         systemversion "latest"
 
         defines
@@ -87,10 +93,10 @@ project "KaimosEngine"
             "GLFW_INCLUDE_NONE"
         }
 
-        postbuildcommands
-        {
-            ("{COPY} %{cfg.buildtarget.relpath} \"../bin/" .. outputdir .. "/KaimosEditor/\"")
-        }
+        --postbuildcommands
+        --{
+        --    ("{COPY} %{cfg.buildtarget.relpath} \"../bin/" .. outputdir .. "/KaimosEditor/\"")
+        --}
 
     -- Configurations --
     filter "configurations:Debug"
@@ -112,7 +118,8 @@ project "KaimosEditor"
     location "KaimosEditor"
     kind "ConsoleApp"
     language "C++"
-    staticruntime "Off"
+    cppdialect "C++17"
+    staticruntime "On"
 
     targetdir ("bin/" .. outputdir .. "/%{prj.name}")
     objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
@@ -138,7 +145,6 @@ project "KaimosEditor"
 
     -- Systems --
     filter "system:windows"
-        cppdialect "C++17"
         systemversion "latest"
 
         defines

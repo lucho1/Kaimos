@@ -18,7 +18,7 @@ namespace Kaimos {
 
 	
 	// -- Platform-independent Window class --
-	class KAIMOS_API Window
+	class Window
 	{
 	public:
 

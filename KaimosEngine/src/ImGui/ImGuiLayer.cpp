@@ -5,8 +5,9 @@
 //#include "Platform/OpenGL/ImGuiOGLRenderer.h"
 
 #define IMGUI_IMPL_API
-#include "examples/imgui_impl_glfw.h"
-#include "examples/imgui_impl_opengl3.h"
+#include <imgui.h>
+#include <examples/imgui_impl_glfw.h>
+#include <examples/imgui_impl_opengl3.h>
 
 // TEMPORARY
 #include <GLFW/glfw3.h>
@@ -77,7 +78,7 @@ namespace Kaimos {
 	{
 		ImGuiIO& io = ImGui::GetIO();
 		Application& app = Application::Get();
-		io.DisplaySize = ImVec2(app.GetWindow().GetWidth(), app.GetWindow().GetHeight());
+		io.DisplaySize = ImVec2((float)app.GetWindow().GetWidth(), (float)app.GetWindow().GetHeight());
 		
 		//float time = (float)glfwGetTime();
 		//m_Time = time;
@@ -110,10 +111,13 @@ namespace Kaimos {
 		ImVec4* colors = style->Colors;
 
 		// ImGui Style gotten from a free-to-use style from https://www.unknowncheats.me/forum/c-and-c-/189635-imgui-style-settings.html
-		io.Fonts->AddFontFromFileTTF("D:/GitHub/Kaimos/KaimosEngine/res/fonts/Ruda-Bold.ttf", 12);
-		io.Fonts->AddFontFromFileTTF("D:/GitHub/Kaimos/KaimosEngine/res/fonts/Ruda-Bold.ttf", 10);
-		io.Fonts->AddFontFromFileTTF("D:/GitHub/Kaimos/KaimosEngine/res/fonts/Ruda-Bold.ttf", 14);
-		io.Fonts->AddFontFromFileTTF("D:/GitHub/Kaimos/KaimosEngine/res/fonts/Ruda-Bold.ttf", 18);
+		// Careful in the next lines of codes because the path is not relative, is absolute, so it will work only in one PC, otherwise we will have to change it
+		// For desktop-PC (Lucho): D:/GitHub/Kaimos/KaimosEngine/res/fonts/
+		// For portable-PC (Lucho): C:/Users/Lucho/Documents/GitHub/Kaimos/KaimosEngine/res/fonts/
+		io.Fonts->AddFontFromFileTTF("C:/Users/Lucho/Documents/GitHub/Kaimos/KaimosEngine/res/fonts/Ruda-Bold.ttf", 12);
+		io.Fonts->AddFontFromFileTTF("C:/Users/Lucho/Documents/GitHub/Kaimos/KaimosEngine/res/fonts/Ruda-Bold.ttf", 10);
+		io.Fonts->AddFontFromFileTTF("C:/Users/Lucho/Documents/GitHub/Kaimos/KaimosEngine/res/fonts/Ruda-Bold.ttf", 14);
+		io.Fonts->AddFontFromFileTTF("C:/Users/Lucho/Documents/GitHub/Kaimos/KaimosEngine/res/fonts/Ruda-Bold.ttf", 18);
 
 		style->WindowPadding = ImVec2(15, 15);
 		style->WindowRounding = 5.0f;
@@ -180,11 +184,11 @@ namespace Kaimos {
 		colors[ImGuiCol_Separator] = colors[ImGuiCol_Border];
 		colors[ImGuiCol_SeparatorHovered] = ImVec4(0.10f, 0.40f, 0.75f, 0.78f);
 		colors[ImGuiCol_SeparatorActive] = ImVec4(0.10f, 0.40f, 0.75f, 1.00f);
-		colors[ImGuiCol_Tab] = ImVec4(0.392f, 0.369f, 0.376, 0.5f);
-		colors[ImGuiCol_TabHovered] = ImVec4(0.392f, 0.369f, 0.376, 0.5f);
-		colors[ImGuiCol_TabActive] = ImVec4(0.392f, 0.369f, 0.376, 1.0f);
-		colors[ImGuiCol_TabUnfocused] = ImVec4(0.392f, 0.369f, 0.376, 0.5f);
-		colors[ImGuiCol_TabUnfocusedActive] = ImVec4(0.392f, 0.369f, 0.376, 0.50f);
+		colors[ImGuiCol_Tab] = ImVec4(0.392f, 0.369f, 0.376f, 0.5f);
+		colors[ImGuiCol_TabHovered] = ImVec4(0.392f, 0.369f, 0.376f, 0.5f);
+		colors[ImGuiCol_TabActive] = ImVec4(0.392f, 0.369f, 0.376f, 1.0f);
+		colors[ImGuiCol_TabUnfocused] = ImVec4(0.392f, 0.369f, 0.376f, 0.5f);
+		colors[ImGuiCol_TabUnfocusedActive] = ImVec4(0.392f, 0.369f, 0.376f, 0.50f);
 		colors[ImGuiCol_DragDropTarget] = ImVec4(1.00f, 1.00f, 0.00f, 0.90f);
 		colors[ImGuiCol_NavHighlight] = ImVec4(0.26f, 0.59f, 0.98f, 1.00f);
 		colors[ImGuiCol_NavWindowingHighlight] = ImVec4(1.00f, 1.00f, 1.00f, 0.70f);

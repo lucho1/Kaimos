@@ -7,7 +7,7 @@
 
 namespace Kaimos {
 
-	class KAIMOS_API Log
+	class Log
 	{
 	public:
 		static void Init();

@@ -9,7 +9,7 @@
 
 namespace Kaimos {
 
-	class KAIMOS_API Application
+	class Application
 	{
 	public:
 
