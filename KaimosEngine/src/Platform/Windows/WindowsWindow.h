@@ -39,9 +39,9 @@ namespace Kaimos {
 		struct WindowData
 		{
 			EventCallbackFn EventCallback;
-			uint Width, Height;
-			std::string Title;
-			bool VSync;
+			uint Width = 0, Height = 0;
+			std::string Title = "";
+			bool VSync = true;
 		};
 
 		GLFWwindow* m_Window;

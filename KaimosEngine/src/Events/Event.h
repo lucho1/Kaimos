@@ -43,7 +43,7 @@ namespace Kaimos {
 		virtual int GetCategoryFlags() const = 0;
 		virtual std::string ToString() const { return GetName(); }
 
-		inline bool IsInCategory(EVENT_CATEGORY category) { return GetCategoryFlags() & category; }
+		bool IsInCategory(EVENT_CATEGORY category) { return GetCategoryFlags() & category; }
 
 		inline bool IsHandled() const { return m_Handled; }
 

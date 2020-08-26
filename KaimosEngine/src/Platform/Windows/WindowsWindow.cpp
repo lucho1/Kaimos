@@ -173,14 +173,14 @@ namespace Kaimos {
 		glfwSetScrollCallback(m_Window, [](GLFWwindow* window, double xOff, double yOff)
 			{
 				WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
-				MouseScrolledEvent event(xOff, yOff);
+				MouseScrolledEvent event((float)xOff, (float)yOff);
 				data.EventCallback(event);
 			});
 
 		glfwSetCursorPosCallback(m_Window, [](GLFWwindow* window, double xPos, double yPos)
 			{
 				WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
-				MouseMovedEvent event(xPos, yPos);
+				MouseMovedEvent event((float)xPos, (float)yPos);
 				data.EventCallback(event);
 			});
 	}
