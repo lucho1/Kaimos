@@ -2,6 +2,7 @@
 #define _WINDOWSWINDOW_H_
 
 #include "Core/Window.h"
+#include "Renderer/GraphicsContext.h"
 #include <GLFW/glfw3.h>
 
 namespace Kaimos {
@@ -46,6 +47,7 @@ namespace Kaimos {
 
 		GLFWwindow* m_Window;
 		WindowData m_Data;
+		GraphicsContext* m_Context;
 	};
 }
 

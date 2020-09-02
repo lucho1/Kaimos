@@ -7,6 +7,9 @@
 #include "Events/ApplicationEvent.h"
 #include "Layers/LayerStack.h"
 
+// TEMP
+#include "Renderer/Buffer.h"
+
 namespace Kaimos {
 
 	class Application
@@ -40,6 +43,10 @@ namespace Kaimos {
 		std::unique_ptr<Window> m_Window; // Having a unique_ptr means we don't have to worry about deleting the Window ourselves on app termination :D
 		ImGuiLayer* m_ImGuiLayer;
 		LayerStack m_LayerStack;
+
+		std::unique_ptr<VertexBuffer> m_VBuffer;
+		std::unique_ptr<IndexBuffer> m_IBuffer;
+		uint vertexArr = 0;
 
 		static Application* s_Instance; // Singleton of Application (we only want 1)
 	};

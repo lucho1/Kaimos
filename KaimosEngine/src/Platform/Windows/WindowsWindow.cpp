@@ -5,7 +5,7 @@
 #include "Events/MouseEvent.h"
 #include "Events/KeyEvent.h"
 
-#include <glad/glad.h>
+#include "Platform/OpenGL/OpenGLContext.h"
 
 
 namespace Kaimos {
@@ -51,11 +51,10 @@ namespace Kaimos {
 
 		// -- Window Creation --
 		m_Window = glfwCreateWindow((int)props.Width, (int)props.Height, m_Data.Title.c_str(), nullptr, nullptr);
-		glfwMakeContextCurrent(m_Window);
 		
-		// -- Glad Initialization --
-		int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
-		KS_ENGINE_ASSERT(status, "Couldn't Initialize Glad!");
+		// -- Graphics Context Creation --
+		m_Context = new OpenGLContext(m_Window);
+		m_Context->Init();
 		
 		// -- GLFW Window User ptr & VSYNC --
 		glfwSetWindowUserPointer(m_Window, &m_Data);
@@ -76,7 +75,7 @@ namespace Kaimos {
 	void WindowsWindow::OnUpdate()
 	{
 		glfwPollEvents();
-		glfwSwapBuffers(m_Window);
+		m_Context->SwapBuffers();
 	}
 
 	void WindowsWindow::SetVSync(bool enabled)

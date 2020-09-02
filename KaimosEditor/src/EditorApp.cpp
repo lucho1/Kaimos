@@ -19,6 +19,14 @@ glm::mat4 camera(float Translate, glm::vec2 const& Rotate)
 }
 
 
+extern "C" {
+	// http://developer.download.nvidia.com/devzone/devcenter/gamegraphics/files/OptimusRenderingPolicies.pdf
+	__declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
+
+	// http://developer.amd.com/community/blog/2015/10/02/amd-enduro-system-for-developers/
+	// or (if the 1st doesn't works): https://gpuopen.com/amdpowerxpressrequesthighperformance/ or https://community.amd.com/thread/169965
+	__declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
+}
 
 
 class LayerTest : public Kaimos::Layer

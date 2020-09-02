@@ -37,7 +37,7 @@
 #define KS_BIND_EVENT_FN(x) std::bind(&x, this, std::placeholders::_1)
 
 // -- Typedefs --
-typedef unsigned int uint;
+typedef unsigned int uint; // This is the same than uint32_t
 typedef unsigned short ushort;
 
 #endif //_CORE_H_

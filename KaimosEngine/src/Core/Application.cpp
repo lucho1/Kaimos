@@ -22,6 +22,24 @@ namespace Kaimos {
 		// an event happens will be Application::OnEvent. The placeholder will be replaced by whatever argument
 		// is passed, so OnEvent() will be called with some argument passed (now represented by this "placeholder")
 		m_Window->SetEventCallback(KS_BIND_EVENT_FN(Application::OnEvent)); // SAME: m_Window->SetEventCallback(std::bind(&Application::OnEvent, this, std::placeholders::_1));
+		
+		// -- Initial vertices test --
+		glGenVertexArrays(1, &vertexArr);
+		glBindVertexArray(vertexArr);
+
+		float vertices[3 * 3] = {
+				-0.5f,	-0.5f,	0.0f,
+				 0.5f,	-0.5f,	0.0f,
+				 0.0f,	 0.5f,	0.0f
+		};
+
+		uint indices[3] = { 0, 1, 2 };
+
+		m_VBuffer.reset(VertexBuffer::Create(vertices, sizeof(vertices)));
+		m_IBuffer.reset(IndexBuffer::Create(indices, 3)); // That 3 could also be sizeof(indices)/sizeof(uint), but extra calculation!
+		
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
 	}
 
 	Application::~Application()
@@ -41,8 +59,12 @@ namespace Kaimos {
 		while (m_Running)
 		{
 			// Pink Window Test
-			glClearColor(1, 0, 1, 1);
+			glClearColor(0.15f, 0.15f, 0.15f, 1.0f);
 			glClear(GL_COLOR_BUFFER_BIT);
+
+			// -- Initial vertices (draw) test --
+
+			glDrawElements(GL_TRIANGLES, m_IBuffer->GetCount(), GL_UNSIGNED_INT, nullptr);
 
 			// Layers Update
 			std::vector<Layer*>::iterator it = m_LayerStack.begin();
