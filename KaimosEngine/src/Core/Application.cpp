@@ -15,7 +15,7 @@ namespace Kaimos {
 		s_Instance = this;
 
 		m_Window = std::unique_ptr<Window>(Window::Create());
-		m_ImGuiLayer = new ImGuiLayer; // It will be deleted with all the other layers in the ~LayerStack()
+		m_ImGuiLayer = new ImGuiLayer(); // It will be deleted with all the other layers in the ~LayerStack()
 		PushOverlay(m_ImGuiLayer);
 
 		// This will bind the Application::OnEvent function to SetEventCallback(), so the callback when
@@ -24,22 +24,30 @@ namespace Kaimos {
 		m_Window->SetEventCallback(KS_BIND_EVENT_FN(Application::OnEvent)); // SAME: m_Window->SetEventCallback(std::bind(&Application::OnEvent, this, std::placeholders::_1));
 		
 		// -- Initial vertices test --
-		glGenVertexArrays(1, &vertexArr);
-		glBindVertexArray(vertexArr);
-
-		float vertices[3 * 3] = {
-				-0.5f,	-0.5f,	0.0f,
-				 0.5f,	-0.5f,	0.0f,
-				 0.0f,	 0.5f,	0.0f
-		};
-
+		std::shared_ptr<VertexBuffer> m_VBuffer;
+		std::shared_ptr<IndexBuffer> m_IBuffer;
 		uint indices[3] = { 0, 1, 2 };
-
+		float vertices[3 * 7] = {
+				-0.5f,	-0.5f,	0.0f,	1.0f,	0.0f,	0.0f,	1.0f,
+				 0.5f,	-0.5f,	0.0f,	1.0f,	0.0f,	0.0f,	1.0f,
+				 0.0f,	 0.5f,	0.0f,	1.0f,	0.0f,	0.0f,	1.0f
+		};
+		
+		m_VArray.reset(VertexArray::Create());
 		m_VBuffer.reset(VertexBuffer::Create(vertices, sizeof(vertices)));
 		m_IBuffer.reset(IndexBuffer::Create(indices, 3)); // That 3 could also be sizeof(indices)/sizeof(uint), but extra calculation!
 		
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
+		BufferLayout layout = {
+			{ ShaderDataType::Float3, "a_Position" },
+			//{ ShaderDataType::Float2, "a_TexCoords" },
+			//{ ShaderDataType::Float3, "a_Normal" },
+			{ ShaderDataType::Float4, "a_Color" }
+		};
+		
+		m_VBuffer->SetLayout(layout);
+		m_VArray->AddVertexBuffer(m_VBuffer);
+		m_VArray->SetIndexBuffer(m_IBuffer);
+		//m_VArray->Unbind();
 	}
 
 	Application::~Application()
@@ -63,8 +71,9 @@ namespace Kaimos {
 			glClear(GL_COLOR_BUFFER_BIT);
 
 			// -- Initial vertices (draw) test --
-
-			glDrawElements(GL_TRIANGLES, m_IBuffer->GetCount(), GL_UNSIGNED_INT, nullptr);
+			m_VArray->Bind();
+			glDrawElements(GL_TRIANGLES, m_VArray->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
+			m_VArray->Unbind();
 
 			// Layers Update
 			std::vector<Layer*>::iterator it = m_LayerStack.begin();

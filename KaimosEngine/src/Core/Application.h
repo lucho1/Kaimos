@@ -44,9 +44,7 @@ namespace Kaimos {
 		ImGuiLayer* m_ImGuiLayer;
 		LayerStack m_LayerStack;
 
-		std::unique_ptr<VertexBuffer> m_VBuffer;
-		std::unique_ptr<IndexBuffer> m_IBuffer;
-		uint vertexArr = 0;
+		std::shared_ptr<VertexArray> m_VArray;
 
 		static Application* s_Instance; // Singleton of Application (we only want 1)
 	};

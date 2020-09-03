@@ -34,4 +34,17 @@ namespace Kaimos {
 		return nullptr;
 	}
 
+	// Here we decide which rendering API we are using, thus which kind of class type we instantiate/return
+	VertexArray* VertexArray::Create()
+	{
+		switch (Renderer::GetRendererAPI())
+		{
+			case RENDERER_API::OPENGL:		return new OpenGLVertexArray();
+			case RENDERER_API::NONE:		KS_ENGINE_ASSERT(false, "RendererAPI is set to NONE (unsupported)!"); return nullptr;
+		}
+
+		KS_ENGINE_ASSERT(false, "RendererAPI is unknown, not selected or failed!");
+		return nullptr;
+	}
+
 }
