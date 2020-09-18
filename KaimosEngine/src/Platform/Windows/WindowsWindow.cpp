@@ -1,9 +1,9 @@
 #include "kspch.h"
 #include "WindowsWindow.h"
 
-#include "Events/ApplicationEvent.h"
-#include "Events/MouseEvent.h"
-#include "Events/KeyEvent.h"
+#include "Core/Events/ApplicationEvent.h"
+#include "Core/Events/MouseEvent.h"
+#include "Core/Events/KeyEvent.h"
 
 #include "Platform/OpenGL/OpenGLContext.h"
 

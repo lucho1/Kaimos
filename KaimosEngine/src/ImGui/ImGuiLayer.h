@@ -3,9 +3,9 @@
 
 #include "Core/Layers/Layer.h"
 
-#include "Events/KeyEvent.h"
-#include "Events/MouseEvent.h"
-#include "Events/ApplicationEvent.h"
+#include "Core/Events/KeyEvent.h"
+#include "Core/Events/MouseEvent.h"
+#include "Core/Events/ApplicationEvent.h"
 
 namespace Kaimos {
 
