@@ -114,10 +114,10 @@ namespace Kaimos {
 		// Careful in the next lines of codes because the path is not relative, is absolute, so it will work only in one PC, otherwise we will have to change it
 		// For desktop-PC (Lucho): D:/GitHub/Kaimos/KaimosEngine/res/fonts/
 		// For portable-PC (Lucho): C:/Users/Lucho/Documents/GitHub/Kaimos/KaimosEngine/res/fonts/
-		io.Fonts->AddFontFromFileTTF("C:/Users/Lucho/Documents/GitHub/Kaimos/KaimosEngine/res/fonts/Ruda-Bold.ttf", 12);
-		io.Fonts->AddFontFromFileTTF("C:/Users/Lucho/Documents/GitHub/Kaimos/KaimosEngine/res/fonts/Ruda-Bold.ttf", 10);
-		io.Fonts->AddFontFromFileTTF("C:/Users/Lucho/Documents/GitHub/Kaimos/KaimosEngine/res/fonts/Ruda-Bold.ttf", 14);
-		io.Fonts->AddFontFromFileTTF("C:/Users/Lucho/Documents/GitHub/Kaimos/KaimosEngine/res/fonts/Ruda-Bold.ttf", 18);
+		io.Fonts->AddFontFromFileTTF("D:/GitHub/Kaimos/KaimosEngine/res/fonts/Ruda-Bold.ttf", 12);
+		io.Fonts->AddFontFromFileTTF("D:/GitHub/Kaimos/KaimosEngine/res/fonts/Ruda-Bold.ttf", 10);
+		io.Fonts->AddFontFromFileTTF("D:/GitHub/Kaimos/KaimosEngine/res/fonts/Ruda-Bold.ttf", 14);
+		io.Fonts->AddFontFromFileTTF("D:/GitHub/Kaimos/KaimosEngine/res/fonts/Ruda-Bold.ttf", 18);
 
 		style->WindowPadding = ImVec2(15, 15);
 		style->WindowRounding = 5.0f;
