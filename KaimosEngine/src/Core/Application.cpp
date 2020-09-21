@@ -2,8 +2,8 @@
 #include "Application.h"
 
 // Temporary Includes (DELETE THEM!)
-#include <glad/glad.h>
 #include "Input/Input.h"
+#include "Renderer/Renderer.h"
 
 namespace Kaimos {
 
@@ -47,7 +47,10 @@ namespace Kaimos {
 		m_VBuffer->SetLayout(layout);
 		m_VArray->AddVertexBuffer(m_VBuffer);
 		m_VArray->SetIndexBuffer(m_IBuffer);
-		//m_VArray->Unbind();
+		
+		m_VArray->Unbind();
+		m_IBuffer->Unbind();
+		m_VBuffer->Unbind();
 	}
 
 	Application::~Application()
@@ -66,16 +69,18 @@ namespace Kaimos {
 
 		while (m_Running)
 		{
-			// Pink Window Test
-			glClearColor(0.15f, 0.15f, 0.15f, 1.0f);
-			glClear(GL_COLOR_BUFFER_BIT);
+			//RenderCommands should NOT do multiple things, they are just commands (unless specifically suposed-to)
+			RenderCommand::SetClearColor(glm::vec4(0.15f, 0.15f, 0.15f, 1.0f));
+			RenderCommand::Clear();
 
 			// -- Initial vertices (draw) test --
-			m_VArray->Bind();
-			glDrawElements(GL_TRIANGLES, m_VArray->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
-			m_VArray->Unbind();
+			//A renderer is a high-level class, a full-on renderer (doesn't deals with commands such as ClearScene), it deals with high-level constructs (scenes, meshes...)
+			Renderer::BeginScene();
+			Renderer::Submit(m_VArray);
+			Renderer::EndScene();
+			//Renderer::Flush() // In a separate thread in MT Engine
 
-			// Layers Update
+			// -- Layers Update --
 			std::vector<Layer*>::iterator it = m_LayerStack.begin();
 			for (; it != m_LayerStack.end(); ++it)
 				(*it)->OnUpdate();

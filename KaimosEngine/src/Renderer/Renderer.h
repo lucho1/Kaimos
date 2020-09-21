@@ -1,16 +1,24 @@
 #ifndef _RENDERER_H_
 #define _RENDERER_H_
 
-namespace Kaimos {
+#include "RenderCommand.h"
 
-	enum class RENDERER_API { NONE = 0, OPENGL = 1 };
+namespace Kaimos {
 
 	class Renderer
 	{
 	public:
-		inline static const RENDERER_API GetRendererAPI() { return s_RendererAPI; }
-	private:
-		static RENDERER_API s_RendererAPI;
+
+		// -- Methods --
+		static void BeginScene();
+		static void EndScene();
+
+		static void Submit(const std::shared_ptr<VertexArray>& vertexArray);
+
+	public:
+
+		// -- Getters --
+		inline static const RendererAPI::API GetRendererAPI() { return RendererAPI::GetAPI(); }
 	};
 }
 

@@ -35,7 +35,6 @@ namespace Kaimos {
 		glCreateBuffers(1, &m_BufferID);
 		glBindBuffer(GL_ARRAY_BUFFER, m_BufferID);
 		glBufferData(GL_ARRAY_BUFFER, size, vertices, GL_STATIC_DRAW);
-		//glBindBuffer(GL_ARRAY_BUFFER, 0);
 	}
 
 	OpenGLVertexBuffer::~OpenGLVertexBuffer()
@@ -61,7 +60,6 @@ namespace Kaimos {
 		glCreateBuffers(1, &m_BufferID);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_BufferID);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * sizeof(uint), vertices, GL_STATIC_DRAW);
-		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	}
 
 	OpenGLIndexBuffer::~OpenGLIndexBuffer()
@@ -84,7 +82,6 @@ namespace Kaimos {
 	OpenGLVertexArray::OpenGLVertexArray()
 	{
 		glCreateVertexArrays(1, &m_ArrayID);
-		//glBindVertexArray(0);
 	}
 
 	OpenGLVertexArray::~OpenGLVertexArray()
@@ -121,9 +118,6 @@ namespace Kaimos {
 		}
 
 		m_VertexBuffers.push_back(Vbuffer);
-
-		//Vbuffer->Unbind();
-		//glBindVertexArray(0);
 	}
 
 	void OpenGLVertexArray::SetIndexBuffer(const std::shared_ptr<IndexBuffer>& Ibuffer)
@@ -132,9 +126,6 @@ namespace Kaimos {
 		Ibuffer->Bind();
 
 		m_IndexBuffer = Ibuffer;
-
-		//Ibuffer->Unbind();
-		//glBindVertexArray(0);
 	}
 
 }
