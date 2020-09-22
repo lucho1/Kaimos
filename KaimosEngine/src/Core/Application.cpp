@@ -10,6 +10,7 @@ namespace Kaimos {
 	Application* Application::s_Instance = nullptr;
 
 	Application::Application()
+		: m_Camera(-1.6f, 1.6f, -0.9f, 0.9f)
 	{
 		KS_ENGINE_ASSERT(!s_Instance, "There already exist one instance of Application!!"); // Assertion to not to have more than 1 Application instances
 		s_Instance = this;
@@ -75,8 +76,8 @@ namespace Kaimos {
 
 			// -- Initial vertices (draw) test --
 			//A renderer is a high-level class, a full-on renderer (doesn't deals with commands such as ClearScene), it deals with high-level constructs (scenes, meshes...)
-			Renderer::BeginScene();
-			Renderer::Submit(m_VArray);
+			Renderer::BeginScene(m_Camera);
+			Renderer::Submit(nullptr, m_VArray);
 			Renderer::EndScene();
 			//Renderer::Flush() // In a separate thread in MT Engine
 

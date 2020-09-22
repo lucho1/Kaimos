@@ -9,6 +9,7 @@
 
 // TEMP
 #include "Renderer/Buffer.h"
+#include "Renderer/OrthographicCamera.h"
 
 namespace Kaimos {
 
@@ -43,6 +44,8 @@ namespace Kaimos {
 		std::unique_ptr<Window> m_Window; // Having a unique_ptr means we don't have to worry about deleting the Window ourselves on app termination :D
 		ImGuiLayer* m_ImGuiLayer;
 		LayerStack m_LayerStack;
+
+		OrthographicCamera m_Camera;
 
 		std::shared_ptr<VertexArray> m_VArray;
 
