@@ -29,10 +29,6 @@ namespace Kaimos {
 
 		// -- Class Methods --
 		void SetEngineUIStyle() const;
-
-	private:
-
-		float m_Time = 0.0f;
 	};
 }
 

@@ -148,6 +148,7 @@
     <ClInclude Include="src\Core\Layers\Layer.h" />
     <ClInclude Include="src\Core\Layers\LayerStack.h" />
     <ClInclude Include="src\Core\Log.h" />
+    <ClInclude Include="src\Core\Time\Timestep.h" />
     <ClInclude Include="src\Core\Window.h" />
     <ClInclude Include="src\Core\Events\ApplicationEvent.h" />
     <ClInclude Include="src\Core\Events\Event.h" />

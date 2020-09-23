@@ -3,6 +3,7 @@
 
 #include "kspch.h"
 #include "Core/Core.h"
+#include "Core/Time/Timestep.h"
 #include "Core/Events/Event.h"
 
 namespace Kaimos {
@@ -16,7 +17,7 @@ namespace Kaimos {
 
 		virtual void OnAttach() {} // Added to layer stack
 		virtual void OnDetach() {} // Removed from layer stack
-		virtual void OnUpdate() {}
+		virtual void OnUpdate(Timestep dt) {}
 		virtual void OnUIRender() {}
 		virtual void OnEvent(Event& event) {}
 

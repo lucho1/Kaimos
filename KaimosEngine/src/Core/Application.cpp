@@ -4,13 +4,13 @@
 // Temporary Includes (DELETE THEM!)
 #include "Input/Input.h"
 #include "Renderer/Renderer.h"
+#include <GLFW/glfw3.h>
 
 namespace Kaimos {
 
 	Application* Application::s_Instance = nullptr;
 
 	Application::Application()
-		: m_Camera(-1.6f, 1.6f, -0.9f, 0.9f)
 	{
 		KS_ENGINE_ASSERT(!s_Instance, "There already exist one instance of Application!!"); // Assertion to not to have more than 1 Application instances
 		s_Instance = this;
@@ -23,35 +23,6 @@ namespace Kaimos {
 		// an event happens will be Application::OnEvent. The placeholder will be replaced by whatever argument
 		// is passed, so OnEvent() will be called with some argument passed (now represented by this "placeholder")
 		m_Window->SetEventCallback(KS_BIND_EVENT_FN(Application::OnEvent)); // SAME: m_Window->SetEventCallback(std::bind(&Application::OnEvent, this, std::placeholders::_1));
-		
-		// -- Initial vertices test --
-		std::shared_ptr<VertexBuffer> m_VBuffer;
-		std::shared_ptr<IndexBuffer> m_IBuffer;
-		uint indices[3] = { 0, 1, 2 };
-		float vertices[3 * 7] = {
-				-0.5f,	-0.5f,	0.0f,	1.0f,	0.0f,	0.0f,	1.0f,
-				 0.5f,	-0.5f,	0.0f,	1.0f,	0.0f,	0.0f,	1.0f,
-				 0.0f,	 0.5f,	0.0f,	1.0f,	0.0f,	0.0f,	1.0f
-		};
-		
-		m_VArray.reset(VertexArray::Create());
-		m_VBuffer.reset(VertexBuffer::Create(vertices, sizeof(vertices)));
-		m_IBuffer.reset(IndexBuffer::Create(indices, 3)); // That 3 could also be sizeof(indices)/sizeof(uint), but extra calculation!
-		
-		BufferLayout layout = {
-			{ ShaderDataType::Float3, "a_Position" },
-			//{ ShaderDataType::Float2, "a_TexCoords" },
-			//{ ShaderDataType::Float3, "a_Normal" },
-			{ ShaderDataType::Float4, "a_Color" }
-		};
-		
-		m_VBuffer->SetLayout(layout);
-		m_VArray->AddVertexBuffer(m_VBuffer);
-		m_VArray->SetIndexBuffer(m_IBuffer);
-		
-		m_VArray->Unbind();
-		m_IBuffer->Unbind();
-		m_VBuffer->Unbind();
 	}
 
 	Application::~Application()
@@ -70,21 +41,16 @@ namespace Kaimos {
 
 		while (m_Running)
 		{
-			//RenderCommands should NOT do multiple things, they are just commands (unless specifically suposed-to)
-			RenderCommand::SetClearColor(glm::vec4(0.15f, 0.15f, 0.15f, 1.0f));
-			RenderCommand::Clear();
-
-			// -- Initial vertices (draw) test --
-			//A renderer is a high-level class, a full-on renderer (doesn't deals with commands such as ClearScene), it deals with high-level constructs (scenes, meshes...)
-			Renderer::BeginScene(m_Camera);
-			Renderer::Submit(nullptr, m_VArray);
-			Renderer::EndScene();
-			//Renderer::Flush() // In a separate thread in MT Engine
+			float time = glfwGetTime();//QueryPerformanceFrequency(); QueryPerformanceCounter(); // Platform::GetTime() !!!!!!
+			Timestep timestep = time - m_LastFrameTime; // How long this frame is (dt, current time vs last frame time)
+			m_LastFrameTime = time;
+			
+			m_Timestep;
 
 			// -- Layers Update --
 			std::vector<Layer*>::iterator it = m_LayerStack.begin();
 			for (; it != m_LayerStack.end(); ++it)
-				(*it)->OnUpdate();
+				(*it)->OnUpdate(timestep);
 
 			m_ImGuiLayer->Begin();
 
