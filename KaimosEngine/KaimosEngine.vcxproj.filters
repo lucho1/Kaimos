@@ -7,14 +7,17 @@
     <Filter Include="src\Core">
       <UniqueIdentifier>{A5D31CCF-91A0-77DA-BAB9-6582A6E5AC68}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\Core\Events">
+      <UniqueIdentifier>{E953F58B-55DF-6250-5EF0-E544CAFABE50}</UniqueIdentifier>
+    </Filter>
     <Filter Include="src\Core\Input">
       <UniqueIdentifier>{64EB8104-50B9-750A-394D-E63025BA516F}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\Core\Layers">
       <UniqueIdentifier>{C43ED89A-30CA-455F-39DB-C853A5E5A15F}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\Events">
-      <UniqueIdentifier>{7162C20E-5D1A-045C-C621-DDB7B2F89E4C}</UniqueIdentifier>
+    <Filter Include="src\Core\Time">
+      <UniqueIdentifier>{633F7E55-CFFF-F98B-983A-430904BA3E68}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\ImGui">
       <UniqueIdentifier>{170E22B3-8378-D629-CCB6-87CF3860B47E}</UniqueIdentifier>
@@ -63,6 +66,18 @@
     <ClInclude Include="src\Core\EntryPoint.h">
       <Filter>src\Core</Filter>
     </ClInclude>
+    <ClInclude Include="src\Core\Events\ApplicationEvent.h">
+      <Filter>src\Core\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Events\Event.h">
+      <Filter>src\Core\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Events\KeyEvent.h">
+      <Filter>src\Core\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Events\MouseEvent.h">
+      <Filter>src\Core\Events</Filter>
+    </ClInclude>
     <ClInclude Include="src\Core\Input\Input.h">
       <Filter>src\Core\Input</Filter>
     </ClInclude>
@@ -77,6 +92,9 @@
     </ClInclude>
     <ClInclude Include="src\Core\Log.h">
       <Filter>src\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Time\Timestep.h">
+      <Filter>src\Core\Time</Filter>
     </ClInclude>
     <ClInclude Include="src\Core\Window.h">
       <Filter>src\Core</Filter>
@@ -93,6 +111,9 @@
     <ClInclude Include="src\Platform\OpenGL\OpenGLContext.h">
       <Filter>src\Platform\OpenGL</Filter>
     </ClInclude>
+    <ClInclude Include="src\Platform\OpenGL\OpenGLRendererAPI.h">
+      <Filter>src\Platform\OpenGL</Filter>
+    </ClInclude>
     <ClInclude Include="src\Platform\Windows\WindowsInput.h">
       <Filter>src\Platform\Windows</Filter>
     </ClInclude>
@@ -105,7 +126,16 @@
     <ClInclude Include="src\Renderer\GraphicsContext.h">
       <Filter>src\Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="src\Renderer\OrthographicCamera.h">
+      <Filter>src\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Renderer\RenderCommand.h">
+      <Filter>src\Renderer</Filter>
+    </ClInclude>
     <ClInclude Include="src\Renderer\Renderer.h">
+      <Filter>src\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Renderer\RendererAPI.h">
       <Filter>src\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Renderer\Shader.h">
@@ -1338,23 +1368,6 @@
     <ClInclude Include="vendor\glm\glm\vector_relational.hpp">
       <Filter>vendor\glm\glm</Filter>
     </ClInclude>
-    <ClInclude Include="src\Core\Events\ApplicationEvent.h">
-      <Filter>src\Events</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Core\Events\Event.h">
-      <Filter>src\Events</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Core\Events\KeyEvent.h">
-      <Filter>src\Events</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Core\Events\MouseEvent.h">
-      <Filter>src\Events</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Renderer\RendererAPI.h" />
-    <ClInclude Include="src\Renderer\RenderCommand.h" />
-    <ClInclude Include="src\Platform\OpenGL\OpenGLRendererAPI.h" />
-    <ClInclude Include="src\Renderer\OrthographicCamera.h" />
-    <ClInclude Include="src\Core\Time\Timestep.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Application.cpp">
@@ -1378,6 +1391,9 @@
     <ClCompile Include="src\Platform\OpenGL\OpenGLContext.cpp">
       <Filter>src\Platform\OpenGL</Filter>
     </ClCompile>
+    <ClCompile Include="src\Platform\OpenGL\OpenGLRendererAPI.cpp">
+      <Filter>src\Platform\OpenGL</Filter>
+    </ClCompile>
     <ClCompile Include="src\Platform\Windows\WindowsInput.cpp">
       <Filter>src\Platform\Windows</Filter>
     </ClCompile>
@@ -1387,7 +1403,16 @@
     <ClCompile Include="src\Renderer\Buffer.cpp">
       <Filter>src\Renderer</Filter>
     </ClCompile>
+    <ClCompile Include="src\Renderer\OrthographicCamera.cpp">
+      <Filter>src\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\RenderCommand.cpp">
+      <Filter>src\Renderer</Filter>
+    </ClCompile>
     <ClCompile Include="src\Renderer\Renderer.cpp">
+      <Filter>src\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\RendererAPI.cpp">
       <Filter>src\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\Renderer\Shader.cpp">
@@ -1396,9 +1421,5 @@
     <ClCompile Include="src\kspch.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\RendererAPI.cpp" />
-    <ClCompile Include="src\Renderer\RenderCommand.cpp" />
-    <ClCompile Include="src\Platform\OpenGL\OpenGLRendererAPI.cpp" />
-    <ClCompile Include="src\Renderer\OrthographicCamera.cpp" />
   </ItemGroup>
 </Project>

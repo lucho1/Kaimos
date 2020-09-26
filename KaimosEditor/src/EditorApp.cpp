@@ -2,30 +2,32 @@
 
 #include "imgui.h"
 
+//TEMP
+#include <glm/gtc/matrix_transform.hpp>
 
 class LayerTest : public Kaimos::Layer
 {
 public:
 
-	LayerTest() : Layer("LayerTest"), m_Camera(-1.6f, 1.6f, -0.9f, 0.9f), m_CameraPos(0.0f)
+	LayerTest() : Layer("LayerTest"), m_Camera(-1.6f, 1.6f, -0.9f, 0.9f), m_CameraPos(0.0f), m_ObjPos(0.0f)
 	{
 		// -- Initial vertices test --
 		std::shared_ptr<Kaimos::VertexBuffer> m_VBuffer;
 		std::shared_ptr<Kaimos::IndexBuffer> m_IBuffer;
-		uint indices[3] = { 0, 1, 2 };
-		float vertices[3 * 7] = {
-				-0.5f,	-0.5f,	0.0f,	1.0f,	0.0f,	0.0f,	1.0f,
-				 0.5f,	-0.5f,	0.0f,	1.0f,	0.0f,	0.0f,	1.0f,
-				 0.0f,	 0.5f,	0.0f,	1.0f,	0.0f,	0.0f,	1.0f
+		uint indices[6] = { 0, 1, 2, 2, 3, 0 };
+		float vertices[3 * 4] = {
+				-0.5f,	-0.5f,	0.0f,
+				 0.5f,	-0.5f,	0.0f,
+				 0.5f,	 0.5f,	0.0f,
+				-0.5f,	 0.5f,	0.0f
 		};
 
 		m_VArray.reset(Kaimos::VertexArray::Create());
 		m_VBuffer.reset(Kaimos::VertexBuffer::Create(vertices, sizeof(vertices)));
-		m_IBuffer.reset(Kaimos::IndexBuffer::Create(indices, 3)); // That 3 could also be sizeof(indices)/sizeof(uint), but extra calculation!
+		m_IBuffer.reset(Kaimos::IndexBuffer::Create(indices, sizeof(indices)/sizeof(uint)));
 
 		Kaimos::BufferLayout layout = {
-			{ Kaimos::ShaderDataType::Float3, "a_Position" },
-			{ Kaimos::ShaderDataType::Float4, "a_Color" }
+			{ Kaimos::ShaderDataType::Float3, "a_Position" }
 		};
 
 		m_VBuffer->SetLayout(layout);
@@ -93,6 +95,20 @@ public:
 		//A renderer is a high-level class, a full-on renderer (doesn't deals with commands such as ClearScene), it deals with high-level constructs (scenes, meshes...)
 		Kaimos::Renderer::BeginScene(m_Camera);
 		Kaimos::Renderer::Submit(nullptr, m_VArray);
+		
+		// -- Tests --
+		glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f));
+
+		for (int y = 0; y < 20; ++y)
+		{
+			for (int x = 0; x < 20; ++x)
+			{
+				glm::vec3 pos(x * 0.11f, y * 0.11f, 0.0f);
+				glm::mat4 transform = glm::translate(glm::mat4(1.0f), pos) * scale;
+				Kaimos::Renderer::Submit(nullptr, m_VArray, transform);
+			}
+		}
+
 		Kaimos::Renderer::EndScene();
 		//Renderer::Flush() // In a separate thread in MT Engine
 	}
@@ -107,6 +123,7 @@ private:
 	glm::vec3 m_CameraPos;
 	float m_CameraRotation = 0.0f;
 	float m_CameraSpeed = 4.0f;
+	glm::vec3 m_ObjPos;
 
 	std::shared_ptr<Kaimos::VertexArray> m_VArray;
 };

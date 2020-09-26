@@ -15,11 +15,12 @@ namespace Kaimos {
 	{
 	}
 
-	void Renderer::Submit(const std::shared_ptr<Shader>& shader, const std::shared_ptr<VertexArray>& vertexArray)
+	void Renderer::Submit(const std::shared_ptr<Shader>& shader, const std::shared_ptr<VertexArray>& vertexArray, const glm::mat4& transformation)
 	{
 		if(shader != nullptr)
 			shader->Bind();
 		// TODO: Upload ViewProjectionMatrix uniform here and delete if statement
+		// TODO: Upload tranform here as ModelMatrix
 
 		// Vertex Array bound here since RenderCommands should NOT do multiple things, they are just commands (unless specifically suposed-to)
 		vertexArray->Bind();

@@ -143,6 +143,10 @@
     <ClInclude Include="src\Core\Application.h" />
     <ClInclude Include="src\Core\Core.h" />
     <ClInclude Include="src\Core\EntryPoint.h" />
+    <ClInclude Include="src\Core\Events\ApplicationEvent.h" />
+    <ClInclude Include="src\Core\Events\Event.h" />
+    <ClInclude Include="src\Core\Events\KeyEvent.h" />
+    <ClInclude Include="src\Core\Events\MouseEvent.h" />
     <ClInclude Include="src\Core\Input\Input.h" />
     <ClInclude Include="src\Core\Input\KaimosInputCodes.h" />
     <ClInclude Include="src\Core\Layers\Layer.h" />
@@ -150,10 +154,6 @@
     <ClInclude Include="src\Core\Log.h" />
     <ClInclude Include="src\Core\Time\Timestep.h" />
     <ClInclude Include="src\Core\Window.h" />
-    <ClInclude Include="src\Core\Events\ApplicationEvent.h" />
-    <ClInclude Include="src\Core\Events\Event.h" />
-    <ClInclude Include="src\Core\Events\KeyEvent.h" />
-    <ClInclude Include="src\Core\Events\MouseEvent.h" />
     <ClInclude Include="src\ImGui\ImGuiLayer.h" />
     <ClInclude Include="src\Kaimos.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLBuffer.h" />
