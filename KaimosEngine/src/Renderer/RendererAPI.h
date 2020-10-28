@@ -16,7 +16,7 @@ namespace Kaimos {
 
 		virtual void SetClearColor(const glm::vec4& color) const = 0;
 		virtual void Clear() const = 0;
-		virtual void DrawIndexed(const std::shared_ptr<VertexArray>& vertexArray) const = 0;
+		virtual void DrawIndexed(const Ref<VertexArray>& vertexArray) const = 0;
 
 		inline static const API GetAPI() { return s_API; }
 

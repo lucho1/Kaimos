@@ -99,7 +99,7 @@ namespace Kaimos {
 		glBindVertexArray(0);
 	}
 
-	void OpenGLVertexArray::AddVertexBuffer(const std::shared_ptr<VertexBuffer>& Vbuffer)
+	void OpenGLVertexArray::AddVertexBuffer(const Ref<VertexBuffer>& Vbuffer)
 	{
 		KS_ENGINE_ASSERT(Vbuffer->GetLayout().GetElements().size(), "VertexBuffer has not layouts!");
 		glBindVertexArray(m_ArrayID);
@@ -120,7 +120,7 @@ namespace Kaimos {
 		m_VertexBuffers.push_back(Vbuffer);
 	}
 
-	void OpenGLVertexArray::SetIndexBuffer(const std::shared_ptr<IndexBuffer>& Ibuffer)
+	void OpenGLVertexArray::SetIndexBuffer(const Ref<IndexBuffer>& Ibuffer)
 	{
 		glBindVertexArray(m_ArrayID);
 		Ibuffer->Bind();

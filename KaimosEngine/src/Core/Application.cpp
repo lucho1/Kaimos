@@ -44,8 +44,6 @@ namespace Kaimos {
 			float time = glfwGetTime();//QueryPerformanceFrequency(); QueryPerformanceCounter(); // Platform::GetTime() !!!!!!
 			Timestep timestep = time - m_LastFrameTime; // How long this frame is (dt, current time vs last frame time)
 			m_LastFrameTime = time;
-			
-			m_Timestep;
 
 			// -- Layers Update --
 			std::vector<Layer*>::iterator it = m_LayerStack.begin();

@@ -112,13 +112,23 @@ namespace Kaimos {
 
 		// ImGui Style gotten from a free-to-use style from https://www.unknowncheats.me/forum/c-and-c-/189635-imgui-style-settings.html & From CronosEngine (style by Roger Leon @rleonborras) with some touches by myself
 		// Careful in the next lines of codes because the path is not relative, is absolute, so it will work only in one PC, otherwise we will have to change it
+		
+		// --- Fonts Load ---
 		// For desktop-PC (Lucho): D:/GitHub/Kaimos/KaimosEngine/res/fonts/
 		// For portable-PC (Lucho): C:/Users/Lucho/Documents/GitHub/Kaimos/KaimosEngine/res/fonts/
-		io.Fonts->AddFontFromFileTTF("C:/Users/Lucho/Documents/GitHub/Kaimos/KaimosEngine/res/fonts/Ruda-Bold.ttf", 12);
-		io.Fonts->AddFontFromFileTTF("C:/Users/Lucho/Documents/GitHub/Kaimos/KaimosEngine/res/fonts/Ruda-Bold.ttf", 10);
-		io.Fonts->AddFontFromFileTTF("C:/Users/Lucho/Documents/GitHub/Kaimos/KaimosEngine/res/fonts/Ruda-Bold.ttf", 14);
-		io.Fonts->AddFontFromFileTTF("C:/Users/Lucho/Documents/GitHub/Kaimos/KaimosEngine/res/fonts/Ruda-Bold.ttf", 18);
+		// TODO: Change this for god sake, add a filesystem
+		std::string init_path = "D:";		
+		if (false)										// By now just change this to true when on PortablePC
+			init_path = "C:/Users/Lucho/Documents";
 
+		init_path += "/GitHub/Kaimos/KaimosEngine/res/fonts/Ruda-Bold.ttf";
+		io.Fonts->AddFontFromFileTTF(init_path.c_str(), 12);
+		io.Fonts->AddFontFromFileTTF(init_path.c_str(), 10);
+		io.Fonts->AddFontFromFileTTF(init_path.c_str(), 14);
+		io.Fonts->AddFontFromFileTTF(init_path.c_str(), 18);
+		// --- ---
+
+		// --- UI Style Settings ---
 		style->WindowPadding = ImVec2(15, 15);
 		style->WindowRounding = 5.0f;
 		style->FramePadding = ImVec2(5, 5);
@@ -196,6 +206,7 @@ namespace Kaimos {
 		colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.35f);
 		colors[ImGuiCol_DockingPreview] = colors[ImGuiCol_HeaderActive]; colors[ImGuiCol_DockingPreview].w *= 0.7f;
 		colors[ImGuiCol_DockingEmptyBg] = ImVec4(0.12f, 0.12f, 0.12f, 1.00f);
+		// --- ---
 	}
 
 }

@@ -37,7 +37,7 @@ namespace Kaimos {
 		bool Normalized = false;
 
 		// -- Functions --
-		BufferElement() {}
+		BufferElement() = default;
 
 		BufferElement(ShaderDataType type, const std::string& name, bool normalized = false)
 			: Name(name), Type(type), Size(ShaderDataTypeSize(type)), Normalized(normalized)
@@ -75,7 +75,7 @@ namespace Kaimos {
 		// without having to declare it as a std::vector<BufferElement> layout and having a constructor such as BufferLayout(std::vector<BufferElement>)
 		// so, is way more confortable and readable to have it as this, with an initializer list.
 		BufferLayout(const std::initializer_list<BufferElement>& elements) : m_Elements(elements) { CalculateOffsetAndStride(); }
-		BufferLayout() {}
+		BufferLayout() = default;
 
 		// -- Getters --
 		inline const std::vector<BufferElement>& GetElements() const { return m_Elements; }
@@ -112,7 +112,7 @@ namespace Kaimos {
 	{
 	public:
 
-		virtual ~VertexBuffer() {}
+		virtual ~VertexBuffer() = default;
 
 		virtual void Bind() const = 0;
 		virtual void Unbind() const = 0;
@@ -128,7 +128,7 @@ namespace Kaimos {
 	{
 	public:
 
-		virtual ~IndexBuffer() {}
+		virtual ~IndexBuffer() = default;
 
 		virtual void Bind() const = 0;
 		virtual void Unbind() const = 0;
@@ -149,11 +149,11 @@ namespace Kaimos {
 		virtual void Bind() const = 0;
 		virtual void Unbind() const = 0;
 
-		virtual void AddVertexBuffer(const std::shared_ptr<VertexBuffer>& Vbuffer) = 0;
-		virtual void SetIndexBuffer(const std::shared_ptr<IndexBuffer>& Ibuffer) = 0;
+		virtual void AddVertexBuffer(const Ref<VertexBuffer>& Vbuffer) = 0;
+		virtual void SetIndexBuffer(const Ref<IndexBuffer>& Ibuffer) = 0;
 
-		virtual const std::vector<std::shared_ptr<VertexBuffer>>& GetVertexBuffers() const = 0;
-		virtual const std::shared_ptr<IndexBuffer>& GetIndexBuffer() const = 0;
+		virtual const std::vector<Ref<VertexBuffer>>& GetVertexBuffers() const = 0;
+		virtual const Ref<IndexBuffer>& GetIndexBuffer() const = 0;
 
 		static VertexArray* Create(); // This is the "Constructor", we take anything we want here (static cause doesn't belong to this class)
 	};

@@ -40,4 +40,19 @@
 typedef unsigned int uint; // This is the same than uint32_t
 typedef unsigned short ushort;
 
+#include <memory>
+namespace Kaimos
+{
+	// There must be a line between a Kaimos Reference (for assets, mem/resource management...)
+	// and an std::_ptr. We still using std::_ptr but not for things that are explicitly only for
+	// Kaimos Engine, and that could, potentially and in the future, be handled by an asset manager
+	// or similar, being their references handled by them
+	template<typename T>
+	using ScopePtr = std::unique_ptr<T>;
+
+	template<typename T>
+	using Ref = std::shared_ptr<T>;
+}
+
+
 #endif //_CORE_H_

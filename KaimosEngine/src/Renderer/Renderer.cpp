@@ -1,6 +1,8 @@
 #include "kspch.h"
 #include "Renderer.h"
 
+#include "Platform/OpenGL/OpenGLShader.h"
+
 namespace Kaimos {
 
 	Renderer::SceneData* Renderer::m_SceneData = new Renderer::SceneData;
@@ -15,12 +17,14 @@ namespace Kaimos {
 	{
 	}
 
-	void Renderer::Submit(const std::shared_ptr<Shader>& shader, const std::shared_ptr<VertexArray>& vertexArray, const glm::mat4& transformation)
+	void Renderer::Submit(const Ref<Shader>& shader, const Ref<VertexArray>& vertexArray, const glm::mat4& transformation)
 	{
 		if(shader != nullptr)
 			shader->Bind();
 		// TODO: Upload ViewProjectionMatrix uniform here and delete if statement
 		// TODO: Upload tranform here as ModelMatrix
+		std::dynamic_pointer_cast<OpenGLShader>(shader)->UploadUniformMat4("u_ViewProjection", m_SceneData->ViewProjectionMatrix);
+		std::dynamic_pointer_cast<OpenGLShader>(shader)->UploadUniformMat4("u_Model", transformation);
 
 		// Vertex Array bound here since RenderCommands should NOT do multiple things, they are just commands (unless specifically suposed-to)
 		vertexArray->Bind();

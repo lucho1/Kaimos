@@ -3,7 +3,9 @@
 #include "imgui.h"
 
 //TEMP
+#include "Platform/OpenGL/OpenGLShader.h"
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 class LayerTest : public Kaimos::Layer
 {
@@ -12,8 +14,8 @@ public:
 	LayerTest() : Layer("LayerTest"), m_Camera(-1.6f, 1.6f, -0.9f, 0.9f), m_CameraPos(0.0f), m_ObjPos(0.0f)
 	{
 		// -- Initial vertices test --
-		std::shared_ptr<Kaimos::VertexBuffer> m_VBuffer;
-		std::shared_ptr<Kaimos::IndexBuffer> m_IBuffer;
+		Kaimos::Ref<Kaimos::VertexBuffer> m_VBuffer;
+		Kaimos::Ref<Kaimos::IndexBuffer> m_IBuffer;
 		uint indices[6] = { 0, 1, 2, 2, 3, 0 };
 		float vertices[3 * 4] = {
 				-0.5f,	-0.5f,	0.0f,
@@ -37,6 +39,8 @@ public:
 		m_VArray->Unbind();
 		m_IBuffer->Unbind();
 		m_VBuffer->Unbind();
+
+		m_Shader.reset(Kaimos::Shader::Create("assets/shaders/TextureShader.glsl"));
 	}
 
 	virtual void OnEvent(Kaimos::Event& ev) override
@@ -48,27 +52,12 @@ public:
 		//	KS_EDITOR_TRACE("{0}", (char)e.GetKeyCode());
 		//}
 
-		Kaimos::EventDispatcher dispatcher(ev);
-		dispatcher.Dispatch<Kaimos::KeyPressedEvent>(KS_BIND_EVENT_FN(LayerTest::OnKeyPressedEvent));
-	}
-
-	bool OnKeyPressedEvent(Kaimos::KeyPressedEvent& ev)
-	{
-		if (ev.GetKeyCode() == KS_KEY_LEFT)
-			m_CameraPos.x -= m_CameraSpeed;
-		if (ev.GetKeyCode() == KS_KEY_RIGHT)
-			m_CameraPos.x += m_CameraSpeed;
-		if (ev.GetKeyCode() == KS_KEY_DOWN)
-			m_CameraPos.y -= m_CameraSpeed;
-		if (ev.GetKeyCode() == KS_KEY_UP)
-			m_CameraPos.y += m_CameraSpeed;
-
-		return false;
+		//Kaimos::EventDispatcher dispatcher(ev);
+		//dispatcher.Dispatch<Kaimos::KeyPressedEvent>(KS_BIND_EVENT_FN(LayerTest::OnKeyPressedEvent)); // For a "OnKeyPressedEvent()" function
 	}
 
 	virtual void OnUpdate(Kaimos::Timestep dt) override
 	{
-		KS_ENGINE_TRACE("DeltaTime: {0} ms", dt.GetMilliseconds());
 		//RenderCommands should NOT do multiple things, they are just commands (unless specifically suposed-to)
 		Kaimos::RenderCommand::SetClearColor(glm::vec4(0.15f, 0.15f, 0.15f, 1.0f));
 		Kaimos::RenderCommand::Clear();
@@ -94,10 +83,11 @@ public:
 		// -- Initial vertices (draw) test --
 		//A renderer is a high-level class, a full-on renderer (doesn't deals with commands such as ClearScene), it deals with high-level constructs (scenes, meshes...)
 		Kaimos::Renderer::BeginScene(m_Camera);
-		Kaimos::Renderer::Submit(nullptr, m_VArray);
 		
 		// -- Tests --
 		glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f));
+		std::dynamic_pointer_cast<Kaimos::OpenGLShader>(m_Shader)->Bind();
+		
 
 		for (int y = 0; y < 20; ++y)
 		{
@@ -105,27 +95,46 @@ public:
 			{
 				glm::vec3 pos(x * 0.11f, y * 0.11f, 0.0f);
 				glm::mat4 transform = glm::translate(glm::mat4(1.0f), pos) * scale;
-				Kaimos::Renderer::Submit(nullptr, m_VArray, transform);
+				
+				if (x % 2 == 0)
+					std::dynamic_pointer_cast<Kaimos::OpenGLShader>(m_Shader)->UploadUniformFloat4("u_BaseColor", { color1, 1.0f });
+				else
+					std::dynamic_pointer_cast<Kaimos::OpenGLShader>(m_Shader)->UploadUniformFloat4("u_BaseColor", { color2, 1.0f });
+
+				
+				Kaimos::Renderer::Submit(m_Shader, m_VArray, transform);
 			}
 		}
 
+		Kaimos::Renderer::Submit(m_Shader, m_VArray);
 		Kaimos::Renderer::EndScene();
 		//Renderer::Flush() // In a separate thread in MT Engine
 	}
 
 	virtual void OnUIRender() override
 	{
+		ImGui::Begin("Settings");
+		ImGui::ColorEdit3("Color1", glm::value_ptr(color1));
+		ImGui::ColorEdit3("Color2", glm::value_ptr(color2));
+		ImGui::End();
 	}
 
 private:
 
+	// --- Camera ---
 	Kaimos::OrthographicCamera m_Camera;
 	glm::vec3 m_CameraPos;
 	float m_CameraRotation = 0.0f;
 	float m_CameraSpeed = 4.0f;
 	glm::vec3 m_ObjPos;
 
-	std::shared_ptr<Kaimos::VertexArray> m_VArray;
+	// --- UI ---
+	glm::vec3 color1 = { 0.8f, 0.2f, 0.3f };
+	glm::vec3 color2 = { 0.2f, 0.3f, 0.8f };
+
+	// --- Rendering ---
+	Kaimos::Ref<Kaimos::VertexArray> m_VArray;
+	Kaimos::Ref<Kaimos::Shader> m_Shader;
 };
 
 

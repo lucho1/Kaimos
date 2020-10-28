@@ -4,6 +4,7 @@
 
 namespace Kaimos {
 
+	// In this case, as this is isolated and not specially handled by a Kaimos System, is an std::_ptr
 	std::shared_ptr<spdlog::logger> Log::s_EngineLogger; // Core Logger
 	std::shared_ptr<spdlog::logger> Log::s_EditorLogger; // Client Logger
 
