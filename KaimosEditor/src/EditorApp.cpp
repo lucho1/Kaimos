@@ -17,11 +17,11 @@ public:
 		Kaimos::Ref<Kaimos::VertexBuffer> m_VBuffer;
 		Kaimos::Ref<Kaimos::IndexBuffer> m_IBuffer;
 		uint indices[6] = { 0, 1, 2, 2, 3, 0 };
-		float vertices[3 * 4] = {
-				-0.5f,	-0.5f,	0.0f,
-				 0.5f,	-0.5f,	0.0f,
-				 0.5f,	 0.5f,	0.0f,
-				-0.5f,	 0.5f,	0.0f
+		float vertices[5 * 4] = {
+				-0.5f,	-0.5f,	0.0f,	0.0f, 0.0f,		// For negative X positions, UV should be 0, for positive, 1
+				 0.5f,	-0.5f,	0.0f,	1.0f, 0.0f,		// If you render, on a square, the texCoords (as color = vec4(tC, 0, 1)), the colors of the square in its corners are
+				 0.5f,	 0.5f,	0.0f,	1.0f, 1.0f,		// (0,0,0,1) - Black, (1,0,0,1) - Red, (1,1,0,0) - Yellow, (0,1,0,1) - Green
+				-0.5f,	 0.5f,	0.0f,	0.0f, 1.0
 		};
 
 		m_VArray.reset(Kaimos::VertexArray::Create());
@@ -29,7 +29,8 @@ public:
 		m_IBuffer.reset(Kaimos::IndexBuffer::Create(indices, sizeof(indices)/sizeof(uint)));
 
 		Kaimos::BufferLayout layout = {
-			{ Kaimos::ShaderDataType::Float3, "a_Position" }
+			{ Kaimos::ShaderDataType::Float3, "a_Position" },
+			{ Kaimos::ShaderDataType::Float2, "a_TexCoord" }
 		};
 
 		m_VBuffer->SetLayout(layout);
@@ -41,6 +42,12 @@ public:
 		m_VBuffer->Unbind();
 
 		m_Shader.reset(Kaimos::Shader::Create("assets/shaders/TextureShader.glsl"));
+		m_CheckerTexture = Kaimos::Texture2D::Create("assets/textures/Checkerboard.png");
+		m_LogoTexture = Kaimos::Texture2D::Create("assets/textures/ChernoLogo.png");
+
+		
+		std::dynamic_pointer_cast<Kaimos::OpenGLShader>(m_Shader)->Bind();
+		std::dynamic_pointer_cast<Kaimos::OpenGLShader>(m_Shader)->UploadUniformInt("u_Texture", 0); // Second parameter asks for the TEXTURE SLOT, not ID!!! (store slots?)
 	}
 
 	virtual void OnEvent(Kaimos::Event& ev) override
@@ -106,7 +113,12 @@ public:
 			}
 		}
 
+		m_CheckerTexture->Bind();
 		Kaimos::Renderer::Submit(m_Shader, m_VArray);
+		m_LogoTexture->Bind();
+		Kaimos::Renderer::Submit(m_Shader, m_VArray);
+
+		// -- End Scene --
 		Kaimos::Renderer::EndScene();
 		//Renderer::Flush() // In a separate thread in MT Engine
 	}
@@ -135,6 +147,8 @@ private:
 	// --- Rendering ---
 	Kaimos::Ref<Kaimos::VertexArray> m_VArray;
 	Kaimos::Ref<Kaimos::Shader> m_Shader;
+	Kaimos::Ref<Kaimos::Texture2D> m_CheckerTexture;
+	Kaimos::Ref<Kaimos::Texture2D> m_LogoTexture;
 };
 
 

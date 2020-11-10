@@ -17,11 +17,12 @@ IncludeDir["GLFW"] = "KaimosEngine/vendor/GLFW/include"
 IncludeDir["Glad"] = "KaimosEngine/vendor/Glad/include"
 IncludeDir["ImGui"] = "KaimosEngine/vendor/imgui"
 IncludeDir["glm"] = "KaimosEngine/vendor/glm"
+IncludeDir["stb_image"] = "KaimosEngine/vendor/stb_image"
 
 -- How To Add a Library: --
 -- Just include it here, on top, as a new IncludeDir, 
--- then add it down there in includedirs (under files)
--- and finally add it in links if needed (aside anything
+-- then add it down there in includedirs (under defines{})
+-- and finally add it in links if needed (aside anything)
 -- needed, such as dlls)
 ---------------------------
 
@@ -47,13 +48,15 @@ project "KaimosEngine"
     pchheader "kspch.h"
     pchsource "KaimosEngine/src/kspch.cpp"
 
-    -- Files to Add --
+    -- Files to Add into the VS Project --
     files
     {
         "%{prj.name}/src/**.h",
         "%{prj.name}/src/**.cpp",
         "%{prj.name}/vendor/glm/glm/**.hpp",
-        "%{prj.name}/vendor/glm/glm/**.inl"
+        "%{prj.name}/vendor/glm/glm/**.inl",
+        "%{prj.name}/vendor/stb_image/**.cpp",
+        "%{prj.name}/vendor/stb_image/**.h"
     }
 
     -- Definitions for the project (global ones)
@@ -70,7 +73,8 @@ project "KaimosEngine"
         "%{IncludeDir.GLFW}",
         "%{IncludeDir.Glad}",
         "%{IncludeDir.ImGui}",
-        "%{IncludeDir.glm}"
+        "%{IncludeDir.glm}",
+        "%{IncludeDir.stb_image}"
     }
 
     -- Kaimos Engine Project Links --
