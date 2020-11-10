@@ -7,6 +7,11 @@ namespace Kaimos {
 
 	Renderer::SceneData* Renderer::m_SceneData = new Renderer::SceneData;
 
+	void Renderer::Init()
+	{
+		RenderCommand::Init();
+	}
+
 	void Renderer::BeginScene(OrthographicCamera& camera)
 	{
 		// Takes all scene parameters and makes sure the shaders we use get the right uniforms

@@ -114,9 +114,9 @@ public:
 		}
 
 		m_CheckerTexture->Bind();
-		Kaimos::Renderer::Submit(m_Shader, m_VArray);
+		Kaimos::Renderer::Submit(m_Shader, m_VArray, glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)));
 		m_LogoTexture->Bind();
-		Kaimos::Renderer::Submit(m_Shader, m_VArray);
+		Kaimos::Renderer::Submit(m_Shader, m_VArray, glm::translate(glm::mat4(1.0f), glm::vec3(0.25f, -0.25f, 0.0f)) * glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)));
 
 		// -- End Scene --
 		Kaimos::Renderer::EndScene();

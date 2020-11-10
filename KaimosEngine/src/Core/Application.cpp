@@ -16,6 +16,9 @@ namespace Kaimos {
 		s_Instance = this;
 
 		m_Window = std::unique_ptr<Window>(Window::Create());
+		
+		Renderer::Init();
+
 		m_ImGuiLayer = new ImGuiLayer(); // It will be deleted with all the other layers in the ~LayerStack()
 		PushOverlay(m_ImGuiLayer);
 
