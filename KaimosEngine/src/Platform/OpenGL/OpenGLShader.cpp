@@ -115,10 +115,10 @@ namespace Kaimos {
 		GLuint program = glCreateProgram();
 		std::vector<GLenum> glShaderIDs(shaderSources.size());
 
-		for (auto& kv : shaderSources)
+		for (auto&& [key, value] : shaderSources)
 		{
-			GLenum type = kv.first;
-			const std::string& source = kv.second;
+			GLenum type = key;
+			const std::string& source = value;
 
 			// Create an empty shader handle
 			GLuint shader = glCreateShader(type);
