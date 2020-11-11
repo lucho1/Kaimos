@@ -1,7 +1,7 @@
 #include "kspch.h"
 #include "Shader.h"
 
-#include "Renderer.h"
+#include "Renderer/Renderer.h"
 #include "Platform/OpenGL/OpenGLShader.h"
 
 namespace Kaimos {

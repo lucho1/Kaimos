@@ -20,10 +20,10 @@
 #include "Renderer/RenderCommand.h"
 
 #include "Renderer/Buffer.h"
-#include "Renderer/Shader.h"
-#include "Renderer/Texture.h"
+#include "Renderer/Resources/Shader.h"
+#include "Renderer/Resources/Texture.h"
 
-#include "Renderer/OrthographicCamera.h"
+#include "Renderer/Cameras/OrthographicCamera.h"
 
 
 // --- Entry Point ---

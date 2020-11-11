@@ -11,7 +11,7 @@
 
 // TEMP
 #include "Renderer/Buffer.h"
-#include "Renderer/OrthographicCamera.h"
+#include "Renderer/Cameras/OrthographicCamera.h"
 
 namespace Kaimos {
 

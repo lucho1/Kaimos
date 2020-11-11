@@ -1,7 +1,7 @@
 #ifndef _OPENGLTEXTURE_H_
 #define _OPENGLTEXTURE_H_
 
-#include "Renderer/Texture.h"
+#include "Renderer/Resources/Texture.h"
 
 namespace Kaimos {
 

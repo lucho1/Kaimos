@@ -1,7 +1,7 @@
 #ifndef _OPENGLSHADER_H_
 #define _OPENGLSHADER_H_
 
-#include "Renderer/Shader.h"
+#include "Renderer/Resources/Shader.h"
 
 #include <glm/glm.hpp>
 
