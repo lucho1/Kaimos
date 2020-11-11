@@ -9,11 +9,11 @@ namespace Kaimos {
 
 
 	// Here we decide which rendering API we are using, thus which kind of class type we instantiate/return
-	VertexBuffer* VertexBuffer::Create(float* vertices, uint size)
+	Ref<VertexBuffer> VertexBuffer::Create(float* vertices, uint size)
 	{
 		switch (Renderer::GetRendererAPI())
 		{
-			case RendererAPI::API::OPENGL:		return new OpenGLVertexBuffer(vertices, size);
+			case RendererAPI::API::OPENGL:		return std::make_shared<OpenGLVertexBuffer>(vertices, size);
 			case RendererAPI::API::NONE:		KS_ENGINE_ASSERT(false, "RendererAPI is set to NONE (unsupported)!"); return nullptr;
 		}
 
@@ -22,11 +22,11 @@ namespace Kaimos {
 	}
 
 	// Here we decide which rendering API we are using, thus which kind of class type we instantiate/return
-	IndexBuffer* IndexBuffer::Create(uint* vertices, uint count)
+	Ref<IndexBuffer> IndexBuffer::Create(uint* vertices, uint count)
 	{
 		switch (Renderer::GetRendererAPI())
 		{
-			case RendererAPI::API::OPENGL:		return new OpenGLIndexBuffer(vertices, count);
+			case RendererAPI::API::OPENGL:		return std::make_shared<OpenGLIndexBuffer>(vertices, count);
 			case RendererAPI::API::NONE:		KS_ENGINE_ASSERT(false, "RendererAPI is set to NONE (unsupported)!"); return nullptr;
 		}
 
@@ -35,11 +35,11 @@ namespace Kaimos {
 	}
 
 	// Here we decide which rendering API we are using, thus which kind of class type we instantiate/return
-	VertexArray* VertexArray::Create()
+	Ref<VertexArray> VertexArray::Create()
 	{
 		switch (Renderer::GetRendererAPI())
 		{
-			case RendererAPI::API::OPENGL:		return new OpenGLVertexArray();
+			case RendererAPI::API::OPENGL:		return std::make_shared<OpenGLVertexArray>();
 			case RendererAPI::API::NONE:		KS_ENGINE_ASSERT(false, "RendererAPI is set to NONE (unsupported)!"); return nullptr;
 		}
 

@@ -120,7 +120,7 @@ namespace Kaimos {
 		virtual const BufferLayout& GetLayout() const = 0;
 		virtual void SetLayout(const BufferLayout& layout) = 0;
 
-		static VertexBuffer* Create(float* vertices, uint size); // This is the "Constructor", we take anything we want here (static cause doesn't belong to this class)
+		static Ref<VertexBuffer> Create(float* vertices, uint size); // This is the "Constructor", we take anything we want here (static cause doesn't belong to this class)
 	};
 
 
@@ -133,7 +133,7 @@ namespace Kaimos {
 		virtual void Bind() const = 0;
 		virtual void Unbind() const = 0;
 
-		static IndexBuffer* Create(uint* vertices, uint count); // This is the "Constructor", we take anything we want here (static cause doesn't belong to this class)
+		static Ref <IndexBuffer> Create(uint* vertices, uint count); // This is the "Constructor", we take anything we want here (static cause doesn't belong to this class)
 		
 		// -- Getters --
 		virtual uint GetCount() const = 0;
@@ -155,7 +155,7 @@ namespace Kaimos {
 		virtual const std::vector<Ref<VertexBuffer>>& GetVertexBuffers() const = 0;
 		virtual const Ref<IndexBuffer>& GetIndexBuffer() const = 0;
 
-		static VertexArray* Create(); // This is the "Constructor", we take anything we want here (static cause doesn't belong to this class)
+		static Ref<VertexArray> Create(); // This is the "Constructor", we take anything we want here (static cause doesn't belong to this class)
 	};
 
 }

@@ -24,9 +24,9 @@ public:
 				-0.5f,	 0.5f,	0.0f,	0.0f, 1.0
 		};
 
-		m_VArray.reset(Kaimos::VertexArray::Create());
-		m_VBuffer.reset(Kaimos::VertexBuffer::Create(vertices, sizeof(vertices)));
-		m_IBuffer.reset(Kaimos::IndexBuffer::Create(indices, sizeof(indices)/sizeof(uint)));
+		m_VArray = Kaimos::VertexArray::Create();
+		m_VBuffer = Kaimos::VertexBuffer::Create(vertices, sizeof(vertices));
+		m_IBuffer = Kaimos::IndexBuffer::Create(indices, sizeof(indices)/sizeof(uint));
 
 		Kaimos::BufferLayout layout = {
 			{ Kaimos::ShaderDataType::Float3, "a_Position" },
@@ -135,11 +135,11 @@ public:
 private:
 
 	// --- Camera ---
-	Kaimos::OrthographicCamera m_Camera;
+	glm::vec3 m_ObjPos;
 	glm::vec3 m_CameraPos;
 	float m_CameraRotation = 0.0f;
 	float m_CameraSpeed = 4.0f;
-	glm::vec3 m_ObjPos;
+	Kaimos::OrthographicCamera m_Camera;
 
 	// --- UI ---
 	glm::vec3 color1 = { 0.8f, 0.2f, 0.3f };
