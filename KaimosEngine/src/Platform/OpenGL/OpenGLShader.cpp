@@ -21,14 +21,34 @@ namespace Kaimos {
 	
 	OpenGLShader::OpenGLShader(const std::string& filepath)
 	{
+		// Compile Shader
 		CompileShader(PreProcessShader(ReadShaderFile(filepath)));
+
+		// Extract the shader name from filepath --> Basically the substring between last '/' or '\' and the last '.' (assets/textureSh.glsl = textureSh)
+		// rfind is the same but will find exactly the character you pass (find_last will find any of the characters passed)
+		size_t lastSlash = filepath.find_last_of("/\\");
+		size_t lastDot = filepath.rfind('.');
+
+		// lastSlash + 1 is to get "TextureSh" and not "/TextureSh" (and npos is in case we don't have slashes or previous paths)
+		// If no '.', then we take the end of the string until the last slash (assets/TextureSh --> TextureSh), otherwise, we take from the '.' pos to the lastSlash (remember we are dealing with sizes,
+		// if we begin the substr() at last "/" and end it at last "." and not "." - last"/", we will have errors of empty characters because the end pos will be bigger than it has to actually be!
+		lastSlash = lastSlash == std::string::npos ? 0 : lastSlash + 1;
+		lastDot = (lastDot == std::string::npos ? filepath.size() : lastDot) - lastSlash;
+		m_Name = filepath.substr(lastSlash, lastDot);
+
+		// This might be better:
+		//std::filesystem::path path = filepath;
+		//m_Name = path.stem().string(); // Returns the file's name stripped of the extension.
 	}
 
-	OpenGLShader::OpenGLShader(const std::string& vertexSrc, const std::string& fragmentSrc)
+	OpenGLShader::OpenGLShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc) : m_Name(name)
 	{
+		// Set a source for the shader
 		std::unordered_map<GLenum, std::string> sources;
 		sources[GL_VERTEX_SHADER] = vertexSrc;
 		sources[GL_FRAGMENT_SHADER] = fragmentSrc;
+		
+		// Compile shader source
 		CompileShader(sources);
 	}
 
@@ -43,7 +63,7 @@ namespace Kaimos {
 	{
 		// Input File Stream (to open a file) --> We give the filepath, tell it to process it as an input file
 		// and to be read as binary (because we don't want to do any processing into it, it will be completely in the format we want it to be, otherwise is read as text, as strings)
-		std::ifstream file(filepath, std::ios::in, std::ios::binary);
+		std::ifstream file(filepath, std::ios::in | std::ios::binary); // "or bitwise operator" (|), states the type of input stream, "we are opening the file as an input stream (read-only) and as a binary
 
 		if (file)
 		{
@@ -113,7 +133,13 @@ namespace Kaimos {
 	{
 		// Get a program object.
 		GLuint program = glCreateProgram();
-		std::vector<GLenum> glShaderIDs(shaderSources.size());
+		std::vector<GLenum> glShaderIDs;
+		glShaderIDs.reserve(shaderSources.size());
+
+		// Instead, you could create an array, which is much better than a vector:
+		//KS_ENGINE_ASSERT(shaderSources.size() <= 2, "Only 2 shader types are supported currently!");
+		//std::array<GLenum, 2> glShaderIDs;
+		// int glShaderIDIndex = 0; // In this case, the glShaderIDs.push_back() - downwards -, should be substituted by a glShaderIDs[glShaderIDIndex++] = shader;
 
 		for (auto&& [key, value] : shaderSources)
 		{

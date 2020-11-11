@@ -14,12 +14,13 @@ namespace Kaimos {
 	{
 	public:
 
-		OpenGLShader(const std::string& vertexSrc, const std::string& fragmentSrc);
+		OpenGLShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc);
 		OpenGLShader(const std::string& filepath);
 		virtual ~OpenGLShader();
 
 		virtual void Bind() const override;
 		virtual void Unbind() const override;
+		virtual const std::string& GetName() const override { return m_Name; }
 		
 		void UploadUniformInt(const std::string& name, const int& value);
 		void UploadUniformFloat(const std::string& name, const float& value);
@@ -36,7 +37,9 @@ namespace Kaimos {
 		const std::string ReadShaderFile(const std::string& filepath);
 
 	private:
+
 		uint m_ShaderID;
+		std::string m_Name;
 	};
 
 }

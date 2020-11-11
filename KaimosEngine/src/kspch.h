@@ -15,6 +15,7 @@
 #include <vector>
 #include <unordered_map>
 #include <unordered_set>
+#include <array>
 
 // --- Engine Includes ---
 #include "Core/Log.h"

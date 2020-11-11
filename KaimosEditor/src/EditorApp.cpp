@@ -41,13 +41,14 @@ public:
 		m_IBuffer->Unbind();
 		m_VBuffer->Unbind();
 
-		m_Shader.reset(Kaimos::Shader::Create("assets/shaders/TextureShader.glsl"));
 		m_CheckerTexture = Kaimos::Texture2D::Create("assets/textures/Checkerboard.png");
 		m_LogoTexture = Kaimos::Texture2D::Create("assets/textures/ChernoLogo.png");
+		//m_Shader = Kaimos::Shader::Create("assets/shaders/TextureShader.glsl");
+		auto textureShader = m_ShaderLibrary.Load("assets/shaders/TextureShader.glsl");
 
 		
-		std::dynamic_pointer_cast<Kaimos::OpenGLShader>(m_Shader)->Bind();
-		std::dynamic_pointer_cast<Kaimos::OpenGLShader>(m_Shader)->UploadUniformInt("u_Texture", 0); // Second parameter asks for the TEXTURE SLOT, not ID!!! (store slots?)
+		textureShader->Bind();
+		std::dynamic_pointer_cast<Kaimos::OpenGLShader>(textureShader)->UploadUniformInt("u_Texture", 0); // Second parameter asks for the TEXTURE SLOT, not ID!!! (store slots?)
 	}
 
 	virtual void OnEvent(Kaimos::Event& ev) override
@@ -93,8 +94,8 @@ public:
 		
 		// -- Tests --
 		glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f));
-		std::dynamic_pointer_cast<Kaimos::OpenGLShader>(m_Shader)->Bind();
-		
+		auto textureShader = m_ShaderLibrary.Get("TextureShader");
+		textureShader->Bind();
 
 		for (int y = 0; y < 20; ++y)
 		{
@@ -104,19 +105,19 @@ public:
 				glm::mat4 transform = glm::translate(glm::mat4(1.0f), pos) * scale;
 				
 				if (x % 2 == 0)
-					std::dynamic_pointer_cast<Kaimos::OpenGLShader>(m_Shader)->UploadUniformFloat4("u_BaseColor", { color1, 1.0f });
+					std::dynamic_pointer_cast<Kaimos::OpenGLShader>(textureShader)->UploadUniformFloat4("u_BaseColor", { color1, 1.0f });
 				else
-					std::dynamic_pointer_cast<Kaimos::OpenGLShader>(m_Shader)->UploadUniformFloat4("u_BaseColor", { color2, 1.0f });
+					std::dynamic_pointer_cast<Kaimos::OpenGLShader>(textureShader)->UploadUniformFloat4("u_BaseColor", { color2, 1.0f });
 
 				
-				Kaimos::Renderer::Submit(m_Shader, m_VArray, transform);
+				Kaimos::Renderer::Submit(textureShader, m_VArray, transform);
 			}
 		}
 
 		m_CheckerTexture->Bind();
-		Kaimos::Renderer::Submit(m_Shader, m_VArray, glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)));
+		Kaimos::Renderer::Submit(textureShader, m_VArray, glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)));
 		m_LogoTexture->Bind();
-		Kaimos::Renderer::Submit(m_Shader, m_VArray, glm::translate(glm::mat4(1.0f), glm::vec3(0.25f, -0.25f, 0.0f)) * glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)));
+		Kaimos::Renderer::Submit(textureShader, m_VArray, glm::translate(glm::mat4(1.0f), glm::vec3(0.25f, -0.25f, 0.0f)) * glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)));
 
 		// -- End Scene --
 		Kaimos::Renderer::EndScene();
@@ -146,7 +147,7 @@ private:
 
 	// --- Rendering ---
 	Kaimos::Ref<Kaimos::VertexArray> m_VArray;
-	Kaimos::Ref<Kaimos::Shader> m_Shader;
+	Kaimos::ShaderLibrary m_ShaderLibrary;
 	Kaimos::Ref<Kaimos::Texture2D> m_CheckerTexture;
 	Kaimos::Ref<Kaimos::Texture2D> m_LogoTexture;
 };
