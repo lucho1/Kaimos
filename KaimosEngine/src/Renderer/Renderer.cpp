@@ -12,7 +12,7 @@ namespace Kaimos {
 		RenderCommand::Init();
 	}
 
-	void Renderer::BeginScene(OrthographicCamera& camera)
+	void Renderer::BeginScene(const OrthographicCamera& camera)
 	{
 		// Takes all scene parameters and makes sure the shaders we use get the right uniforms
 		s_SceneData->ViewProjectionMatrix = camera.GetViewProjectionMatrix();

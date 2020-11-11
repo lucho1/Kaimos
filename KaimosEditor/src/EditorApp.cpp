@@ -11,7 +11,7 @@ class LayerTest : public Kaimos::Layer
 {
 public:
 
-	LayerTest() : Layer("LayerTest"), m_Camera(-1.6f, 1.6f, -0.9f, 0.9f), m_CameraPos(0.0f), m_ObjPos(0.0f)
+	LayerTest() : Layer("LayerTest"), m_CameraController(1280.0f/720.0f, true), m_ObjPos(0.0f)
 	{
 		// -- Initial vertices test --
 		Kaimos::Ref<Kaimos::VertexBuffer> m_VBuffer;
@@ -53,6 +53,7 @@ public:
 
 	virtual void OnEvent(Kaimos::Event& ev) override
 	{
+		m_CameraController.OnEvent(ev);
 		//KS_EDITOR_TRACE("LayerTest Event: {0}", ev);
 		//if (ev.GetEventType() == Kaimos::EVENT_TYPE::KEY_PRESSED)
 		//{
@@ -66,31 +67,17 @@ public:
 
 	virtual void OnUpdate(Kaimos::Timestep dt) override
 	{
+		// --- UPDATE ---
+		m_CameraController.OnUpdate(dt);
+
+		// --- RENDER ---
+		//A renderer is a high-level class, a full-on renderer (doesn't deals with commands such as ClearScene), it deals with high-level constructs (scenes, meshes...)
 		//RenderCommands should NOT do multiple things, they are just commands (unless specifically suposed-to)
 		Kaimos::RenderCommand::SetClearColor(glm::vec4(0.15f, 0.15f, 0.15f, 1.0f));
-		Kaimos::RenderCommand::Clear();
-
-		// -- Engine Camera Movement --
-		if (Kaimos::Input::IsKeyPressed(KS_KEY_D))
-			m_CameraPos.x += m_CameraSpeed * dt;
-		else if (Kaimos::Input::IsKeyPressed(KS_KEY_A))
-			m_CameraPos.x -= m_CameraSpeed * dt;
-		else if (Kaimos::Input::IsKeyPressed(KS_KEY_W))
-			m_CameraPos.y += m_CameraSpeed * dt;
-		else if (Kaimos::Input::IsKeyPressed(KS_KEY_S))
-			m_CameraPos.y -= m_CameraSpeed * dt;
-
-		if (Kaimos::Input::IsKeyPressed(KS_KEY_E))
-			m_CameraRotation -= m_CameraSpeed * dt;
-		else if (Kaimos::Input::IsKeyPressed(KS_KEY_Q))
-			m_CameraRotation += m_CameraSpeed * dt;
-
-		m_Camera.SetPosition(m_CameraPos);
-		m_Camera.SetRotation(m_CameraRotation);
+		Kaimos::RenderCommand::Clear();		
 		
 		// -- Initial vertices (draw) test --
-		//A renderer is a high-level class, a full-on renderer (doesn't deals with commands such as ClearScene), it deals with high-level constructs (scenes, meshes...)
-		Kaimos::Renderer::BeginScene(m_Camera);
+		Kaimos::Renderer::BeginScene(m_CameraController.GetCamera());
 		
 		// -- Tests --
 		glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f));
@@ -135,11 +122,8 @@ public:
 private:
 
 	// --- Camera ---
+	Kaimos::OrtographicCameraController m_CameraController;
 	glm::vec3 m_ObjPos;
-	glm::vec3 m_CameraPos;
-	float m_CameraRotation = 0.0f;
-	float m_CameraSpeed = 4.0f;
-	Kaimos::OrthographicCamera m_Camera;
 
 	// --- UI ---
 	glm::vec3 color1 = { 0.8f, 0.2f, 0.3f };

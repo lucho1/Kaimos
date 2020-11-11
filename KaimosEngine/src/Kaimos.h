@@ -24,6 +24,7 @@
 #include "Renderer/Resources/Texture.h"
 
 #include "Renderer/Cameras/OrthographicCamera.h"
+#include "Renderer/Cameras/OrtographicCameraController.h"
 
 
 // --- Entry Point ---
