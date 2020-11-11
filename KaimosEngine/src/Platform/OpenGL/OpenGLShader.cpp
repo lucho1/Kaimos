@@ -95,17 +95,19 @@ namespace Kaimos {
 
 		const char* typeToken = "#type"; // Token to designate the beginning of a new shader (check any .glsl file)
 		size_t typeTokenLength = strlen(typeToken); // Length of the token
-		size_t pos = source.find(typeToken, 0); // Find the position of the token (to find the shader beginning) to use it as a cursor
+		size_t pos = source.find(typeToken, 0); // Start of shader type declaration line - Find the position of the token (to find the shader beginning) to use it as a cursor
 
 		while (pos != std::string::npos) // While the position/cursor is not the end of the shader file/source code (we have to find all places where there is a #type word)
 		{
-			size_t eol = source.find_first_of("\r\n", pos);	// Find a new line or a carraige return from pos cursor
+			size_t eol = source.find_first_of("\r\n", pos);	// End of shader type declaration line - Find a new line or a carraige return from pos cursor
 															// On Windows platform, a new line is represented by Carriage Return Line Feed (CRLF), a combination
 															// of Enter key on keyboard and new line character. In other words "\r\n"... Basically, at the end of each line there are 2 chars on windows, "\r\n"
 
+			// TODO: Fix assertions pls and make sure this works
 			//KS_ENGINE_ASSERT(eol != std::string::npos, "Syntax Error!"); // If end of line is the end of shader (null, since pos isn't), there's a syntax error
 			
-			size_t begin = pos + typeTokenLength + 1;	// In this case, we are at the shader beginning (pos) + the length of "#type" + 1, this situates the begin
+			size_t begin = pos + typeTokenLength + 1;	// Start of shader type name (after '#type')
+														// In this case, we are at the shader beginning (pos) + the length of "#type" + 1, this situates the begin
 														// just in the place where the shader type is specificated, so if we hace "(whatever pos is)#type vertex",
 														// begin is placed in pos + "#type" length + 1, so we are on "vertex" word beginning
 
@@ -115,10 +117,14 @@ namespace Kaimos {
 
 			KS_ENGINE_ASSERT(ShaderTypeFromString(shaderType), "Invalid ShaderType specification or not supported"); // Assert if shader type invalid or not supported
 			
-			size_t nextLinePos = source.find_first_not_of("\r\n", eol); // Find, from the end of previous line, the next line, which will be the first that we will find not being "\r\n" (an end of line)
-			pos = source.find(typeToken, nextLinePos); // Find the next "#type" word from the next line of the previous "#type X" statement, and put 'pos' in there (new size for pos, we are now getting, finally, the whole shader strings code)
-			ret[ShaderTypeFromString(shaderType)] = source.substr(nextLinePos,
-																	pos - (nextLinePos == std::string::npos ? source.size() - 1 : nextLinePos));
+			size_t nextLinePos = source.find_first_not_of("\r\n", eol);			// Start of shader code after shader type declaration line - Find, from the end of previous line, the next line, which will be the first that we will find not being "\r\n" (an end of line)
+			//KS_ENGINE_ASSERT(nextLinePos != std::string::npos, "Syntax Error");
+			pos = source.find(typeToken, nextLinePos);							// Start of next shader type declaration line - Find the next "#type" word from the next line of the previous "#type X" statement, and put 'pos' in there (new size for pos, we are now getting, finally, the whole shader strings code)
+			
+			ret[ShaderTypeFromString(shaderType)] = (pos == std::string::npos) ? source.substr(nextLinePos) : source.substr(nextLinePos, pos - nextLinePos);
+
+			//ret[ShaderTypeFromString(shaderType)] = source.substr(nextLinePos,
+			//														pos - (nextLinePos == std::string::npos ? source.size() - 1 : nextLinePos));
 			// Here we have to put, into the final shader string (the final shader source code), everything between 'nextLinePos' (the line just below the "#type X" line) and
 			// 'pos', which is now at the end of the shader (being this just before the next "#type X" or the end of the file). That's done with 'substr()'
 			// So pos - nextLinePos... Except when nextLinePos is the end of the shader file, case in which we use, to calculate, the shader file size - 1 (so we don't have errors or 0s around)
