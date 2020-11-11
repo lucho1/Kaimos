@@ -14,7 +14,7 @@ namespace Kaimos {
 	public:
 
 		ImGuiLayer();
-		~ImGuiLayer();
+		~ImGuiLayer() = default;
 
 		// -- Layer Methods --
 		virtual void OnAttach() override;

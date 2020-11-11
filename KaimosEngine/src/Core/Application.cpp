@@ -28,10 +28,6 @@ namespace Kaimos {
 		m_Window->SetEventCallback(KS_BIND_EVENT_FN(Application::OnEvent)); // SAME: m_Window->SetEventCallback(std::bind(&Application::OnEvent, this, std::placeholders::_1));
 	}
 
-	Application::~Application()
-	{
-	}
-
 	// -- Class Methods --
 	void Application::Run()
 	{
@@ -76,13 +72,11 @@ namespace Kaimos {
 	void Application::PushLayer(Layer* layer)
 	{
 		m_LayerStack.PushLayer(layer);
-		layer->OnAttach();
 	}
 
 	void Application::PushOverlay(Layer* layer)
 	{
 		m_LayerStack.PushOverlay(layer);
-		layer->OnAttach();
 	}
 
 	// -- Events --

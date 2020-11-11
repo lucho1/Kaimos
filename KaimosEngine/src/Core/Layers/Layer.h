@@ -13,7 +13,7 @@ namespace Kaimos {
 	public:
 
 		Layer(const std::string& name = "Layer") : m_Name(name) {}
-		virtual ~Layer() {}
+		virtual ~Layer() = default;
 
 		virtual void OnAttach() {} // Added to layer stack
 		virtual void OnDetach() {} // Removed from layer stack

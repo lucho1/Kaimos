@@ -61,7 +61,8 @@ namespace Kaimos {
 
 		std::vector<Ref<VertexBuffer>> m_VertexBuffers;
 		Ref<IndexBuffer> m_IndexBuffer;
-		uint m_ArrayID;
+		uint m_VArrayID;
+		uint m_VBufferIndex = 0;
 	};
 
 }

@@ -9,6 +9,11 @@ workspace "Kaimos"
         "Dist"
     }
 
+    flags
+    {
+        "MultiProcessorCompile"
+    }
+
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 -- Include directories relative to Root Folder (or Solution Directory)
@@ -97,7 +102,7 @@ project "KaimosEngine"
             "GLFW_INCLUDE_NONE"
         }
 
-        --postbuildcommands
+        --postbuildcommands -- Made this upwards!
         --{
         --    ("{COPY} %{cfg.buildtarget.relpath} \"../bin/" .. outputdir .. "/KaimosEditor/\"")
         --}

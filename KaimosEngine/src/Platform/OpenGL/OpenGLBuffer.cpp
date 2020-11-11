@@ -44,12 +44,12 @@ namespace Kaimos {
 
 	void OpenGLVertexBuffer::Bind() const
 	{
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_BufferID);
+		glBindBuffer(GL_ARRAY_BUFFER, m_BufferID);
 	}
 
 	void OpenGLVertexBuffer::Unbind() const
 	{
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
 	}
 
 	// --- INDEX BUFFER ---
@@ -58,8 +58,8 @@ namespace Kaimos {
 		: m_Count(count)
 	{
 		glCreateBuffers(1, &m_BufferID);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_BufferID);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * sizeof(uint), vertices, GL_STATIC_DRAW);
+		glBindBuffer(GL_ARRAY_BUFFER, m_BufferID); //Also, GL_ELEMENT_ARRAY_BUFFER
+		glBufferData(GL_ARRAY_BUFFER, count * sizeof(uint), vertices, GL_STATIC_DRAW); //Also, GL_ELEMENT_ARRAY_BUFFER
 	}
 
 	OpenGLIndexBuffer::~OpenGLIndexBuffer()
@@ -81,17 +81,17 @@ namespace Kaimos {
 	// ------------------------------------------------------------------------
 	OpenGLVertexArray::OpenGLVertexArray()
 	{
-		glCreateVertexArrays(1, &m_ArrayID);
+		glCreateVertexArrays(1, &m_VArrayID);
 	}
 
 	OpenGLVertexArray::~OpenGLVertexArray()
 	{
-		glDeleteVertexArrays(1, &m_ArrayID);
+		glDeleteVertexArrays(1, &m_VArrayID);
 	}
 
 	void OpenGLVertexArray::Bind() const
 	{
-		glBindVertexArray(m_ArrayID);
+		glBindVertexArray(m_VArrayID);
 	}
 
 	void OpenGLVertexArray::Unbind() const
@@ -102,19 +102,18 @@ namespace Kaimos {
 	void OpenGLVertexArray::AddVertexBuffer(const Ref<VertexBuffer>& Vbuffer)
 	{
 		KS_ENGINE_ASSERT(Vbuffer->GetLayout().GetElements().size(), "VertexBuffer has not layouts!");
-		glBindVertexArray(m_ArrayID);
+		glBindVertexArray(m_VArrayID);
 		Vbuffer->Bind();
 
-		uint index = 0;
 		const auto& layout = Vbuffer->GetLayout();
 		for (const auto& element : layout)
 		{
-			glEnableVertexAttribArray(index);
-			glVertexAttribPointer(	index, element.GetElementTypeCount(),
+			glEnableVertexAttribArray(m_VBufferIndex);
+			glVertexAttribPointer(	m_VBufferIndex, element.GetElementTypeCount(),
 									ShaderDataTypeToOpenGLType(element.Type),
 									element.Normalized ? GL_TRUE : GL_FALSE,
-									layout.GetStride(), (const void*)element.Offset);
-			++index;
+									layout.GetStride(), (const void*)(intptr_t)element.Offset);
+			++m_VBufferIndex;
 		}
 
 		m_VertexBuffers.push_back(Vbuffer);
@@ -122,7 +121,7 @@ namespace Kaimos {
 
 	void OpenGLVertexArray::SetIndexBuffer(const Ref<IndexBuffer>& Ibuffer)
 	{
-		glBindVertexArray(m_ArrayID);
+		glBindVertexArray(m_VArrayID);
 		Ibuffer->Bind();
 
 		m_IndexBuffer = Ibuffer;

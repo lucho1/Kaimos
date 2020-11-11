@@ -3,6 +3,7 @@
 
 #include "Core.h"
 #include "Window.h"
+
 #include "ImGui/ImGuiLayer.h"
 #include "Events/ApplicationEvent.h"
 #include "Layers/LayerStack.h"
@@ -19,7 +20,7 @@ namespace Kaimos {
 	public:
 
 		Application();
-		virtual ~Application();
+		virtual ~Application() = default;
 
 		// -- Class Methods --
 		void Run();

@@ -7,7 +7,12 @@ namespace Kaimos {
 
 	class Input
 	{
+	protected:
+		Input() = default;
 	public:
+
+		Input(const Input&) = delete;
+		Input& operator=(const Input&) = delete;
 
 		inline static bool IsKeyPressed(uint keycode) { return s_Instance->IsKeyPressedImpl(keycode); }
 
