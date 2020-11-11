@@ -45,24 +45,23 @@ namespace Kaimos {
 			m_LastFrameTime = time;
 
 			// -- Layers Update --
-			std::vector<Layer*>::iterator it = m_LayerStack.begin();
-			for (; it != m_LayerStack.end(); ++it)
-				(*it)->OnUpdate(timestep);
+			if (!m_Minimized)
+			{
+				for (Layer* layer : m_LayerStack)
+					layer->OnUpdate(timestep);
+			}
 
+			// ImGui stills updating when minimized because we don't know its behaviour on minimizing
 			m_ImGuiLayer->Begin();
 
-			it = m_LayerStack.begin();
-			for (; it != m_LayerStack.end(); ++it)
-				(*it)->OnUIRender();
+			for (Layer* layer : m_LayerStack)
+				layer->OnUIRender();
 
 			m_ImGuiLayer->End();
 
 			// -- Input Test --
 			//auto [x, y] = Input::GetMousePos();
 			//KS_ENGINE_TRACE(" {0}, {1}", x, y);
-
-			//for (Layer* layer : m_LayerStack)
-			//	layer->OnUpdate();
 
 			m_Window->OnUpdate();
 		}
@@ -84,10 +83,10 @@ namespace Kaimos {
 	{
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<WindowCloseEvent>(KS_BIND_EVENT_FN(Application::OnWindowClose)); // If there's a WindowCloseEvent (checked in Dispatch()), dispatcher will call OnWindowClose function (same than a Lambda)
+		dispatcher.Dispatch<WindowResizeEvent>(KS_BIND_EVENT_FN(Application::OnWindowResize));
 		//KS_ENGINE_TRACE("{0}", e);
 
 		// Layers Events handling
-		//std::vector<Layer*>::iterator it = m_LayerStack.end();
 		for (auto it = m_LayerStack.end(); it != m_LayerStack.begin(); )
 		{
 			(*--it)->OnEvent(e);
@@ -99,6 +98,21 @@ namespace Kaimos {
 	bool Application::OnWindowClose(WindowCloseEvent& e)
 	{
 		m_Running = false;
+		return true;
+	}
+
+	bool Application::OnWindowResize(WindowResizeEvent& e)
+	{
+		float w = e.GetWidth(), h = e.GetHeight();
+
+		if (w == 0 || h == 0)
+		{
+			m_Minimized = true;
+			return false;
+		}
+
+		Renderer::OnWindowResize(w, h);
+		m_Minimized = false;
 		return false;
 	}
 	

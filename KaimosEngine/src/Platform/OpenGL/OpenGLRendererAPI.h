@@ -14,6 +14,8 @@ namespace Kaimos {
 		virtual void Clear() const override;
 
 		virtual void DrawIndexed(const Ref<VertexArray>& vertexArray) const override;
+
+		virtual void SetViewport(uint x, uint y, uint width, uint height) override;
 	};
 
 }

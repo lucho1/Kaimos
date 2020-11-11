@@ -25,4 +25,9 @@ namespace Kaimos {
 	{
 		glDrawElements(GL_TRIANGLES, vertexArray->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
 	}
+
+	void OpenGLRendererAPI::SetViewport(uint x, uint y, uint width, uint height)
+	{
+		glViewport(x, y, width, height);
+	}
 }

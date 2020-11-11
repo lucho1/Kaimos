@@ -18,7 +18,12 @@ namespace Kaimos {
 		void OnUpdate(Timestep dt);
 		void OnEvent(Event& e);
 
+		// --- Getters ---
 		const OrthographicCamera& GetCamera() const { return m_Camera; }
+		float GetZoomLevel() const { return m_ZoomLevel; }
+
+		// --- Setters ---
+		void SetZoomLevel(float zoom_level) { m_ZoomLevel = zoom_level; }
 
 	private:
 

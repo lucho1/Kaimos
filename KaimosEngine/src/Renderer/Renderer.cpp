@@ -37,4 +37,9 @@ namespace Kaimos {
 		vertexArray->Unbind();
 	}
 
+	// --- Resize Event ---
+	void Renderer::OnWindowResize(uint width, uint height)
+	{
+		RenderCommand::SetViewport(0, 0, width, height);
+	}
 }

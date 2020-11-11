@@ -20,6 +20,9 @@ namespace Kaimos {
 
 	public:
 
+		// -- Events --
+		static void OnWindowResize(uint width, uint height);
+
 		// -- Getters --
 		inline static const RendererAPI::API GetRendererAPI() { return RendererAPI::GetAPI(); }
 

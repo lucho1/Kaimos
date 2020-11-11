@@ -40,9 +40,11 @@ namespace Kaimos {
 
 		// -- Events --
 		bool OnWindowClose(WindowCloseEvent& e);
+		bool OnWindowResize(WindowResizeEvent& e);
 
 		// -- Class Variables --
 		bool m_Running = true;
+		bool m_Minimized = false;
 		std::unique_ptr<Window> m_Window; // Having a unique_ptr means we don't have to worry about deleting the Window ourselves on app termination :D
 		ImGuiLayer* m_ImGuiLayer;
 		LayerStack m_LayerStack;
