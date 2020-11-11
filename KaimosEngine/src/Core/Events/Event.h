@@ -27,7 +27,7 @@ namespace Kaimos {
 		EVENT_CATEGORY_MOUSE_BUTTON		= BIT(4)
 	};
 
-#define EVENT_CLASS_TYPE(type)	static EVENT_TYPE GetStaticType() { return EVENT_TYPE::##type; }\
+#define EVENT_CLASS_TYPE(type)	static EVENT_TYPE GetStaticType() { return EVENT_TYPE::type; }\
 								virtual EVENT_TYPE GetEventType() const override { return GetStaticType(); }\
 								virtual const char* GetName() const override { return #type; }
 

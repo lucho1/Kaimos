@@ -98,7 +98,6 @@ project "KaimosEngine"
         defines
         {
             "KS_BUILD_DLL",
-            "KS_PLATFORM_WINDOWS",
             "GLFW_INCLUDE_NONE"
         }
 
@@ -155,11 +154,6 @@ project "KaimosEditor"
     -- Systems --
     filter "system:windows"
         systemversion "latest"
-
-        defines
-        {
-            "KS_PLATFORM_WINDOWS"
-        }
 
     -- Configurations --
     filter "configurations:Debug"

@@ -9,12 +9,15 @@ namespace Kaimos {
 
 	LayerStack::~LayerStack()
 	{
-		std::vector<Layer*>::iterator item = m_Layers.begin();
-		for (; item != end(); ++item)
-			delete *item;
+		//std::vector<Layer*>::iterator item = m_Layers.begin();
+		//for (; item != end(); ++item)
+		//	delete *item;
 
-		//for (Layer* layer : m_Layers)
-		//	delete layer;
+		for (Layer* layer : m_Layers)
+		{
+			layer->OnDetach();
+			delete layer;
+		}
 	}
 
 	void LayerStack::PushLayer(Layer* layer)

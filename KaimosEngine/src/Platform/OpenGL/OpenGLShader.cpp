@@ -140,7 +140,6 @@ namespace Kaimos {
 		//KS_ENGINE_ASSERT(shaderSources.size() <= 2, "Only 2 shader types are supported currently!");
 		//std::array<GLenum, 2> glShaderIDs;
 		// int glShaderIDIndex = 0; // In this case, the glShaderIDs.push_back() - downwards -, should be substituted by a glShaderIDs[glShaderIDIndex++] = shader;
-
 		for (auto&& [key, value] : shaderSources)
 		{
 			GLenum type = key;
@@ -182,6 +181,7 @@ namespace Kaimos {
 			glShaderIDs.push_back(shader);
 		}
 
+		m_ShaderID = program;
 
 		// Vertex and fragment shaders are successfully compiled. Now time to link them together into a program
 		// Link our program
@@ -214,9 +214,10 @@ namespace Kaimos {
 
 		// Always detach shaders after a successful link.
 		for (auto id : glShaderIDs)
+		{
 			glDetachShader(program, id);
-
-		m_ShaderID = program;
+			glDeleteShader(id);
+		}
 	}
 
 

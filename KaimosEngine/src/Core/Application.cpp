@@ -40,7 +40,7 @@ namespace Kaimos {
 
 		while (m_Running)
 		{
-			float time = glfwGetTime();//QueryPerformanceFrequency(); QueryPerformanceCounter(); // Platform::GetTime() !!!!!!
+			float time = (float)glfwGetTime();//QueryPerformanceFrequency(); QueryPerformanceCounter(); // Platform::GetTime() !!!!!!
 			Timestep timestep = time - m_LastFrameTime; // How long this frame is (dt, current time vs last frame time)
 			m_LastFrameTime = time;
 
@@ -103,7 +103,7 @@ namespace Kaimos {
 
 	bool Application::OnWindowResize(WindowResizeEvent& e)
 	{
-		float w = e.GetWidth(), h = e.GetHeight();
+		uint w = e.GetWidth(), h = e.GetHeight();
 
 		if (w == 0 || h == 0)
 		{

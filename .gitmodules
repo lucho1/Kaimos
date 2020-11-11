@@ -1,12 +1,16 @@
 [submodule "KaimosEngine/vendor/spdlog"]
 	path = KaimosEngine/vendor/spdlog
 	url = https://github.com/gabime/spdlog
+	branch = v1.x
 [submodule "KaimosEngine/vendor/GLFW"]
 	path = KaimosEngine/vendor/GLFW
 	url = https://github.com/TheCherno/GLFW
+	branch = master
 [submodule "KaimosEngine/vendor/imgui"]
 	path = KaimosEngine/vendor/imgui
 	url = https://github.com/TheCherno/imgui
+	branch = docking
 [submodule "KaimosEngine/vendor/glm"]
 	path = KaimosEngine/vendor/glm
 	url = https://github.com/g-truc/glm
+	branch = master
