@@ -18,7 +18,7 @@
 #include <array>
 
 // --- Engine Includes ---
-#include "Core/Log.h"
+#include "Core/Log/Log.h"
 
 // --- Windows Include ---
 #ifdef KS_PLATFORM_WINDOWS

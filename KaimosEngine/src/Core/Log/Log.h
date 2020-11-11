@@ -1,7 +1,7 @@
 #ifndef _LOG_H_
 #define _LOG_H_
 
-#include "Core.h"
+#include "Core/Core.h"
 #include "spdlog/spdlog.h"
 #include "spdlog/fmt/ostr.h" // To pass events
 

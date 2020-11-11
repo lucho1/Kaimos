@@ -2,7 +2,7 @@
 #define _APPLICATION_H_
 
 #include "Core.h"
-#include "Window.h"
+#include "Core/Window/Window.h"
 
 #include "ImGui/ImGuiLayer.h"
 #include "Events/ApplicationEvent.h"

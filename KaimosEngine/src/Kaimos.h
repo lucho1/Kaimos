@@ -6,7 +6,7 @@
 // --- Engine Basic Stuff ---
 #include "Core/Application.h"
 #include "Core/Layers/Layer.h"
-#include "Core/Log.h"
+#include "Core/Log/Log.h"
 #include "Core/Time/Timestep.h"
 
 #include "Core/Input/Input.h"
