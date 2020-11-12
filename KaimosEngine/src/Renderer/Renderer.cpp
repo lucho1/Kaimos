@@ -5,7 +5,7 @@
 
 namespace Kaimos {
 
-	Renderer::SceneData* Renderer::s_SceneData = new Renderer::SceneData;
+	ScopePtr<Renderer::SceneData> Renderer::s_SceneData = CreateScopePtr<Renderer::SceneData>();
 
 	void Renderer::Init()
 	{

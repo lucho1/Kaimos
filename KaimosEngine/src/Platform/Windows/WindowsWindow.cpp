@@ -53,7 +53,7 @@ namespace Kaimos {
 		m_Window = glfwCreateWindow((int)props.Width, (int)props.Height, m_Data.Title.c_str(), nullptr, nullptr);
 		
 		// -- Graphics Context Creation --
-		m_Context = new OpenGLContext(m_Window);
+		m_Context = CreateScopePtr<OpenGLContext>(m_Window);
 		m_Context->Init();
 		
 		// -- GLFW Window User ptr & VSYNC --

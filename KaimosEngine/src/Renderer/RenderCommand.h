@@ -19,7 +19,7 @@ namespace Kaimos {
 
 	private:
 
-		static RendererAPI* s_RendererAPI;
+		static ScopePtr<RendererAPI> s_RendererAPI;
 	};
 
 }

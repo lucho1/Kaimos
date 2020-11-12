@@ -33,7 +33,9 @@ namespace Kaimos {
 
 	private:
 
-		static Input* s_Instance; // Since it's a singleton and lives all the program's lifetime, we can allow to not to call delete, but... not sure... Maybe use a smart pointer?
+		// Since it's a singleton and lives all the program's lifetime, we can allow to not to call delete, but... not sure... Maybe use a smart pointer?
+		//static Input* s_Instance; ... Therefore, yes, using a smart pointer now:
+		static ScopePtr<Input> s_Instance;
 	};
 }
 

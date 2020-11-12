@@ -33,7 +33,7 @@ namespace Kaimos {
 			glm::mat4 ViewProjectionMatrix;
 		};
 
-		static SceneData* s_SceneData;
+		static ScopePtr<SceneData> s_SceneData;
 	};
 }
 

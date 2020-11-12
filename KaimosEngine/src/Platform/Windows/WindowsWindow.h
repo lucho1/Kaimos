@@ -47,7 +47,7 @@ namespace Kaimos {
 
 		GLFWwindow* m_Window;
 		WindowData m_Data;
-		GraphicsContext* m_Context;
+		ScopePtr<GraphicsContext> m_Context;
 	};
 }
 

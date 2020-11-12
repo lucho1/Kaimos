@@ -6,7 +6,7 @@
 
 namespace Kaimos {
 
-	Input* Input::s_Instance = new WindowsInput();
+	ScopePtr<Input> Input::s_Instance = CreateScopePtr<WindowsInput>();
 
 	bool WindowsInput::IsKeyPressedImpl(uint keycode)
 	{
