@@ -4,7 +4,7 @@
 	branch = v1.x
 [submodule "KaimosEngine/vendor/GLFW"]
 	path = KaimosEngine/vendor/GLFW
-	url = https://github.com/TheCherno/GLFW
+	url = https://github.com/lucho1/glfw
 	branch = master
 [submodule "KaimosEngine/vendor/imgui"]
 	path = KaimosEngine/vendor/imgui
