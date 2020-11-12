@@ -18,12 +18,33 @@ namespace Kaimos {
 		void OnUpdate(Timestep dt);
 		void OnEvent(Event& e);
 
+	public:
+
 		// --- Getters ---
-		const OrthographicCamera& GetCamera() const { return m_Camera; }
-		float GetZoomLevel() const { return m_ZoomLevel; }
+		const OrthographicCamera& GetCamera()	const { return m_Camera; }
+
+		inline const float GetZoomLevel()		const { return m_ZoomLevel; }
+		inline const float GetAspectRatio()		const { return m_AspectRatio; }
+
+		inline const float GetRotationSpeed()	const { return m_CameraRotSpeed; }
+		inline const float GetMovementSpeed()	const { return m_SpeedMultiplier; }
+		
+		inline const glm::vec3 GetPosition()	const { return m_CameraPos; }
+		inline const float GetRotation()		const { return m_CameraRotation; }
+		inline const bool IsRotationActive()	const { return m_RotationActive; }
 
 		// --- Setters ---
-		void SetZoomLevel(float zoom_level) { m_ZoomLevel = zoom_level; }
+		void SetZoomLevel(float zoom_level);
+		void SetAspectRatio(float aspect_ratio);
+		inline void SetAspectRatio(float width, float height);
+		
+		inline void SetRotationSpeed(float rot_speed)	{ m_CameraRotSpeed = rot_speed; }
+		inline void SetMovementSpeed(float mov_speed)	{ m_SpeedMultiplier = mov_speed; }
+
+		inline void SetPosition(const glm::vec3& pos)	{ m_CameraPos = pos; }
+		inline void SetRotation(float rot)				{ m_CameraRotation = rot; }
+		inline void SetRotationActive(bool activate)	{ m_RotationActive = activate; }
+
 
 	private:
 
@@ -34,11 +55,13 @@ namespace Kaimos {
 	private:
 
 		float m_AspectRatio, m_ZoomLevel = 1.0f;
-		OrthographicCamera m_Camera;
-
-		bool m_RotationActive;
-		float m_CameraRotation = 0.0f, m_CameraMoveSpeed = 1.0f, m_CameraRotSpeed = 15.0f;
 		glm::vec3 m_CameraPos = glm::vec3(0.0f);
+
+		bool m_RotationActive = true;
+		float m_CameraMoveSpeed = 1.0f, m_SpeedMultiplier = 1.0f;
+		float m_CameraRotSpeed = 15.0f, m_CameraRotation = 0.0f; // Degrees, anti-clockwise - Also, OrthoCameras rotate only over 1 axis, so we only need a float
+		
+		OrthographicCamera m_Camera;
 	};
 }
 

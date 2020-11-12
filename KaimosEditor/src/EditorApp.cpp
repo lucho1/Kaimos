@@ -116,6 +116,49 @@ public:
 		ImGui::Begin("Settings");
 		ImGui::ColorEdit3("Color1", glm::value_ptr(color1));
 		ImGui::ColorEdit3("Color2", glm::value_ptr(color2));
+
+		ImGuiTreeNodeFlags tree_flags = ImGuiTreeNodeFlags_FramePadding	| ImGuiTreeNodeFlags_DefaultOpen
+			| ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
+
+		if (ImGui::TreeNodeEx("Engine Camera Settings", tree_flags))
+		{
+			// Get Camera Values
+			bool rot_active = m_CameraController.IsRotationActive();
+			float rot = m_CameraController.GetRotation();
+			float rot_speed = m_CameraController.GetRotationSpeed();
+			float move_speed = m_CameraController.GetMovementSpeed();
+			float vec[2] = { m_CameraController.GetPosition().x, m_CameraController.GetPosition().y };
+			
+			float zoom = m_CameraController.GetZoomLevel();
+			float AR = m_CameraController.GetAspectRatio();			
+
+			// Rotation & Movement
+			if (ImGui::Checkbox("Activate Camera Rotation", &rot_active))
+				m_CameraController.SetRotationActive(rot_active);
+
+			if (ImGui::DragFloat("Rotation", &rot, 1.0f, 0.0f, 0.0f, "%.1f"))
+				m_CameraController.SetRotation(rot);
+			
+			if (ImGui::SliderFloat("Rotation Speed", &rot_speed, 0.1f, 500.0f, "%.2f", 3.0f))
+				m_CameraController.SetRotationSpeed(rot_speed);
+
+			if (ImGui::SliderFloat("Movement Speed", &move_speed, 0.01f, 12.0f, "%.2f", 2.0f))
+				m_CameraController.SetMovementSpeed(move_speed);
+
+			if (ImGui::DragFloat2("Position", vec, 0.05f, 0.0f, 0.0f, "%.2f"))
+				m_CameraController.SetPosition({vec[0], vec[1], 0.0f});
+
+			// Zoom & AR
+			if (ImGui::SliderFloat("Zoom", &zoom, 0.25f, 10.0f, "%.2f"), -5.0f)
+				m_CameraController.SetZoomLevel(zoom);
+
+			if (ImGui::SliderFloat("Aspect Ratio", &AR, 1.0f, 2.5f, "%.2f"), 2.0f)
+				m_CameraController.SetAspectRatio(AR);
+
+			ImGui::TreePop();
+		}
+
+
 		ImGui::End();
 	}
 
