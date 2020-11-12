@@ -238,6 +238,21 @@ namespace Kaimos {
 		glUseProgram(0);
 	}
 
+	void OpenGLShader::SetUFloat3(const std::string& name, const glm::vec3& value)
+	{
+		UploadUniformFloat3(name, value);
+	}
+
+	void OpenGLShader::SetUFloat4(const std::string& name, const glm::vec4& value)
+	{
+		UploadUniformFloat4(name, value);
+	}
+
+	void OpenGLShader::SetUMat4(const std::string& name, const glm::mat4& value)
+	{
+		UploadUniformMat4(name, value);
+	}
+
 	// --- Uniforms Upload ---
 	void OpenGLShader::UploadUniformInt(const std::string& name, const int& value)
 	{

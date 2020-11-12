@@ -14,32 +14,6 @@ Sandbox2D::Sandbox2D() : Layer("Sandbox2D"), m_CameraController(1280.0f / 720.0f
 
 void Sandbox2D::OnAttach()
 {
-	// --- Vertex Array & Buffers ---
-	Kaimos::Ref<Kaimos::VertexBuffer> m_VBuffer;
-	Kaimos::Ref<Kaimos::IndexBuffer> m_IBuffer;
-	uint indices[6] = { 0, 1, 2, 2, 3, 0 };
-	float vertices[3 * 4] = {
-			-0.5f,	-0.5f,	0.0f,
-			 0.5f,	-0.5f,	0.0f,
-			 0.5f,	 0.5f,	0.0f,
-			-0.5f,	 0.5f,	0.0f
-	};
-
-	m_VArray = Kaimos::VertexArray::Create();
-	m_VBuffer = Kaimos::VertexBuffer::Create(vertices, sizeof(vertices));
-	m_IBuffer = Kaimos::IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint));
-	Kaimos::BufferLayout layout = { { Kaimos::ShaderDataType::Float3, "a_Position" } };
-
-	m_VBuffer->SetLayout(layout);
-	m_VArray->AddVertexBuffer(m_VBuffer);
-	m_VArray->SetIndexBuffer(m_IBuffer);
-
-	m_VArray->Unbind();
-	m_IBuffer->Unbind();
-	m_VBuffer->Unbind();
-
-	// --- Shader ---
-	m_Shader = Kaimos::Shader::Create("assets/shaders/FlatColorShader.glsl");
 }
 
 void Sandbox2D::OnDetach()
@@ -54,15 +28,13 @@ void Sandbox2D::OnUpdate(Kaimos::Timestep dt)
 	// --- RENDER ---
 	Kaimos::RenderCommand::SetClearColor(glm::vec4(0.15f, 0.15f, 0.15f, 1.0f));
 	Kaimos::RenderCommand::Clear();
-	Kaimos::Renderer::BeginScene(m_CameraController.GetCamera());
 
-	// --- Squares Test ---
-	m_Shader->Bind();
-	std::dynamic_pointer_cast<Kaimos::OpenGLShader>(m_Shader)->UploadUniformFloat4("u_Color", m_Color);
-	Kaimos::Renderer::Submit(m_Shader, m_VArray, glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)));
-
+	Kaimos::Renderer2D::BeginScene(m_CameraController.GetCamera());
+	
 	// -- End Scene --
-	Kaimos::Renderer::EndScene();
+	Kaimos::Renderer2D::DrawQuad(glm::vec2(0.0f), glm::vec2(1.2f), 45.0f, { 0.8f, 0.2f, 0.3f, 1.0f });
+	Kaimos::Renderer2D::DrawQuad(glm::vec2(1.0f), glm::vec2(0.5f), 20.0f, { 0.3f, 0.2f, 0.8f, 1.0f });
+	Kaimos::Renderer2D::EndScene();
 }
 
 void Sandbox2D::OnUIRender()

@@ -2,6 +2,7 @@
 #include "Renderer.h"
 
 #include "Platform/OpenGL/OpenGLShader.h"
+#include "Renderer2D.h"
 
 namespace Kaimos {
 
@@ -10,6 +11,7 @@ namespace Kaimos {
 	void Renderer::Init()
 	{
 		RenderCommand::Init();
+		Renderer2D::Init();
 	}
 
 	void Renderer::BeginScene(const OrthographicCamera& camera)
@@ -24,8 +26,8 @@ namespace Kaimos {
 
 	void Renderer::Submit(const Ref<Shader>& shader, const Ref<VertexArray>& vertexArray, const glm::mat4& transformation)
 	{
-		if(shader != nullptr)
-			shader->Bind();
+		//if(shader != nullptr)
+		//	shader->Bind();
 		// TODO: Upload ViewProjectionMatrix uniform here and delete if statement
 		// TODO: Upload tranform here as ModelMatrix
 		std::dynamic_pointer_cast<OpenGLShader>(shader)->UploadUniformMat4("u_ViewProjection", s_SceneData->ViewProjectionMatrix);
@@ -34,7 +36,7 @@ namespace Kaimos {
 		// Vertex Array bound here since RenderCommands should NOT do multiple things, they are just commands (unless specifically suposed-to)
 		vertexArray->Bind();
 		RenderCommand::DrawIndexed(vertexArray);
-		vertexArray->Unbind();
+		//vertexArray->Unbind();
 	}
 
 	// --- Resize Event ---
