@@ -1,11 +1,17 @@
+// --- Entry Point & Kaimos Header---
 #include <Kaimos.h>
+#include <Core/EntryPoint.h>
 
+// Other Includes
 #include "imgui.h"
 
-//TEMP
+//TODO: TEMP
 #include "Platform/OpenGL/OpenGLShader.h"
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+
+#include "Sandbox2D.h"
+
 
 class LayerTest : public Kaimos::Layer
 {
@@ -92,9 +98,9 @@ public:
 				glm::mat4 transform = glm::translate(glm::mat4(1.0f), pos) * scale;
 				
 				if (x % 2 == 0)
-					std::dynamic_pointer_cast<Kaimos::OpenGLShader>(textureShader)->UploadUniformFloat4("u_BaseColor", { color1, 1.0f });
+					std::dynamic_pointer_cast<Kaimos::OpenGLShader>(textureShader)->UploadUniformFloat4("u_Color", { color1, 1.0f });
 				else
-					std::dynamic_pointer_cast<Kaimos::OpenGLShader>(textureShader)->UploadUniformFloat4("u_BaseColor", { color2, 1.0f });
+					std::dynamic_pointer_cast<Kaimos::OpenGLShader>(textureShader)->UploadUniformFloat4("u_Color", { color2, 1.0f });
 
 				
 				Kaimos::Renderer::Submit(textureShader, m_VArray, transform);
@@ -186,7 +192,8 @@ public:
 
 	EditorApp()
 	{
-		PushLayer(new LayerTest());
+		//PushLayer(new LayerTest());
+		PushLayer(new Sandbox2D());
 	}
 
 	~EditorApp() {}
