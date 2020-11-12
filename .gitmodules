@@ -8,7 +8,7 @@
 	branch = master
 [submodule "KaimosEngine/vendor/imgui"]
 	path = KaimosEngine/vendor/imgui
-	url = https://github.com/TheCherno/imgui
+	url = https://github.com/lucho1/imgui
 	branch = docking
 [submodule "KaimosEngine/vendor/glm"]
 	path = KaimosEngine/vendor/glm
