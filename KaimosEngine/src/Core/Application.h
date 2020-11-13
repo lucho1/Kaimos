@@ -20,7 +20,7 @@ namespace Kaimos {
 	public:
 
 		Application();
-		virtual ~Application() = default;
+		virtual ~Application();
 
 		// -- Class Methods --
 		void Run();

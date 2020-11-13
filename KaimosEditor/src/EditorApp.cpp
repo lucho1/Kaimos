@@ -3,7 +3,7 @@
 #include <Core/EntryPoint.h>
 
 // Other Includes
-#include "imgui.h"
+#include <imgui.h>
 
 //TODO: TEMP
 #include "Platform/OpenGL/OpenGLShader.h"
@@ -20,8 +20,6 @@ public:
 	LayerTest() : Layer("LayerTest"), m_CameraController(1280.0f/720.0f, true), m_ObjPos(0.0f)
 	{
 		// -- Initial vertices test --
-		Kaimos::Ref<Kaimos::VertexBuffer> m_VBuffer;
-		Kaimos::Ref<Kaimos::IndexBuffer> m_IBuffer;
 		uint indices[6] = { 0, 1, 2, 2, 3, 0 };
 		float vertices[5 * 4] = {
 				-0.5f,	-0.5f,	0.0f,	0.0f, 0.0f,		// For negative X positions, UV should be 0, for positive, 1
@@ -31,8 +29,8 @@ public:
 		};
 
 		m_VArray = Kaimos::VertexArray::Create();
-		m_VBuffer = Kaimos::VertexBuffer::Create(vertices, sizeof(vertices));
-		m_IBuffer = Kaimos::IndexBuffer::Create(indices, sizeof(indices)/sizeof(uint));
+		Kaimos::Ref<Kaimos::VertexBuffer> m_VBuffer = Kaimos::VertexBuffer::Create(vertices, sizeof(vertices));
+		Kaimos::Ref<Kaimos::IndexBuffer> m_IBuffer = Kaimos::IndexBuffer::Create(indices, sizeof(indices)/sizeof(uint));
 
 		Kaimos::BufferLayout layout = {
 			{ Kaimos::ShaderDataType::Float3, "a_Position" },
@@ -54,7 +52,7 @@ public:
 
 		
 		textureShader->Bind();
-		std::dynamic_pointer_cast<Kaimos::OpenGLShader>(textureShader)->UploadUniformInt("u_Texture", 0); // Second parameter asks for the TEXTURE SLOT, not ID!!! (store slots?)
+		textureShader->SetUInt("u_Texture", 0); // Second parameter asks for the TEXTURE SLOT, not ID!!! (store slots?)
 	}
 
 	virtual void OnEvent(Kaimos::Event& ev) override
@@ -98,9 +96,9 @@ public:
 				glm::mat4 transform = glm::translate(glm::mat4(1.0f), pos) * scale;
 				
 				if (x % 2 == 0)
-					std::dynamic_pointer_cast<Kaimos::OpenGLShader>(textureShader)->UploadUniformFloat4("u_Color", { color1, 1.0f });
+					textureShader->SetUFloat4("u_Color", { color1, 1.0f });
 				else
-					std::dynamic_pointer_cast<Kaimos::OpenGLShader>(textureShader)->UploadUniformFloat4("u_Color", { color2, 1.0f });
+					textureShader->SetUFloat4("u_Color", { color2, 1.0f });
 
 				
 				Kaimos::Renderer::Submit(textureShader, m_VArray, transform);

@@ -15,7 +15,7 @@ namespace Kaimos {
 		KS_ENGINE_ASSERT(!s_Instance, "There already exist one instance of Application!!"); // Assertion to not to have more than 1 Application instances
 		s_Instance = this;
 
-		m_Window = std::unique_ptr<Window>(Window::Create());
+		m_Window = Window::Create();
 		
 		Renderer::Init();
 
@@ -26,6 +26,11 @@ namespace Kaimos {
 		// an event happens will be Application::OnEvent. The placeholder will be replaced by whatever argument
 		// is passed, so OnEvent() will be called with some argument passed (now represented by this "placeholder")
 		m_Window->SetEventCallback(KS_BIND_EVENT_FN(Application::OnEvent)); // SAME: m_Window->SetEventCallback(std::bind(&Application::OnEvent, this, std::placeholders::_1));
+	}
+
+	Application::~Application()
+	{
+		Renderer::Shutdown();
 	}
 
 	// -- Class Methods --

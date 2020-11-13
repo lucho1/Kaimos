@@ -5,5 +5,5 @@
 
 namespace Kaimos {
 
-	ScopePtr<RendererAPI> RenderCommand::s_RendererAPI = CreateScopePtr<OpenGLRendererAPI>();
+	ScopePtr<RendererAPI> RenderCommand::s_RendererAPI = RendererAPI::Create();
 }

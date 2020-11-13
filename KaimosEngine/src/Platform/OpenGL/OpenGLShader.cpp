@@ -64,29 +64,34 @@ namespace Kaimos {
 		// Input File Stream (to open a file) --> We give the filepath, tell it to process it as an input file
 		// and to be read as binary (because we don't want to do any processing into it, it will be completely in the format we want it to be, otherwise is read as text, as strings)
 		std::ifstream file(filepath, std::ios::in | std::ios::binary); // "or bitwise operator" (|), states the type of input stream, "we are opening the file as an input stream (read-only) and as a binary
+		std::string ret;
 
 		if (file)
 		{
 			// - First we see what's the size of the file -
-			file.seekg(0, std::ios::end);							// seekg sets position in input sequence (in this case, place cursor at the very end of the file)
+			file.seekg(0, std::ios::end);			// seekg sets position in input sequence (in this case, place cursor at the very end of the file)
+			
+			size_t file_size = file.tellg();		// tellg says us where the file cursor is (since it's at the file end, it's the size of the file)
+			if (file_size != -1)
+			{
+				// - Then create a string as big as the file size -				
+				ret.resize(file_size);
+				file.seekg(0, std::ios::beg);		// Place the cursor back to beginning of the file
 
-			// - Then create a string as big as the file size -
-			std::string result;
-			result.resize(file.tellg());							// tellg says us where the file cursor is (since it's at the file end, it's the size of the file)
+				// - And finally load it all into that string -
+				file.read(&ret[0], file_size);	// Put it into the string (passing a ptr to the string beginning), and with the size of the string
 
-			file.seekg(0, std::ios::beg);							// Place the cursor back to beginning of the file
-
-			// - And finally load it all into that string -
-			file.read(&result[0], result.size()); // Put it into the string (passing a ptr to the string beginning), and with the size of the string
-
-			// - Close the string -
-			file.close();
-			return result;
+				// - Close the string -
+				file.close();
+				return ret;
+			}
+			else
+				KS_ENGINE_ERROR("Couldn't read Shader file at path '{0}'", filepath);
 		}
 		else
 			KS_ENGINE_ERROR("Couldn't open Shader file at path '{0}'", filepath);
 
-		return std::string();
+		return ret;
 	}
 
 	const std::unordered_map<GLenum, std::string> OpenGLShader::PreProcessShader(const std::string& source)

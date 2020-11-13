@@ -1,6 +1,6 @@
 #include "Sandbox2D.h"
 
-#include "imgui.h"
+#include <imgui.h>
 
 // TODO: TEMP
 #include "Platform/OpenGL/OpenGLShader.h"

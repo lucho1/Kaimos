@@ -9,6 +9,8 @@ namespace Kaimos {
 
 		virtual void Init() = 0;
 		virtual void SwapBuffers() = 0;
+
+		static ScopePtr<GraphicsContext> Create(void* window);
 	};
 }
 

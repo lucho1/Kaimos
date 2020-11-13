@@ -13,6 +13,7 @@ namespace Kaimos {
 
 		// -- Methods --
 		static void Init();
+		static void Shutdown();
 		static void BeginScene(const OrthographicCamera& camera);
 		static void EndScene();
 

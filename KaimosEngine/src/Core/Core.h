@@ -67,7 +67,7 @@
 #endif
 // -- End of DLL SUPPORT --
 
-
+// -- GLOBALS --
 // -- Assertions --
 #if KS_ENABLE_ASSERTS
 	#define KS_EDITOR_ASSERT(x, ...) { if(!x) { KS_EDITOR_CRITICAL("ASSERION FAILED: {0}", __VA_ARGS__); __debugbreak(); }} // Client/Editor Assert
@@ -110,5 +110,6 @@ namespace Kaimos
 	}
 }
 
+// -- END OF GLOBALS --
 
 #endif //_CORE_H_

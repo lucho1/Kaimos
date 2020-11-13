@@ -17,9 +17,9 @@ namespace Kaimos {
 		KS_ENGINE_ERROR("GLFW Initialization Error ({0}): {1}", error, desc);
 	}
 
-	Window* Window::Create(const WindowProps& props)
+	ScopePtr<Window> Window::Create(const WindowProps& props)
 	{
-		return new WindowsWindow(props);
+		return CreateScopePtr<WindowsWindow>(props);
 	}
 
 
@@ -30,7 +30,7 @@ namespace Kaimos {
 
 	WindowsWindow::~WindowsWindow()
 	{
-		ShutdownWindow();
+		Shutdown();
 	}
 
 	void WindowsWindow::Init(const WindowProps& props)
@@ -54,7 +54,7 @@ namespace Kaimos {
 		++s_WindowCount;
 		
 		// -- Graphics Context Creation --
-		m_Context = CreateScopePtr<OpenGLContext>(m_Window);
+		m_Context = GraphicsContext::Create(m_Window);
 		m_Context->Init();
 		
 		// -- GLFW Window User ptr & VSYNC --
@@ -65,12 +65,13 @@ namespace Kaimos {
 		SetGLFWEventCallbacks();
 	}
 
-	void WindowsWindow::ShutdownWindow()
+	void WindowsWindow::Shutdown()
 	{
 		KS_ENGINE_INFO("Destroying GLFW Window '{0}'", m_Data.Title);
 		glfwDestroyWindow(m_Window);
+		--s_WindowCount;
 
-		if (--s_WindowCount == 0)
+		if (s_WindowCount == 0)
 		{
 			KS_ENGINE_INFO("Terminating GLFW");
 			glfwTerminate();

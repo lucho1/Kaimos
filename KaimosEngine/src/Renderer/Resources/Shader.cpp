@@ -12,7 +12,7 @@ namespace Kaimos {
 	{
 		switch (Renderer::GetRendererAPI())
 		{
-			case RendererAPI::API::OPENGL:		return std::make_shared<OpenGLShader>(filepath);
+			case RendererAPI::API::OPENGL:		return CreateRef<OpenGLShader>(filepath);
 			case RendererAPI::API::NONE:		KS_ENGINE_ASSERT(false, "RendererAPI is set to NONE (unsupported)!"); return nullptr;
 		}
 
@@ -26,7 +26,7 @@ namespace Kaimos {
 	{
 		switch (Renderer::GetRendererAPI())
 		{
-			case RendererAPI::API::OPENGL:		return std::make_shared<OpenGLShader>(name, vertexSrc, fragmentSrc);
+			case RendererAPI::API::OPENGL:		return CreateRef<OpenGLShader>(name, vertexSrc, fragmentSrc);
 			case RendererAPI::API::NONE:		KS_ENGINE_ASSERT(false, "RendererAPI is set to NONE (unsupported)!"); return nullptr;
 		}
 

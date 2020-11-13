@@ -39,7 +39,7 @@ namespace Kaimos {
 		virtual bool IsVSync() const = 0;
 
 		// This function is implemented per-platform too (Windows window, Mac window...), each platform creates its own windows
-		static Window* Create(const WindowProps& props = WindowProps());
+		static ScopePtr<Window> Create(const WindowProps& props = WindowProps());
 	};
 
 	// It's basically an interface, everything is pure virtual,

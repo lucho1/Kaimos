@@ -3,10 +3,6 @@
 
 namespace Kaimos {
 
-	LayerStack::LayerStack()
-	{
-	}
-
 	LayerStack::~LayerStack()
 	{
 		//std::vector<Layer*>::iterator item = m_Layers.begin();

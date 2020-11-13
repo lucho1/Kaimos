@@ -33,7 +33,7 @@ namespace Kaimos {
 	{
 	public:
 
-		WindowCloseEvent() {}
+		WindowCloseEvent() = default;
 		EVENT_CLASS_TYPE(WINDOW_CLOSE)
 		EVENT_CLASS_CATEGORY(EVENT_CATEGORY_APPLICATION)
 	};
@@ -43,7 +43,7 @@ namespace Kaimos {
 	{
 	public:
 
-		AppTickEvent() {}
+		AppTickEvent() = default;
 		EVENT_CLASS_TYPE(APP_TICK)
 		EVENT_CLASS_CATEGORY(EVENT_CATEGORY_APPLICATION)
 	};
@@ -53,7 +53,7 @@ namespace Kaimos {
 	{
 	public:
 
-		AppUpdateEvent() {}
+		AppUpdateEvent() = default;
 		EVENT_CLASS_TYPE(APP_UPDATE)
 		EVENT_CLASS_CATEGORY(EVENT_CATEGORY_APPLICATION)
 	};
@@ -63,7 +63,7 @@ namespace Kaimos {
 	{
 	public:
 
-		AppRenderEvent() {}
+		AppRenderEvent() = default;
 		EVENT_CLASS_TYPE(APP_RENDER)
 		EVENT_CLASS_CATEGORY(EVENT_CATEGORY_APPLICATION)
 	};

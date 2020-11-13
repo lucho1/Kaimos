@@ -20,7 +20,7 @@ namespace Kaimos {
 		// -- Class Methods --
 		inline uint GetWidth() const override { return m_Data.Width; }
 		inline uint GetHeight() const override { return m_Data.Height; }
-		virtual void ShutdownWindow();
+		virtual void Shutdown();
 
 		inline void* GetNativeWindow() const override { return m_Window; }
 

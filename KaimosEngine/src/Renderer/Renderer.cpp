@@ -14,6 +14,11 @@ namespace Kaimos {
 		Renderer2D::Init();
 	}
 
+	void Renderer::Shutdown()
+	{
+		Renderer2D::Shutdown();
+	}
+
 	void Renderer::BeginScene(const OrthographicCamera& camera)
 	{
 		// Takes all scene parameters and makes sure the shaders we use get the right uniforms
@@ -26,13 +31,9 @@ namespace Kaimos {
 
 	void Renderer::Submit(const Ref<Shader>& shader, const Ref<VertexArray>& vertexArray, const glm::mat4& transformation)
 	{
-		//if(shader != nullptr)
-		//	shader->Bind();
-		// TODO: Upload ViewProjectionMatrix uniform here and delete if statement
-		// TODO: Upload tranform here as ModelMatrix
 		shader->Bind();
-		std::dynamic_pointer_cast<OpenGLShader>(shader)->UploadUniformMat4("u_ViewProjection", s_SceneData->ViewProjectionMatrix);
-		std::dynamic_pointer_cast<OpenGLShader>(shader)->UploadUniformMat4("u_Model", transformation);
+		shader->SetUMat4("u_ViewProjection", s_SceneData->ViewProjectionMatrix);
+		shader->SetUMat4("u_Model", transformation);
 
 		// Vertex Array bound here since RenderCommands should NOT do multiple things, they are just commands (unless specifically suposed-to)
 		vertexArray->Bind();

@@ -2,6 +2,7 @@
 #define _KAIMOS_H_
 
 // For Kaimos Applications use (clients)
+#include "Core/Core.h"
 
 // --- Engine Basic Stuff ---
 #include "Core/Application.h"

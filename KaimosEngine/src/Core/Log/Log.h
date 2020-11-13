@@ -2,8 +2,8 @@
 #define _LOG_H_
 
 #include "Core/Core.h"
-#include "spdlog/spdlog.h"
-#include "spdlog/fmt/ostr.h" // To pass events
+#include <spdlog/spdlog.h>
+#include <spdlog/fmt/ostr.h> // To pass events
 
 namespace Kaimos {
 
@@ -12,13 +12,13 @@ namespace Kaimos {
 	public:
 		static void Init();
 
-		inline static std::shared_ptr<spdlog::logger>& GetEngineLogger() { return s_EngineLogger; }
-		inline static std::shared_ptr<spdlog::logger>& GetEditorLogger() { return s_EditorLogger; }
+		inline static Ref<spdlog::logger>& GetEngineLogger() { return s_EngineLogger; }
+		inline static Ref<spdlog::logger>& GetEditorLogger() { return s_EditorLogger; }
 
 	private:
 
-		static std::shared_ptr<spdlog::logger> s_EngineLogger; // Core Logger
-		static std::shared_ptr<spdlog::logger> s_EditorLogger; // Client Logger
+		static Ref<spdlog::logger> s_EngineLogger; // Core Logger
+		static Ref<spdlog::logger> s_EditorLogger; // Client Logger
 	};
 }
 
