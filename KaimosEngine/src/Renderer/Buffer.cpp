@@ -13,7 +13,7 @@ namespace Kaimos {
 	{
 		switch (Renderer::GetRendererAPI())
 		{
-			case RendererAPI::API::OPENGL:		return std::make_shared<OpenGLVertexBuffer>(vertices, size);
+			case RendererAPI::API::OPENGL:		return CreateRef<OpenGLVertexBuffer>(vertices, size);
 			case RendererAPI::API::NONE:		KS_ENGINE_ASSERT(false, "RendererAPI is set to NONE (unsupported)!"); return nullptr;
 		}
 
@@ -26,7 +26,7 @@ namespace Kaimos {
 	{
 		switch (Renderer::GetRendererAPI())
 		{
-			case RendererAPI::API::OPENGL:		return std::make_shared<OpenGLIndexBuffer>(vertices, count);
+			case RendererAPI::API::OPENGL:		return CreateRef<OpenGLIndexBuffer>(vertices, count);
 			case RendererAPI::API::NONE:		KS_ENGINE_ASSERT(false, "RendererAPI is set to NONE (unsupported)!"); return nullptr;
 		}
 
@@ -39,7 +39,7 @@ namespace Kaimos {
 	{
 		switch (Renderer::GetRendererAPI())
 		{
-			case RendererAPI::API::OPENGL:		return std::make_shared<OpenGLVertexArray>();
+			case RendererAPI::API::OPENGL:		return CreateRef<OpenGLVertexArray>();
 			case RendererAPI::API::NONE:		KS_ENGINE_ASSERT(false, "RendererAPI is set to NONE (unsupported)!"); return nullptr;
 		}
 

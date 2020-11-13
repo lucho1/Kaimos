@@ -25,6 +25,7 @@ namespace Kaimos {
 	void OpenGLRendererAPI::DrawIndexed(const Ref<VertexArray>& vertexArray) const
 	{
 		glDrawElements(GL_TRIANGLES, vertexArray->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
+		glBindTexture(GL_TEXTURE_2D, 0); // TODO/OJU: Should we actually do this?
 	}
 
 	void OpenGLRendererAPI::SetViewport(uint x, uint y, uint width, uint height)
