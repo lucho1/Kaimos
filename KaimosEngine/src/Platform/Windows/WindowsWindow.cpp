@@ -10,7 +10,7 @@
 
 namespace Kaimos {
 
-	static uint8_t s_GLFWWindowCount = 0;
+	static uint8_t s_WindowCount = 0;
 
 	static void GLFWErrorCallback(int error, const char* desc)
 	{
@@ -41,7 +41,7 @@ namespace Kaimos {
 		KS_ENGINE_INFO("Creating Window {0} with measure {1}x{2}px", props.Title, props.Width, props.Height);
 
 		// -- GLFW Initialization --
-		if (s_GLFWWindowCount == 0)
+		if (s_WindowCount == 0)
 		{
 			KS_ENGINE_INFO("Initializing GLFW");
 			int success = glfwInit();
@@ -51,7 +51,7 @@ namespace Kaimos {
 
 		// -- Window Creation --
 		m_Window = glfwCreateWindow((int)props.Width, (int)props.Height, m_Data.Title.c_str(), nullptr, nullptr);
-		++s_GLFWWindowCount;
+		++s_WindowCount;
 		
 		// -- Graphics Context Creation --
 		m_Context = CreateScopePtr<OpenGLContext>(m_Window);
@@ -70,7 +70,7 @@ namespace Kaimos {
 		KS_ENGINE_INFO("Destroying GLFW Window '{0}'", m_Data.Title);
 		glfwDestroyWindow(m_Window);
 
-		if (--s_GLFWWindowCount == 0)
+		if (--s_WindowCount == 0)
 		{
 			KS_ENGINE_INFO("Terminating GLFW");
 			glfwTerminate();

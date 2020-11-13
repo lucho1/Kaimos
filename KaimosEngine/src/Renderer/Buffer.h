@@ -33,7 +33,8 @@ namespace Kaimos {
 		// -- Variables --
 		std::string Name = "";
 		ShaderDataType Type = ShaderDataType::None;
-		uint Offset = 0, Size = 0;
+		size_t Offset = 0;
+		uint Size = 0;
 		bool Normalized = false;
 
 		// -- Functions --
@@ -91,7 +92,7 @@ namespace Kaimos {
 
 		void CalculateOffsetAndStride()
 		{
-			uint offset = 0;
+			size_t offset = 0;
 			m_Stride = 0;
 			for (auto& element : m_Elements)
 			{
