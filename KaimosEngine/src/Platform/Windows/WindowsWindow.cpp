@@ -10,7 +10,7 @@
 
 namespace Kaimos {
 
-	static bool s_GLFWInitialized = false;
+	static uint8_t s_GLFWWindowCount = 0;
 
 	static void GLFWErrorCallback(int error, const char* desc)
 	{
@@ -30,7 +30,7 @@ namespace Kaimos {
 
 	WindowsWindow::~WindowsWindow()
 	{
-		ShutdownWindow(true);
+		ShutdownWindow();
 	}
 
 	void WindowsWindow::Init(const WindowProps& props)
@@ -41,16 +41,17 @@ namespace Kaimos {
 		KS_ENGINE_INFO("Creating Window {0} with measure {1}x{2}px", props.Title, props.Width, props.Height);
 
 		// -- GLFW Initialization --
-		if (!s_GLFWInitialized)
+		if (s_GLFWWindowCount == 0)
 		{
+			KS_ENGINE_INFO("Initializing GLFW");
 			int success = glfwInit();
 			KS_ENGINE_ASSERT(success, "Couldn't Initialize GLFW!");
-			glfwSetErrorCallback(GLFWErrorCallback); // GLFW Error Callback
-			s_GLFWInitialized = true;
+			glfwSetErrorCallback(GLFWErrorCallback);
 		}
 
 		// -- Window Creation --
 		m_Window = glfwCreateWindow((int)props.Width, (int)props.Height, m_Data.Title.c_str(), nullptr, nullptr);
+		++s_GLFWWindowCount;
 		
 		// -- Graphics Context Creation --
 		m_Context = CreateScopePtr<OpenGLContext>(m_Window);
@@ -64,12 +65,16 @@ namespace Kaimos {
 		SetGLFWEventCallbacks();
 	}
 
-	void WindowsWindow::ShutdownWindow(bool terminateGLFW)
+	void WindowsWindow::ShutdownWindow()
 	{
+		KS_ENGINE_INFO("Destroying GLFW Window '{0}'", m_Data.Title);
 		glfwDestroyWindow(m_Window);
 
-		if (terminateGLFW)
+		if (--s_GLFWWindowCount == 0)
+		{
+			KS_ENGINE_INFO("Terminating GLFW");
 			glfwTerminate();
+		}
 	}
 
 	void WindowsWindow::OnUpdate()
