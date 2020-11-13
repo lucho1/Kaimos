@@ -24,6 +24,7 @@ private:
 	Kaimos::Ref<Kaimos::VertexArray> m_VArray;
 	
 	Kaimos::Ref<Kaimos::Shader> m_Shader;
+	Kaimos::Ref<Kaimos::Texture2D> m_CheckerTexture;
 	glm::vec4 m_Color = { 0.2f, 0.3f, 0.8f, 1.0f };
 };
 

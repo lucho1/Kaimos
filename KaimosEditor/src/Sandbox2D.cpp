@@ -14,6 +14,7 @@ Sandbox2D::Sandbox2D() : Layer("Sandbox2D"), m_CameraController(1280.0f / 720.0f
 
 void Sandbox2D::OnAttach()
 {
+	m_CheckerTexture = Kaimos::Texture2D::Create("assets/textures/Checkerboard.png");
 }
 
 void Sandbox2D::OnDetach()
@@ -32,8 +33,9 @@ void Sandbox2D::OnUpdate(Kaimos::Timestep dt)
 	Kaimos::Renderer2D::BeginScene(m_CameraController.GetCamera());
 	
 	// -- End Scene --
-	Kaimos::Renderer2D::DrawQuad(glm::vec2(0.0f), glm::vec2(1.2f), 45.0f, { 0.8f, 0.2f, 0.3f, 1.0f });
-	Kaimos::Renderer2D::DrawQuad(glm::vec2(1.0f), glm::vec2(0.5f), 20.0f, { 0.3f, 0.2f, 0.8f, 1.0f });
+	Kaimos::Renderer2D::DrawQuad(glm::vec2(-1.0f, 0.0f), glm::vec2(0.8f), 45.0f, { 0.8f, 0.2f, 0.3f, 1.0f });
+	Kaimos::Renderer2D::DrawQuad(glm::vec2(0.5f, -0.5f), glm::vec2(0.5f, 0.75f), 20.0f, { 0.2f, 0.3f, 0.8f, 1.0f });
+	Kaimos::Renderer2D::DrawQuad(glm::vec3(0.2f, 0.5f, -0.1f), glm::vec2(10.0f), 0.0f, m_CheckerTexture);
 	Kaimos::Renderer2D::EndScene();
 }
 

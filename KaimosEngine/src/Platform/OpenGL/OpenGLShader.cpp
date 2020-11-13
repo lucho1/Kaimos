@@ -252,6 +252,12 @@ namespace Kaimos {
 	{
 		UploadUniformMat4(name, value);
 	}
+	
+	void OpenGLShader::SetUInt(const std::string& name, float value)
+	{
+		UploadUniformInt(name, value);
+	}
+
 
 	// --- Uniforms Upload ---
 	void OpenGLShader::UploadUniformInt(const std::string& name, const int& value)

@@ -43,6 +43,9 @@ namespace Kaimos {
 		glTextureParameteri(m_ID, GL_TEXTURE_MIN_FILTER, GL_LINEAR);		// GL_LINEAR will make the minification (zoomed-out) of the texture to be linearly interpolated to the color we want
 		glTextureParameteri(m_ID, GL_TEXTURE_MAG_FILTER, GL_NEAREST);		// GL_NEAREST will make the magnification (zoomed-in) to snap into the nearest pixel (instead of blurring with GL_LINEAR) --> Linear filtering is OK for images but not with few colors
 
+		glTextureParameteri(m_ID, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTextureParameteri(m_ID, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
 		glTextureSubImage2D(m_ID, 0, 0, 0, m_Width, m_Height, dataFormat, GL_UNSIGNED_BYTE, texture_data); // X,Y Offset can be use to upload partially a texture, you can change a region of an already uploaded texture
 		
 		stbi_image_free(texture_data);

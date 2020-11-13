@@ -30,6 +30,7 @@ namespace Kaimos {
 		//	shader->Bind();
 		// TODO: Upload ViewProjectionMatrix uniform here and delete if statement
 		// TODO: Upload tranform here as ModelMatrix
+		shader->Bind();
 		std::dynamic_pointer_cast<OpenGLShader>(shader)->UploadUniformMat4("u_ViewProjection", s_SceneData->ViewProjectionMatrix);
 		std::dynamic_pointer_cast<OpenGLShader>(shader)->UploadUniformMat4("u_Model", transformation);
 

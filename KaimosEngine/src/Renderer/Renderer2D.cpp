@@ -14,6 +14,7 @@ namespace Kaimos {
 	{
 		Ref<VertexArray> QuadVArray;
 		Ref<Shader> FlatColorShader;
+		Ref<Shader> TextureShader;
 	};
 	
 	static Renderer2DStorage* s_Data;	// On shutdown, this is deleted, and ~VertexArray() called, freeing GPU Memory too
@@ -28,17 +29,21 @@ namespace Kaimos {
 		Ref<VertexBuffer> m_VBuffer;
 		Ref<IndexBuffer> m_IBuffer;
 		uint indices[6] = { 0, 1, 2, 2, 3, 0 };
-		float vertices[3 * 4] = {
-				-0.5f,	-0.5f,	0.0f,
-				 0.5f,	-0.5f,	0.0f,
-				 0.5f,	 0.5f,	0.0f,
-				-0.5f,	 0.5f,	0.0f
+		float vertices[5 * 4] = {
+				-0.5f,	-0.5f,	0.0f, 0.0f, 0.0f,
+				 0.5f,	-0.5f,	0.0f, 1.0f, 0.0f,
+				 0.5f,	 0.5f,	0.0f, 1.0f, 1.0f,
+				-0.5f,	 0.5f,	0.0f, 0.0f, 1.0f
 		};
 
 		s_Data->QuadVArray = VertexArray::Create();
 		m_VBuffer = VertexBuffer::Create(vertices, sizeof(vertices));
 		m_IBuffer = IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint));
-		BufferLayout layout = { { ShaderDataType::Float3, "a_Position" } };
+		
+		BufferLayout layout = {
+			{ ShaderDataType::Float3, "a_Position" },
+			{ ShaderDataType::Float2, "a_TexCoord" }
+		};
 
 		m_VBuffer->SetLayout(layout);
 		s_Data->QuadVArray->AddVertexBuffer(m_VBuffer);
@@ -48,8 +53,9 @@ namespace Kaimos {
 		m_IBuffer->Unbind();
 		m_VBuffer->Unbind();
 
-		// --- Shader ---
+		// --- Shader & Texture ---
 		s_Data->FlatColorShader = Shader::Create("assets/shaders/FlatColorShader.glsl");
+		s_Data->TextureShader = Shader::Create("assets/shaders/TextureShader.glsl");
 	}
 
 	void Renderer2D::Shutdown()
@@ -63,7 +69,9 @@ namespace Kaimos {
 	{
 		s_Data->FlatColorShader->Bind();		
 		s_Data->FlatColorShader->SetUMat4("u_ViewProjection", camera.GetViewProjectionMatrix());
-		
+
+		s_Data->TextureShader->Bind();
+		s_Data->TextureShader->SetUMat4("u_ViewProjection", camera.GetViewProjectionMatrix());		
 	}
 
 	void Renderer2D::EndScene()
@@ -83,6 +91,24 @@ namespace Kaimos {
 		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * glm::rotate(glm::mat4(1.0f), glm::radians(rotation), glm::vec3(0, 0, 1)) * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
 		s_Data->FlatColorShader->SetUMat4("u_Model", transform);
 
+		s_Data->QuadVArray->Bind();
+		RenderCommand::DrawIndexed(s_Data->QuadVArray);
+	}
+
+	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2 size, float rotation, const Ref<Texture2D> texture)
+	{
+		DrawQuad({ position.x, position.y, 0.0f }, size, rotation, texture);
+	}
+
+	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2 size, float rotation, const Ref<Texture2D> texture)
+	{
+		s_Data->TextureShader->Bind();
+		texture->Bind();
+
+		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * glm::rotate(glm::mat4(1.0f), glm::radians(rotation), glm::vec3(0, 0, 1)) * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
+		s_Data->TextureShader->SetUMat4("u_Model", transform);
+		s_Data->TextureShader->SetUInt("u_Texture", 0);
+		
 		s_Data->QuadVArray->Bind();
 		RenderCommand::DrawIndexed(s_Data->QuadVArray);
 	}
