@@ -96,8 +96,8 @@ namespace Kaimos {
 
 	void ImGuiLayer::OnUIRender()
 	{
-		static bool show = true;
-		ImGui::ShowDemoWindow(&show);
+		//static bool show = true;
+		//ImGui::ShowDemoWindow(&show);
 	}
 
 
