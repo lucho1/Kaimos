@@ -14,6 +14,17 @@ extern "C" {
 
 #ifdef KS_PLATFORM_WINDOWS
 
+#if KS_DEBUG
+	#define SESSION_NAME(name) "<KS_DEBUG> - "##name
+	#define SESSION_FILENAME(name) "../Profiling/KaimosDebug_Profile"##name
+#elif KS_RELEASE
+	#define SESSION_NAME(name) "<KS_RELEASE> - "##name
+	#define SESSION_FILENAME(name) "../Profiling/KaimosRelease_Profile"##name
+#else
+	#define SESSION_NAME(name) "<WRONG_CONFIG> - "##name
+	#define SESSION_FILENAME(name) "../Profiling/WrongConfig_Profile"##name
+#endif
+
 extern Kaimos::Application* Kaimos::CreateApplication();
 
 int main(int argc, char** argv)
@@ -24,17 +35,17 @@ int main(int argc, char** argv)
 
 
 	KS_ENGINE_INFO("--- Creating Kaimos Application ---");
-	KS_PROFILE_BEGIN_SESSION("Startup", "../Profiling/KaimosProfileStartup.json");
+	KS_PROFILE_BEGIN_SESSION(SESSION_NAME("Startup"), SESSION_FILENAME("Startup.json"));
 	Kaimos::Application* app = Kaimos::CreateApplication();
 	KS_PROFILE_END_SESSION();
 
 	KS_ENGINE_INFO("--- Running Kaimos Application ---");
-	KS_PROFILE_BEGIN_SESSION("Runtime", "../Profiling/KaimosProfileRuntime.json");
+	KS_PROFILE_BEGIN_SESSION(SESSION_NAME("Runtime"), SESSION_FILENAME("Runtime.json"));
 	app->Run();
 	KS_PROFILE_END_SESSION();
 
 	KS_ENGINE_INFO("--- Shutting Down Kaimos Application ---");
-	KS_PROFILE_BEGIN_SESSION("Shutdown", "../Profiling/KaimosProfileShutdown.json");
+	KS_PROFILE_BEGIN_SESSION(SESSION_NAME("Shutdown"), SESSION_FILENAME("Shutdown.json"));
 	delete app;
 	KS_PROFILE_END_SESSION();
 

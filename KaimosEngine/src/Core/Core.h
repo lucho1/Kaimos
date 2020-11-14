@@ -68,6 +68,12 @@
 // -- End of DLL SUPPORT --
 
 // -- GLOBALS --
+#if KS_DEBUG || KS_RELEASE
+	#define KS_ACTIVATE_PROFILE 1
+#else
+	#define KS_ACTIVATE_PROFILE 0
+#endif
+
 // -- Assertions --
 #if KS_ENABLE_ASSERTS
 	#define KS_EDITOR_ASSERT(x, ...) { if(!x) { KS_EDITOR_CRITICAL("ASSERION FAILED: {0}", __VA_ARGS__); __debugbreak(); }} // Client/Editor Assert
