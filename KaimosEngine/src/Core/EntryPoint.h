@@ -16,13 +16,13 @@ extern "C" {
 
 #if KS_DEBUG
 	#define SESSION_NAME(name) "<KS_DEBUG> - "##name
-	#define SESSION_FILENAME(name) "../Profiling/KaimosDebug_Profile"##name
+	#define SESSION_FILENAME(name) "../ResultOutputFiles/KaimosDebug_Profile"##name
 #elif KS_RELEASE
 	#define SESSION_NAME(name) "<KS_RELEASE> - "##name
-	#define SESSION_FILENAME(name) "../Profiling/KaimosRelease_Profile"##name
+	#define SESSION_FILENAME(name) "../ResultOutputFiles/KaimosRelease_Profile"##name
 #else
 	#define SESSION_NAME(name) "<WRONG_CONFIG> - "##name
-	#define SESSION_FILENAME(name) "../Profiling/WrongConfig_Profile"##name
+	#define SESSION_FILENAME(name) "../ResultOutputFiles/WrongConfig_Profile"##name
 #endif
 
 extern Kaimos::Application* Kaimos::CreateApplication();

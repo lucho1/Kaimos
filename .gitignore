@@ -15,4 +15,6 @@ bin-int/
 **.sln
 
 # Unnecessary Files
-**/ProfileResults/
+**/ResultOutputFiles/
+*.log
+*.json
