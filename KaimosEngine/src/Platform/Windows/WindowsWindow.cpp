@@ -1,6 +1,8 @@
 #include "kspch.h"
 #include "WindowsWindow.h"
 
+#include "Core/Input/Input.h"
+
 #include "Core/Events/ApplicationEvent.h"
 #include "Core/Events/MouseEvent.h"
 #include "Core/Events/KeyEvent.h"
@@ -134,31 +136,31 @@ namespace Kaimos {
 
 				switch (action)
 				{
-				case GLFW_PRESS:
-				{
-					KeyPressedEvent event(key, 0);
-					data.EventCallback(event);
-					break;
-				}
-				case GLFW_RELEASE:
-				{
-					KeyReleasedEvent event(key);
-					data.EventCallback(event);
-					break;
-				}
-				case GLFW_REPEAT:
-				{
-					KeyPressedEvent event(key, 1);
-					data.EventCallback(event);
-					break;
-				}
+					case GLFW_PRESS:
+					{
+						KeyPressedEvent event(static_cast<KEYCODE>(key), 0);
+						data.EventCallback(event);
+						break;
+					}
+					case GLFW_RELEASE:
+					{
+						KeyReleasedEvent event(static_cast<KEYCODE>(key));
+						data.EventCallback(event);
+						break;
+					}
+					case GLFW_REPEAT:
+					{
+						KeyPressedEvent event(static_cast<KEYCODE>(key), 1);
+						data.EventCallback(event);
+						break;
+					}
 				}
 			});
 
-		glfwSetCharCallback(m_Window, [](GLFWwindow* window, uint key)
+		glfwSetCharCallback(m_Window, [](GLFWwindow* window, uint keycode)
 			{
 				WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
-				KeyTypedEvent event(key);
+				KeyTypedEvent event(static_cast<KEYCODE>(keycode));
 				data.EventCallback(event);
 			});
 
@@ -172,13 +174,13 @@ namespace Kaimos {
 				{
 				case GLFW_PRESS:
 				{
-					MouseButtonPressedEvent event(button);
+					MouseButtonPressedEvent event(static_cast<MOUSECODE>(button));
 					data.EventCallback(event);
 					break;
 				}
 				case GLFW_RELEASE:
 				{
-					MouseButtonReleasedEvent event(button);
+					MouseButtonReleasedEvent event(static_cast<MOUSECODE>(button));
 					data.EventCallback(event);
 					break;
 				}

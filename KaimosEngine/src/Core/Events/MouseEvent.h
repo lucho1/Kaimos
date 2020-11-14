@@ -2,6 +2,7 @@
 #define	_MOUSEEVENT_H_
 
 #include "Event.h"
+#include "Core/Input/Input.h"
 
 namespace Kaimos {
 
@@ -57,13 +58,13 @@ namespace Kaimos {
 	{
 	public:
 
-		inline int GetMouseButton() const { return m_Button; }
+		inline MOUSECODE GetMouseButton() const { return m_Button; }
 		EVENT_CLASS_CATEGORY(EVENT_CATEGORY_MOUSE | EVENT_CATEGORY_INPUT)
 
 	protected:
 
-		MouseButtonEvent(int button) : m_Button(button) {}
-		int m_Button = 0;
+		MouseButtonEvent(MOUSECODE button) : m_Button(button) {}
+		MOUSECODE m_Button;
 	};
 
 
@@ -71,7 +72,7 @@ namespace Kaimos {
 	{
 	public:
 
-		MouseButtonPressedEvent(int button) : MouseButtonEvent(button) {}
+		MouseButtonPressedEvent(MOUSECODE button) : MouseButtonEvent(button) {}
 
 		std::string ToString() const override
 		{
@@ -88,7 +89,7 @@ namespace Kaimos {
 	{
 	public:
 
-		MouseButtonReleasedEvent(int button) : MouseButtonEvent(button) {}
+		MouseButtonReleasedEvent(MOUSECODE button) : MouseButtonEvent(button) {}
 
 		std::string ToString() const override
 		{

@@ -9,9 +9,9 @@ namespace Kaimos {
 	{
 	protected:
 
-		virtual bool IsKeyPressedImpl(uint keycode) override;
+		virtual bool IsKeyPressedImpl(KEYCODE key) override;
 
-		virtual bool IsMouseButtonPressedImpl(uint button) override;
+		virtual bool IsMouseButtonPressedImpl(MOUSECODE button) override;
 		virtual std::pair<float, float> GetMousePosImpl() override;
 		virtual float GetMouseXImpl() override;
 		virtual float GetMouseYImpl() override;

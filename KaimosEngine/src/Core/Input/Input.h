@@ -2,6 +2,7 @@
 #define _INPUT_H
 
 #include "Core/Core.h"
+#include "KaimosInputCodes.h"
 
 namespace Kaimos {
 
@@ -15,9 +16,9 @@ namespace Kaimos {
 		Input(const Input&) = delete;
 		Input& operator=(const Input&) = delete;
 
-		inline static bool IsKeyPressed(uint keycode) { return s_Instance->IsKeyPressedImpl(keycode); }
+		inline static bool IsKeyPressed(KEYCODE key) { return s_Instance->IsKeyPressedImpl(key); }
 
-		inline static bool IsMouseButtonPressed(uint button) { return s_Instance->IsMouseButtonPressedImpl(button); }
+		inline static bool IsMouseButtonPressed(MOUSECODE button) { return s_Instance->IsMouseButtonPressedImpl(button); }
 		inline static std::pair<float, float> GetMousePos() { return s_Instance->GetMousePosImpl(); }
 		inline static float GetMouseX() { return s_Instance->GetMouseXImpl(); }
 		inline static float GetMouseY() { return s_Instance->GetMouseYImpl(); }
@@ -27,9 +28,9 @@ namespace Kaimos {
 	protected:
 
 		// -- To keep platform-abstraction, virtual functions defined per platform (called by public ones above) --
-		virtual bool IsKeyPressedImpl(uint keycode) = 0;
-		
-		virtual bool IsMouseButtonPressedImpl(uint button) = 0;
+		virtual bool IsKeyPressedImpl(KEYCODE keycode) = 0;
+
+		virtual bool IsMouseButtonPressedImpl(MOUSECODE button) = 0;
 		virtual std::pair<float, float> GetMousePosImpl() = 0;
 		virtual float GetMouseXImpl() = 0;
 		virtual float GetMouseYImpl() = 0;
