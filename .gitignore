@@ -13,3 +13,6 @@ bin-int/
 **.vcxproj.user
 **.ini
 **.sln
+
+# Unnecessary Files
+**/Profiling/

@@ -19,26 +19,24 @@ extern Kaimos::Application* Kaimos::CreateApplication();
 int main(int argc, char** argv)
 {
 	Kaimos::Log::Init();
-	KS_ENGINE_INFO("Kaimos Engine Started");
+	KS_ENGINE_INFO("--- Kaimos Engine Started ---");
+	KS_ENGINE_INFO("		Initialized Logger");
 
-	KS_ENGINE_INFO("Started Engine Logger Successfully");
-	KS_ENGINE_TRACE("-- Engine Logger Test --");
-	KS_ENGINE_WARN("Warn Test Message");
-	KS_ENGINE_ERROR("Error Test Message");
-	KS_ENGINE_CRITICAL("Fatal Test Message");
 
-	KS_EDITOR_INFO("Started Editor Logger Successfully");
-	KS_EDITOR_TRACE("-- Editor Logger Test --");
-	KS_EDITOR_WARN("Warn Test Message");
-	KS_EDITOR_ERROR("Error Test Message");
-	KS_EDITOR_CRITICAL("Fatal Test Message");
-
-	int a = 5;
-	KS_ENGINE_INFO("Numerical Test: Var = {0}", a);
-
+	KS_ENGINE_INFO("--- Creating Kaimos Application ---");
+	KS_PROFILE_BEGIN_SESSION("Startup", "../Profiling/KaimosProfileStartup.json");
 	Kaimos::Application* app = Kaimos::CreateApplication();
+	KS_PROFILE_END_SESSION();
+
+	KS_ENGINE_INFO("--- Running Kaimos Application ---");
+	KS_PROFILE_BEGIN_SESSION("Runtime", "../Profiling/KaimosProfileRuntime.json");
 	app->Run();
+	KS_PROFILE_END_SESSION();
+
+	KS_ENGINE_INFO("--- Shutting Down Kaimos Application ---");
+	KS_PROFILE_BEGIN_SESSION("Shutdown", "../Profiling/KaimosProfileShutdown.json");
 	delete app;
+	KS_PROFILE_END_SESSION();
 
 	return 0;
 }

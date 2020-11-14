@@ -19,6 +19,8 @@
 
 // --- Engine Includes ---
 #include "Core/Log/Log.h"
+#include "Core/Time/Profiling/Instrumentor.h"
+
 
 // --- Windows Include ---
 #ifdef KS_PLATFORM_WINDOWS
