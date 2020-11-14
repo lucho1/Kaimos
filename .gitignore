@@ -15,4 +15,4 @@ bin-int/
 **.sln
 
 # Unnecessary Files
-**/Profiling/
+**/ProfileResults/
