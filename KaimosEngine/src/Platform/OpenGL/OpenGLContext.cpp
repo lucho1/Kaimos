@@ -14,6 +14,8 @@ namespace Kaimos {
 
 	void OpenGLContext::Init()
 	{
+		KS_PROFILE_FUNCTION();
+
 		// -- Communicating to GLFW which is the Current Context --
 		glfwMakeContextCurrent(m_WindowHandle);
 
@@ -30,6 +32,7 @@ namespace Kaimos {
 
 	void OpenGLContext::SwapBuffers()
 	{
+		KS_PROFILE_FUNCTION();
 		glfwSwapBuffers(m_WindowHandle);
 	}
 

@@ -10,6 +10,7 @@ namespace Kaimos {
 
 	void Renderer::Init()
 	{
+		KS_PROFILE_FUNCTION();
 		RenderCommand::Init();
 		Renderer2D::Init();
 	}

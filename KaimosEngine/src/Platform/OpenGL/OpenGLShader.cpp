@@ -21,6 +21,8 @@ namespace Kaimos {
 	
 	OpenGLShader::OpenGLShader(const std::string& filepath)
 	{
+		KS_PROFILE_FUNCTION();
+
 		// Compile Shader
 		CompileShader(PreProcessShader(ReadShaderFile(filepath)));
 
@@ -43,6 +45,8 @@ namespace Kaimos {
 
 	OpenGLShader::OpenGLShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc) : m_Name(name)
 	{
+		KS_PROFILE_FUNCTION();
+
 		// Set a source for the shader
 		std::unordered_map<GLenum, std::string> sources;
 		sources[GL_VERTEX_SHADER] = vertexSrc;
@@ -55,12 +59,15 @@ namespace Kaimos {
 	
 	OpenGLShader::~OpenGLShader()
 	{
+		KS_PROFILE_FUNCTION();
 		glDeleteProgram(m_ShaderID);
 	}
 
 
 	const std::string OpenGLShader::ReadShaderFile(const std::string& filepath)
 	{
+		KS_PROFILE_FUNCTION();
+
 		// Input File Stream (to open a file) --> We give the filepath, tell it to process it as an input file
 		// and to be read as binary (because we don't want to do any processing into it, it will be completely in the format we want it to be, otherwise is read as text, as strings)
 		std::ifstream file(filepath, std::ios::in | std::ios::binary); // "or bitwise operator" (|), states the type of input stream, "we are opening the file as an input stream (read-only) and as a binary
@@ -96,6 +103,8 @@ namespace Kaimos {
 
 	const std::unordered_map<GLenum, std::string> OpenGLShader::PreProcessShader(const std::string& source)
 	{
+		KS_PROFILE_FUNCTION();
+
 		std::unordered_map<GLenum, std::string> ret; // shader sources to return
 
 		const char* typeToken = "#type"; // Token to designate the beginning of a new shader (check any .glsl file)
@@ -142,6 +151,8 @@ namespace Kaimos {
 
 	void OpenGLShader::CompileShader(const std::unordered_map<GLenum, std::string>& shaderSources)
 	{
+		KS_PROFILE_FUNCTION();
+
 		// Get a program object.
 		GLuint program = glCreateProgram();
 		std::vector<GLenum> glShaderIDs;
@@ -235,31 +246,37 @@ namespace Kaimos {
 	// --- Shader Operations ---
 	void OpenGLShader::Bind() const
 	{
+		KS_PROFILE_FUNCTION();
 		glUseProgram(m_ShaderID);
 	}
 
 	void OpenGLShader::Unbind() const
 	{
+		KS_PROFILE_FUNCTION();
 		glUseProgram(0);
 	}
 
 	void OpenGLShader::SetUFloat3(const std::string& name, const glm::vec3& value)
 	{
+		KS_PROFILE_FUNCTION();
 		UploadUniformFloat3(name, value);
 	}
 
 	void OpenGLShader::SetUFloat4(const std::string& name, const glm::vec4& value)
 	{
+		KS_PROFILE_FUNCTION();
 		UploadUniformFloat4(name, value);
 	}
 
 	void OpenGLShader::SetUMat4(const std::string& name, const glm::mat4& value)
 	{
+		KS_PROFILE_FUNCTION();
 		UploadUniformMat4(name, value);
 	}
 	
 	void OpenGLShader::SetUInt(const std::string& name, float value)
 	{
+		KS_PROFILE_FUNCTION();
 		UploadUniformInt(name, value);
 	}
 

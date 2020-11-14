@@ -32,6 +32,7 @@ namespace Kaimos {
 	// ------------------------------------------------------------------------
 	OpenGLVertexBuffer::OpenGLVertexBuffer(float* vertices, uint size)
 	{
+		KS_PROFILE_FUNCTION();
 		glCreateBuffers(1, &m_BufferID);
 		glBindBuffer(GL_ARRAY_BUFFER, m_BufferID);
 		glBufferData(GL_ARRAY_BUFFER, size, vertices, GL_STATIC_DRAW);
@@ -39,16 +40,19 @@ namespace Kaimos {
 
 	OpenGLVertexBuffer::~OpenGLVertexBuffer()
 	{
+		KS_PROFILE_FUNCTION();
 		glDeleteBuffers(1, &m_BufferID);
 	}
 
 	void OpenGLVertexBuffer::Bind() const
 	{
+		KS_PROFILE_FUNCTION();
 		glBindBuffer(GL_ARRAY_BUFFER, m_BufferID);
 	}
 
 	void OpenGLVertexBuffer::Unbind() const
 	{
+		KS_PROFILE_FUNCTION();
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 	}
 
@@ -57,6 +61,7 @@ namespace Kaimos {
 	OpenGLIndexBuffer::OpenGLIndexBuffer(uint* vertices, uint count)
 		: m_Count(count)
 	{
+		KS_PROFILE_FUNCTION();
 		glCreateBuffers(1, &m_BufferID);
 		glBindBuffer(GL_ARRAY_BUFFER, m_BufferID); //Also, GL_ELEMENT_ARRAY_BUFFER
 		glBufferData(GL_ARRAY_BUFFER, count * sizeof(uint), vertices, GL_STATIC_DRAW); //Also, GL_ELEMENT_ARRAY_BUFFER
@@ -64,16 +69,19 @@ namespace Kaimos {
 
 	OpenGLIndexBuffer::~OpenGLIndexBuffer()
 	{
+		KS_PROFILE_FUNCTION();
 		glDeleteBuffers(1, &m_BufferID);
 	}
 
 	void OpenGLIndexBuffer::Bind() const
 	{
+		KS_PROFILE_FUNCTION();
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_BufferID);
 	}
 
 	void OpenGLIndexBuffer::Unbind() const
 	{
+		KS_PROFILE_FUNCTION();
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	}
 
@@ -81,26 +89,31 @@ namespace Kaimos {
 	// ------------------------------------------------------------------------
 	OpenGLVertexArray::OpenGLVertexArray()
 	{
+		KS_PROFILE_FUNCTION();
 		glCreateVertexArrays(1, &m_VArrayID);
 	}
 
 	OpenGLVertexArray::~OpenGLVertexArray()
 	{
+		KS_PROFILE_FUNCTION();
 		glDeleteVertexArrays(1, &m_VArrayID);
 	}
 
 	void OpenGLVertexArray::Bind() const
 	{
+		KS_PROFILE_FUNCTION();
 		glBindVertexArray(m_VArrayID);
 	}
 
 	void OpenGLVertexArray::Unbind() const
 	{
+		KS_PROFILE_FUNCTION();
 		glBindVertexArray(0);
 	}
 
 	void OpenGLVertexArray::AddVertexBuffer(const Ref<VertexBuffer>& Vbuffer)
 	{
+		KS_PROFILE_FUNCTION();
 		KS_ENGINE_ASSERT(Vbuffer->GetLayout().GetElements().size(), "VertexBuffer has not layouts!");
 		glBindVertexArray(m_VArrayID);
 		Vbuffer->Bind();
@@ -121,6 +134,7 @@ namespace Kaimos {
 
 	void OpenGLVertexArray::SetIndexBuffer(const Ref<IndexBuffer>& Ibuffer)
 	{
+		KS_PROFILE_FUNCTION();
 		glBindVertexArray(m_VArrayID);
 		Ibuffer->Bind();
 

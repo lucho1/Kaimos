@@ -23,6 +23,7 @@ namespace Kaimos {
 
 	void Renderer2D::Init()
 	{
+		KS_PROFILE_FUNCTION();
 		s_Data = new Renderer2DStorage();
 
 		// --- Vertex Array & Buffers ---
@@ -67,6 +68,8 @@ namespace Kaimos {
 
 	void Renderer2D::Shutdown()
 	{
+		KS_PROFILE_FUNCTION();
+
 		// This is deleted here (manually), and not treated as smart pointer, waiting for the end of the program lifetime
 		// because there is still some code of the graphics (OpenGL) that it has to run to free VRAM (for ex. deleting VArrays, Shaders...)
 		delete s_Data;
@@ -74,12 +77,14 @@ namespace Kaimos {
 
 	void Renderer2D::BeginScene(const OrthographicCamera& camera)
 	{
+		KS_PROFILE_FUNCTION();
 		s_Data->ColoredTextureShader->Bind();
 		s_Data->ColoredTextureShader->SetUMat4("u_ViewProjection", camera.GetViewProjectionMatrix());
 	}
 
 	void Renderer2D::EndScene()
 	{
+		KS_PROFILE_FUNCTION();
 	}
 
 	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2 size, float rotation, const glm::vec4& color)
@@ -94,6 +99,7 @@ namespace Kaimos {
 
 	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2 size, float rotation, const glm::vec4& color)
 	{
+		KS_PROFILE_FUNCTION();
 		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * glm::rotate(glm::mat4(1.0f), glm::radians(rotation), glm::vec3(0, 0, 1)) * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
 
 		s_Data->ColoredTextureShader->SetUMat4("u_Model", transform);
@@ -106,6 +112,7 @@ namespace Kaimos {
 
 	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2 size, float rotation, const Ref<Texture2D> texture)
 	{
+		KS_PROFILE_FUNCTION();
 		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * glm::rotate(glm::mat4(1.0f), glm::radians(rotation), glm::vec3(0, 0, 1)) * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
 		
 		s_Data->ColoredTextureShader->SetUMat4("u_Model", transform);

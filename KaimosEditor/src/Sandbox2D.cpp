@@ -8,7 +8,6 @@
 #include <glm/gtc/type_ptr.hpp>
 
 
-	~Timer()
 
 Sandbox2D::Sandbox2D() : Layer("Sandbox2D"), m_CameraController(1280.0f / 720.0f, true)
 {
@@ -16,11 +15,14 @@ Sandbox2D::Sandbox2D() : Layer("Sandbox2D"), m_CameraController(1280.0f / 720.0f
 
 void Sandbox2D::OnAttach()
 {
+	KS_PROFILE_FUNCTION();
+
 	m_CheckerTexture = Kaimos::Texture2D::Create("assets/textures/Checkerboard.png");
 }
 
 void Sandbox2D::OnDetach()
 {
+	KS_PROFILE_FUNCTION();
 }
 
 void Sandbox2D::OnUpdate(Kaimos::Timestep dt)
@@ -28,10 +30,7 @@ void Sandbox2D::OnUpdate(Kaimos::Timestep dt)
 	KS_PROFILE_FUNCTION();
 
 	// --- UPDATE ---
-	{
-		KS_PROFILE_SCOPE("Sandbox2D::OnUpdate::CameraController");
 		m_CameraController.OnUpdate(dt);
-	}
 
 	// --- RENDER ---
 	{

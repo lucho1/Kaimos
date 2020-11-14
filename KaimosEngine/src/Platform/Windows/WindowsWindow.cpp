@@ -25,16 +25,19 @@ namespace Kaimos {
 
 	WindowsWindow::WindowsWindow(const WindowProps& props)
 	{
+		KS_PROFILE_FUNCTION();
 		Init(props);
 	}
 
 	WindowsWindow::~WindowsWindow()
 	{
+		KS_PROFILE_FUNCTION();
 		Shutdown();
 	}
 
 	void WindowsWindow::Init(const WindowProps& props)
 	{
+		KS_PROFILE_FUNCTION();
 		m_Data.Width = props.Width;
 		m_Data.Height = props.Height;
 		m_Data.Title = props.Title;
@@ -43,6 +46,7 @@ namespace Kaimos {
 		// -- GLFW Initialization --
 		if (s_WindowCount == 0)
 		{
+			KS_PROFILE_SCOPE("GLFW Init");
 			KS_ENGINE_INFO("Initializing GLFW");
 			int success = glfwInit();
 			KS_ENGINE_ASSERT(success, "Couldn't Initialize GLFW!");
@@ -50,8 +54,11 @@ namespace Kaimos {
 		}
 
 		// -- Window Creation --
-		m_Window = glfwCreateWindow((int)props.Width, (int)props.Height, m_Data.Title.c_str(), nullptr, nullptr);
-		++s_WindowCount;
+		{
+			KS_PROFILE_SCOPE("GLFW Create Window");
+			m_Window = glfwCreateWindow((int)props.Width, (int)props.Height, m_Data.Title.c_str(), nullptr, nullptr);
+			++s_WindowCount;
+		}
 		
 		// -- Graphics Context Creation --
 		m_Context = GraphicsContext::Create(m_Window);
@@ -67,6 +74,7 @@ namespace Kaimos {
 
 	void WindowsWindow::Shutdown()
 	{
+		KS_PROFILE_FUNCTION();
 		KS_ENGINE_INFO("Destroying GLFW Window '{0}'", m_Data.Title);
 		glfwDestroyWindow(m_Window);
 		--s_WindowCount;
@@ -80,6 +88,7 @@ namespace Kaimos {
 
 	void WindowsWindow::OnUpdate()
 	{
+		KS_PROFILE_FUNCTION();
 		glfwPollEvents();
 		m_Context->SwapBuffers();
 	}

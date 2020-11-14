@@ -12,6 +12,7 @@ namespace Kaimos {
 
 	Application::Application()
 	{
+		KS_PROFILE_FUNCTION();
 		KS_ENGINE_ASSERT(!s_Instance, "There already exist one instance of Application!!"); // Assertion to not to have more than 1 Application instances
 		s_Instance = this;
 
@@ -30,12 +31,15 @@ namespace Kaimos {
 
 	Application::~Application()
 	{
+		KS_PROFILE_FUNCTION();
 		Renderer::Shutdown();
 	}
 
 	// -- Class Methods --
 	void Application::Run()
 	{
+		KS_PROFILE_FUNCTION();
+
 		// -- Events Test --
 		//WindowResizeEvent e(1080, 720);
 		//if (e.IsInCategory(EVENT_CATEGORY_APPLICATION))
@@ -45,6 +49,7 @@ namespace Kaimos {
 
 		while (m_Running)
 		{
+			KS_PROFILE_SCOPE("Run Loop");
 			float time = (float)glfwGetTime();//QueryPerformanceFrequency(); QueryPerformanceCounter(); // Platform::GetTime() !!!!!!
 			Timestep timestep = time - m_LastFrameTime; // How long this frame is (dt, current time vs last frame time)
 			m_LastFrameTime = time;
@@ -52,40 +57,54 @@ namespace Kaimos {
 			// -- Layers Update --
 			if (!m_Minimized)
 			{
+				KS_PROFILE_SCOPE("LayerStack Update");
 				for (Layer* layer : m_LayerStack)
 					layer->OnUpdate(timestep);
 			}
 
 			// ImGui stills updating when minimized because we don't know its behaviour on minimizing
-			m_ImGuiLayer->Begin();
+			{
+				KS_PROFILE_SCOPE("UI Render");
+				m_ImGuiLayer->Begin();
 
-			for (Layer* layer : m_LayerStack)
-				layer->OnUIRender();
+				for (Layer* layer : m_LayerStack)
+					layer->OnUIRender();
 
-			m_ImGuiLayer->End();
+				m_ImGuiLayer->End();
+			}
 
 			// -- Input Test --
 			//auto [x, y] = Input::GetMousePos();
 			//KS_ENGINE_TRACE(" {0}, {1}", x, y);
 
-			m_Window->OnUpdate();
+			// -- Window Update --
+			{
+				KS_PROFILE_SCOPE("Window Update");
+				m_Window->OnUpdate();
+			}
 		}
 	}
 
 	// -- Layers --
 	void Application::PushLayer(Layer* layer)
 	{
+		KS_PROFILE_FUNCTION();
 		m_LayerStack.PushLayer(layer);
+		layer->OnAttach();
 	}
 
 	void Application::PushOverlay(Layer* layer)
 	{
+		KS_PROFILE_FUNCTION();
 		m_LayerStack.PushOverlay(layer);
+		layer->OnAttach();
 	}
 
 	// -- Events --
 	void Application::OnEvent(Event& e)
 	{
+		KS_PROFILE_FUNCTION();
+
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<WindowCloseEvent>(KS_BIND_EVENT_FN(Application::OnWindowClose)); // If there's a WindowCloseEvent (checked in Dispatch()), dispatcher will call OnWindowClose function (same than a Lambda)
 		dispatcher.Dispatch<WindowResizeEvent>(KS_BIND_EVENT_FN(Application::OnWindowResize));
@@ -108,6 +127,7 @@ namespace Kaimos {
 
 	bool Application::OnWindowResize(WindowResizeEvent& e)
 	{
+		KS_PROFILE_FUNCTION();
 		uint w = e.GetWidth(), h = e.GetHeight();
 
 		if (w == 0 || h == 0)

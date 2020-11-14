@@ -14,6 +14,8 @@ namespace Kaimos {
 
 	void OrtographicCameraController::OnUpdate(Timestep dt)
 	{
+		KS_PROFILE_FUNCTION();
+
 		// -- Camera Movement --
 		m_CameraMoveSpeed = m_ZoomLevel * m_SpeedMultiplier;
 		if (Input::IsKeyPressed(KS_KEY_D))
@@ -64,6 +66,8 @@ namespace Kaimos {
 
 	void OrtographicCameraController::OnEvent(Event& e)
 	{
+		KS_PROFILE_FUNCTION();
+
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<MouseScrolledEvent>(KS_BIND_EVENT_FN(OrtographicCameraController::OnMouseScrolled));
 		dispatcher.Dispatch<WindowResizeEvent>(KS_BIND_EVENT_FN(OrtographicCameraController::OnWindowResized));
@@ -71,6 +75,8 @@ namespace Kaimos {
 
 	bool OrtographicCameraController::OnMouseScrolled(MouseScrolledEvent& e)
 	{
+		KS_PROFILE_FUNCTION();
+
 		m_ZoomLevel -= e.GetYOffset() * 0.25f;
 		m_ZoomLevel = std::max(m_ZoomLevel, 0.25f);
 		m_Camera.SetProjection(-m_AspectRatio * m_ZoomLevel, m_AspectRatio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel);
@@ -81,6 +87,8 @@ namespace Kaimos {
 
 	bool OrtographicCameraController::OnWindowResized(WindowResizeEvent& e)
 	{
+		KS_PROFILE_FUNCTION();
+
 		m_AspectRatio = (float)e.GetWidth()/(float)e.GetHeight();
 		m_Camera.SetProjection(-m_AspectRatio * m_ZoomLevel, m_AspectRatio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel);
 		return false;
@@ -89,6 +97,8 @@ namespace Kaimos {
 	// --- Setters ---
 	void OrtographicCameraController::SetZoomLevel(float zoom_level)
 	{
+		KS_PROFILE_FUNCTION();
+
 		m_ZoomLevel = zoom_level;
 		m_ZoomLevel = std::max(m_ZoomLevel, 0.25f);
 		m_Camera.SetProjection(-m_AspectRatio * m_ZoomLevel, m_AspectRatio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel);
@@ -98,6 +108,8 @@ namespace Kaimos {
 
 	void OrtographicCameraController::SetAspectRatio(float aspect_ratio)
 	{
+		KS_PROFILE_FUNCTION();
+
 		m_AspectRatio = aspect_ratio;
 		m_Camera.SetProjection(-m_AspectRatio * m_ZoomLevel, m_AspectRatio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel);
 	}

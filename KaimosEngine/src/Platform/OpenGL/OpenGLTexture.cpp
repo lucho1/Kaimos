@@ -7,6 +7,7 @@ namespace Kaimos {
 
 	OpenGLTexture2D::OpenGLTexture2D(uint width, uint height) : m_Path(""), m_Width(width), m_Height(height)
 	{
+		KS_PROFILE_FUNCTION();
 		m_InternalFormat = GL_RGBA8;
 		m_DataFormat = GL_RGBA;
 
@@ -26,11 +27,15 @@ namespace Kaimos {
 
 	OpenGLTexture2D::OpenGLTexture2D(const std::string& path) : m_Path(path)
 	{
+		KS_PROFILE_FUNCTION();
 		int w, h, channels;
 		stbi_set_flip_vertically_on_load(1);
-		
-		stbi_uc* texture_data = stbi_load(path.c_str(), &w, &h, &channels, 0);
-		KS_ENGINE_ASSERT(texture_data, "Failed to load texture data from path: {0}", path.c_str());
+		stbi_uc* texture_data = nullptr;
+		{
+			KS_PROFILE_SCOPE("TEXTURE STBI LOAD - OpenGLTexture2D::OpenGLTexture2D(const std::string & path)");
+			texture_data = stbi_load(path.c_str(), &w, &h, &channels, 0);
+			KS_ENGINE_ASSERT(texture_data, "Failed to load texture data from path: {0}", path.c_str());
+		}
 
 		m_Width = w;
 		m_Height = h;
@@ -70,16 +75,19 @@ namespace Kaimos {
 
 	OpenGLTexture2D::~OpenGLTexture2D()
 	{
+		KS_PROFILE_FUNCTION();
 		glDeleteTextures(1, &m_ID);
 	}
 
 	void OpenGLTexture2D::Bind(uint slot) const
 	{
+		KS_PROFILE_FUNCTION();
 		glBindTextureUnit(slot, m_ID); //Slot/Unit refers to the (opengl) slot in which the texture is bound, in case we bind +1 textures at a time
 	}
 
 	void OpenGLTexture2D::SetData(void* data, uint size)
 	{
+		KS_PROFILE_FUNCTION();
 		uint bpp = m_DataFormat == GL_RGBA ? 4 : 3; // Bytes per pixel
 		KS_ENGINE_ASSERT(size == m_Width * m_Height * bpp, "Data passed must be the same size than the entire texture size");
 		KS_ENGINE_ASSERT((m_DataFormat == GL_RGBA || m_DataFormat == GL_RGB), "Texture format was wrong");
