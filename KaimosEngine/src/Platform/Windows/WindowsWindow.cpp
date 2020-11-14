@@ -6,6 +6,7 @@
 #include "Core/Events/KeyEvent.h"
 
 #include "Platform/OpenGL/OpenGLContext.h"
+#include "Renderer/Renderer.h"
 
 
 namespace Kaimos {
@@ -56,6 +57,12 @@ namespace Kaimos {
 		// -- Window Creation --
 		{
 			KS_PROFILE_SCOPE("GLFW Create Window");
+
+			#ifdef KS_DEBUG
+			if (Renderer::GetRendererAPI() == RendererAPI::API::OPENGL)
+				glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
+			#endif
+
 			m_Window = glfwCreateWindow((int)props.Width, (int)props.Height, m_Data.Title.c_str(), nullptr, nullptr);
 			++s_WindowCount;
 		}

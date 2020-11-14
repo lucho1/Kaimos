@@ -31,7 +31,7 @@ int main(int argc, char** argv)
 {
 	Kaimos::Log::Init();
 	KS_ENGINE_INFO("--- Kaimos Engine Started ---");
-	KS_ENGINE_INFO("		Initialized Logger");
+	KS_ENGINE_INFO("	Initialized Logger");
 
 
 	KS_ENGINE_INFO("--- Creating Kaimos Application ---");
