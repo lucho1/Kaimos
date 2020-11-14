@@ -6,8 +6,6 @@
 
 namespace Kaimos {
 
-	ScopePtr<Input> Input::s_Instance = CreateScopePtr<WindowsInput>();
-
 	bool WindowsInput::IsKeyPressedImpl(uint keycode)
 	{
 		auto window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());

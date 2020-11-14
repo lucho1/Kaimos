@@ -13,6 +13,9 @@
 #include "Renderer/Buffer.h"
 #include "Renderer/Cameras/OrthographicCamera.h"
 
+
+int main(int argc, char** argv);
+
 namespace Kaimos {
 
 	class Application
@@ -21,9 +24,6 @@ namespace Kaimos {
 
 		Application();
 		virtual ~Application();
-
-		// -- Class Methods --
-		void Run();
 
 		// -- Events --
 		void OnEvent(Event& e);
@@ -38,6 +38,9 @@ namespace Kaimos {
 
 	private:
 
+		// -- Class Methods --
+		void Run();
+
 		// -- Events --
 		bool OnWindowClose(WindowCloseEvent& e);
 		bool OnWindowResize(WindowResizeEvent& e);
@@ -51,7 +54,8 @@ namespace Kaimos {
 		Timestep m_Timestep;
 		float m_LastFrameTime = 0.0f;
 
-		static Application* s_Instance; // Singleton of Application (we only want 1)
+		static Application* s_Instance; // Singleton of Application (we only want 1 Application)
+		friend int ::main(int argc, char** argv);
 	};
 
 

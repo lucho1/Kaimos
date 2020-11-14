@@ -18,12 +18,6 @@ namespace Kaimos {
 		KS_ENGINE_ERROR("GLFW Initialization Error ({0}): {1}", error, desc);
 	}
 
-	ScopePtr<Window> Window::Create(const WindowProps& props)
-	{
-		return CreateScopePtr<WindowsWindow>(props);
-	}
-
-
 	WindowsWindow::WindowsWindow(const WindowProps& props)
 	{
 		KS_PROFILE_FUNCTION();

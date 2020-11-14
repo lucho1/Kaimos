@@ -9,6 +9,7 @@ namespace Kaimos {
 	{
 	protected:
 		Input() = default;
+
 	public:
 
 		Input(const Input&) = delete;
@@ -20,6 +21,8 @@ namespace Kaimos {
 		inline static std::pair<float, float> GetMousePos() { return s_Instance->GetMousePosImpl(); }
 		inline static float GetMouseX() { return s_Instance->GetMouseXImpl(); }
 		inline static float GetMouseY() { return s_Instance->GetMouseYImpl(); }
+
+		static ScopePtr<Input> Create();
 
 	protected:
 
