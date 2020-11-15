@@ -26,10 +26,11 @@ namespace Kaimos {
 
 		// Upload --> API-Specific Call (opengl --> glUniform...)
 		// Set --> high-level call/concept, it might be set inside a uniform buffer, might set it individually (not tied to API)...
+		virtual void SetUFloat(const std::string& name, float value) override;
 		virtual void SetUFloat3(const std::string& name, const glm::vec3& value) override;
 		virtual void SetUFloat4(const std::string& name, const glm::vec4& value) override;
 		virtual void SetUMat4(const std::string& name, const glm::mat4& value) override;
-		virtual void SetUInt(const std::string& name, float value) override;
+		virtual void SetUInt(const std::string& name, int value) override;
 
 		void UploadUniformInt(const std::string& name, const int& value);
 		void UploadUniformFloat(const std::string& name, const float& value);

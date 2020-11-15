@@ -256,6 +256,12 @@ namespace Kaimos {
 		glUseProgram(0);
 	}
 
+	void OpenGLShader::SetUFloat(const std::string& name, float value)
+	{
+		KS_PROFILE_FUNCTION();
+		UploadUniformFloat(name, value);
+	}
+
 	void OpenGLShader::SetUFloat3(const std::string& name, const glm::vec3& value)
 	{
 		KS_PROFILE_FUNCTION();
@@ -274,7 +280,7 @@ namespace Kaimos {
 		UploadUniformMat4(name, value);
 	}
 	
-	void OpenGLShader::SetUInt(const std::string& name, float value)
+	void OpenGLShader::SetUInt(const std::string& name, int value)
 	{
 		KS_PROFILE_FUNCTION();
 		UploadUniformInt(name, value);
