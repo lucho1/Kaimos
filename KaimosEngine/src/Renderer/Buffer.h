@@ -121,7 +121,10 @@ namespace Kaimos {
 		virtual const BufferLayout& GetLayout() const = 0;
 		virtual void SetLayout(const BufferLayout& layout) = 0;
 
+		virtual void SetData(const void* data, uint size) = 0;
+
 		static Ref<VertexBuffer> Create(float* vertices, uint size); // This is the "Constructor", we take anything we want here (static cause doesn't belong to this class)
+		static Ref<VertexBuffer> Create(uint size);
 	};
 
 

@@ -10,6 +10,7 @@ namespace Kaimos {
 	public:
 
 		OpenGLVertexBuffer(float* vertices, uint size);
+		OpenGLVertexBuffer(uint size);
 		virtual ~OpenGLVertexBuffer();
 
 		virtual void Bind() const override;
@@ -17,6 +18,8 @@ namespace Kaimos {
 
 		virtual const BufferLayout& GetLayout() const override { return m_Layout; }
 		virtual void SetLayout(const BufferLayout& layout) override { m_Layout = layout; }
+
+		virtual void SetData(const void* data, uint size) override;
 
 	private:
 

@@ -38,6 +38,14 @@ namespace Kaimos {
 		glBufferData(GL_ARRAY_BUFFER, size, vertices, GL_STATIC_DRAW);
 	}
 
+	OpenGLVertexBuffer::OpenGLVertexBuffer(uint size)
+	{
+		KS_PROFILE_FUNCTION();
+		glCreateBuffers(1, &m_BufferID);
+		glBindBuffer(GL_ARRAY_BUFFER, m_BufferID);
+		glBufferData(GL_ARRAY_BUFFER, size, nullptr, GL_DYNAMIC_DRAW);
+	}
+
 	OpenGLVertexBuffer::~OpenGLVertexBuffer()
 	{
 		KS_PROFILE_FUNCTION();
@@ -54,6 +62,12 @@ namespace Kaimos {
 	{
 		KS_PROFILE_FUNCTION();
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
+	}
+
+	void OpenGLVertexBuffer::SetData(const void* data, uint size)
+	{
+		glBindBuffer(GL_ARRAY_BUFFER, m_BufferID);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, size, data);
 	}
 
 	// --- INDEX BUFFER ---

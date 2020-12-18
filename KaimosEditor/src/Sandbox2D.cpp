@@ -43,9 +43,11 @@ void Sandbox2D::OnUpdate(Kaimos::Timestep dt)
 	// -- Scene --
 	{
 		KS_PROFILE_SCOPE("Sandbox2D::OnUpdate::Rendering");
-		Kaimos::Renderer2D::DrawRotatedQuad(glm::vec2(-1.0f, 0.0f), glm::vec2(0.8f), 45.0f, { 0.8f, 0.2f, 0.3f, 1.0f });
-		Kaimos::Renderer2D::DrawQuad(glm::vec2(0.5f, -0.5f), glm::vec2(0.5f, 0.75f), { 0.2f, 0.3f, 0.8f, 1.0f });
-		Kaimos::Renderer2D::DrawQuad(glm::vec3(0.2f, 0.5f, -0.1f), glm::vec2(10.0f), m_CheckerTexture, m_BackgroundTiling, m_Color);
+		//Kaimos::Renderer2D::DrawRotatedQuad(glm::vec2(-1.0f, 0.0f), glm::vec2(0.8f), 45.0f, { 0.8f, 0.2f, 0.3f, 1.0f });
+		Kaimos::Renderer2D::DrawQuad(glm::vec2(1.5f, -2.5f), glm::vec2(0.5f, 0.75f), m_Color);
+		Kaimos::Renderer2D::DrawQuad(glm::vec2(0.5f, -0.5f), glm::vec2(0.5f, 0.75f), m_Color);
+		Kaimos::Renderer2D::DrawQuad(glm::vec2(-2.0f, -1.5f), glm::vec2(0.5f, 0.75f), m_Color);
+		//Kaimos::Renderer2D::DrawQuad(glm::vec3(0.2f, 0.5f, -0.1f), glm::vec2(10.0f), m_CheckerTexture, m_BackgroundTiling, m_Color);
 		Kaimos::Renderer2D::EndScene();
 	}
 }
