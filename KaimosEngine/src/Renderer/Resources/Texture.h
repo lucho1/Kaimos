@@ -16,8 +16,9 @@ namespace Kaimos {
 		virtual uint GetTextureID() const = 0;
 
 		virtual void SetData(void* data, uint size) = 0;
-
 		virtual void Bind(uint slot = 0) const = 0;
+
+		virtual bool operator==(const Texture& texture) const = 0;
 	};
 
 	class Texture2D : public Texture

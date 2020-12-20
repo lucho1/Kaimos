@@ -193,7 +193,7 @@ namespace Kaimos {
 				glDeleteShader(shader);
 
 				// Use the infoLog to print error & assert
-				KS_ENGINE_CRITICAL("VShader Compilation Error: {0}", infoLog.data());
+				KS_ENGINE_CRITICAL("{0} Shader Compilation Error: {1}", type, infoLog.data());
 				KS_ENGINE_ASSERT(false, "Shader Compilation Failure!");
 				break;
 			}
@@ -286,12 +286,24 @@ namespace Kaimos {
 		UploadUniformInt(name, value);
 	}
 
+	void OpenGLShader::SetUIntArray(const std::string& name, int* values_array, uint size)
+	{
+		KS_PROFILE_FUNCTION();
+		UploadUniformIntArray(name, values_array, size);
+	}
+
 
 	// --- Uniforms Upload ---
 	void OpenGLShader::UploadUniformInt(const std::string& name, const int& value)
 	{
 		GLint loc = glGetUniformLocation(m_ShaderID, name.c_str());
 		glUniform1i(loc, value);
+	}
+
+	void OpenGLShader::UploadUniformIntArray(const std::string& name, const int* values_array, uint size)
+	{
+		GLint loc = glGetUniformLocation(m_ShaderID, name.c_str());
+		glUniform1iv(loc, size, values_array);
 	}
 
 	void OpenGLShader::UploadUniformFloat(const std::string& name, const float& value)

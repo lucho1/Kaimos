@@ -31,7 +31,9 @@ namespace Kaimos {
 		virtual void SetUFloat4(const std::string& name, const glm::vec4& value) override;
 		virtual void SetUMat4(const std::string& name, const glm::mat4& value) override;
 		virtual void SetUInt(const std::string& name, int value) override;
+		virtual void SetUIntArray(const std::string& name, int* values_array, uint size) override;
 
+		void UploadUniformIntArray(const std::string& name, const int* values_array, uint size);
 		void UploadUniformInt(const std::string& name, const int& value);
 		void UploadUniformFloat(const std::string& name, const float& value);
 		void UploadUniformFloat2(const std::string& name, const glm::vec2& value);

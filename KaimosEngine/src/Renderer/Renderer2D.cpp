@@ -15,7 +15,8 @@ namespace Kaimos {
 		glm::vec3 Pos;
 		glm::vec2 TexCoord;
 		glm::vec4 Color;
-		// TexID, ...
+		float TexIndex;
+		float TilingFactor;
 	};
 
 	struct Renderer2DData
@@ -23,6 +24,7 @@ namespace Kaimos {
 		const uint MaxQuads = 10000;
 		const uint MaxVertices = MaxQuads * 4;
 		const uint MaxIndices = MaxQuads * 6;
+		static const uint MaxTextureSlots = 32; // TODO: RenderCaps
 
 		uint QuadIndicesDrawCount = 0;
 		QuadVertex* QuadVBufferBase = nullptr;
@@ -32,6 +34,9 @@ namespace Kaimos {
 		Ref<VertexBuffer> QuadVBuffer;
 		Ref<Shader> ColoredTextureShader;
 		Ref<Texture2D> WhiteTexture;
+
+		std::array<Ref<Texture2D>, MaxTextureSlots> TextureSlots;
+		uint TextureSlotIndex = 1; // Slot 0 is for White Texture 
 	};
 	
 	static Renderer2DData* s_Data;	// On shutdown, this is deleted, and ~VertexArray() called, freeing GPU Memory too
@@ -81,7 +86,9 @@ namespace Kaimos {
 		BufferLayout layout = {
 			{ ShaderDataType::Float3, "a_Position" },
 			{ ShaderDataType::Float2, "a_TexCoord" },
-			{ ShaderDataType::Float4, "a_Color" }
+			{ ShaderDataType::Float4, "a_Color" },
+			{ ShaderDataType::Float , "a_TexIndex" },
+			{ ShaderDataType::Float , "a_TilingFactor" }
 		};
 
 		//m_VBuffer->SetLayout(layout);
@@ -89,9 +96,6 @@ namespace Kaimos {
 		s_Data->QuadVBuffer->SetLayout(layout);
 		s_Data->QuadVArray->AddVertexBuffer(s_Data->QuadVBuffer);
 		s_Data->QuadVArray->SetIndexBuffer(m_IBuffer);
-
-
-
 
 		s_Data->QuadVArray->Unbind();
 		m_IBuffer->Unbind();
@@ -106,8 +110,17 @@ namespace Kaimos {
 		s_Data->WhiteTexture = Texture2D::Create(1, 1);
 		s_Data->WhiteTexture->SetData(&whiteTextData, sizeof(whiteTextData)); // or sizeof(uint)
 
+		// Set all TextureSlots to 0 --> Could be also done with a memset or with s_Data->TextureSlots.fill(0);
+		//for (uint i = 0; i < s_Data->TextureSlots.size(); ++i)
+		//	s_Data->TextureSlots[i] = 0;
+		s_Data->TextureSlots[0] = s_Data->WhiteTexture;
+		int texture_samplers[s_Data->MaxTextureSlots];
+
+		for (uint i = 0; i < s_Data->MaxTextureSlots; ++i)
+			texture_samplers[i] = i;
+
 		s_Data->ColoredTextureShader->Bind();
-		s_Data->ColoredTextureShader->SetUInt("u_Texture", 0);
+		s_Data->ColoredTextureShader->SetUIntArray("u_Textures", texture_samplers, s_Data->MaxTextureSlots);
 	}
 
 	void Renderer2D::Shutdown()
@@ -126,6 +139,7 @@ namespace Kaimos {
 		s_Data->ColoredTextureShader->SetUMat4("u_ViewProjection", camera.GetViewProjectionMatrix());
 
 		s_Data->QuadIndicesDrawCount = 0;
+		s_Data->TextureSlotIndex = 1;
 		s_Data->QuadVBufferPtr = s_Data->QuadVBufferBase;
 	}
 
@@ -143,6 +157,10 @@ namespace Kaimos {
 	void Renderer2D::Flush()
 	{
 		KS_PROFILE_FUNCTION();
+
+		for (uint i = 0; i < s_Data->TextureSlotIndex; ++i)
+			s_Data->TextureSlots[i]->Bind(i);
+
 		s_Data->QuadVArray->Bind();
 		RenderCommand::DrawIndexed(s_Data->QuadVArray, s_Data->QuadIndicesDrawCount);
 	}
@@ -152,33 +170,43 @@ namespace Kaimos {
 		DrawQuad({ position.x, position.y, 0.0f }, size, color);
 	}
 
-	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2 size, const Ref<Texture2D> texture, float tilling, const glm::vec4& tintColor)
+	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2 size, const Ref<Texture2D> texture, float tiling, const glm::vec4& tintColor)
 	{
-		DrawQuad({ position.x, position.y, 0.0f }, size, texture, tilling, tintColor);
+		DrawQuad({ position.x, position.y, 0.0f }, size, texture, tiling, tintColor);
 	}
 
 	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2 size, const glm::vec4& color)
 	{
 		KS_PROFILE_FUNCTION();
 
+		const float texIndex = 0.0f, tilingFactor = 1.0f;
+
 		s_Data->QuadVBufferPtr->Pos = position;
 		s_Data->QuadVBufferPtr->TexCoord = {0.0f, 0.0f };
 		s_Data->QuadVBufferPtr->Color = color;
+		s_Data->QuadVBufferPtr->TexIndex = texIndex;
+		s_Data->QuadVBufferPtr->TilingFactor = tilingFactor;
 		s_Data->QuadVBufferPtr++;
 
 		s_Data->QuadVBufferPtr->Pos = { position.x + size.x, position.y, 0.0f };
 		s_Data->QuadVBufferPtr->TexCoord = { 1.0f, 0.0f };
 		s_Data->QuadVBufferPtr->Color = color;
+		s_Data->QuadVBufferPtr->TexIndex = texIndex;
+		s_Data->QuadVBufferPtr->TilingFactor = tilingFactor;
 		s_Data->QuadVBufferPtr++;
 
 		s_Data->QuadVBufferPtr->Pos = { position.x + size.x, position.y + size.y, 0.0f };
 		s_Data->QuadVBufferPtr->TexCoord = { 1.0f, 1.0f };
 		s_Data->QuadVBufferPtr->Color = color;
+		s_Data->QuadVBufferPtr->TexIndex = texIndex;
+		s_Data->QuadVBufferPtr->TilingFactor = tilingFactor;
 		s_Data->QuadVBufferPtr++;
 
 		s_Data->QuadVBufferPtr->Pos = { position.x, position.y + size.y, 0.0f };
 		s_Data->QuadVBufferPtr->TexCoord = { 0.0f, 1.0f };
 		s_Data->QuadVBufferPtr->Color = color;
+		s_Data->QuadVBufferPtr->TexIndex = texIndex;
+		s_Data->QuadVBufferPtr->TilingFactor = tilingFactor;
 		s_Data->QuadVBufferPtr++;
 
 		s_Data->QuadIndicesDrawCount += 6;
@@ -186,7 +214,7 @@ namespace Kaimos {
 		//glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
 
 		//s_Data->ColoredTextureShader->SetUMat4("u_Model", transform);
-		s_Data->ColoredTextureShader->SetUFloat4("u_Color", color);
+		//s_Data->ColoredTextureShader->SetUFloat4("u_Color", color);
 		//s_Data->ColoredTextureShader->SetUFloat("u_TilingFactor", 10.0f);
 		//s_Data->WhiteTexture->Bind();
 		//
@@ -194,18 +222,70 @@ namespace Kaimos {
 		//RenderCommand::DrawIndexed(s_Data->QuadVArray);
 	}
 
-	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2 size, const Ref<Texture2D> texture, float tilling, const glm::vec4& tintColor)
+	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2 size, const Ref<Texture2D> texture, float tiling, const glm::vec4& tintColor)
 	{
 		KS_PROFILE_FUNCTION();
-		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
-		
-		s_Data->ColoredTextureShader->SetUMat4("u_Model", transform);
-		s_Data->ColoredTextureShader->SetUFloat4("u_Color", tintColor);
-		s_Data->ColoredTextureShader->SetUFloat("u_TilingFactor", tilling);
-		texture->Bind();
-		
-		s_Data->QuadVArray->Bind();
-		RenderCommand::DrawIndexed(s_Data->QuadVArray);
+
+		constexpr glm::vec4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
+
+		uint textureIndex = 0;
+
+		for (uint i = 1; i < s_Data->TextureSlotIndex; ++i)
+		{
+			if (s_Data->TextureSlots[i].get() == texture.get())
+			{
+				textureIndex = i;
+				break;
+			}
+		}
+
+		if (textureIndex == 0)
+		{
+			textureIndex = s_Data->TextureSlotIndex;
+			s_Data->TextureSlots[s_Data->TextureSlotIndex] = texture;
+			++s_Data->TextureSlotIndex;
+		}
+
+		s_Data->QuadVBufferPtr->Pos = position;
+		s_Data->QuadVBufferPtr->TexCoord = { 0.0f, 0.0f };
+		s_Data->QuadVBufferPtr->Color = color;
+		s_Data->QuadVBufferPtr->TexIndex = (float)textureIndex;
+		s_Data->QuadVBufferPtr->TilingFactor = tiling;
+		s_Data->QuadVBufferPtr++;
+
+		s_Data->QuadVBufferPtr->Pos = { position.x + size.x, position.y, 0.0f };
+		s_Data->QuadVBufferPtr->TexCoord = { 1.0f, 0.0f };
+		s_Data->QuadVBufferPtr->Color = color;
+		s_Data->QuadVBufferPtr->TexIndex = (float)textureIndex;
+		s_Data->QuadVBufferPtr->TilingFactor = tiling;
+		s_Data->QuadVBufferPtr++;
+
+		s_Data->QuadVBufferPtr->Pos = { position.x + size.x, position.y + size.y, 0.0f };
+		s_Data->QuadVBufferPtr->TexCoord = { 1.0f, 1.0f };
+		s_Data->QuadVBufferPtr->Color = color;
+		s_Data->QuadVBufferPtr->TexIndex = (float)textureIndex;
+		s_Data->QuadVBufferPtr->TilingFactor = tiling;
+		s_Data->QuadVBufferPtr++;
+
+		s_Data->QuadVBufferPtr->Pos = { position.x, position.y + size.y, 0.0f };
+		s_Data->QuadVBufferPtr->TexCoord = { 0.0f, 1.0f };
+		s_Data->QuadVBufferPtr->Color = color;
+		s_Data->QuadVBufferPtr->TexIndex = (float)textureIndex;
+		s_Data->QuadVBufferPtr->TilingFactor = tiling;
+		s_Data->QuadVBufferPtr++;
+
+		s_Data->QuadIndicesDrawCount += 6;
+
+
+		//glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
+		//
+		//s_Data->ColoredTextureShader->SetUMat4("u_Model", transform);
+		//s_Data->ColoredTextureShader->SetUFloat4("u_Color", tintColor);
+		//s_Data->ColoredTextureShader->SetUFloat("u_TilingFactor", tiling);
+		//texture->Bind();
+		//
+		//s_Data->QuadVArray->Bind();
+		//RenderCommand::DrawIndexed(s_Data->QuadVArray);
 	}
 
 	void Renderer2D::DrawRotatedQuad(const glm::vec2& position, const glm::vec2 size, float rotation, const glm::vec4& color)
@@ -213,9 +293,9 @@ namespace Kaimos {
 		DrawRotatedQuad({ position.x, position.y, 0.0f }, size, rotation, color);
 	}
 
-	void Renderer2D::DrawRotatedQuad(const glm::vec2& position, const glm::vec2 size, float rotation, const Ref<Texture2D> texture, float tilling, const glm::vec4& tintColor)
+	void Renderer2D::DrawRotatedQuad(const glm::vec2& position, const glm::vec2 size, float rotation, const Ref<Texture2D> texture, float tiling, const glm::vec4& tintColor)
 	{
-		DrawRotatedQuad({ position.x, position.y, 0.0f }, size, rotation, texture, tilling, tintColor);
+		DrawRotatedQuad({ position.x, position.y, 0.0f }, size, rotation, texture, tiling, tintColor);
 	}
 
 	void Renderer2D::DrawRotatedQuad(const glm::vec3& position, const glm::vec2 size, float rotation, const glm::vec4& color)
@@ -232,14 +312,14 @@ namespace Kaimos {
 		RenderCommand::DrawIndexed(s_Data->QuadVArray);
 	}
 
-	void Renderer2D::DrawRotatedQuad(const glm::vec3& position, const glm::vec2 size, float rotation, const Ref<Texture2D> texture, float tilling, const glm::vec4& tintColor)
+	void Renderer2D::DrawRotatedQuad(const glm::vec3& position, const glm::vec2 size, float rotation, const Ref<Texture2D> texture, float tiling, const glm::vec4& tintColor)
 	{
 		KS_PROFILE_FUNCTION();
 		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * glm::rotate(glm::mat4(1.0f), glm::radians(rotation), glm::vec3(0, 0, 1)) * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
 
 		s_Data->ColoredTextureShader->SetUMat4("u_Model", transform);
 		s_Data->ColoredTextureShader->SetUFloat4("u_Color", tintColor);
-		s_Data->ColoredTextureShader->SetUFloat("u_TilingFactor", tilling);
+		s_Data->ColoredTextureShader->SetUFloat("u_TilingFactor", tiling);
 		texture->Bind();
 
 		s_Data->QuadVArray->Bind();

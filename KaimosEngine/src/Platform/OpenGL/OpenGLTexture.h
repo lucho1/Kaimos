@@ -22,6 +22,8 @@ namespace Kaimos {
 
 		virtual void Bind(uint slot = 0) const override;
 
+		virtual bool operator==(const Texture& texture) const override { return m_ID == ((OpenGLTexture2D&)texture).m_ID; }
+
 	private:
 
 		std::string m_Path; // This is not 100% necessary, but OK for debugging... However shouldn't be here, there should be an "AssetManager" with a map storing [resource, path]
