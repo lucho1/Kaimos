@@ -37,6 +37,8 @@ namespace Kaimos {
 
 		std::array<Ref<Texture2D>, MaxTextureSlots> TextureSlots;
 		uint TextureSlotIndex = 1; // Slot 0 is for White Texture 
+
+		glm::vec4 VerticesPositions[4]; // It's a vec4 so it's easier to multiply by a matrix (4th has to be 1)
 	};
 	
 	static Renderer2DData* s_Data;	// On shutdown, this is deleted, and ~VertexArray() called, freeing GPU Memory too
@@ -48,6 +50,13 @@ namespace Kaimos {
 		KS_PROFILE_FUNCTION();
 		s_Data = new Renderer2DData();
 
+		// --- Vertices Positioning ---
+		s_Data->VerticesPositions[0] = { -0.5f, -0.5f, 0.0f, 1.0f };
+		s_Data->VerticesPositions[1] = {  0.5f, -0.5f, 0.0f, 1.0f };
+		s_Data->VerticesPositions[2] = {  0.5f,  0.5f, 0.0f, 1.0f };
+		s_Data->VerticesPositions[3] = { -0.5f,  0.5f, 0.0f, 1.0f };
+
+
 		// --- Vertex Array & Buffers ---
 		//Ref<VertexBuffer> m_VBuffer;
 		//uint indices[6] = { 0, 1, 2, 2, 3, 0 };
@@ -57,6 +66,7 @@ namespace Kaimos {
 		//		 0.5f,	 0.5f,	0.0f, 1.0f, 1.0f,
 		//		-0.5f,	 0.5f,	0.0f, 0.0f, 1.0f
 		//};
+
 
 		Ref<IndexBuffer> m_IBuffer;
 		uint* quadIndices = new uint[s_Data->MaxIndices];
@@ -178,31 +188,33 @@ namespace Kaimos {
 	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2 size, const glm::vec4& color)
 	{
 		KS_PROFILE_FUNCTION();
-
 		const float texIndex = 0.0f, tilingFactor = 1.0f;
 
-		s_Data->QuadVBufferPtr->Pos = position;
+		// Vertex Buffer setup
+		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
+
+		s_Data->QuadVBufferPtr->Pos = transform * s_Data->VerticesPositions[0];
 		s_Data->QuadVBufferPtr->TexCoord = {0.0f, 0.0f };
 		s_Data->QuadVBufferPtr->Color = color;
 		s_Data->QuadVBufferPtr->TexIndex = texIndex;
 		s_Data->QuadVBufferPtr->TilingFactor = tilingFactor;
 		s_Data->QuadVBufferPtr++;
 
-		s_Data->QuadVBufferPtr->Pos = { position.x + size.x, position.y, 0.0f };
+		s_Data->QuadVBufferPtr->Pos = transform * s_Data->VerticesPositions[1];
 		s_Data->QuadVBufferPtr->TexCoord = { 1.0f, 0.0f };
 		s_Data->QuadVBufferPtr->Color = color;
 		s_Data->QuadVBufferPtr->TexIndex = texIndex;
 		s_Data->QuadVBufferPtr->TilingFactor = tilingFactor;
 		s_Data->QuadVBufferPtr++;
 
-		s_Data->QuadVBufferPtr->Pos = { position.x + size.x, position.y + size.y, 0.0f };
+		s_Data->QuadVBufferPtr->Pos = transform * s_Data->VerticesPositions[2];
 		s_Data->QuadVBufferPtr->TexCoord = { 1.0f, 1.0f };
 		s_Data->QuadVBufferPtr->Color = color;
 		s_Data->QuadVBufferPtr->TexIndex = texIndex;
 		s_Data->QuadVBufferPtr->TilingFactor = tilingFactor;
 		s_Data->QuadVBufferPtr++;
 
-		s_Data->QuadVBufferPtr->Pos = { position.x, position.y + size.y, 0.0f };
+		s_Data->QuadVBufferPtr->Pos = transform * s_Data->VerticesPositions[3];
 		s_Data->QuadVBufferPtr->TexCoord = { 0.0f, 1.0f };
 		s_Data->QuadVBufferPtr->Color = color;
 		s_Data->QuadVBufferPtr->TexIndex = texIndex;
@@ -227,9 +239,7 @@ namespace Kaimos {
 		KS_PROFILE_FUNCTION();
 
 		constexpr glm::vec4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
-
 		uint textureIndex = 0;
-
 		for (uint i = 1; i < s_Data->TextureSlotIndex; ++i)
 		{
 			if (s_Data->TextureSlots[i].get() == texture.get())
@@ -246,28 +256,31 @@ namespace Kaimos {
 			++s_Data->TextureSlotIndex;
 		}
 
-		s_Data->QuadVBufferPtr->Pos = position;
+		// Vertex Buffer setup
+		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
+
+		s_Data->QuadVBufferPtr->Pos = transform * s_Data->VerticesPositions[0];
 		s_Data->QuadVBufferPtr->TexCoord = { 0.0f, 0.0f };
 		s_Data->QuadVBufferPtr->Color = color;
 		s_Data->QuadVBufferPtr->TexIndex = (float)textureIndex;
 		s_Data->QuadVBufferPtr->TilingFactor = tiling;
 		s_Data->QuadVBufferPtr++;
 
-		s_Data->QuadVBufferPtr->Pos = { position.x + size.x, position.y, 0.0f };
+		s_Data->QuadVBufferPtr->Pos = transform * s_Data->VerticesPositions[1];
 		s_Data->QuadVBufferPtr->TexCoord = { 1.0f, 0.0f };
 		s_Data->QuadVBufferPtr->Color = color;
 		s_Data->QuadVBufferPtr->TexIndex = (float)textureIndex;
 		s_Data->QuadVBufferPtr->TilingFactor = tiling;
 		s_Data->QuadVBufferPtr++;
 
-		s_Data->QuadVBufferPtr->Pos = { position.x + size.x, position.y + size.y, 0.0f };
+		s_Data->QuadVBufferPtr->Pos = transform * s_Data->VerticesPositions[2];
 		s_Data->QuadVBufferPtr->TexCoord = { 1.0f, 1.0f };
 		s_Data->QuadVBufferPtr->Color = color;
 		s_Data->QuadVBufferPtr->TexIndex = (float)textureIndex;
 		s_Data->QuadVBufferPtr->TilingFactor = tiling;
 		s_Data->QuadVBufferPtr++;
 
-		s_Data->QuadVBufferPtr->Pos = { position.x, position.y + size.y, 0.0f };
+		s_Data->QuadVBufferPtr->Pos = transform * s_Data->VerticesPositions[3];
 		s_Data->QuadVBufferPtr->TexCoord = { 0.0f, 1.0f };
 		s_Data->QuadVBufferPtr->Color = color;
 		s_Data->QuadVBufferPtr->TexIndex = (float)textureIndex;
@@ -275,7 +288,6 @@ namespace Kaimos {
 		s_Data->QuadVBufferPtr++;
 
 		s_Data->QuadIndicesDrawCount += 6;
-
 
 		//glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
 		//
@@ -301,28 +313,118 @@ namespace Kaimos {
 	void Renderer2D::DrawRotatedQuad(const glm::vec3& position, const glm::vec2 size, float rotation, const glm::vec4& color)
 	{
 		KS_PROFILE_FUNCTION();
+		const float texIndex = 0.0f, tilingFactor = 1.0f;
+
+		// Vertex Buffer setup
 		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * glm::rotate(glm::mat4(1.0f), glm::radians(rotation), glm::vec3(0, 0, 1)) * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
 
-		s_Data->ColoredTextureShader->SetUMat4("u_Model", transform);
-		s_Data->ColoredTextureShader->SetUFloat4("u_Color", color);
-		s_Data->ColoredTextureShader->SetUFloat("u_TilingFactor", 10.0f);
-		s_Data->WhiteTexture->Bind();
+		s_Data->QuadVBufferPtr->Pos = transform * s_Data->VerticesPositions[0];
+		s_Data->QuadVBufferPtr->TexCoord = { 0.0f, 0.0f };
+		s_Data->QuadVBufferPtr->Color = color;
+		s_Data->QuadVBufferPtr->TexIndex = (float)texIndex;
+		s_Data->QuadVBufferPtr->TilingFactor = tilingFactor;
+		s_Data->QuadVBufferPtr++;
 
-		s_Data->QuadVArray->Bind();
-		RenderCommand::DrawIndexed(s_Data->QuadVArray);
+		s_Data->QuadVBufferPtr->Pos = transform * s_Data->VerticesPositions[1];
+		s_Data->QuadVBufferPtr->TexCoord = { 1.0f, 0.0f };
+		s_Data->QuadVBufferPtr->Color = color;
+		s_Data->QuadVBufferPtr->TexIndex = (float)texIndex;
+		s_Data->QuadVBufferPtr->TilingFactor = tilingFactor;
+		s_Data->QuadVBufferPtr++;
+
+		s_Data->QuadVBufferPtr->Pos = transform * s_Data->VerticesPositions[2];
+		s_Data->QuadVBufferPtr->TexCoord = { 1.0f, 1.0f };
+		s_Data->QuadVBufferPtr->Color = color;
+		s_Data->QuadVBufferPtr->TexIndex = (float)texIndex;
+		s_Data->QuadVBufferPtr->TilingFactor = tilingFactor;
+		s_Data->QuadVBufferPtr++;
+
+		s_Data->QuadVBufferPtr->Pos = transform * s_Data->VerticesPositions[3];
+		s_Data->QuadVBufferPtr->TexCoord = { 0.0f, 1.0f };
+		s_Data->QuadVBufferPtr->Color = color;
+		s_Data->QuadVBufferPtr->TexIndex = (float)texIndex;
+		s_Data->QuadVBufferPtr->TilingFactor = tilingFactor;
+		s_Data->QuadVBufferPtr++;
+
+		s_Data->QuadIndicesDrawCount += 6;
+
+
+
+		//glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * glm::rotate(glm::mat4(1.0f), glm::radians(rotation), glm::vec3(0, 0, 1)) * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
+		//
+		//s_Data->ColoredTextureShader->SetUMat4("u_Model", transform);
+		//s_Data->ColoredTextureShader->SetUFloat4("u_Color", color);
+		//s_Data->ColoredTextureShader->SetUFloat("u_TilingFactor", 10.0f);
+		//s_Data->WhiteTexture->Bind();
+		//
+		//s_Data->QuadVArray->Bind();
+		//RenderCommand::DrawIndexed(s_Data->QuadVArray);
 	}
 
 	void Renderer2D::DrawRotatedQuad(const glm::vec3& position, const glm::vec2 size, float rotation, const Ref<Texture2D> texture, float tiling, const glm::vec4& tintColor)
 	{
 		KS_PROFILE_FUNCTION();
+
+		constexpr glm::vec4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
+		uint textureIndex = 0;
+		for (uint i = 1; i < s_Data->TextureSlotIndex; ++i)
+		{
+			if (s_Data->TextureSlots[i].get() == texture.get())
+			{
+				textureIndex = i;
+				break;
+			}
+		}
+
+		if (textureIndex == 0)
+		{
+			textureIndex = s_Data->TextureSlotIndex;
+			s_Data->TextureSlots[s_Data->TextureSlotIndex] = texture;
+			++s_Data->TextureSlotIndex;
+		}
+
+		// Vertex Buffer setup
 		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * glm::rotate(glm::mat4(1.0f), glm::radians(rotation), glm::vec3(0, 0, 1)) * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
 
-		s_Data->ColoredTextureShader->SetUMat4("u_Model", transform);
-		s_Data->ColoredTextureShader->SetUFloat4("u_Color", tintColor);
-		s_Data->ColoredTextureShader->SetUFloat("u_TilingFactor", tiling);
-		texture->Bind();
+		s_Data->QuadVBufferPtr->Pos = transform * s_Data->VerticesPositions[0];
+		s_Data->QuadVBufferPtr->TexCoord = { 0.0f, 0.0f };
+		s_Data->QuadVBufferPtr->Color = color;
+		s_Data->QuadVBufferPtr->TexIndex = (float)textureIndex;
+		s_Data->QuadVBufferPtr->TilingFactor = tiling;
+		s_Data->QuadVBufferPtr++;
 
-		s_Data->QuadVArray->Bind();
-		RenderCommand::DrawIndexed(s_Data->QuadVArray);
+		s_Data->QuadVBufferPtr->Pos = transform * s_Data->VerticesPositions[1];
+		s_Data->QuadVBufferPtr->TexCoord = { 1.0f, 0.0f };
+		s_Data->QuadVBufferPtr->Color = color;
+		s_Data->QuadVBufferPtr->TexIndex = (float)textureIndex;
+		s_Data->QuadVBufferPtr->TilingFactor = tiling;
+		s_Data->QuadVBufferPtr++;
+
+		s_Data->QuadVBufferPtr->Pos = transform * s_Data->VerticesPositions[2];
+		s_Data->QuadVBufferPtr->TexCoord = { 1.0f, 1.0f };
+		s_Data->QuadVBufferPtr->Color = color;
+		s_Data->QuadVBufferPtr->TexIndex = (float)textureIndex;
+		s_Data->QuadVBufferPtr->TilingFactor = tiling;
+		s_Data->QuadVBufferPtr++;
+
+		s_Data->QuadVBufferPtr->Pos = transform * s_Data->VerticesPositions[3];
+		s_Data->QuadVBufferPtr->TexCoord = { 0.0f, 1.0f };
+		s_Data->QuadVBufferPtr->Color = color;
+		s_Data->QuadVBufferPtr->TexIndex = (float)textureIndex;
+		s_Data->QuadVBufferPtr->TilingFactor = tiling;
+		s_Data->QuadVBufferPtr++;
+
+		s_Data->QuadIndicesDrawCount += 6;
+
+
+		//glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * glm::rotate(glm::mat4(1.0f), glm::radians(rotation), glm::vec3(0, 0, 1)) * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
+		//
+		//s_Data->ColoredTextureShader->SetUMat4("u_Model", transform);
+		//s_Data->ColoredTextureShader->SetUFloat4("u_Color", tintColor);
+		//s_Data->ColoredTextureShader->SetUFloat("u_TilingFactor", tiling);
+		//texture->Bind();
+		//
+		//s_Data->QuadVArray->Bind();
+		//RenderCommand::DrawIndexed(s_Data->QuadVArray);
 	}
 }

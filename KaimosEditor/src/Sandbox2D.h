@@ -25,6 +25,7 @@ private:
 	
 	Kaimos::Ref<Kaimos::Shader> m_Shader;
 	Kaimos::Ref<Kaimos::Texture2D> m_CheckerTexture;
+	Kaimos::Ref<Kaimos::Texture2D> m_LogoTexture;
 	float m_BackgroundTiling = 10.0f;
 	glm::vec4 m_Color = { 1.0f, 0.9f, 0.8f, 1.0f };
 };
