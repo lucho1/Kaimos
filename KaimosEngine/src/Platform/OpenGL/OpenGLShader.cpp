@@ -18,6 +18,17 @@ namespace Kaimos {
 		return 0;
 	}
 
+	static char* StringFromShaderType(const GLenum& ShaderType)
+	{
+		if (ShaderType == GL_VERTEX_SHADER)
+			return "Vertex";
+		if (ShaderType == GL_FRAGMENT_SHADER)
+			return "Fragment/Pixel";
+
+		KS_ENGINE_ASSERT(false, "Unknown Shader Type '{0}'", ShaderType);
+		return 0;
+	}
+
 	
 	OpenGLShader::OpenGLShader(const std::string& filepath)
 	{
@@ -193,7 +204,7 @@ namespace Kaimos {
 				glDeleteShader(shader);
 
 				// Use the infoLog to print error & assert
-				KS_ENGINE_CRITICAL("{0} Shader Compilation Error: {1}", type, infoLog.data());
+				KS_ENGINE_CRITICAL("{0} Shader Compilation Error: {1}", StringFromShaderType(type), infoLog.data());
 				KS_ENGINE_ASSERT(false, "Shader Compilation Failure!");
 				break;
 			}
