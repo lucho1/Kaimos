@@ -1,5 +1,5 @@
 workspace "Kaimos"
-    architecture "x64"
+    architecture "x86_64"
     startproject "KaimosEditor"
 
     configurations
