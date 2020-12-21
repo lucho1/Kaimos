@@ -39,8 +39,6 @@ in float v_TexIndex;
 in float v_TilingFactor;
 
 uniform sampler2D u_Textures[32];
-uniform float u_TilingFactor = 1;
-uniform vec4 u_Color = vec4(1.0);
 
 void main()
 {

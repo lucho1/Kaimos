@@ -25,6 +25,9 @@ namespace Kaimos {
 		Application();
 		virtual ~Application();
 
+		// -- Class Methods --
+		void CloseApp()						{ m_Running = false; }
+
 		// -- Events --
 		void OnEvent(Event& e);
 
@@ -33,8 +36,8 @@ namespace Kaimos {
 		void PushOverlay(Layer* layer);
 
 		// -- Getters --
-		inline static Application& Get() { return *s_Instance; }
-		inline Window& GetWindow() const { return *m_Window; }
+		inline static Application& Get()	{ return *s_Instance; }
+		inline Window& GetWindow() const	{ return *m_Window; }
 
 	private:
 
