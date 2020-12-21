@@ -186,8 +186,6 @@ namespace Kaimos {
 		s_Data->QuadVBuffer->SetData(s_Data->QuadVBufferBase, dataSize);
 
 		Flush();
-		//s_Data->ColoredTextureShader->Unbind();
-		//s_Data->QuadVArray->Unbind();
 	}
 
 	void Renderer2D::Flush()
@@ -204,7 +202,6 @@ namespace Kaimos {
 	void Renderer2D::StartNewBatch()
 	{
 		EndScene();
-
 		s_Data->QuadIndicesDrawCount = 0;
 		s_Data->TextureSlotIndex = 1;
 		s_Data->QuadVBufferPtr = s_Data->QuadVBufferBase;
@@ -220,22 +217,8 @@ namespace Kaimos {
 			StartNewBatch();
 
 		// Vertex Buffer setup
-		constexpr size_t quadVertexCount = 4;
-		constexpr glm::vec2 texCoords[] = { {0.0f, 0.0f}, {1.0f, 0.0f}, {1.0f, 1.0f}, {0.0f, 1.0f} };
 		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
-
-		for (size_t i = 0; i < quadVertexCount; ++i)
-		{
-			s_Data->QuadVBufferPtr->Pos = transform * s_Data->VerticesPositions[i];
-			s_Data->QuadVBufferPtr->TexCoord = texCoords[i];
-			s_Data->QuadVBufferPtr->Color = color;
-			s_Data->QuadVBufferPtr->TexIndex = 0.0f;
-			s_Data->QuadVBufferPtr->TilingFactor = 1.0f;
-			++s_Data->QuadVBufferPtr;
-		}
-
-		s_Data->QuadIndicesDrawCount += 6;
-		++s_Data->RendererStats.QuadCount;
+		SetupVertexArray(transform, color);
 	}
 
 	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2 size, const Ref<Texture2D> texture, float tiling, const glm::vec4& tintColor)
@@ -267,23 +250,8 @@ namespace Kaimos {
 		}
 
 		// Vertex Buffer setup
-		constexpr size_t quadVertexCount = 4;
-		constexpr glm::vec2 texCoords[] = { {0.0f, 0.0f}, {1.0f, 0.0f}, {1.0f, 1.0f}, {0.0f, 1.0f} };
-
 		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
-
-		for (size_t i = 0; i < quadVertexCount; ++i)
-		{
-			s_Data->QuadVBufferPtr->Pos = transform * s_Data->VerticesPositions[i];
-			s_Data->QuadVBufferPtr->TexCoord = texCoords[i];
-			s_Data->QuadVBufferPtr->Color = tintColor;
-			s_Data->QuadVBufferPtr->TexIndex = (float)textureIndex;
-			s_Data->QuadVBufferPtr->TilingFactor = tiling;
-			++s_Data->QuadVBufferPtr;
-		}
-
-		s_Data->QuadIndicesDrawCount += 6;
-		++s_Data->RendererStats.QuadCount;
+		SetupVertexArray(transform, tintColor, (float)textureIndex, tiling);
 	}
 
 
@@ -295,22 +263,8 @@ namespace Kaimos {
 			StartNewBatch();
 
 		// Vertex Buffer setup
-		constexpr size_t quadVertexCount = 4;
-		constexpr glm::vec2 texCoords[] = { {0.0f, 0.0f}, {1.0f, 0.0f}, {1.0f, 1.0f}, {0.0f, 1.0f} };
 		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * glm::rotate(glm::mat4(1.0f), glm::radians(rotation), glm::vec3(0, 0, 1)) * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
-
-		for (size_t i = 0; i < quadVertexCount; ++i)
-		{
-			s_Data->QuadVBufferPtr->Pos = transform * s_Data->VerticesPositions[i];
-			s_Data->QuadVBufferPtr->TexCoord = texCoords[i];
-			s_Data->QuadVBufferPtr->Color = color;
-			s_Data->QuadVBufferPtr->TexIndex = 0.0f;
-			s_Data->QuadVBufferPtr->TilingFactor = 1.0f;
-			++s_Data->QuadVBufferPtr;
-		}
-
-		s_Data->QuadIndicesDrawCount += 6;
-		++s_Data->RendererStats.QuadCount;
+		SetupVertexArray(transform, color);
 	}
 
 	void Renderer2D::DrawRotatedQuad(const glm::vec3& position, const glm::vec2 size, float rotation, const Ref<Texture2D> texture, float tiling, const glm::vec4& tintColor)
@@ -342,17 +296,23 @@ namespace Kaimos {
 		}
 
 		// Vertex Buffer setup
+		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * glm::rotate(glm::mat4(1.0f), glm::radians(rotation), glm::vec3(0, 0, 1)) * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
+		SetupVertexArray(transform, tintColor, (float)textureIndex, tiling);
+	}
+
+
+	void Renderer2D::SetupVertexArray(const glm::mat4& transform, const glm::vec4& color, float texture_index, float texture_tiling)
+	{
 		constexpr size_t quadVertexCount = 4;
 		constexpr glm::vec2 texCoords[] = { {0.0f, 0.0f}, {1.0f, 0.0f}, {1.0f, 1.0f}, {0.0f, 1.0f} };
-		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * glm::rotate(glm::mat4(1.0f), glm::radians(rotation), glm::vec3(0, 0, 1)) * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
 
 		for (size_t i = 0; i < quadVertexCount; ++i)
 		{
 			s_Data->QuadVBufferPtr->Pos = transform * s_Data->VerticesPositions[i];
 			s_Data->QuadVBufferPtr->TexCoord = texCoords[i];
-			s_Data->QuadVBufferPtr->Color = tintColor;
-			s_Data->QuadVBufferPtr->TexIndex = (float)textureIndex;
-			s_Data->QuadVBufferPtr->TilingFactor = tiling;
+			s_Data->QuadVBufferPtr->Color = color;
+			s_Data->QuadVBufferPtr->TexIndex = texture_index;
+			s_Data->QuadVBufferPtr->TilingFactor = texture_tiling;
 			++s_Data->QuadVBufferPtr;
 		}
 
