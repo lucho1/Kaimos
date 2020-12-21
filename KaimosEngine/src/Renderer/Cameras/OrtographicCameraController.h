@@ -9,6 +9,14 @@
 
 namespace Kaimos {
 
+	struct OrthographicCameraBounds
+	{
+		float Left, Right, Bottom, Top;
+
+		float GetWidth()	{ return Right - Left;}
+		float GetHeight()	{ return Top - Bottom;}
+	};
+
 	class OrtographicCameraController
 	{
 	public:
@@ -21,17 +29,18 @@ namespace Kaimos {
 	public:
 
 		// --- Getters ---
-		const OrthographicCamera& GetCamera()	const { return m_Camera; }
+		const OrthographicCamera& GetCamera()		const { return m_Camera; }
+		const OrthographicCameraBounds& GetBounds()	const { return m_CamBounds; }
 
-		inline const float GetZoomLevel()		const { return m_ZoomLevel; }
-		inline const float GetAspectRatio()		const { return m_AspectRatio; }
+		inline const float GetZoomLevel()			const { return m_ZoomLevel; }
+		inline const float GetAspectRatio()			const { return m_AspectRatio; }
 
-		inline const float GetRotationSpeed()	const { return m_CameraRotSpeed; }
-		inline const float GetMovementSpeed()	const { return m_SpeedMultiplier; }
+		inline const float GetRotationSpeed()		const { return m_CameraRotSpeed; }
+		inline const float GetMovementSpeed()		const { return m_SpeedMultiplier; }
 		
-		inline const glm::vec3 GetPosition()	const { return m_CameraPos; }
-		inline const float GetRotation()		const { return m_CameraRotation; }
-		inline const bool IsRotationActive()	const { return m_RotationActive; }
+		inline const glm::vec3 GetPosition()		const { return m_CameraPos; }
+		inline const float GetRotation()			const { return m_CameraRotation; }
+		inline const bool IsRotationActive()		const { return m_RotationActive; }
 
 		// --- Setters ---
 		void SetZoomLevel(float zoom_level);
@@ -61,6 +70,7 @@ namespace Kaimos {
 		float m_CameraMoveSpeed = 1.0f, m_SpeedMultiplier = 1.0f;
 		float m_CameraRotSpeed = 15.0f, m_CameraRotation = 0.0f; // Degrees, anti-clockwise - Also, OrthoCameras rotate only over 1 axis, so we only need a float
 		
+		OrthographicCameraBounds m_CamBounds;
 		OrthographicCamera m_Camera;
 	};
 }

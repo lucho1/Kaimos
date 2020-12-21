@@ -8,7 +8,8 @@
 namespace Kaimos {
 
 	OrtographicCameraController::OrtographicCameraController(float aspect_ratio, bool activate_rotation)
-		: m_AspectRatio(aspect_ratio), m_RotationActive(activate_rotation), m_Camera(-m_AspectRatio * m_ZoomLevel, m_AspectRatio* m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel) // From -AR to +AR (X) and -Zoom to +Zoom (Y)
+		: m_AspectRatio(aspect_ratio), m_RotationActive(activate_rotation), m_CamBounds({-m_AspectRatio * m_ZoomLevel, m_AspectRatio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel}), // From -AR to +AR (X) and -Zoom to +Zoom (Y)
+		m_Camera(m_CamBounds.Left, m_CamBounds.Right, m_CamBounds.Bottom, m_CamBounds.Top)
 	{
 	}
 
@@ -17,7 +18,6 @@ namespace Kaimos {
 		KS_PROFILE_FUNCTION();
 
 		// -- Camera Movement --
-		m_CameraMoveSpeed = m_ZoomLevel * m_SpeedMultiplier;
 		if (Input::IsKeyPressed(KS_KEY_D))
 		{
 			m_CameraPos.x += cos(glm::radians(m_CameraRotation)) * m_CameraMoveSpeed * dt;
@@ -79,9 +79,11 @@ namespace Kaimos {
 
 		m_ZoomLevel -= e.GetYOffset() * 0.25f;
 		m_ZoomLevel = std::max(m_ZoomLevel, 0.25f);
-		m_Camera.SetProjection(-m_AspectRatio * m_ZoomLevel, m_AspectRatio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel);
 
-		//m_CameraMoveSpeed = m_ZoomLevel * m_SpeedMultiplier;
+		m_CamBounds = { -m_AspectRatio * m_ZoomLevel, m_AspectRatio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel };
+		m_Camera.SetProjection(m_CamBounds.Left, m_CamBounds.Right, m_CamBounds.Bottom, m_CamBounds.Top);
+
+		m_CameraMoveSpeed = m_ZoomLevel * m_SpeedMultiplier;
 		return false;
 	}
 
@@ -90,7 +92,9 @@ namespace Kaimos {
 		KS_PROFILE_FUNCTION();
 
 		m_AspectRatio = (float)e.GetWidth()/(float)e.GetHeight();
-		m_Camera.SetProjection(-m_AspectRatio * m_ZoomLevel, m_AspectRatio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel);
+		m_CamBounds = { -m_AspectRatio * m_ZoomLevel, m_AspectRatio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel };
+		m_Camera.SetProjection(m_CamBounds.Left, m_CamBounds.Right, m_CamBounds.Bottom, m_CamBounds.Top);
+
 		return false;
 	}
 
@@ -101,9 +105,10 @@ namespace Kaimos {
 
 		m_ZoomLevel = zoom_level;
 		m_ZoomLevel = std::max(m_ZoomLevel, 0.25f);
-		m_Camera.SetProjection(-m_AspectRatio * m_ZoomLevel, m_AspectRatio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel);
+		m_CamBounds = { -m_AspectRatio * m_ZoomLevel, m_AspectRatio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel };
+		m_Camera.SetProjection(m_CamBounds.Left, m_CamBounds.Right, m_CamBounds.Bottom, m_CamBounds.Top);
 		
-		//m_CameraMoveSpeed = m_ZoomLevel * m_SpeedMultiplier;
+		m_CameraMoveSpeed = m_ZoomLevel * m_SpeedMultiplier;
 	}
 
 	void OrtographicCameraController::SetAspectRatio(float aspect_ratio)
@@ -111,7 +116,8 @@ namespace Kaimos {
 		KS_PROFILE_FUNCTION();
 
 		m_AspectRatio = aspect_ratio;
-		m_Camera.SetProjection(-m_AspectRatio * m_ZoomLevel, m_AspectRatio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel);
+		m_CamBounds = { -m_AspectRatio * m_ZoomLevel, m_AspectRatio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel };
+		m_Camera.SetProjection(m_CamBounds.Left, m_CamBounds.Right, m_CamBounds.Bottom, m_CamBounds.Top);
 	}
 
 	void OrtographicCameraController::SetAspectRatio(float width, float height)
