@@ -241,7 +241,7 @@ namespace Kaimos {
 	{
 		KS_PROFILE_FUNCTION();
 
-		constexpr glm::vec4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
+		//constexpr glm::vec4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
 		uint textureIndex = 0;
 		for (uint i = 1; i < s_Data->TextureSlotIndex; ++i)
 		{
@@ -264,28 +264,28 @@ namespace Kaimos {
 
 		s_Data->QuadVBufferPtr->Pos = transform * s_Data->VerticesPositions[0];
 		s_Data->QuadVBufferPtr->TexCoord = { 0.0f, 0.0f };
-		s_Data->QuadVBufferPtr->Color = color;
+		s_Data->QuadVBufferPtr->Color = tintColor;
 		s_Data->QuadVBufferPtr->TexIndex = (float)textureIndex;
 		s_Data->QuadVBufferPtr->TilingFactor = tiling;
 		s_Data->QuadVBufferPtr++;
 
 		s_Data->QuadVBufferPtr->Pos = transform * s_Data->VerticesPositions[1];
 		s_Data->QuadVBufferPtr->TexCoord = { 1.0f, 0.0f };
-		s_Data->QuadVBufferPtr->Color = color;
+		s_Data->QuadVBufferPtr->Color = tintColor;
 		s_Data->QuadVBufferPtr->TexIndex = (float)textureIndex;
 		s_Data->QuadVBufferPtr->TilingFactor = tiling;
 		s_Data->QuadVBufferPtr++;
 
 		s_Data->QuadVBufferPtr->Pos = transform * s_Data->VerticesPositions[2];
 		s_Data->QuadVBufferPtr->TexCoord = { 1.0f, 1.0f };
-		s_Data->QuadVBufferPtr->Color = color;
+		s_Data->QuadVBufferPtr->Color = tintColor;
 		s_Data->QuadVBufferPtr->TexIndex = (float)textureIndex;
 		s_Data->QuadVBufferPtr->TilingFactor = tiling;
 		s_Data->QuadVBufferPtr++;
 
 		s_Data->QuadVBufferPtr->Pos = transform * s_Data->VerticesPositions[3];
 		s_Data->QuadVBufferPtr->TexCoord = { 0.0f, 1.0f };
-		s_Data->QuadVBufferPtr->Color = color;
+		s_Data->QuadVBufferPtr->Color = tintColor;
 		s_Data->QuadVBufferPtr->TexIndex = (float)textureIndex;
 		s_Data->QuadVBufferPtr->TilingFactor = tiling;
 		s_Data->QuadVBufferPtr++;
@@ -368,7 +368,7 @@ namespace Kaimos {
 	{
 		KS_PROFILE_FUNCTION();
 
-		constexpr glm::vec4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
+		//constexpr glm::vec4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
 		uint textureIndex = 0;
 		for (uint i = 1; i < s_Data->TextureSlotIndex; ++i)
 		{
@@ -391,28 +391,28 @@ namespace Kaimos {
 
 		s_Data->QuadVBufferPtr->Pos = transform * s_Data->VerticesPositions[0];
 		s_Data->QuadVBufferPtr->TexCoord = { 0.0f, 0.0f };
-		s_Data->QuadVBufferPtr->Color = color;
+		s_Data->QuadVBufferPtr->Color = tintColor;
 		s_Data->QuadVBufferPtr->TexIndex = (float)textureIndex;
 		s_Data->QuadVBufferPtr->TilingFactor = tiling;
 		s_Data->QuadVBufferPtr++;
 
 		s_Data->QuadVBufferPtr->Pos = transform * s_Data->VerticesPositions[1];
 		s_Data->QuadVBufferPtr->TexCoord = { 1.0f, 0.0f };
-		s_Data->QuadVBufferPtr->Color = color;
+		s_Data->QuadVBufferPtr->Color = tintColor;
 		s_Data->QuadVBufferPtr->TexIndex = (float)textureIndex;
 		s_Data->QuadVBufferPtr->TilingFactor = tiling;
 		s_Data->QuadVBufferPtr++;
 
 		s_Data->QuadVBufferPtr->Pos = transform * s_Data->VerticesPositions[2];
 		s_Data->QuadVBufferPtr->TexCoord = { 1.0f, 1.0f };
-		s_Data->QuadVBufferPtr->Color = color;
+		s_Data->QuadVBufferPtr->Color = tintColor;
 		s_Data->QuadVBufferPtr->TexIndex = (float)textureIndex;
 		s_Data->QuadVBufferPtr->TilingFactor = tiling;
 		s_Data->QuadVBufferPtr++;
 
 		s_Data->QuadVBufferPtr->Pos = transform * s_Data->VerticesPositions[3];
 		s_Data->QuadVBufferPtr->TexCoord = { 0.0f, 1.0f };
-		s_Data->QuadVBufferPtr->Color = color;
+		s_Data->QuadVBufferPtr->Color = tintColor;
 		s_Data->QuadVBufferPtr->TexIndex = (float)textureIndex;
 		s_Data->QuadVBufferPtr->TilingFactor = tiling;
 		s_Data->QuadVBufferPtr++;

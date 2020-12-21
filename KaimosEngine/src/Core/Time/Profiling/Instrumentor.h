@@ -21,7 +21,7 @@
 //@lucho1: Only changes from original file:
 //                  톂his next ifndef - define with the #endif downside
 //                  톂he macros at the bottom of the document () - Extracted from the Cherno video too!
-//                  � The inclusion in the Kaimos namespace
+//                  톂he inclusion in the Kaimos namespace
 
 #ifndef _INSTRUMENTOR_H_
 #define _INSTRUMENTOR_H_
