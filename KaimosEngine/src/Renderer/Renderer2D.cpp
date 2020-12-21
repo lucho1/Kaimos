@@ -258,6 +258,9 @@ namespace Kaimos {
 
 		if (textureIndex == 0)
 		{
+			if (s_Data->TextureSlotIndex >= s_Data->MaxTextureSlots)
+				StartNewBatch();
+
 			textureIndex = s_Data->TextureSlotIndex;
 			s_Data->TextureSlots[s_Data->TextureSlotIndex] = texture;
 			++s_Data->TextureSlotIndex;
@@ -330,6 +333,9 @@ namespace Kaimos {
 
 		if (textureIndex == 0)
 		{
+			if (s_Data->TextureSlotIndex >= s_Data->MaxTextureSlots)
+				StartNewBatch();
+
 			textureIndex = s_Data->TextureSlotIndex;
 			s_Data->TextureSlots[s_Data->TextureSlotIndex] = texture;
 			++s_Data->TextureSlotIndex;
