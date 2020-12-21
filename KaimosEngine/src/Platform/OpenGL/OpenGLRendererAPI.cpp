@@ -62,7 +62,7 @@ namespace Kaimos {
 
 	void OpenGLRendererAPI::DrawIndexed(const Ref<VertexArray>& vertexArray, uint indexCount) const
 	{
-		uint count = indexCount ? vertexArray->GetIndexBuffer()->GetCount() : indexCount;
+		uint count = indexCount ? indexCount : vertexArray->GetIndexBuffer()->GetCount();
 		glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, nullptr);
 		glBindTexture(GL_TEXTURE_2D, 0); // TODO/OJU: Should we actually do this?
 	}

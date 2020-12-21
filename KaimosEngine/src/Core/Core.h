@@ -35,11 +35,9 @@
 #elif defined(__ANDROID__)
 	#define KS_PLATFORM_ANDROID
 	#error "Android is not Supported!"
-
 #elif defined(__linux__)
 	#define KS_PLATFORM_LINUX
 	#error "Linux is not Currently Supported!"
-
 #else
 	#error "Unknown Platform!"
 #endif
@@ -70,14 +68,23 @@
 // -- GLOBALS --
 #if KS_DEBUG || KS_RELEASE
 	#define KS_ACTIVATE_PROFILE 1
+	#if defined(KS_PLATFORM_WINDOWS)
+		#define KS_DEBUGBREAK() __debugbreak()
+	#elif defined(KS_PLATFORM_LINUX)
+		#include <signal.h>
+		#define KS_DEBUGBREAK() raise(SIGTRAP)
+	#else
+		#error "Kaimos does't support DEBUGBREAK for this platform!"
+	#endif
 #else
 	#define KS_ACTIVATE_PROFILE 0
+	#define KS_DEBUGBREAK()
 #endif
 
 // -- Assertions --
 #if KS_ENABLE_ASSERTS
-	#define KS_EDITOR_ASSERT(x, ...) { if(!x) { KS_EDITOR_CRITICAL("ASSERION FAILED: {0}", __VA_ARGS__); __debugbreak(); }} // Client/Editor Assert
-	#define KS_ENGINE_ASSERT(x, ...) { if(!x) { KS_ENGINE_CRITICAL("ASSERION FAILED: {0}", __VA_ARGS__); __debugbreak(); }} // Core/Engine Assert
+	#define KS_EDITOR_ASSERT(x, ...) { if(!x) { KS_EDITOR_CRITICAL("ASSERION FAILED: {0}", __VA_ARGS__); KS_DEBUGBREAK(); }} // Client/Editor Assert
+	#define KS_ENGINE_ASSERT(x, ...) { if(!x) { KS_ENGINE_CRITICAL("ASSERION FAILED: {0}", __VA_ARGS__); KS_DEBUGBREAK(); }} // Core/Engine Assert
 #else
 	#define KS_EDITOR_ASSERT(x, ...)
 	#define KS_ENGINE_ASSERT(x, ...)

@@ -67,7 +67,8 @@ project "KaimosEngine"
     -- Definitions for the project (global ones)
     defines
     {
-        "_CRT_SECURE_NO_WARNINGS"
+        "_CRT_SECURE_NO_WARNINGS",
+        "GLFW_INCLUDE_NONE"
     }
 
     -- Include Directories to project (to avoid typing a lot in each #include) --
@@ -97,8 +98,8 @@ project "KaimosEngine"
 
         defines
         {
-            "KS_BUILD_DLL",
-            "GLFW_INCLUDE_NONE"
+            --"KS_BUILD_DLL",
+            --"GLFW_INCLUDE_NONE"
         }
 
         --postbuildcommands -- Made this upwards!
@@ -112,7 +113,7 @@ project "KaimosEngine"
         runtime "Debug"
         symbols "On"
     filter "configurations:Release"
-        defines "KS_RELEASE"
+        defines { "KS_RELEASE", "KS_ENABLE_ASSERTS" }
         runtime "Release"
         optimize "On"
     filter "configurations:Dist"
