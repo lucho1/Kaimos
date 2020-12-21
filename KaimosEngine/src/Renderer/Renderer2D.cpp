@@ -131,6 +131,7 @@ namespace Kaimos {
 
 		s_Data->ColoredTextureShader->Bind();
 		s_Data->ColoredTextureShader->SetUIntArray("u_Textures", texture_samplers, s_Data->MaxTextureSlots);
+		s_Data->ColoredTextureShader->Unbind();
 	}
 
 	void Renderer2D::Shutdown()
@@ -162,6 +163,8 @@ namespace Kaimos {
 		s_Data->QuadVBuffer->SetData(s_Data->QuadVBufferBase, dataSize);
 
 		Flush();
+		s_Data->ColoredTextureShader->Unbind();
+		s_Data->QuadVArray->Unbind();
 	}
 
 	void Renderer2D::Flush()

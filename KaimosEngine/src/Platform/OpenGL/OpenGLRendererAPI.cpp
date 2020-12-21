@@ -7,8 +7,8 @@ namespace Kaimos {
 
 	static void APIENTRY OpenGLMessageCallback(GLenum msg_source, GLenum msg_type, GLuint msg_id, GLenum msg_severity, GLsizei msg_length, const GLchar* msg, const void* userParam)
 	{
+		// Take into account that "ShaderRecompilation" message (#131218) warns you that there is a shader already bound on a shader-bind call
 		std::string error_message = " --- OpenGL Error (#" + std::to_string(msg_id) +"): ";
-
 		switch (msg_type)
 		{
 			case GL_DEBUG_TYPE_ERROR:				error_message += "GL Error";			break;
