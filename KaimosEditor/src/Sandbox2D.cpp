@@ -87,6 +87,9 @@ void Sandbox2D::OnUIRender()
 	ImGui::Text("--- 2D RENDERER STATS ---");
 	ImGui::Text("Draw Calls: %d", stats.DrawCalls);
 	ImGui::Text("Quads Drawn: %d", stats.QuadCount);
+	ImGui::Text("Max Quads per Draw Call: %d", Kaimos::Renderer2D::GetMaxQuads());
+	
+	ImGui::NewLine();
 	ImGui::Text("Vertices: %d", stats.GetTotalVerticesCount());
 	ImGui::Text("Indices: %d", stats.GetTotalIndicesCount());
 	ImGui::Text("Tris: %d", stats.GetTotalTrianglesCount());

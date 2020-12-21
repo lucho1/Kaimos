@@ -68,6 +68,7 @@ namespace Kaimos {
 
 		static void ResetStats();
 		static const Statistics GetStats();
+		static const uint GetMaxQuads();
 	};
 
 }
