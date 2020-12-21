@@ -21,9 +21,11 @@ namespace Kaimos {
 
 	struct Renderer2DData
 	{
-		const uint MaxQuads = 10000;
-		const uint MaxVertices = MaxQuads * 4;
-		const uint MaxIndices = MaxQuads * 6;
+		Renderer2D::Statistics RendererStats;
+
+		static const uint MaxQuads = 20000;
+		static const uint MaxVertices = MaxQuads * 4;
+		static const uint MaxIndices = MaxQuads * 6;
 		static const uint MaxTextureSlots = 32; // TODO: RenderCaps
 
 		uint QuadIndicesDrawCount = 0;
@@ -44,7 +46,20 @@ namespace Kaimos {
 	static Renderer2DData* s_Data;	// On shutdown, this is deleted, and ~VertexArray() called, freeing GPU Memory too
 										// (the whole renderer has to be shutdown while we still have a context, otherwise, it will crash!)
 
+	
+	// --- Statistics Methods ---
+	void Renderer2D::ResetStats()
+	{
+		memset(&s_Data->RendererStats, 0, sizeof(Statistics));
+	}
+	
+	const Renderer2D::Statistics Renderer2D::GetStats()
+	{
+		return s_Data->RendererStats;
+	}
 
+
+	// --- Class Methods ---
 	void Renderer2D::Init()
 	{
 		KS_PROFILE_FUNCTION();
@@ -108,8 +123,8 @@ namespace Kaimos {
 		s_Data->QuadVArray->SetIndexBuffer(m_IBuffer);
 
 		s_Data->QuadVArray->Unbind();
-		m_IBuffer->Unbind();
 		s_Data->QuadVBuffer->Unbind();
+		m_IBuffer->Unbind();
 		delete[] quadIndices;
 		
 		// --- Shader ---
@@ -143,9 +158,12 @@ namespace Kaimos {
 		delete s_Data;
 	}
 
+
+	// --- Rendering Methods ---
 	void Renderer2D::BeginScene(const OrthographicCamera& camera)
 	{
 		KS_PROFILE_FUNCTION();
+		s_Data->QuadVArray->Bind();
 		s_Data->ColoredTextureShader->Bind();
 		s_Data->ColoredTextureShader->SetUMat4("u_ViewProjection", camera.GetViewProjectionMatrix());
 
@@ -163,8 +181,8 @@ namespace Kaimos {
 		s_Data->QuadVBuffer->SetData(s_Data->QuadVBufferBase, dataSize);
 
 		Flush();
-		s_Data->ColoredTextureShader->Unbind();
-		s_Data->QuadVArray->Unbind();
+		//s_Data->ColoredTextureShader->Unbind();
+		//s_Data->QuadVArray->Unbind();
 	}
 
 	void Renderer2D::Flush()
@@ -174,23 +192,29 @@ namespace Kaimos {
 		for (uint i = 0; i < s_Data->TextureSlotIndex; ++i)
 			s_Data->TextureSlots[i]->Bind(i);
 
-		s_Data->QuadVArray->Bind();
 		RenderCommand::DrawIndexed(s_Data->QuadVArray, s_Data->QuadIndicesDrawCount);
+		++s_Data->RendererStats.DrawCalls;
 	}
 
-	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2 size, const glm::vec4& color)
+	void Renderer2D::StartNewBatch()
 	{
-		DrawQuad({ position.x, position.y, 0.0f }, size, color);
+		EndScene();
+
+		s_Data->QuadIndicesDrawCount = 0;
+		s_Data->TextureSlotIndex = 1;
+		s_Data->QuadVBufferPtr = s_Data->QuadVBufferBase;
 	}
 
-	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2 size, const Ref<Texture2D> texture, float tiling, const glm::vec4& tintColor)
-	{
-		DrawQuad({ position.x, position.y, 0.0f }, size, texture, tiling, tintColor);
-	}
 
+	// --- Drawing Methods ---
 	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2 size, const glm::vec4& color)
 	{
 		KS_PROFILE_FUNCTION();
+
+		if (s_Data->QuadIndicesDrawCount >= s_Data->MaxIndices)
+			StartNewBatch();
+
+
 		const float texIndex = 0.0f, tilingFactor = 1.0f;
 
 		// Vertex Buffer setup
@@ -225,6 +249,8 @@ namespace Kaimos {
 		s_Data->QuadVBufferPtr++;
 
 		s_Data->QuadIndicesDrawCount += 6;
+		++s_Data->RendererStats.QuadCount;
+
 
 		//glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
 
@@ -240,6 +266,9 @@ namespace Kaimos {
 	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2 size, const Ref<Texture2D> texture, float tiling, const glm::vec4& tintColor)
 	{
 		KS_PROFILE_FUNCTION();
+
+		if (s_Data->QuadIndicesDrawCount >= s_Data->MaxIndices)
+			StartNewBatch();
 
 		//constexpr glm::vec4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
 		uint textureIndex = 0;
@@ -291,6 +320,7 @@ namespace Kaimos {
 		s_Data->QuadVBufferPtr++;
 
 		s_Data->QuadIndicesDrawCount += 6;
+		++s_Data->RendererStats.QuadCount;
 
 		//glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
 		//
@@ -303,19 +333,14 @@ namespace Kaimos {
 		//RenderCommand::DrawIndexed(s_Data->QuadVArray);
 	}
 
-	void Renderer2D::DrawRotatedQuad(const glm::vec2& position, const glm::vec2 size, float rotation, const glm::vec4& color)
-	{
-		DrawRotatedQuad({ position.x, position.y, 0.0f }, size, rotation, color);
-	}
-
-	void Renderer2D::DrawRotatedQuad(const glm::vec2& position, const glm::vec2 size, float rotation, const Ref<Texture2D> texture, float tiling, const glm::vec4& tintColor)
-	{
-		DrawRotatedQuad({ position.x, position.y, 0.0f }, size, rotation, texture, tiling, tintColor);
-	}
 
 	void Renderer2D::DrawRotatedQuad(const glm::vec3& position, const glm::vec2 size, float rotation, const glm::vec4& color)
 	{
 		KS_PROFILE_FUNCTION();
+
+		if (s_Data->QuadIndicesDrawCount >= s_Data->MaxIndices)
+			StartNewBatch();
+
 		const float texIndex = 0.0f, tilingFactor = 1.0f;
 
 		// Vertex Buffer setup
@@ -350,7 +375,7 @@ namespace Kaimos {
 		s_Data->QuadVBufferPtr++;
 
 		s_Data->QuadIndicesDrawCount += 6;
-
+		++s_Data->RendererStats.QuadCount;
 
 
 		//glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * glm::rotate(glm::mat4(1.0f), glm::radians(rotation), glm::vec3(0, 0, 1)) * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
@@ -367,6 +392,9 @@ namespace Kaimos {
 	void Renderer2D::DrawRotatedQuad(const glm::vec3& position, const glm::vec2 size, float rotation, const Ref<Texture2D> texture, float tiling, const glm::vec4& tintColor)
 	{
 		KS_PROFILE_FUNCTION();
+
+		if (s_Data->QuadIndicesDrawCount >= s_Data->MaxIndices)
+			StartNewBatch();
 
 		//constexpr glm::vec4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
 		uint textureIndex = 0;
@@ -418,7 +446,7 @@ namespace Kaimos {
 		s_Data->QuadVBufferPtr++;
 
 		s_Data->QuadIndicesDrawCount += 6;
-
+		++s_Data->RendererStats.QuadCount;
 
 		//glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * glm::rotate(glm::mat4(1.0f), glm::radians(rotation), glm::vec3(0, 0, 1)) * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
 		//
