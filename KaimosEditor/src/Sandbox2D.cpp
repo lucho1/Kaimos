@@ -19,6 +19,11 @@ void Sandbox2D::OnAttach()
 
 	m_CheckerTexture = Kaimos::Texture2D::Create("assets/textures/Checkerboard.png");
 	m_LogoTexture = Kaimos::Texture2D::Create("assets/textures/ChernoLogo.png");
+
+	Kaimos::FramebufferSettings fboSettings;
+	fboSettings.width = 1280;
+	fboSettings.height = 720;
+	m_Framebuffer = Kaimos::Framebuffer::Create(fboSettings);
 }
 
 void Sandbox2D::OnDetach()
@@ -38,6 +43,7 @@ void Sandbox2D::OnUpdate(Kaimos::Timestep dt)
 
 	{
 		KS_PROFILE_SCOPE("Sandbox2D::OnUpdate::RenderingPreparation");
+		m_Framebuffer->Bind();
 		Kaimos::RenderCommand::SetClearColor(glm::vec4(0.15f, 0.15f, 0.15f, 1.0f));
 		Kaimos::RenderCommand::Clear();
 	}
@@ -71,6 +77,7 @@ void Sandbox2D::OnUpdate(Kaimos::Timestep dt)
 		}
 
 		Kaimos::Renderer2D::EndScene();
+		m_Framebuffer->Unbind();
 	}
 }
 
@@ -138,6 +145,10 @@ void Sandbox2D::OnUIRender()
 	ImGui::Text("Vertices: %d", stats.GetTotalVerticesCount());
 	ImGui::Text("Indices: %d", stats.GetTotalIndicesCount());
 	ImGui::Text("Tris: %d", stats.GetTotalTrianglesCount());
+
+
+	uint fboID = m_Framebuffer->GetFBOTextureID();
+	ImGui::Image((void*)fboID, ImVec2(1280, 720));
 
 	ImGui::End();
 	ImGui::End();

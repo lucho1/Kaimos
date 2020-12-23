@@ -23,6 +23,7 @@ private:
 	Kaimos::OrtographicCameraController m_CameraController;
 	Kaimos::Ref<Kaimos::VertexArray> m_VArray;
 	
+	Kaimos::Ref<Kaimos::Framebuffer> m_Framebuffer;
 	Kaimos::Ref<Kaimos::Shader> m_Shader;
 	Kaimos::Ref<Kaimos::Texture2D> m_CheckerTexture;
 	Kaimos::Ref<Kaimos::Texture2D> m_LogoTexture;

@@ -23,6 +23,7 @@
 
 #include "Renderer/Buffer.h"
 #include "Renderer/Resources/Shader.h"
+#include "Renderer/Resources/Framebuffer.h"
 #include "Renderer/Resources/Texture.h"
 
 #include "Renderer/Cameras/OrthographicCamera.h"
