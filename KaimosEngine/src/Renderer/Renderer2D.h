@@ -6,6 +6,8 @@
 
 namespace Kaimos {
 
+	//A renderer is a high-level class, a full-on renderer (doesn't deals with commands such as ClearScene), it deals with high-level constructs (scenes, meshes...)
+	//RenderCommands should NOT do multiple things, they are just commands (unless specifically suposed-to)
 	class Renderer2D // Won't deal with Storage (will have 0 storage), no static stuff, just render commands
 	{
 		friend struct Renderer2DData;

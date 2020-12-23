@@ -22,7 +22,7 @@ namespace Kaimos {
 	{
 	public:
 
-		Application();
+		Application(const std::string& name = "Kaimos Engine");
 		virtual ~Application();
 
 		// -- Class Methods --

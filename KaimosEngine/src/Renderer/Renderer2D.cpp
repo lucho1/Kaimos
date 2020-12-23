@@ -80,10 +80,11 @@ namespace Kaimos {
 		// --- Vertex Array & Buffers ---
 		//Ref<VertexBuffer> m_VBuffer;
 		//uint indices[6] = { 0, 1, 2, 2, 3, 0 };
+
 		//float vertices[5 * 4] = {
-		//		-0.5f,	-0.5f,	0.0f, 0.0f, 0.0f,
-		//		 0.5f,	-0.5f,	0.0f, 1.0f, 0.0f,
-		//		 0.5f,	 0.5f,	0.0f, 1.0f, 1.0f,
+		//		-0.5f,	-0.5f,	0.0f, 0.0f, 0.0f,		// For negative X positions, UV should be 0, for positive, 1
+		//		 0.5f,	-0.5f,	0.0f, 1.0f, 0.0f,		// If you render, on a square, the texCoords (as color = vec4(tC, 0, 1)), the colors of the square in its corners are
+		//		 0.5f,	 0.5f,	0.0f, 1.0f, 1.0f,		// (0,0,0,1) - Black, (1,0,0,1) - Red, (1,1,0,0) - Yellow, (0,1,0,1) - Green
 		//		-0.5f,	 0.5f,	0.0f, 0.0f, 1.0f
 		//};
 

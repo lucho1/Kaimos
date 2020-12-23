@@ -5,6 +5,8 @@
 
 namespace Kaimos {
 
+	//A renderer is a high-level class, a full-on renderer (doesn't deals with commands such as ClearScene), it deals with high-level constructs (scenes, meshes...)
+	//RenderCommands should NOT do multiple things, they are just commands (unless specifically suposed-to)
 	class RenderCommand
 	{
 	public:
