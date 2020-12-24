@@ -1,26 +1,26 @@
 #include "kspch.h"
-#include "WindowsInput.h"
+#include "Core/Input/Input.h"
 
 #include "Core/Application.h"
 #include <GLFW/glfw3.h>
 
 namespace Kaimos {
 
-	bool WindowsInput::IsKeyPressedImpl(KEYCODE key)
+	bool Input::IsKeyPressed(KEYCODE key)
 	{
 		auto window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
 		auto state = glfwGetKey(window, static_cast<int32_t>(key));
 		return state == GLFW_PRESS || state == GLFW_REPEAT;
 	}
 
-	bool WindowsInput::IsMouseButtonPressedImpl(MOUSECODE button)
+	bool Input::IsMouseButtonPressed(MOUSECODE button)
 	{
 		auto window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
 		auto state = glfwGetMouseButton(window, static_cast<int32_t>(button));
 		return state == GLFW_PRESS;
 	}
 
-	std::pair<float, float> WindowsInput::GetMousePosImpl()
+	std::pair<float, float> Input::GetMousePos()
 	{
 		double x = 0.0, y = 0.0;
 		auto window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
@@ -28,15 +28,15 @@ namespace Kaimos {
 		return { (float)x, (float)y };
 	}
 
-	float WindowsInput::GetMouseXImpl()
+	float Input::GetMouseX()
 	{
-		auto [x, y] = GetMousePosImpl();
+		auto [x, y] = GetMousePos();
 		return x;
 	}
 
-	float WindowsInput::GetMouseYImpl()
+	float Input::GetMouseY()
 	{
-		auto [x, y] = GetMousePosImpl();
+		auto [x, y] = GetMousePos();
 		return y;
 	}
 
