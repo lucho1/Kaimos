@@ -26,7 +26,7 @@ namespace Kaimos {
 		static const uint MaxQuads = 20000;
 		static const uint MaxVertices = MaxQuads * 4;
 		static const uint MaxIndices = MaxQuads * 6;
-		static const uint MaxTextureSlots = 32; // TODO: RenderCaps
+		static const uint MaxTextureSlots = 32; // TODO: RenderCapabilities
 
 		uint QuadIndicesDrawCount = 0;
 		QuadVertex* QuadVBufferBase = nullptr;
@@ -161,6 +161,7 @@ namespace Kaimos {
 
 		// This is deleted here (manually), and not treated as smart pointer, waiting for the end of the program lifetime
 		// because there is still some code of the graphics (OpenGL) that it has to run to free VRAM (for ex. deleting VArrays, Shaders...)
+		delete[] s_Data->QuadVBufferBase;
 		delete s_Data;
 	}
 
@@ -193,9 +194,15 @@ namespace Kaimos {
 	{
 		KS_PROFILE_FUNCTION();
 
+		// Check if something to draw
+		if (s_Data->QuadIndicesDrawCount == 0)
+			return;
+
+		// Bind all Textures to bind
 		for (uint i = 0; i < s_Data->TextureSlotIndex; ++i)
 			s_Data->TextureSlots[i]->Bind(i);
 
+		// Draw VArray
 		RenderCommand::DrawIndexed(s_Data->QuadVArray, s_Data->QuadIndicesDrawCount);
 		++s_Data->RendererStats.DrawCalls;
 	}

@@ -139,12 +139,33 @@ namespace Kaimos {
 		const auto& layout = Vbuffer->GetLayout();
 		for (const auto& element : layout)
 		{
-			glEnableVertexAttribArray(m_VBufferIndex);
-			glVertexAttribPointer(	m_VBufferIndex, element.GetElementTypeCount(),
-									ShaderDataTypeToOpenGLType(element.Type),
-									element.Normalized ? GL_TRUE : GL_FALSE,
-									layout.GetStride(), (const void*)element.Offset);
-			++m_VBufferIndex;
+			if (element.Type == ShaderDataType::Mat3 || element.Type == ShaderDataType::Mat4)
+			{
+				uint8_t count = element.GetElementTypeCount();
+				for (uint8_t i = 0; i < count; ++i)
+				{
+					glEnableVertexAttribArray(m_VBufferIndex);
+					
+					glVertexAttribPointer(m_VBufferIndex, count,
+						ShaderDataTypeToOpenGLType(element.Type),
+						element.Normalized ? GL_TRUE : GL_FALSE,
+						layout.GetStride(), (const void*)(sizeof(float) * count * i));
+					
+					glVertexAttribDivisor(m_VBufferIndex, 1);
+					++m_VBufferIndex;
+				}
+			}
+			else
+			{
+				glEnableVertexAttribArray(m_VBufferIndex);
+
+				glVertexAttribPointer(m_VBufferIndex, element.GetElementTypeCount(),
+					ShaderDataTypeToOpenGLType(element.Type),
+					element.Normalized ? GL_TRUE : GL_FALSE,
+					layout.GetStride(), (const void*)element.Offset);
+
+				++m_VBufferIndex;
+			}
 		}
 
 		m_VertexBuffers.push_back(Vbuffer);
