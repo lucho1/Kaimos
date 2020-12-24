@@ -12,7 +12,7 @@ namespace Kaimos {
 		OpenGLFramebuffer(const FramebufferSettings& settings);
 		virtual ~OpenGLFramebuffer();
 
-		void Resize();
+		virtual void Resize(uint width, uint height) override;
 		virtual void Bind() override;
 		virtual void Unbind() override;
 
@@ -22,9 +22,9 @@ namespace Kaimos {
 
 	private:
 
-		FramebufferSettings m_FBOSettings;
 		uint m_ID = 0;
-		uint m_ColorTexture, m_DepthTexture;
+		uint m_ColorTexture = 0, m_DepthTexture = 0;
+		FramebufferSettings m_FBOSettings;
 	};
 
 }

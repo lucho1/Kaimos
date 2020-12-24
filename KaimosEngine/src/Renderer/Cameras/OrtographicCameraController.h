@@ -44,8 +44,8 @@ namespace Kaimos {
 
 		// --- Setters ---
 		void SetZoomLevel(float zoom_level);
+		void SetAspectRatio(float width, float height);
 		void SetAspectRatio(float aspect_ratio);
-		inline void SetAspectRatio(float width, float height);
 		
 		inline void SetRotationSpeed(float rot_speed)	{ m_CameraRotSpeed = rot_speed; }
 		inline void SetMovementSpeed(float mov_speed)	{ m_SpeedMultiplier = mov_speed; }

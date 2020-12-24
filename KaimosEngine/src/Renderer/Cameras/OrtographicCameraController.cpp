@@ -76,25 +76,14 @@ namespace Kaimos {
 	bool OrtographicCameraController::OnMouseScrolled(MouseScrolledEvent& e)
 	{
 		KS_PROFILE_FUNCTION();
-
-		m_ZoomLevel -= e.GetYOffset() * 0.25f;
-		m_ZoomLevel = std::max(m_ZoomLevel, 0.25f);
-
-		m_CamBounds = { -m_AspectRatio * m_ZoomLevel, m_AspectRatio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel };
-		m_Camera.SetProjection(m_CamBounds.Left, m_CamBounds.Right, m_CamBounds.Bottom, m_CamBounds.Top);
-
-		m_CameraMoveSpeed = m_ZoomLevel * m_SpeedMultiplier;
+		SetZoomLevel(m_ZoomLevel - e.GetYOffset() * 0.25f);
 		return false;
 	}
 
 	bool OrtographicCameraController::OnWindowResized(WindowResizeEvent& e)
 	{
 		KS_PROFILE_FUNCTION();
-
-		m_AspectRatio = (float)e.GetWidth()/(float)e.GetHeight();
-		m_CamBounds = { -m_AspectRatio * m_ZoomLevel, m_AspectRatio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel };
-		m_Camera.SetProjection(m_CamBounds.Left, m_CamBounds.Right, m_CamBounds.Bottom, m_CamBounds.Top);
-
+		SetAspectRatio((float)e.GetWidth() / (float)e.GetHeight());
 		return false;
 	}
 
@@ -111,6 +100,12 @@ namespace Kaimos {
 		m_CameraMoveSpeed = m_ZoomLevel * m_SpeedMultiplier;
 	}
 
+	void OrtographicCameraController::SetAspectRatio(float width, float height)
+	{
+		KS_PROFILE_FUNCTION();
+		SetAspectRatio(width/height);
+	}
+
 	void OrtographicCameraController::SetAspectRatio(float aspect_ratio)
 	{
 		KS_PROFILE_FUNCTION();
@@ -118,10 +113,5 @@ namespace Kaimos {
 		m_AspectRatio = aspect_ratio;
 		m_CamBounds = { -m_AspectRatio * m_ZoomLevel, m_AspectRatio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel };
 		m_Camera.SetProjection(m_CamBounds.Left, m_CamBounds.Right, m_CamBounds.Bottom, m_CamBounds.Top);
-	}
-
-	void OrtographicCameraController::SetAspectRatio(float width, float height)
-	{
-		SetAspectRatio(width/height);
 	}
 }

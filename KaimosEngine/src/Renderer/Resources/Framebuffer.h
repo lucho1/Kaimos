@@ -19,6 +19,7 @@ namespace Kaimos {
 
 		virtual const FramebufferSettings& GetFBOSettings() const = 0;
 		virtual const uint GetFBOTextureID() const = 0;
+		virtual void Resize(uint width, uint height) = 0;
 
 		static Ref<Framebuffer> Create(const FramebufferSettings& settings);
 	};

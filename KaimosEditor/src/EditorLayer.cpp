@@ -7,7 +7,6 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-
 namespace Kaimos {
 
 	EditorLayer::EditorLayer() : Layer("EditorLayer"), m_CameraController(1280.0f / 720.0f, true)
@@ -36,7 +35,25 @@ namespace Kaimos {
 	{
 		KS_PROFILE_FUNCTION();
 
-		// --- UPDATE ---
+		// --- VIEWPORT RESIZE ---
+		if (FramebufferSettings settings = m_Framebuffer->GetFBOSettings();
+			m_ViewportSize.x > 0.0f && m_ViewportSize.y > 0.0f &&
+			(settings.width != m_ViewportSize.x || settings.height != m_ViewportSize.y))
+		{
+			m_Framebuffer->Resize((uint)m_ViewportSize.x, (uint)m_ViewportSize.y);
+			m_CameraController.SetAspectRatio(m_ViewportSize.x, m_ViewportSize.y);
+		}
+
+
+		//ImVec2 ViewportPanelSize = ImGui::GetContentRegionAvail();
+		//if (m_ViewportSize != *((glm::vec2*)&ViewportPanelSize))
+		//{
+		//	m_ViewportSize = *((glm::vec2*)&ViewportPanelSize);
+		//	m_Framebuffer->Resize(m_ViewportSize.x, m_ViewportSize.y);
+		//	m_CameraController.SetAspectRatio(m_ViewportSize.x, m_ViewportSize.y);
+		//}
+
+		// --- CAMERA UPDATE ---
 		m_CameraController.OnUpdate(dt);
 
 		// --- RENDER ---
@@ -115,7 +132,7 @@ namespace Kaimos {
 			ImGui::DockSpace(dock_id, ImVec2(0.0f, 0.0f), dockspace_flags);
 		}
 
-		// --- Up-Menu Tab Bar
+		// --- Upper Menu Tab Bar ---
 		if (ImGui::BeginMenuBar())
 		{
 			if (ImGui::BeginMenu("File"))
@@ -128,6 +145,8 @@ namespace Kaimos {
 
 			ImGui::EndMenuBar();
 		}
+		
+		ImGui::End();
 
 		// --- Settings Floating Window ---
 		ImGui::Begin("Settings");
@@ -147,11 +166,17 @@ namespace Kaimos {
 		ImGui::Text("Indices: %d", stats.GetTotalIndicesCount());
 		ImGui::Text("Tris: %d", stats.GetTotalTrianglesCount());
 
-
-		uint fboID = m_Framebuffer->GetFBOTextureID();
-		ImGui::Image((void*)fboID, ImVec2(1280, 720), ImVec2(0, 1), ImVec2(1, 0));
-
 		ImGui::End();
+
+		// --- Viewport ---
+		ImGui::Begin("Viewport");
+		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0.0f, 0.0f));
+
+		ImVec2 ViewportPanelSize = ImGui::GetContentRegionAvail();
+		m_ViewportSize = glm::vec2(ViewportPanelSize.x, ViewportPanelSize.y);
+
+		ImGui::Image((void*)m_Framebuffer->GetFBOTextureID(), ViewportPanelSize, ImVec2(0, 1), ImVec2(1, 0));
+		ImGui::PopStyleVar();
 		ImGui::End();
 	}
 
