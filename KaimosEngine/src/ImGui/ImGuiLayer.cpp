@@ -64,6 +64,18 @@ namespace Kaimos {
 		ImGui::DestroyContext();
 	}
 
+	void ImGuiLayer::OnEvent(Event& e)
+	{
+		ImGuiIO& imgui_io = ImGui::GetIO();
+		
+		// a |= b is the same than a = a | b
+		// a = a | b --> a is true if at least a or b is true, else is false
+		bool handled = e.IsHandled() | e.IsInCategory(EVENT_CATEGORY_MOUSE) & imgui_io.WantCaptureMouse;
+		handled = e.IsHandled() | e.IsInCategory(EVENT_CATEGORY_KEYBOARD) & imgui_io.WantCaptureKeyboard;
+
+		e.SetHandled(handled);
+	}
+
 
 	// -- Class Methods --
 	void ImGuiLayer::Begin()

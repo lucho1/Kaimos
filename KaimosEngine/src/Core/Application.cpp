@@ -113,9 +113,10 @@ namespace Kaimos {
 		// Layers Events handling
 		for (auto it = m_LayerStack.rbegin(); it != m_LayerStack.rend(); ++it)
 		{
-			(*it)->OnEvent(e);
 			if (e.IsHandled())
 				break;
+			
+			(*it)->OnEvent(e);
 		}
 	}
 

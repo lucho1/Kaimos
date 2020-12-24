@@ -20,6 +20,7 @@ namespace Kaimos {
 		virtual void OnAttach() override;
 		virtual void OnDetach() override;
 		virtual void OnUIRender() override;
+		virtual void OnEvent(Event& e) override;
 
 		// -- Class Methods --
 		void Begin();

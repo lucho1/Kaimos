@@ -46,6 +46,7 @@ namespace Kaimos {
 		bool IsInCategory(EVENT_CATEGORY category) { return GetCategoryFlags() & category; }
 
 		inline bool IsHandled() const { return m_Handled; }
+		inline void SetHandled(bool handled) { m_Handled = handled; }
 
 	protected:
 		bool m_Handled = false;
