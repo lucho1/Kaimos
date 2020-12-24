@@ -183,7 +183,7 @@ namespace Kaimos {
 		KS_PROFILE_FUNCTION();
 
 		// This cast is because uint8_t is 1 byte large, so the substraction give us the elements in terms of bytes
-		uint dataSize = (uint8_t*)s_Data->QuadVBufferPtr - (uint8_t*)s_Data->QuadVBufferBase;
+		uint dataSize = (uint)((uint8_t*)s_Data->QuadVBufferPtr - (uint8_t*)s_Data->QuadVBufferBase);
 		s_Data->QuadVBuffer->SetData(s_Data->QuadVBufferBase, dataSize);
 
 		Flush();
