@@ -15,6 +15,7 @@ namespace Kaimos {
 
 		Input(const Input&) = delete;
 		Input& operator=(const Input&) = delete;
+		virtual ~Input() = default;
 
 		inline static bool IsKeyPressed(KEYCODE key) { return s_Instance->IsKeyPressedImpl(key); }
 

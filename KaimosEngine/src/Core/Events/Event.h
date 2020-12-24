@@ -38,6 +38,8 @@ namespace Kaimos {
 		friend class EventDispatcher;
 	public:
 
+		virtual ~Event() = default;
+
 		virtual EVENT_TYPE GetEventType() const = 0;
 		virtual const char* GetName() const = 0;
 		virtual int GetCategoryFlags() const = 0;
