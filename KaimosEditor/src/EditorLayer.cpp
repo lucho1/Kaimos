@@ -54,7 +54,8 @@ namespace Kaimos {
 		//}
 
 		// --- CAMERA UPDATE ---
-		m_CameraController.OnUpdate(dt);
+		if(m_ViewportFocused)
+			m_CameraController.OnUpdate(dt);
 
 		// --- RENDER ---
 		Renderer2D::ResetStats();
@@ -171,6 +172,10 @@ namespace Kaimos {
 		// --- Viewport ---
 		ImGui::Begin("Viewport");
 		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0.0f, 0.0f));
+
+		m_ViewportFocused = ImGui::IsWindowFocused();
+		m_ViewportHovered = ImGui::IsWindowHovered();
+		Application::Get().GetImGuiLayer()->SetBlockEvents(!m_ViewportFocused || !m_ViewportHovered);
 
 		ImVec2 ViewportPanelSize = ImGui::GetContentRegionAvail();
 		m_ViewportSize = glm::vec2(ViewportPanelSize.x, ViewportPanelSize.y);

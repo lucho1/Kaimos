@@ -23,6 +23,7 @@ namespace Kaimos {
 		virtual void OnEvent(Event& e) override;
 
 		// -- Class Methods --
+		void SetBlockEvents(bool block_events) { m_BlockEvents = block_events; }
 		void Begin();
 		void End();
 
@@ -30,6 +31,10 @@ namespace Kaimos {
 
 		// -- Class Methods --
 		void SetEngineUIStyle() const;
+
+	private:
+
+		bool m_BlockEvents = true;
 	};
 }
 

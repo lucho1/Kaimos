@@ -36,8 +36,9 @@ namespace Kaimos {
 		void PushOverlay(Layer* layer);
 
 		// -- Getters --
-		inline static Application& Get()	{ return *s_Instance; }
-		inline Window& GetWindow() const	{ return *m_Window; }
+		inline static Application& Get()			{ return *s_Instance; }
+		inline Window& GetWindow()			const	{ return *m_Window; }
+		inline ImGuiLayer* GetImGuiLayer()	const	{ return m_ImGuiLayer; }
 
 	private:
 

@@ -33,6 +33,7 @@ namespace Kaimos {
 		glm::vec4 m_Color = { 1.0f, 0.9f, 0.8f, 1.0f };
 
 		glm::vec2 m_ViewportSize = glm::vec2(0.0f);
+		bool m_ViewportFocused = false, m_ViewportHovered = false;
 	};
 }
 #endif
