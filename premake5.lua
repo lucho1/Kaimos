@@ -23,6 +23,7 @@ IncludeDir["Glad"] = "KaimosEngine/vendor/Glad/include"
 IncludeDir["ImGui"] = "KaimosEngine/vendor/imgui"
 IncludeDir["glm"] = "KaimosEngine/vendor/glm"
 IncludeDir["stb_image"] = "KaimosEngine/vendor/stb_image"
+IncludeDir["entt"] = "KaimosEngine/vendor/entt/include"
 
 -- How To Add a Library: --
 -- Just include it here, on top, as a new IncludeDir, 
@@ -80,7 +81,8 @@ project "KaimosEngine"
         "%{IncludeDir.Glad}",
         "%{IncludeDir.ImGui}",
         "%{IncludeDir.glm}",
-        "%{IncludeDir.stb_image}"
+        "%{IncludeDir.stb_image}",
+        "%{IncludeDir.entt}"
     }
 
     -- Kaimos Engine Project Links --
@@ -144,7 +146,8 @@ project "KaimosEditor"
         "KaimosEngine/vendor/spdlog/include",
         "KaimosEngine/src",
         "%{IncludeDir.ImGui}",
-        "%{IncludeDir.glm}"
+        "%{IncludeDir.glm}",
+        "%{IncludeDir.entt}"
     }
 
     links
