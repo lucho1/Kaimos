@@ -6,7 +6,7 @@ namespace Kaimos {
 
 	struct FramebufferSettings
 	{
-		uint width, height, samples = 1;
+		uint width = 0, height = 0, samples = 1;
 		bool swapchain_target = false;
 	};
 

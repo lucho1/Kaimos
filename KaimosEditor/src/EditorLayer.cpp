@@ -38,7 +38,7 @@ namespace Kaimos {
 		// --- VIEWPORT RESIZE ---
 		if (FramebufferSettings settings = m_Framebuffer->GetFBOSettings();
 			m_ViewportSize.x > 0.0f && m_ViewportSize.y > 0.0f &&
-			(settings.width != m_ViewportSize.x || settings.height != m_ViewportSize.y))
+			(settings.width != (uint)m_ViewportSize.x || settings.height != (uint)m_ViewportSize.y))
 		{
 			m_Framebuffer->Resize((uint)m_ViewportSize.x, (uint)m_ViewportSize.y);
 			m_CameraController.SetAspectRatio(m_ViewportSize.x, m_ViewportSize.y);

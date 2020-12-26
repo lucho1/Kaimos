@@ -5,6 +5,8 @@
 
 namespace Kaimos {
 
+	static const uint s_MaxFBOSize = 8192; // TODO: Don't hardcode this, this should be based on render capabilities
+
 	OpenGLFramebuffer::OpenGLFramebuffer(const FramebufferSettings& settings) : m_FBOSettings(settings)
 	{
 		Resize(settings.width, settings.height);
@@ -31,6 +33,12 @@ namespace Kaimos {
 
 	void OpenGLFramebuffer::Resize(uint width, uint height)
 	{
+		if (width == 0 || height == 0 || width > s_MaxFBOSize || height > s_MaxFBOSize)
+		{
+			KS_ENGINE_WARN("Warning: Tried to resize FBO to {0}x{1}, aborting operation", width, height);
+			return;
+		}
+
 		if (m_ID != 0)
 		{
 			glDeleteFramebuffers(1, &m_ID);
