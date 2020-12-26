@@ -74,7 +74,7 @@ namespace Kaimos {
 
 		// --- Unbind FBO ---
 		// TODO: Assertions are not working, in this case, whether FBO is complete or not, it won't assert, and if I put a != instead, it will assert if it's complete
-		KS_ENGINE_ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE, "Framebuffer Incompleted!");
+		KS_ENGINE_ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == (bool)GL_FRAMEBUFFER_COMPLETE, "Framebuffer Incompleted!");
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 }
