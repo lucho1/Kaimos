@@ -24,6 +24,12 @@ namespace Kaimos {
 		fboSettings.width = 1280;
 		fboSettings.height = 720;
 		m_Framebuffer = Framebuffer::Create(fboSettings);
+
+		m_CurrentScene = CreateRef<Scene>();
+
+		m_Entity = m_CurrentScene->CreateEntity("Square");
+		m_Entity.HasComponent<TransformComponent>();
+		m_Entity.AddComponent<SpriteRendererComponent>(glm::vec4(0.8f, 0.4f, 0.5f, 1.0f));
 	}
 
 	void EditorLayer::OnDetach()
@@ -44,60 +50,49 @@ namespace Kaimos {
 			m_CameraController.SetAspectRatio(m_ViewportSize.x, m_ViewportSize.y);
 		}
 
-
-		//ImVec2 ViewportPanelSize = ImGui::GetContentRegionAvail();
-		//if (m_ViewportSize != *((glm::vec2*)&ViewportPanelSize))
-		//{
-		//	m_ViewportSize = *((glm::vec2*)&ViewportPanelSize);
-		//	m_Framebuffer->Resize(m_ViewportSize.x, m_ViewportSize.y);
-		//	m_CameraController.SetAspectRatio(m_ViewportSize.x, m_ViewportSize.y);
-		//}
-
 		// --- CAMERA UPDATE ---
-		if(m_ViewportFocused)
+		if (m_ViewportFocused)
 			m_CameraController.OnUpdate(dt);
 
 		// --- RENDER ---
 		Renderer2D::ResetStats();
 
-		{
-			KS_PROFILE_SCOPE("EditorLayer::OnUpdate::RenderingPreparation");
-			m_Framebuffer->Bind();
-			RenderCommand::SetClearColor(glm::vec4(0.15f, 0.15f, 0.15f, 1.0f));
-			RenderCommand::Clear();
-		}
+		m_Framebuffer->Bind();
+		RenderCommand::SetClearColor(glm::vec4(0.15f, 0.15f, 0.15f, 1.0f));
+		RenderCommand::Clear();
 
 		// -- Scene --
+		Renderer2D::BeginScene(m_CameraController.GetCamera());
+		Renderer2D::DrawQuad(glm::vec3(0.0f, 0.0f, -0.1f), glm::vec2(10.0f), m_CheckerTexture, m_BackgroundTiling, glm::vec4(1.0f));
+
+		// --- SCENE UPDATE ---
+		m_CurrentScene->OnUpdate(dt);
+
+		/*Renderer2D::DrawQuad(glm::vec2(1.5f, -2.5f), glm::vec2(0.5f, 0.75f), { 0.3f, 0.2f, 0.8f, 1.0f });
+		Renderer2D::DrawQuad(glm::vec2(0.5f, -0.5f), glm::vec2(0.5f, 0.75f), { 0.8f, 0.2f, 0.3f, 1.0f });
+		Renderer2D::DrawQuad(glm::vec2(-2.0f, -1.5f), glm::vec2(0.5f, 0.75f), m_Color);
+
+		Renderer2D::DrawRotatedQuad(glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec2(1.0f), 45.0f, m_LogoTexture, 1.0f, glm::vec4(1.0f));
+
+		static float rotation = 0.0f;
+		rotation += dt * 50.0f;
+		Renderer2D::DrawRotatedQuad(glm::vec3(-3.0f, 0.0f, 0.1f), glm::vec2(0.8f), rotation, { 0.2f, 0.8f, 0.3f, 1.0f });
+
+		Renderer2D::EndScene();
+
+		Renderer2D::BeginScene(m_CameraController.GetCamera());
+
+		for (float y = -5.0f; y < 5.0f; y += 0.475f)
 		{
-			KS_PROFILE_SCOPE("EditorLayer::OnUpdate::Rendering");
-			Renderer2D::BeginScene(m_CameraController.GetCamera());
-			Renderer2D::DrawQuad(glm::vec2(1.5f, -2.5f), glm::vec2(0.5f, 0.75f), { 0.3f, 0.2f, 0.8f, 1.0f });
-			Renderer2D::DrawQuad(glm::vec2(0.5f, -0.5f), glm::vec2(0.5f, 0.75f), { 0.8f, 0.2f, 0.3f, 1.0f });
-			Renderer2D::DrawQuad(glm::vec2(-2.0f, -1.5f), glm::vec2(0.5f, 0.75f), m_Color);
-
-			Renderer2D::DrawQuad(glm::vec3(0.0f, 0.0f, -0.1f), glm::vec2(10.0f), m_CheckerTexture, m_BackgroundTiling, glm::vec4(1.0f));
-			Renderer2D::DrawRotatedQuad(glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec2(1.0f), 45.0f, m_LogoTexture, 1.0f, glm::vec4(1.0f));
-
-			static float rotation = 0.0f;
-			rotation += dt * 50.0f;
-
-			Renderer2D::DrawRotatedQuad(glm::vec3(-3.0f, 0.0f, 0.1f), glm::vec2(0.8f), rotation, { 0.2f, 0.8f, 0.3f, 1.0f });
-			Renderer2D::EndScene();
-
-			Renderer2D::BeginScene(m_CameraController.GetCamera());
-
-			for (float y = -5.0f; y < 5.0f; y += 0.475f)
+			for (float x = -5.0f; x < 5.0f; x += 0.475f)
 			{
-				for (float x = -5.0f; x < 5.0f; x += 0.475f)
-				{
-					glm::vec4 color = { (x + 0.5f) / 10.0f, 0.4f, (y + 5.0f) / 10.0f, 0.75f };
-					Renderer2D::DrawQuad({ x, y }, { 0.45f, 0.45f }, color);
-				}
+				glm::vec4 color = { (x + 0.5f) / 10.0f, 0.4f, (y + 5.0f) / 10.0f, 0.75f };
+				Renderer2D::DrawQuad({ x, y }, { 0.45f, 0.45f }, color);
 			}
+		}*/
 
-			Renderer2D::EndScene();
-			m_Framebuffer->Unbind();
-		}
+		Renderer2D::EndScene();
+		m_Framebuffer->Unbind();
 	}
 
 	void EditorLayer::OnUIRender()
@@ -149,11 +144,22 @@ namespace Kaimos {
 		
 		ImGui::End();
 
-		// --- Settings Floating Window ---
+		// Little test for Entities (this case: square entity color)
+		ImGui::Separator();
 		ImGui::Begin("Settings");
-		ImGui::ColorEdit4("Squares Color", glm::value_ptr(m_Color));
-		ImGui::SliderFloat("Background Tiling", &m_BackgroundTiling, 1.0f, 100.0f, "%.2f");
 
+		if (m_Entity)
+		{
+			ImGui::Text("Entity Name: %s", m_Entity.GetComponent<TagComponent>().Tag.c_str());
+			auto& entColor = m_Entity.GetComponent<SpriteRendererComponent>().Color;
+			ImGui::ColorEdit4("Square Entity Color", glm::value_ptr(entColor));
+		}
+
+		//ImGui::ColorEdit4("Squares Color", glm::value_ptr(m_Color));
+		ImGui::SliderFloat("Background Tiling", &m_BackgroundTiling, 1.0f, 100.0f, "%.2f");
+		ImGui::Separator();
+
+		// --- Renderer Settings Floating Window ---
 		auto stats = Renderer2D::GetStats();
 
 		ImGui::NewLine(); ImGui::NewLine();

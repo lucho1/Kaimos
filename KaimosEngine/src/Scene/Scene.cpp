@@ -1,6 +1,10 @@
 #include "kspch.h"
 #include "Scene.h"
 
+#include "Entity.h"
+#include "Components.h"
+#include "Renderer/Renderer2D.h"
+
 #include <glm/glm.hpp>
 
 namespace Kaimos {
@@ -36,29 +40,31 @@ namespace Kaimos {
 		//	auto&[transform, mesh] = group.get<TransformComponent, MeshComponent>(ent);
 		//}
 
-	struct TransformComponent
-	{
-		glm::mat4 transform;
-
-		TransformComponent() = default;
-		TransformComponent(const TransformComponent&) = default;
-		TransformComponent(const glm::mat4& transform) : transform(transform) {}
-
-		operator const glm::mat4& () const { return transform; } // This allows to use TransformComponent as a matrix (overloading magic), it implicitly makes the cast
-		operator glm::mat4& () { return transform; }
-	};
-	struct MeshComponent {};
 
 	Scene::Scene()
 	{
-		// -- To operate with entities: --
-		entt::entity entity = m_Registry.create();
-		// To add a component type into the registry (and it actually returns the comp. if you want to store it), this case a transform comp. with transform initialized to glm::mat4(1.0f)
-		m_Registry.emplace<TransformComponent>(entity, glm::mat4(1.0f)); // This component is created on fly (don't need to register them on time)
 	}
 
 	Scene::~Scene()
 	{
+	}
+
+	void Scene::OnUpdate(Timestep dt)
+	{
+		auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
+		for (auto ent : group)
+		{
+			auto&[transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(ent);
+			Renderer2D::DrawQuad(transform, sprite.Color);
+		}
+	}
+
+	Entity Scene::CreateEntity(const std::string& name)
+	{
+		Entity entity = { m_Registry.create(), this };
+		entity.AddComponent<TransformComponent>();
+		entity.AddComponent<TagComponent>(name);
+		return entity;
 	}
 
 }

@@ -217,6 +217,51 @@ namespace Kaimos {
 
 
 	// --- Drawing Methods ---
+	void Renderer2D::DrawQuad(const glm::mat4& transform, const glm::vec4& color)
+	{
+		KS_PROFILE_FUNCTION();
+
+		if (s_Data->QuadIndicesDrawCount >= s_Data->MaxIndices)
+			StartNewBatch();
+
+		// Vertex Buffer setup
+		SetupVertexArray(transform, color);
+	}
+
+
+	void Renderer2D::DrawQuad(const glm::mat4& transform, const Ref<Texture2D> texture, float tiling, const glm::vec4& tintColor)
+	{
+		KS_PROFILE_FUNCTION();
+
+		if (s_Data->QuadIndicesDrawCount >= s_Data->MaxIndices)
+			StartNewBatch();
+
+		// Texture Index retrieval
+		uint textureIndex = 0;
+		for (uint i = 1; i < s_Data->TextureSlotIndex; ++i)
+		{
+			if (s_Data->TextureSlots[i].get() == texture.get())
+			{
+				textureIndex = i;
+				break;
+			}
+		}
+
+		if (textureIndex == 0)
+		{
+			if (s_Data->TextureSlotIndex >= s_Data->MaxTextureSlots)
+				StartNewBatch();
+
+			textureIndex = s_Data->TextureSlotIndex;
+			s_Data->TextureSlots[s_Data->TextureSlotIndex] = texture;
+			++s_Data->TextureSlotIndex;
+		}
+
+		// Vertex Buffer setup
+		SetupVertexArray(transform, tintColor, (float)textureIndex, tiling);
+	}
+
+
 	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2 size, const glm::vec4& color)
 	{
 		KS_PROFILE_FUNCTION();

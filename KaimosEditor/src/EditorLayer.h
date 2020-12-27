@@ -22,9 +22,14 @@ namespace Kaimos {
 	private:
 
 		// TODO: TEMP
+		// Scene
+		Ref<Scene> m_CurrentScene;
+		Entity m_Entity;
+
+		// Rendering
 		OrtographicCameraController m_CameraController;
 		Ref<VertexArray> m_VArray;
-
+		
 		Ref<Framebuffer> m_Framebuffer;
 		Ref<Shader> m_Shader;
 		Ref<Texture2D> m_CheckerTexture;
@@ -32,6 +37,7 @@ namespace Kaimos {
 		float m_BackgroundTiling = 10.0f;
 		glm::vec4 m_Color = { 1.0f, 0.9f, 0.8f, 1.0f };
 
+		// Viewport
 		glm::vec2 m_ViewportSize = glm::vec2(0.0f);
 		bool m_ViewportFocused = false, m_ViewportHovered = false;
 	};
