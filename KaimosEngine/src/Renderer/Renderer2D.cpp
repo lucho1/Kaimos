@@ -5,8 +5,6 @@
 #include "Resources/Shader.h"
 #include "RenderCommand.h"
 
-#include <glm/gtc/matrix_transform.hpp>
-
 
 namespace Kaimos {
 
@@ -62,6 +60,7 @@ namespace Kaimos {
 	{
 		return s_Data->MaxQuads;
 	}
+
 
 
 	// --- Class Methods ---
@@ -166,6 +165,7 @@ namespace Kaimos {
 	}
 
 
+
 	// --- Rendering Methods ---
 	void Renderer2D::BeginScene(const OrthographicCamera& camera)
 	{
@@ -215,6 +215,26 @@ namespace Kaimos {
 		s_Data->QuadVBufferPtr = s_Data->QuadVBufferBase;
 	}
 
+	void Renderer2D::SetupVertexArray(const glm::mat4& transform, const glm::vec4& color, float texture_index, float texture_tiling)
+	{
+		constexpr size_t quadVertexCount = 4;
+		constexpr glm::vec2 texCoords[] = { {0.0f, 0.0f}, {1.0f, 0.0f}, {1.0f, 1.0f}, {0.0f, 1.0f} };
+
+		for (size_t i = 0; i < quadVertexCount; ++i)
+		{
+			s_Data->QuadVBufferPtr->Pos = transform * s_Data->VerticesPositions[i];
+			s_Data->QuadVBufferPtr->TexCoord = texCoords[i];
+			s_Data->QuadVBufferPtr->Color = color;
+			s_Data->QuadVBufferPtr->TexIndex = texture_index;
+			s_Data->QuadVBufferPtr->TilingFactor = texture_tiling;
+			++s_Data->QuadVBufferPtr;
+		}
+
+		s_Data->QuadIndicesDrawCount += 6;
+		++s_Data->RendererStats.QuadCount;
+	}
+
+
 
 	// --- Drawing Methods ---
 	void Renderer2D::DrawQuad(const glm::mat4& transform, const glm::vec4& color)
@@ -262,114 +282,54 @@ namespace Kaimos {
 	}
 
 
+
+	// --- Drawing Methods depending on other drawing methods above ---
+	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2 size, const glm::vec4& color)
+	{
+		DrawQuad({ position.x, position.y, 0.0f }, size, color);
+	}
+
 	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2 size, const glm::vec4& color)
 	{
-		KS_PROFILE_FUNCTION();
+		DrawQuad(glm::translate(glm::mat4(1.0f), position) * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f }), color);
+	}
 
-		if (s_Data->QuadIndicesDrawCount >= s_Data->MaxIndices)
-			StartNewBatch();
-
-		// Vertex Buffer setup
-		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
-		SetupVertexArray(transform, color);
+	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2 size, const Ref<Texture2D> texture, float tiling, const glm::vec4& tintColor)
+	{
+		DrawQuad({ position.x, position.y, 0.0f }, size, texture, tiling, tintColor);
 	}
 
 	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2 size, const Ref<Texture2D> texture, float tiling, const glm::vec4& tintColor)
 	{
-		KS_PROFILE_FUNCTION();
-
-		if (s_Data->QuadIndicesDrawCount >= s_Data->MaxIndices)
-			StartNewBatch();
-
-		// Texture Index retrieval
-		uint textureIndex = 0;
-		for (uint i = 1; i < s_Data->TextureSlotIndex; ++i)
-		{
-			if (s_Data->TextureSlots[i].get() == texture.get())
-			{
-				textureIndex = i;
-				break;
-			}
-		}
-
-		if (textureIndex == 0)
-		{
-			if (s_Data->TextureSlotIndex >= s_Data->MaxTextureSlots)
-				StartNewBatch();
-
-			textureIndex = s_Data->TextureSlotIndex;
-			s_Data->TextureSlots[s_Data->TextureSlotIndex] = texture;
-			++s_Data->TextureSlotIndex;
-		}
-
-		// Vertex Buffer setup
-		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
-		SetupVertexArray(transform, tintColor, (float)textureIndex, tiling);
+		DrawQuad(glm::translate(glm::mat4(1.0f), position) * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f }), texture, tiling, tintColor);
 	}
 
+	// Rotated-Quad Methods (the same than previous, but rotated)
+	void Renderer2D::DrawRotatedQuad(const glm::vec2& position, const glm::vec2 size, float rotation, const glm::vec4& color)
+	{
+		DrawRotatedQuad({ position.x, position.y, 0.0f }, size, rotation, color);
+	}
 
 	void Renderer2D::DrawRotatedQuad(const glm::vec3& position, const glm::vec2 size, float rotation, const glm::vec4& color)
 	{
-		KS_PROFILE_FUNCTION();
+		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
+							* glm::rotate(glm::mat4(1.0f), glm::radians(rotation), glm::vec3(0, 0, 1))
+							* glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
 
-		if (s_Data->QuadIndicesDrawCount >= s_Data->MaxIndices)
-			StartNewBatch();
+		DrawQuad(transform, color);
+	}
 
-		// Vertex Buffer setup
-		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * glm::rotate(glm::mat4(1.0f), glm::radians(rotation), glm::vec3(0, 0, 1)) * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
-		SetupVertexArray(transform, color);
+	void Renderer2D::DrawRotatedQuad(const glm::vec2& position, const glm::vec2 size, float rotation, const Ref<Texture2D> texture, float tiling, const glm::vec4& tintColor)
+	{
+		DrawRotatedQuad({ position.x, position.y, 0.0f }, size, rotation, texture, tiling, tintColor);
 	}
 
 	void Renderer2D::DrawRotatedQuad(const glm::vec3& position, const glm::vec2 size, float rotation, const Ref<Texture2D> texture, float tiling, const glm::vec4& tintColor)
 	{
-		KS_PROFILE_FUNCTION();
+		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
+							* glm::rotate(glm::mat4(1.0f), glm::radians(rotation), glm::vec3(0, 0, 1))
+							* glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
 
-		if (s_Data->QuadIndicesDrawCount >= s_Data->MaxIndices)
-			StartNewBatch();
-
-		// Texture Index retrieval
-		uint textureIndex = 0;
-		for (uint i = 1; i < s_Data->TextureSlotIndex; ++i)
-		{
-			if (s_Data->TextureSlots[i].get() == texture.get())
-			{
-				textureIndex = i;
-				break;
-			}
-		}
-
-		if (textureIndex == 0)
-		{
-			if (s_Data->TextureSlotIndex >= s_Data->MaxTextureSlots)
-				StartNewBatch();
-
-			textureIndex = s_Data->TextureSlotIndex;
-			s_Data->TextureSlots[s_Data->TextureSlotIndex] = texture;
-			++s_Data->TextureSlotIndex;
-		}
-
-		// Vertex Buffer setup
-		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * glm::rotate(glm::mat4(1.0f), glm::radians(rotation), glm::vec3(0, 0, 1)) * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
-		SetupVertexArray(transform, tintColor, (float)textureIndex, tiling);
-	}
-
-
-	void Renderer2D::SetupVertexArray(const glm::mat4& transform, const glm::vec4& color, float texture_index, float texture_tiling)
-	{
-		constexpr size_t quadVertexCount = 4;
-		constexpr glm::vec2 texCoords[] = { {0.0f, 0.0f}, {1.0f, 0.0f}, {1.0f, 1.0f}, {0.0f, 1.0f} };
-
-		for (size_t i = 0; i < quadVertexCount; ++i)
-		{
-			s_Data->QuadVBufferPtr->Pos = transform * s_Data->VerticesPositions[i];
-			s_Data->QuadVBufferPtr->TexCoord = texCoords[i];
-			s_Data->QuadVBufferPtr->Color = color;
-			s_Data->QuadVBufferPtr->TexIndex = texture_index;
-			s_Data->QuadVBufferPtr->TilingFactor = texture_tiling;
-			++s_Data->QuadVBufferPtr;
-		}
-
-		s_Data->QuadIndicesDrawCount += 6;
-		++s_Data->RendererStats.QuadCount;
+		DrawQuad(transform, texture, tiling, tintColor);
 	}
 }

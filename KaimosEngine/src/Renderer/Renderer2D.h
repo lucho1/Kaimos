@@ -4,6 +4,8 @@
 #include "Cameras/OrthographicCamera.h"
 #include "Resources/Texture.h"
 
+#include <glm/gtc/matrix_transform.hpp>
+
 namespace Kaimos {
 
 	//A renderer is a high-level class, a full-on renderer (doesn't deals with commands such as ClearScene), it deals with high-level constructs (scenes, meshes...)
@@ -22,35 +24,21 @@ namespace Kaimos {
 		static void EndScene();
 		static void Flush();
 		
-		// --- Drawing Methods ---
+		// --- Base Drawing Methods ---
 		static void DrawQuad(const glm::mat4& transform, const glm::vec4& color);
 		static void DrawQuad(const glm::mat4& transform, const Ref<Texture2D> texture, float tiling = 1.0f, const glm::vec4& tintColor = glm::vec4(1.0f));
 
-		static void DrawQuad(const glm::vec3& position, const glm::vec2 size, const glm::vec4& color);
+		// --- Non-Rotated Quads Drawing Methods (calling Base Drawing Methods) ---
+		static void DrawQuad(const glm::vec2& position, const glm::vec2 size, const glm::vec4& color);
+		static void DrawQuad(const glm::vec3& position, const glm::vec2 size, const glm::vec4& color);		
+		static void DrawQuad(const glm::vec2& position, const glm::vec2 size, const Ref<Texture2D> texture, float tiling = 1.0f, const glm::vec4& tintColor = glm::vec4(1.0f));		
 		static void DrawQuad(const glm::vec3& position, const glm::vec2 size, const Ref<Texture2D> texture, float tiling = 1.0f, const glm::vec4& tintColor = glm::vec4(1.0f));
-		static void DrawRotatedQuad(const glm::vec3& position, const glm::vec2 size, float rotation, const glm::vec4& color);
+		
+		// --- Rotated Quads Drawing Methods (calling Base Drawing Methods) ---
+		static void DrawRotatedQuad(const glm::vec2& position, const glm::vec2 size, float rotation, const glm::vec4& color);		
+		static void DrawRotatedQuad(const glm::vec3& position, const glm::vec2 size, float rotation, const glm::vec4& color);		
+		static void DrawRotatedQuad(const glm::vec2& position, const glm::vec2 size, float rotation, const Ref<Texture2D> texture, float tiling = 1.0f, const glm::vec4& tintColor = glm::vec4(1.0f));		
 		static void DrawRotatedQuad(const glm::vec3& position, const glm::vec2 size, float rotation, const Ref<Texture2D> texture, float tiling = 1.0f, const glm::vec4& tintColor = glm::vec4(1.0f));
-
-		// Drawing methods calling other functions
-		static void DrawQuad(const glm::vec2& position, const glm::vec2 size, const glm::vec4& color)
-		{
-			DrawQuad({ position.x, position.y, 0.0f }, size, color);
-		}
-
-		static void DrawQuad(const glm::vec2& position, const glm::vec2 size, const Ref<Texture2D> texture, float tiling = 1.0f, const glm::vec4& tintColor = glm::vec4(1.0f))
-		{
-			DrawQuad({ position.x, position.y, 0.0f }, size, texture, tiling, tintColor);
-		}
-
-		static void DrawRotatedQuad(const glm::vec2& position, const glm::vec2 size, float rotation, const glm::vec4& color)
-		{
-			DrawRotatedQuad({ position.x, position.y, 0.0f }, size, rotation, color);
-		}
-
-		static void DrawRotatedQuad(const glm::vec2& position, const glm::vec2 size, float rotation, const Ref<Texture2D> texture, float tiling = 1.0f, const glm::vec4& tintColor = glm::vec4(1.0f))
-		{
-			DrawRotatedQuad({ position.x, position.y, 0.0f }, size, rotation, texture, tiling, tintColor);
-		}
 
 
 	private:
