@@ -1,4 +1,3 @@
-//
 // Basic instrumentation profiler by Cherno (https://github.com/TheCherno)
 
 // Usage: include this header file somewhere in your code (eg. precompiled header), and then use like:
@@ -51,15 +50,10 @@ namespace Kaimos {
 
 	class Instrumentor
 	{
-	private:
-		std::mutex m_Mutex;
-		InstrumentationSession* m_CurrentSession;
-		std::ofstream m_OutputStream;
 	public:
-		Instrumentor()
-			: m_CurrentSession(nullptr)
-		{
-		}
+
+		Instrumentor(const Instrumentor&) = delete;
+		Instrumentor(Instrumentor&&) = delete;
 
 		void BeginSession(const std::string& name, const std::string& filepath = "results.json")
 		{
@@ -130,6 +124,16 @@ namespace Kaimos {
 
 	private:
 
+		Instrumentor()
+			: m_CurrentSession(nullptr)
+		{
+		}
+
+		~Instrumentor()
+		{
+			EndSession();
+		}
+
 		void WriteHeader()
 		{
 			m_OutputStream << "{\"otherData\": {},\"traceEvents\":[{}";
@@ -155,6 +159,11 @@ namespace Kaimos {
 			}
 		}
 
+	private:
+
+		std::mutex m_Mutex;
+		InstrumentationSession* m_CurrentSession = nullptr;
+		std::ofstream m_OutputStream;
 	};
 
 	class InstrumentationTimer
@@ -226,31 +235,36 @@ namespace Kaimos {
     // is resolved when the (pre)compiler starts, so the syntax highlighting
     // could mark the wrong one in your editor!
     #if defined(__GNUC__) || (defined(__MWERKS__) && (__MWERKS__ >= 0x3000)) || (defined(__ICC) && (__ICC >= 600)) || defined(__ghs__)
-        #define HZ_FUNC_SIG __PRETTY_FUNCTION__
+        #define KS_FUNC_SIG __PRETTY_FUNCTION__
     #elif defined(__DMC__) && (__DMC__ >= 0x810)
-        #define HZ_FUNC_SIG __PRETTY_FUNCTION__
+        #define KS_FUNC_SIG __PRETTY_FUNCTION__
     #elif (defined(__FUNCSIG__) || (_MSC_VER))
-        #define HZ_FUNC_SIG __FUNCSIG__
+        #define KS_FUNC_SIG __FUNCSIG__
     #elif (defined(__INTEL_COMPILER) && (__INTEL_COMPILER >= 600)) || (defined(__IBMCPP__) && (__IBMCPP__ >= 500))
-        #define HZ_FUNC_SIG __FUNCTION__
+        #define KS_FUNC_SIG __FUNCTION__
     #elif defined(__BORLANDC__) && (__BORLANDC__ >= 0x550)
-        #define HZ_FUNC_SIG __FUNC__
+        #define KS_FUNC_SIG __FUNC__
     #elif defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 199901)
-        #define HZ_FUNC_SIG __func__
+        #define KS_FUNC_SIG __func__
     #elif defined(__cplusplus) && (__cplusplus >= 201103)
-        #define HZ_FUNC_SIG __func__
+        #define KS_FUNC_SIG __func__
     #else
-        #define HZ_FUNC_SIG "HZ_FUNC_SIG unknown!"
+        #define KS_FUNC_SIG "KS_FUNC_SIG unknown!"
     #endif
     
     // --- PROFILING MACROS ---
     #define KS_PROFILE_BEGIN_SESSION(name, filepath)::Kaimos::Instrumentor::Get().BeginSession(name, filepath)
     #define KS_PROFILE_END_SESSION()                ::Kaimos::Instrumentor::Get().EndSession()
+
     // This creates a 'Timer timer', and appending a ##line, creates a 'Timer timerline' so it doesn't crashes if called twice in a row
-	#define KS_PROFILE_SCOPE(name)                  constexpr auto fixedName =	::Kaimos::InstrumentorUtils::CleanupOutputString(name, "__cdecl ");\
-																				::Kaimos::InstrumentationTimer timer##__LINE__(fixedName.Data)
+	#define KS_PROFILE_SCOPE_LINE2(name, line)		constexpr auto fixedName##line =	::Kaimos::InstrumentorUtils::CleanupOutputString(name, "__cdecl ");\
+																						::Kaimos::InstrumentationTimer timer##line(fixedName##line.Data)
+	#define KS_PROFILE_SCOPE_LINE(name, line)		KS_PROFILE_SCOPE_LINE2(name, line)
+
+
     // _FUNCSIG_ is the complete function signature (better than _FUNCTION_ cause we know parameters inside, for the case of overloading)
-    #define KS_PROFILE_FUNCTION()                   KS_PROFILE_SCOPE(HZ_FUNC_SIG)
+	#define KS_PROFILE_SCOPE(name)					KS_PROFILE_SCOPE_LINE(name, __LINE__)
+    #define KS_PROFILE_FUNCTION()                   KS_PROFILE_SCOPE(KS_FUNC_SIG)
 #else
     #define KS_PROFILE_BEGIN_SESSION(name, filepath)
     #define KS_PROFILE_END_SESSION()
