@@ -25,6 +25,7 @@ namespace Kaimos {
 		// Scene
 		Ref<Scene> m_CurrentScene;
 		Entity m_Entity;
+		Entity m_CameraEntity;
 
 		// Rendering
 		OrtographicCameraController m_CameraController;

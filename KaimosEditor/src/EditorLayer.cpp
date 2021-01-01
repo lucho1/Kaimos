@@ -30,6 +30,9 @@ namespace Kaimos {
 		m_Entity = m_CurrentScene->CreateEntity("Square");
 		m_Entity.HasComponent<TransformComponent>();
 		m_Entity.AddComponent<SpriteRendererComponent>(glm::vec4(0.8f, 0.4f, 0.5f, 1.0f));
+
+		m_CameraEntity = m_CurrentScene->CreateEntity("Camera");
+		m_CameraEntity.AddComponent<CameraComponent>(glm::ortho(-16.0f, 16.0f, -9.0f, 9.0f, -1.0f, 1.0f));
 	}
 
 	void EditorLayer::OnDetach()
@@ -62,8 +65,8 @@ namespace Kaimos {
 		RenderCommand::Clear();
 
 		// -- Scene --
-		Renderer2D::BeginScene(m_CameraController.GetCamera());
-		Renderer2D::DrawQuad(glm::vec3(0.0f, 0.0f, -0.1f), glm::vec2(10.0f), m_CheckerTexture, m_BackgroundTiling, glm::vec4(1.0f));
+		//Renderer2D::BeginScene(m_CameraController.GetCamera());
+		//Renderer2D::DrawQuad(glm::vec3(0.0f, 0.0f, -0.1f), glm::vec2(10.0f), m_CheckerTexture, m_BackgroundTiling, glm::vec4(1.0f));
 
 		// --- SCENE UPDATE ---
 		m_CurrentScene->OnUpdate(dt);
@@ -91,7 +94,7 @@ namespace Kaimos {
 			}
 		}*/
 
-		Renderer2D::EndScene();
+		//Renderer2D::EndScene();
 		m_Framebuffer->Unbind();
 	}
 

@@ -51,11 +51,34 @@ namespace Kaimos {
 
 	void Scene::OnUpdate(Timestep dt)
 	{
-		auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
-		for (auto ent : group)
+		Camera* mainCam = nullptr;
+		glm::mat4* camTransform = nullptr;
+
+		auto group1 = m_Registry.view<TransformComponent, CameraComponent>();
+		for (auto ent : group1)
 		{
-			auto&[transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(ent);
-			Renderer2D::DrawQuad(transform, sprite.Color);
+			auto&[transform, camera] = group1.get<TransformComponent, CameraComponent>(ent);
+			
+			if (camera.Primary)
+			{
+				mainCam = &camera.Camera;
+				camTransform = &transform.Transform;
+				break;
+			}
+		}
+
+		if (mainCam)
+		{
+			Renderer2D::BeginScene(mainCam->GetProjection(), *camTransform);
+
+			auto group2 = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
+			for (auto ent : group2)
+			{
+				auto& [transform, sprite] = group2.get<TransformComponent, SpriteRendererComponent>(ent);
+				Renderer2D::DrawQuad(transform, sprite.Color);
+			}
+
+			Renderer2D::EndScene();
 		}
 	}
 

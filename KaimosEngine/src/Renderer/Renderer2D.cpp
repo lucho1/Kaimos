@@ -179,6 +179,20 @@ namespace Kaimos {
 		s_Data->QuadVBufferPtr = s_Data->QuadVBufferBase;
 	}
 
+	void Renderer2D::BeginScene(const Camera& camera, const glm::mat4& camera_transform)
+	{
+		KS_PROFILE_FUNCTION();
+		glm::mat4 ViewProj = camera.GetProjection() * glm::inverse(camera_transform);
+
+		s_Data->QuadVArray->Bind();
+		s_Data->ColoredTextureShader->Bind();
+		s_Data->ColoredTextureShader->SetUMat4("u_ViewProjection", ViewProj);
+
+		s_Data->QuadIndicesDrawCount = 0;
+		s_Data->TextureSlotIndex = 1;
+		s_Data->QuadVBufferPtr = s_Data->QuadVBufferBase;
+	}
+
 	void Renderer2D::EndScene()
 	{
 		KS_PROFILE_FUNCTION();

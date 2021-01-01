@@ -2,6 +2,7 @@
 #define _RENDERER_2D_
 
 #include "Cameras/OrthographicCamera.h"
+#include "Cameras/Camera.h"
 #include "Resources/Texture.h"
 
 #include <glm/gtc/matrix_transform.hpp>
@@ -20,7 +21,8 @@ namespace Kaimos {
 		static void Shutdown();
 		
 		// --- Rendering Methods ---
-		static void BeginScene(const OrthographicCamera& camera);
+		static void BeginScene(const OrthographicCamera& camera); // TODO: Remove this
+		static void BeginScene(const Camera& camera, const glm::mat4& camera_transform);
 		static void EndScene();
 		static void Flush();
 		

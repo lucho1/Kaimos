@@ -95,9 +95,11 @@
 #define BIT(x) (1 << x)
 //#define KS_BIND_EVENT_FN(x) std::bind(&x, this, std::placeholders::_1)
 
-// The next is better than the above (https://stackoverflow.com/questions/24109737/what-are-some-uses-of-decltypeauto):
+// std::bind() is not the best thing to use, it is better to do a lambda, so
+// the next is better than the above (https://stackoverflow.com/questions/24109737/what-are-some-uses-of-decltypeauto):
 // "in generic code you want to perfectly forward a return type without knowing whether
 //  you are dealing with a reference or a value. decltype(auto) gives you that ability"
+// Summarizing, the next deduces the return type after the lambda is declared
 #define KS_BIND_EVENT_FN(x) [this](auto&&... args)->decltype(auto) { return this->x(std::forward<decltype(args)>(args)...); }
 
 // -- Typedefs --
