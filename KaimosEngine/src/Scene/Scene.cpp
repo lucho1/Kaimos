@@ -54,10 +54,10 @@ namespace Kaimos {
 		Camera* mainCam = nullptr;
 		glm::mat4* camTransform = nullptr;
 
-		auto group1 = m_Registry.view<TransformComponent, CameraComponent>();
-		for (auto ent : group1)
+		auto view = m_Registry.view<TransformComponent, CameraComponent>();
+		for (auto ent : view)
 		{
-			auto&[transform, camera] = group1.get<TransformComponent, CameraComponent>(ent);
+			auto&[transform, camera] = view.get<TransformComponent, CameraComponent>(ent);
 			
 			if (camera.Primary)
 			{
@@ -71,10 +71,10 @@ namespace Kaimos {
 		{
 			Renderer2D::BeginScene(mainCam->GetProjection(), *camTransform);
 
-			auto group2 = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
-			for (auto ent : group2)
+			auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
+			for (auto ent : group)
 			{
-				auto& [transform, sprite] = group2.get<TransformComponent, SpriteRendererComponent>(ent);
+				auto& [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(ent);
 				Renderer2D::DrawQuad(transform, sprite.Color);
 			}
 
@@ -90,4 +90,18 @@ namespace Kaimos {
 		return entity;
 	}
 
+	void Scene::SetViewportSize(uint width, uint height)
+	{
+		m_ViewportWidth = width;
+		m_ViewportHeight = height;
+
+		// Resize cameras which have non-fixed AR
+		auto view = m_Registry.view<CameraComponent>();
+		for (auto entity : view)
+		{
+			auto& camComp = view.get<CameraComponent>(entity);
+			if (!camComp.FixedAspectRatio)
+				camComp.Camera.SetViewportSize(width, height);
+		}
+	}
 }

@@ -1,8 +1,7 @@
 #ifndef _COMPONENTS_H_
 #define _COMPONENTS_H_
 
-#include "Renderer/Cameras/Camera.h"
-
+#include "SceneCamera.h"
 #include <glm/glm.hpp>
 
 namespace Kaimos {
@@ -39,12 +38,12 @@ namespace Kaimos {
 
 	struct CameraComponent
 	{
-		Kaimos::Camera Camera;
+		Kaimos::SceneCamera Camera;
 		bool Primary = true; // TODO: Move it to scene
+		bool FixedAspectRatio = false;
 
 		CameraComponent() = default;
 		CameraComponent(const CameraComponent&) = default;
-		CameraComponent(const glm::mat4& projection) : Camera(projection) {}
 	};
 }
 

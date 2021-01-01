@@ -18,11 +18,14 @@ namespace Kaimos {
 
 		void OnUpdate(Timestep dt);
 
+		void SetViewportSize(uint width, uint height);
+
 		Entity CreateEntity(const std::string& name = "unnamed");
 
 	private:
 
 		entt::registry m_Registry;
+		uint m_ViewportWidth = 0, m_ViewportHeight = 0;
 	};
 }
 #endif //_SCENE_H_

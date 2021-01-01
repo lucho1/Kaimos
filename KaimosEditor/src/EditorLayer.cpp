@@ -32,7 +32,7 @@ namespace Kaimos {
 		m_Entity.AddComponent<SpriteRendererComponent>(glm::vec4(0.8f, 0.4f, 0.5f, 1.0f));
 
 		m_CameraEntity = m_CurrentScene->CreateEntity("Camera");
-		m_CameraEntity.AddComponent<CameraComponent>(glm::ortho(-16.0f, 16.0f, -9.0f, 9.0f, -1.0f, 1.0f));
+		m_CameraEntity.AddComponent<CameraComponent>();
 	}
 
 	void EditorLayer::OnDetach()
@@ -51,6 +51,8 @@ namespace Kaimos {
 		{
 			m_Framebuffer->Resize((uint)m_ViewportSize.x, (uint)m_ViewportSize.y);
 			m_CameraController.SetAspectRatio(m_ViewportSize.x, m_ViewportSize.y);
+
+			m_CurrentScene->SetViewportSize((uint)m_ViewportSize.x, (uint)m_ViewportSize.y);
 		}
 
 		// --- CAMERA UPDATE ---
