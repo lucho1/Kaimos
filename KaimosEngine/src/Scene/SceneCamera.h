@@ -15,6 +15,9 @@ namespace Kaimos {
 		void SetOrhographicCamera(float size, float nearClip, float farClip);
 		void SetViewportSize(uint width, uint height);
 
+		void SetOrthographicSize(float size)			{ m_OrthoSize = size; RecalculateProjectionMatrix(); }
+		const float GetOrthographicSize()		const	{ return m_OrthoSize; }
+
 	private:
 
 		void RecalculateProjectionMatrix();
