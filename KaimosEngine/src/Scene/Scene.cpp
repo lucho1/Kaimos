@@ -51,6 +51,20 @@ namespace Kaimos {
 
 	void Scene::OnUpdate(Timestep dt)
 	{
+		// Scripts
+		m_Registry.view<NativeScriptComponent>().each([=](auto entity, auto& component) // Lambda that will be called for each of the NativeScriptComponent
+			{
+				if (!component.EntityInstance)
+				{
+					component.InstantiateFunction();
+					component.EntityInstance->m_Entity = Entity(entity, this);
+					component.OnCreateFunction(component.EntityInstance);
+				}
+
+				component.OnUpdateFunction(component.EntityInstance, dt);
+			});
+
+		// Render
 		Camera* mainCam = nullptr;
 		glm::mat4* camTransform = nullptr;
 

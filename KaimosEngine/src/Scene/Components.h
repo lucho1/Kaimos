@@ -2,6 +2,7 @@
 #define _COMPONENTS_H_
 
 #include "SceneCamera.h"
+#include "ScriptableEntity.h"
 #include <glm/glm.hpp>
 
 namespace Kaimos {
@@ -44,6 +45,29 @@ namespace Kaimos {
 
 		CameraComponent() = default;
 		CameraComponent(const CameraComponent&) = default;
+	};
+
+	struct NativeScriptComponent
+	{
+		ScriptableEntity* EntityInstance = nullptr;
+
+		std::function<void()> InstantiateFunction;
+		std::function<void()> DestroyInstanceFunction;
+		
+		std::function<void(ScriptableEntity*)> OnCreateFunction;
+		std::function<void(ScriptableEntity*, Timestep)> OnUpdateFunction;
+		std::function<void(ScriptableEntity*)> OnDestroyFunction;
+
+		template<typename T>
+		void Bind()
+		{
+			InstantiateFunction = [&]() { EntityInstance = new T(); };
+			DestroyInstanceFunction = [&]() { delete (T*)EntityInstance; EntityInstance = nullptr; };
+
+			OnCreateFunction = [](ScriptableEntity* instance) { ((T*)instance)->OnCreate(); };
+			OnUpdateFunction = [](ScriptableEntity* instance, Timestep dt) { ((T*)instance)->OnUpdate(dt); };
+			OnDestroyFunction = [](ScriptableEntity* instance) { ((T*)instance)->OnDestroy(); };
+		}
 	};
 }
 

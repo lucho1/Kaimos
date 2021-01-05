@@ -33,6 +33,32 @@ namespace Kaimos {
 
 		m_CameraEntity = m_CurrentScene->CreateEntity("Camera");
 		m_CameraEntity.AddComponent<CameraComponent>();
+
+		// ---
+		class CameraController : public ScriptableEntity
+		{
+		public:
+			void OnCreate() { std::cout << "OnCreate" << std::endl; }
+			void OnDestroy() {}
+			void OnUpdate(Timestep dt)
+			{
+				std::cout << "Timestep: " << dt << std::endl;
+
+				auto& transform = GetComponent<TransformComponent>().Transform;
+				float speed = 10.0f;
+
+				if (Input::IsKeyPressed(KEYCODE::A))
+					transform[3][0] -= speed * dt;
+				if (Input::IsKeyPressed(KEYCODE::D))
+					transform[3][0] += speed * dt;
+				if (Input::IsKeyPressed(KEYCODE::W))
+					transform[3][1] += speed * dt;
+				if (Input::IsKeyPressed(KEYCODE::S))
+					transform[3][1] -= speed * dt;
+			}
+		};
+
+		m_CameraEntity.AddComponent<NativeScriptComponent>().Bind<CameraController>();
 	}
 
 	void EditorLayer::OnDetach()
