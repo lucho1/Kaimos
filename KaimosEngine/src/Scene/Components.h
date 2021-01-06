@@ -51,22 +51,14 @@ namespace Kaimos {
 	{
 		ScriptableEntity* EntityInstance = nullptr;
 
-		std::function<void()> InstantiateFunction;
-		std::function<void()> DestroyInstanceFunction;
+		ScriptableEntity*(*InstantiateScript)();
+		void (*DestroyScript)(NativeScriptComponent*);
 		
-		std::function<void(ScriptableEntity*)> OnCreateFunction;
-		std::function<void(ScriptableEntity*, Timestep)> OnUpdateFunction;
-		std::function<void(ScriptableEntity*)> OnDestroyFunction;
-
 		template<typename T>
 		void Bind()
 		{
-			InstantiateFunction = [&]() { EntityInstance = new T(); };
-			DestroyInstanceFunction = [&]() { delete (T*)EntityInstance; EntityInstance = nullptr; };
-
-			OnCreateFunction = [](ScriptableEntity* instance) { ((T*)instance)->OnCreate(); };
-			OnUpdateFunction = [](ScriptableEntity* instance, Timestep dt) { ((T*)instance)->OnUpdate(dt); };
-			OnDestroyFunction = [](ScriptableEntity* instance) { ((T*)instance)->OnDestroy(); };
+			InstantiateScript = []() { return static_cast<ScriptableEntity*>(new T()); };
+			DestroyScript = [](NativeScriptComponent* scriptComp) { delete scriptComp->EntityInstance; scriptComp->EntityInstance = nullptr; };
 		}
 	};
 }

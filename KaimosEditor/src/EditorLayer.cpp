@@ -38,8 +38,14 @@ namespace Kaimos {
 		class CameraController : public ScriptableEntity
 		{
 		public:
-			void OnCreate() { std::cout << "OnCreate" << std::endl; }
 			void OnDestroy() {}
+			
+			void OnCreate()
+			{
+				auto& transform = GetComponent<TransformComponent>().Transform;
+				transform[3][0] = rand() % 10 - 5.0f;
+			}
+
 			void OnUpdate(Timestep dt)
 			{
 				std::cout << "Timestep: " << dt << std::endl;

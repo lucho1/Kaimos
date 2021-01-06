@@ -10,14 +10,21 @@ namespace Kaimos {
 		friend class Scene;
 	public:
 
+		virtual ~ScriptableEntity() = default;
+
 		template<typename T>
 		T& GetComponent()
 		{
 			return m_Entity.GetComponent<T>();
 		}
 
-	private:
+	protected:
 
+		virtual void OnCreate() {}
+		virtual void OnUpdate(Timestep dt) {}
+		virtual void OnDestroy() {}
+
+	private:
 		Entity m_Entity;
 	};
 }

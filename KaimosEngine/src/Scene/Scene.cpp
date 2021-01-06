@@ -51,17 +51,17 @@ namespace Kaimos {
 
 	void Scene::OnUpdate(Timestep dt)
 	{
-		// Scripts
+		// Scripts --> This should happen in Scene::OnScenePlay() or similar (pressing the engine's play button)
 		m_Registry.view<NativeScriptComponent>().each([=](auto entity, auto& component) // Lambda that will be called for each of the NativeScriptComponent
 			{
 				if (!component.EntityInstance)
 				{
-					component.InstantiateFunction();
+					component.EntityInstance = component.InstantiateScript();
 					component.EntityInstance->m_Entity = Entity(entity, this);
-					component.OnCreateFunction(component.EntityInstance);
+					component.EntityInstance->OnCreate();
 				}
 
-				component.OnUpdateFunction(component.EntityInstance, dt);
+				component.EntityInstance->OnUpdate(dt);
 			});
 
 		// Render
