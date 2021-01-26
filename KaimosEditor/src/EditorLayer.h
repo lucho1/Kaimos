@@ -2,6 +2,7 @@
 #define _SANDBOX_2D_
 
 #include "Kaimos.h"
+#include "Panels/ScenePanel.h"
 
 namespace Kaimos {
 
@@ -26,6 +27,8 @@ namespace Kaimos {
 		Ref<Scene> m_CurrentScene;
 		Entity m_Entity;
 		Entity m_CameraEntity;
+
+		ScenePanel m_ScenePanel;
 
 		// Rendering
 		OrtographicCameraController m_CameraController;

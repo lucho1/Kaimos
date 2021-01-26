@@ -11,6 +11,7 @@ namespace Kaimos {
 	class Scene
 	{
 		friend class Entity;
+		friend class ScenePanel;
 	public:
 
 		Scene();

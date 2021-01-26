@@ -65,6 +65,7 @@ namespace Kaimos {
 		};
 
 		m_CameraEntity.AddComponent<NativeScriptComponent>().Bind<CameraController>();
+		m_ScenePanel.SetContext(m_CurrentScene);
 	}
 
 	void EditorLayer::OnDetach()
@@ -180,6 +181,9 @@ namespace Kaimos {
 		}
 		
 		ImGui::End();
+
+		// Scene Panel Rendering
+		m_ScenePanel.OnUIRender();
 
 		// Little test for Entities (this case: square entity color)
 		ImGui::Separator();

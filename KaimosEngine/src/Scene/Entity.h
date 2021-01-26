@@ -43,7 +43,13 @@ namespace Kaimos {
 			return m_Scene->m_Registry.remove<T>(m_Entity);
 		}
 
+		bool operator ==(const Entity& other) const { return m_Entity == other.m_Entity && m_Scene == other.m_Scene; }
+		bool operator !=(const Entity& other) const { return !(*this == other); } // You are using the above operator, that's elegant :)
+
 		operator bool() const { return m_Entity != entt::null; }
+		operator uint()	const { return (uint)m_Entity; }
+
+		uint GetID()	const { return(uint)m_Entity; }
 
 	private:
 
