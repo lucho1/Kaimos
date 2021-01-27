@@ -48,7 +48,7 @@ namespace Kaimos {
 
 			void OnUpdate(Timestep dt)
 			{
-				std::cout << "Timestep: " << dt << std::endl;
+				//std::cout << "Timestep: " << dt << std::endl;
 
 				auto& transform = GetComponent<TransformComponent>().Transform;
 				float speed = 10.0f;
