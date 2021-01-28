@@ -3,6 +3,7 @@
 #include "Scene/Components.h"
 
 #include <imgui.h>
+#include <imgui_internal.h>
 #include <glm/gtc/type_ptr.hpp>
 
 namespace Kaimos {
@@ -53,6 +54,72 @@ namespace Kaimos {
 			ImGui::TreePop();
 	}
 
+
+	// -----
+	static void DrawVec3Control(const std::string& name, glm::vec3& value, float reset_value = 0.0f, float column_width = 100.0f)
+	{
+		// To say to ImGui that this is kind of a new "namespace" a new ID, so we don't have problems of values modifying other values
+		ImGui::PushID(name.c_str());
+
+		// Name Column
+		ImGui::Columns(2);
+		ImGui::SetColumnWidth(0, column_width);
+		ImGui::Text(name.c_str());
+		ImGui::NextColumn();
+
+		// Vector Columns
+		ImGui::PushMultiItemsWidths(3, ImGui::CalcItemWidth());
+		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { 0, 0 });
+
+		// Internal Imgui code, on how ImGui calculates line height
+		float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
+		ImVec2 buttonSize = { lineHeight + 3.0f, lineHeight };
+
+		// X Button and DragFloat
+		ImGui::PushStyleColor(ImGuiCol_Button, { 0.8f, 0.1f, 0.15f, 1.0f });
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, { 0.8f, 0.1f, 0.15f, 1.0f });
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, { 0.9f, 0.2f, 0.2f, 1.0f });
+
+		if (ImGui::Button("X", buttonSize))
+			value.x = reset_value;
+
+		ImGui::PopStyleColor(3);
+		ImGui::SameLine();
+		ImGui::DragFloat("##X", &value.x, 0.1f, 0.0f, 0.0f, "%.2f");
+		ImGui::PopItemWidth();
+		ImGui::SameLine();
+
+		// Y Button and DragFloat
+		ImGui::PushStyleColor(ImGuiCol_Button, { 0.2f, 0.7f, 0.2f, 1.0f });
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, { 0.2f, 0.7f, 0.2f, 1.0f });
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, { 0.3f, 0.8f, 0.3f, 1.0f });
+		if (ImGui::Button("Y", buttonSize))
+			value.y = reset_value;
+
+		ImGui::PopStyleColor(3);
+		ImGui::SameLine();
+		ImGui::DragFloat("##Y", &value.y, 0.1f, 0.0f, 0.0f, "%.2f");
+		ImGui::PopItemWidth();
+		ImGui::SameLine();
+
+		// Z Button and DragFloat
+		ImGui::PushStyleColor(ImGuiCol_Button, { 0.1f, 0.25f, 0.8f, 1.0f });
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, { 0.1f, 0.25f, 0.8f, 1.0f });
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, { 0.2f, 0.35f, 0.9f, 1.0f });
+
+		if (ImGui::Button("Z", buttonSize))
+			value.z = reset_value;
+
+		ImGui::PopStyleColor(3);
+		ImGui::SameLine();
+		ImGui::DragFloat("##Z", &value.z, 0.1f, 0.0f, 0.0f, "%.2f");
+		ImGui::PopItemWidth();
+
+		ImGui::PopStyleVar();
+		ImGui::Columns(1);
+		ImGui::PopID();
+	}
+
 	void ScenePanel::DrawComponents(Entity entity)
 	{
 		if (entity.HasComponent<TagComponent>())
@@ -71,8 +138,14 @@ namespace Kaimos {
 			ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_DefaultOpen;
 			if (ImGui::TreeNodeEx((void*)typeid(TransformComponent).hash_code(), flags, "Transform"))
 			{
-				glm::mat4& transform = entity.GetComponent<TransformComponent>().Transform;
-				ImGui::DragFloat3("Position", glm::value_ptr(transform[3]), 0.1f, -INFINITY, INFINITY, "%.2f");
+				TransformComponent& transform = entity.GetComponent<TransformComponent>();
+				DrawVec3Control("Position", transform.Translation);
+
+				glm::vec3 rot = glm::degrees(transform.Rotation);
+				DrawVec3Control("Rotation", rot);
+				transform.Rotation = glm::radians(rot);
+				
+				DrawVec3Control("Scale", transform.Scale, 1.0f);
 				ImGui::TreePop();
 			}
 		}

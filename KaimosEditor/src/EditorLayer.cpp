@@ -41,25 +41,23 @@ namespace Kaimos {
 			
 			void OnCreate()
 			{
-				auto& transform = GetComponent<TransformComponent>().Transform;
-				transform[3][0] = rand() % 10 - 5.0f;
+				glm::vec3& translation = GetComponent<TransformComponent>().Translation;
+				translation.x = rand() % 10 - 5.0f;
 			}
 
 			void OnUpdate(Timestep dt)
 			{
-				//std::cout << "Timestep: " << dt << std::endl;
-
-				auto& transform = GetComponent<TransformComponent>().Transform;
+				glm::vec3& translation = GetComponent<TransformComponent>().Translation;
 				float speed = 10.0f;
 
 				if (Input::IsKeyPressed(KEYCODE::A))
-					transform[3][0] -= speed * dt;
+					translation.x -= speed * dt;
 				if (Input::IsKeyPressed(KEYCODE::D))
-					transform[3][0] += speed * dt;
+					translation.x += speed * dt;
 				if (Input::IsKeyPressed(KEYCODE::W))
-					transform[3][1] += speed * dt;
+					translation.y += speed * dt;
 				if (Input::IsKeyPressed(KEYCODE::S))
-					transform[3][1] -= speed * dt;
+					translation.y -= speed * dt;
 			}
 		};
 

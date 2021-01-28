@@ -66,7 +66,7 @@ namespace Kaimos {
 
 		// Render
 		Camera* mainCam = nullptr;
-		glm::mat4* camTransform = nullptr;
+		glm::mat4 camTransform;
 
 		auto view = m_Registry.view<TransformComponent, CameraComponent>();
 		for (auto ent : view)
@@ -76,20 +76,20 @@ namespace Kaimos {
 			if (camera.Primary)
 			{
 				mainCam = &camera.Camera;
-				camTransform = &transform.Transform;
+				camTransform = transform.GetTransform();
 				break;
 			}
 		}
 
 		if (mainCam)
 		{
-			Renderer2D::BeginScene(mainCam->GetProjection(), *camTransform);
+			Renderer2D::BeginScene(mainCam->GetProjection(), camTransform);
 
 			auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
 			for (auto ent : group)
 			{
 				auto& [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(ent);
-				Renderer2D::DrawQuad(transform, sprite.Color);
+				Renderer2D::DrawQuad(transform.GetTransform(), sprite.Color);
 			}
 
 			Renderer2D::EndScene();

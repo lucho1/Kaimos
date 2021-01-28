@@ -5,6 +5,8 @@
 #include "Scene/Scene.h"
 #include "Scene/Entity.h"
 
+#include <glm/glm.hpp>
+
 namespace Kaimos {
 
 	class ScenePanel
