@@ -28,7 +28,6 @@ namespace Kaimos {
 		m_CurrentScene = CreateRef<Scene>();
 
 		m_Entity = m_CurrentScene->CreateEntity("Square");
-		m_Entity.HasComponent<TransformComponent>();
 		m_Entity.AddComponent<SpriteRendererComponent>(glm::vec4(0.8f, 0.4f, 0.5f, 1.0f));
 
 		m_CameraEntity = m_CurrentScene->CreateEntity("Camera");
@@ -188,13 +187,6 @@ namespace Kaimos {
 		// Little test for Entities (this case: square entity color)
 		ImGui::Separator();
 		ImGui::Begin("Settings");
-
-		if (m_Entity)
-		{
-			ImGui::Text("Entity Name: %s", m_Entity.GetComponent<TagComponent>().Tag.c_str());
-			auto& entColor = m_Entity.GetComponent<SpriteRendererComponent>().Color;
-			ImGui::ColorEdit4("Square Entity Color", glm::value_ptr(entColor));
-		}
 
 		//ImGui::ColorEdit4("Squares Color", glm::value_ptr(m_Color));
 		ImGui::SliderFloat("Background Tiling", &m_BackgroundTiling, 1.0f, 100.0f, "%.2f");

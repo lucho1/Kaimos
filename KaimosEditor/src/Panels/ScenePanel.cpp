@@ -143,5 +143,16 @@ namespace Kaimos {
 				ImGui::TreePop();
 			}
 		}
+
+		if (entity.HasComponent<SpriteRendererComponent>())
+		{
+			ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_DefaultOpen;
+			if (ImGui::TreeNodeEx((void*)typeid(SpriteRendererComponent).hash_code(), flags, "Sprite Renderer"))
+			{
+				glm::vec4& color = entity.GetComponent<SpriteRendererComponent>().Color;
+				ImGui::ColorEdit4("Color", glm::value_ptr(color), flags);
+				ImGui::TreePop();
+			}
+		}
 	}
 }
