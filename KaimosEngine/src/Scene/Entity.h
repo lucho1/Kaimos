@@ -20,7 +20,9 @@ namespace Kaimos {
 		T& AddComponent(Args&&... args)
 		{
 			KS_ENGINE_ASSERT(!HasComponent<T>(), "Entity already has component");
-			return m_Scene->m_Registry.emplace<T>(m_Entity, std::forward<Args>(args)...);
+			T& comp = m_Scene->m_Registry.emplace<T>(m_Entity, std::forward<Args>(args)...);
+			m_Scene->OnComponentAdded<T>(*this, comp);
+			return comp;
 		}
 
 		template<typename T>
@@ -37,19 +39,20 @@ namespace Kaimos {
 		}
 
 		template<typename T>
-		T& RemoveComponent()
+		void RemoveComponent()
 		{
 			KS_ENGINE_ASSERT(HasComponent<T>(), "Entity doesn't has component");
 			return m_Scene->m_Registry.remove<T>(m_Entity);
 		}
 
-		bool operator ==(const Entity& other) const { return m_Entity == other.m_Entity && m_Scene == other.m_Scene; }
-		bool operator !=(const Entity& other) const { return !(*this == other); } // You are using the above operator, that's elegant :)
+		bool operator ==(const Entity& other)	const { return m_Entity == other.m_Entity && m_Scene == other.m_Scene; }
+		bool operator !=(const Entity& other)	const { return !(*this == other); } // You are using the above operator, that's elegant :)
 
-		operator bool() const { return m_Entity != entt::null; }
-		operator uint()	const { return (uint)m_Entity; }
+		operator bool()							const { return m_Entity != entt::null; }
+		operator entt::entity()					const { return m_Entity; }
+		operator uint()							const { return (uint)m_Entity; }
 
-		uint GetID()	const { return(uint)m_Entity; }
+		uint GetID()							const { return(uint)m_Entity; }
 
 	private:
 

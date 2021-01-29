@@ -31,11 +31,42 @@ namespace Kaimos {
 		if (ImGui::IsWindowHovered() && ImGui::IsMouseDown(0))
 			m_SelectedEntity = {};
 
+		// Right Click on a Blank Space
+		if (ImGui::BeginPopupContextWindow(0, 1, false))
+		{
+			if(ImGui::MenuItem("Create Empty Entity"))
+				m_Context->CreateEntity("Empty Entity");
+
+			ImGui::EndPopup();
+		}
+
 		ImGui::End();
 
 		ImGui::Begin("Properties");
 		if (m_SelectedEntity)
+		{
 			DrawComponents(m_SelectedEntity);
+
+			if (ImGui::Button("Add Component"))
+				ImGui::OpenPopup("AddComponent");
+
+			if (ImGui::BeginPopup("AddComponent"))
+			{
+				if (ImGui::MenuItem("Camera"))
+				{
+					m_SelectedEntity.AddComponent<CameraComponent>();
+					ImGui::CloseCurrentPopup();
+				}
+
+				if (ImGui::MenuItem("Sprite Renderer"))
+				{
+					m_SelectedEntity.AddComponent<SpriteRendererComponent>();
+					ImGui::CloseCurrentPopup();
+				}
+
+				ImGui::EndPopup();
+			}
+		}
 
 		ImGui::End();
 	}
@@ -50,8 +81,25 @@ namespace Kaimos {
 		if (ImGui::IsItemClicked())
 			m_SelectedEntity = entity;
 
+		bool entityDeleted = false;
+		if (ImGui::BeginPopupContextItem())
+		{
+			if (ImGui::MenuItem("Delete Entity"))
+				entityDeleted = true;
+
+			ImGui::EndPopup();
+		}
+
 		if (opened)
 			ImGui::TreePop();
+
+		if (entityDeleted)
+		{
+			if (m_SelectedEntity == entity)
+				m_SelectedEntity = {};
+
+			m_Context->DestroyEntity(entity);
+		}
 	}
 
 
@@ -122,6 +170,9 @@ namespace Kaimos {
 
 	void ScenePanel::DrawComponents(Entity entity)
 	{
+		ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_AllowItemOverlap;
+		
+		// Tag Component
 		if (entity.HasComponent<TagComponent>())
 		{
 			std::string& tag = entity.GetComponent<TagComponent>().Tag;
@@ -133,9 +184,9 @@ namespace Kaimos {
 				tag = std::string(buffer);
 		}
 
+		// Transform Component
 		if (entity.HasComponent<TransformComponent>())
 		{
-			ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_DefaultOpen;
 			if (ImGui::TreeNodeEx((void*)typeid(TransformComponent).hash_code(), flags, "Transform"))
 			{
 				TransformComponent& transform = entity.GetComponent<TransformComponent>();
@@ -150,9 +201,9 @@ namespace Kaimos {
 			}
 		}
 
+		// Camera Component
 		if (entity.HasComponent<CameraComponent>())
 		{
-			ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_DefaultOpen;
 			if (ImGui::TreeNodeEx((void*)typeid(TransformComponent).hash_code(), flags, "Transform"))
 			{
 				CameraComponent& camera_comp = entity.GetComponent<CameraComponent>();
@@ -217,15 +268,39 @@ namespace Kaimos {
 			}
 		}
 
+		// Sprite Renderer Component
 		if (entity.HasComponent<SpriteRendererComponent>())
 		{
-			ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_DefaultOpen;
-			if (ImGui::TreeNodeEx((void*)typeid(SpriteRendererComponent).hash_code(), flags, "Sprite Renderer"))
+			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 4, 4 });
+
+			bool open = ImGui::TreeNodeEx((void*)typeid(SpriteRendererComponent).hash_code(), flags, "Sprite Renderer");
+			ImGui::SameLine(ImGui::GetWindowWidth() - 40.0f);
+			if (ImGui::Button("+", { 20, 20 }))
+				ImGui::OpenPopup("ComponentSettings");
+
+			ImGui::PopStyleVar();
+
+			bool removeComponent = false;
+			if (ImGui::BeginPopup("ComponentSettings"))
+			{
+				if (ImGui::MenuItem("Remove Component"))
+					removeComponent = true;
+
+				ImGui::EndPopup();
+			}
+
+			if (open)
 			{
 				glm::vec4& color = entity.GetComponent<SpriteRendererComponent>().Color;
-				ImGui::ColorEdit4("Color", glm::value_ptr(color), flags);
+
+				ImGuiColorEditFlags color_flags = ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreview | ImGuiColorEditFlags_NoInputs;
+
+				ImGui::ColorEdit4("Color", glm::value_ptr(color), color_flags);
 				ImGui::TreePop();
 			}
+
+			if (removeComponent)
+				entity.RemoveComponent<SpriteRendererComponent>();
 		}
 	}
 }

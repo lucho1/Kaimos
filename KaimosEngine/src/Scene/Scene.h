@@ -22,6 +22,12 @@ namespace Kaimos {
 		void SetViewportSize(uint width, uint height);
 
 		Entity CreateEntity(const std::string& name = "unnamed");
+		void DestroyEntity(Entity entity);
+
+	private:
+
+		template<typename T>
+		void OnComponentAdded(Entity entity, T& component);
 
 	private:
 
