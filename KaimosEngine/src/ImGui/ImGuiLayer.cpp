@@ -131,12 +131,18 @@ namespace Kaimos {
 		// Careful in the next lines of codes because the path is not relative, is absolute, so it will work only in one PC, otherwise we will have to change it
 		
 		// --- Fonts Load ---
-		std::string font_path = "../KaimosEngine/res/fonts/Ruda-SemiBold.ttf";
+		std::string font_path = "../KaimosEngine/res/fonts/Ruda/Ruda-SemiBold.ttf";
+		//std::string font_path = "../KaimosEngine/res/fonts/Opensans/OpenSans-SemiBold.ttf";
 
-		io.Fonts->AddFontFromFileTTF(font_path.c_str(), 12);
-		io.Fonts->AddFontFromFileTTF(font_path.c_str(), 10);
-		io.Fonts->AddFontFromFileTTF(font_path.c_str(), 14);
-		io.Fonts->AddFontFromFileTTF(font_path.c_str(), 18);
+		io.Fonts->AddFontFromFileTTF(font_path.c_str(), 13.0f);
+		//io.Fonts->AddFontFromFileTTF(font_path.c_str(), 10.0f);
+		//io.Fonts->AddFontFromFileTTF(font_path.c_str(), 12.0f);
+		io.Fonts->AddFontFromFileTTF(font_path.c_str(), 14.0f);
+		io.Fonts->AddFontFromFileTTF(font_path.c_str(), 16.0f);
+		io.Fonts->AddFontFromFileTTF(font_path.c_str(), 18.0f);
+		io.Fonts->AddFontFromFileTTF(font_path.c_str(), 20.0f);
+		io.Fonts->AddFontFromFileTTF(font_path.c_str(), 22.0f);
+		io.Fonts->AddFontFromFileTTF(font_path.c_str(), 24.0f);
 		// --- ---
 
 		// --- UI Style Settings ---
