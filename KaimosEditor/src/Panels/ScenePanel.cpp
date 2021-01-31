@@ -106,6 +106,8 @@ namespace Kaimos {
 	// -----
 	static void DrawVec3Control(const std::string& name, glm::vec3& value, float reset_value = 0.0f, float column_width = 100.0f)
 	{
+		auto bold_font = ImGui::GetIO().Fonts->Fonts[1];
+
 		// To say to ImGui that this is kind of a new "namespace" a new ID, so we don't have problems of values modifying other values
 		ImGui::PushID(name.c_str());
 
@@ -127,42 +129,54 @@ namespace Kaimos {
 		ImGui::PushStyleColor(ImGuiCol_Button, { 0.8f, 0.1f, 0.15f, 1.0f });
 		ImGui::PushStyleColor(ImGuiCol_ButtonActive, { 0.8f, 0.1f, 0.15f, 1.0f });
 		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, { 0.9f, 0.2f, 0.2f, 1.0f });
+		ImGui::PushFont(bold_font);
 
 		if (ImGui::Button("X", buttonSize))
 			value.x = reset_value;
 
+		ImGui::PopFont();
 		ImGui::PopStyleColor(3);
+		
 		ImGui::SameLine();
 		ImGui::DragFloat("##X", &value.x, 0.1f, 0.0f, 0.0f, "%.2f");
 		ImGui::PopItemWidth();
-		ImGui::SameLine();
+
 
 		// Y Button and DragFloat
+		ImGui::SameLine();
 		ImGui::PushStyleColor(ImGuiCol_Button, { 0.2f, 0.7f, 0.2f, 1.0f });
 		ImGui::PushStyleColor(ImGuiCol_ButtonActive, { 0.2f, 0.7f, 0.2f, 1.0f });
 		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, { 0.3f, 0.8f, 0.3f, 1.0f });
+		ImGui::PushFont(bold_font);
+
 		if (ImGui::Button("Y", buttonSize))
 			value.y = reset_value;
 
+		ImGui::PopFont();
 		ImGui::PopStyleColor(3);
+
 		ImGui::SameLine();
 		ImGui::DragFloat("##Y", &value.y, 0.1f, 0.0f, 0.0f, "%.2f");
 		ImGui::PopItemWidth();
-		ImGui::SameLine();
 
 		// Z Button and DragFloat
+		ImGui::SameLine();
 		ImGui::PushStyleColor(ImGuiCol_Button, { 0.1f, 0.25f, 0.8f, 1.0f });
 		ImGui::PushStyleColor(ImGuiCol_ButtonActive, { 0.1f, 0.25f, 0.8f, 1.0f });
 		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, { 0.2f, 0.35f, 0.9f, 1.0f });
+		ImGui::PushFont(bold_font);
 
 		if (ImGui::Button("Z", buttonSize))
 			value.z = reset_value;
 
+		ImGui::PopFont();
 		ImGui::PopStyleColor(3);
+
 		ImGui::SameLine();
 		ImGui::DragFloat("##Z", &value.z, 0.1f, 0.0f, 0.0f, "%.2f");
 		ImGui::PopItemWidth();
 
+		// Pop Initial Pushes
 		ImGui::PopStyleVar();
 		ImGui::Columns(1);
 		ImGui::PopID();
