@@ -127,17 +127,18 @@ namespace Kaimos {
 		ImGuiStyle* style = &ImGui::GetStyle();
 		ImVec4* colors = style->Colors;
 
-		// ImGui Style gotten from a free-to-use style from https://www.unknowncheats.me/forum/c-and-c-/189635-imgui-style-settings.html & From CronosEngine (style by Roger Leon @rleonborras) with some touches by myself
-		// Careful in the next lines of codes because the path is not relative, is absolute, so it will work only in one PC, otherwise we will have to change it
+		// ImGui Style gotten from a free-to-use style from https://www.unknowncheats.me/forum/c-and-c-/189635-imgui-style-settings.html
+		// & From CronosEngine (style by Roger Leon @rleonborras) with some touches by myself
 		
 		// --- Fonts Load ---
-		std::string font_path = "../KaimosEngine/res/fonts/Ruda/Ruda-SemiBold.ttf";
-		//std::string font_path = "../KaimosEngine/res/fonts/Opensans/OpenSans-SemiBold.ttf";
-
-		io.Fonts->AddFontFromFileTTF(font_path.c_str(), 13.0f);
-		//io.Fonts->AddFontFromFileTTF(font_path.c_str(), 10.0f);
-		//io.Fonts->AddFontFromFileTTF(font_path.c_str(), 12.0f);
-		io.Fonts->AddFontFromFileTTF(font_path.c_str(), 14.0f);
+		// Default Font + Secondary one
+		io.FontDefault = io.Fonts->AddFontFromFileTTF("../KaimosEngine/res/fonts/Ruda/Ruda-SemiBold.ttf", 13.0f); // You can also try "Opensans/OpenSans-SemiBold.ttf" (in 14.0f)
+		io.Fonts->AddFontFromFileTTF("../KaimosEngine/res/fonts/Ruda/Ruda-Black.ttf", 13.0f);
+		
+		// Load different fonts in different positions so ImGui can handle fonts variations
+		std::string font_path = "../KaimosEngine/res/fonts/Ruda/Ruda-VariableFont_wght.ttf";
+		io.Fonts->AddFontFromFileTTF(font_path.c_str(), 10.0f);
+		io.Fonts->AddFontFromFileTTF(font_path.c_str(), 12.0f);
 		io.Fonts->AddFontFromFileTTF(font_path.c_str(), 16.0f);
 		io.Fonts->AddFontFromFileTTF(font_path.c_str(), 18.0f);
 		io.Fonts->AddFontFromFileTTF(font_path.c_str(), 20.0f);
