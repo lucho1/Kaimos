@@ -42,7 +42,7 @@ namespace Kaimos {
 			void OnCreate()
 			{
 				glm::vec3& translation = GetComponent<TransformComponent>().Translation;
-				translation.x = rand() % 10 - 5.0f;
+				//translation.x = rand() % 10 - 5.0f;
 			}
 
 			void OnUpdate(Timestep dt)
@@ -156,12 +156,19 @@ namespace Kaimos {
 		ImGui::PopStyleVar();
 		ImGui::PopStyleVar(2);
 
+		// Set Dockspace & Its minimum size
 		ImGuiIO& io = ImGui::GetIO();
+		ImGuiStyle& style = ImGui::GetStyle();
+		float original_min_size = style.WindowMinSize.x;
+		style.WindowMinSize.x = 370.0f;
+
 		if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable)
 		{
 			ImGuiID dock_id = ImGui::GetID("MyDockspace");
 			ImGui::DockSpace(dock_id, ImVec2(0.0f, 0.0f), dockspace_flags);
 		}
+		
+		style.WindowMinSize.x = original_min_size;
 
 		// --- Upper Menu Tab Bar ---
 		if (ImGui::BeginMenuBar())

@@ -12,7 +12,7 @@ namespace Kaimos {
 		std::string Title;
 		uint Width, Height;
 
-		WindowProps(const std::string& title = "Kaimos Engine", uint w = 1080, uint h = 720)
+		WindowProps(const std::string& title = "Kaimos Engine", uint w = 1600, uint h = 900)
 			: Title(title), Width(w), Height(h) {}
 	};
 
