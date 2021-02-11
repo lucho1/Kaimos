@@ -275,17 +275,17 @@ namespace Kaimos {
 		if (ev.GetRepeatCount() > 0)
 			return false;
 
-		bool control_pressed = Input::IsKeyPressed(Key::LeftControl) || Input::IsKeyPressed(Key::RightControl);
+		bool control_pressed = Input::IsKeyPressed(KEY::LEFT_CONTROL) || Input::IsKeyPressed(KEY::RIGHT_CONTROL);
 		switch (ev.GetKeyCode())
 		{
-			case Key::N:
+			case KEY::N:
 				if (control_pressed) NewScene();
 				break;
-			case Key::O:
+			case KEY::O:
 				if (control_pressed) OpenScene();
 				break;
-			case Key::S:
-				if (control_pressed && (Input::IsKeyPressed(Key::LeftShift) || Input::IsKeyPressed(Key::RightShift)))
+			case KEY::S:
+				if (control_pressed && (Input::IsKeyPressed(KEY::LEFT_SHIFT) || Input::IsKeyPressed(KEY::RIGHT_SHIFT)))
 					SaveSceneAs();
 				else if (control_pressed) SaveScene();
 				break;

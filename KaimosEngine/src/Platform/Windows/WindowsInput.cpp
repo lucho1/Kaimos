@@ -6,14 +6,14 @@
 
 namespace Kaimos {
 
-	bool Input::IsKeyPressed(const KEYCODE key)
+	bool Input::IsKeyPressed(const KEY_CODE key)
 	{
 		GLFWwindow* window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
 		int state = glfwGetKey(window, static_cast<int32_t>(key));
 		return state == GLFW_PRESS || state == GLFW_REPEAT;
 	}
 
-	bool Input::IsMouseButtonPressed(const MOUSECODE button)
+	bool Input::IsMouseButtonPressed(const MOUSE_CODE button)
 	{
 		GLFWwindow* window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
 		int state = glfwGetMouseButton(window, static_cast<int32_t>(button));

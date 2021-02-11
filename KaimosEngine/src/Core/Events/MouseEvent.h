@@ -58,13 +58,13 @@ namespace Kaimos {
 	{
 	public:
 
-		inline MOUSECODE GetMouseButton() const { return m_Button; }
+		inline MOUSE_CODE GetMouseButton() const { return m_Button; }
 		EVENT_CLASS_CATEGORY(EVENT_CATEGORY_MOUSE | EVENT_CATEGORY_INPUT)
 
 	protected:
 
-		MouseButtonEvent(const MOUSECODE button) : m_Button(button) {}
-		MOUSECODE m_Button;
+		MouseButtonEvent(const MOUSE_CODE button) : m_Button(button) {}
+		MOUSE_CODE m_Button;
 	};
 
 
@@ -72,7 +72,7 @@ namespace Kaimos {
 	{
 	public:
 
-		MouseButtonPressedEvent(const MOUSECODE button) : MouseButtonEvent(button) {}
+		MouseButtonPressedEvent(const MOUSE_CODE button) : MouseButtonEvent(button) {}
 
 		std::string ToString() const override
 		{
@@ -89,7 +89,7 @@ namespace Kaimos {
 	{
 	public:
 
-		MouseButtonReleasedEvent(const MOUSECODE button) : MouseButtonEvent(button) {}
+		MouseButtonReleasedEvent(const MOUSE_CODE button) : MouseButtonEvent(button) {}
 
 		std::string ToString() const override
 		{

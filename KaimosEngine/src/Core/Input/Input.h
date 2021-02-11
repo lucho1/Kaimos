@@ -10,9 +10,9 @@ namespace Kaimos {
 	{
 	public:
 
-		static bool IsKeyPressed(KEYCODE key);
+		static bool IsKeyPressed(KEY_CODE key);
 
-		static bool IsMouseButtonPressed(MOUSECODE button);
+		static bool IsMouseButtonPressed(MOUSE_CODE button);
 		static glm::vec2 GetMousePos();
 		static float GetMouseX();
 		static float GetMouseY();

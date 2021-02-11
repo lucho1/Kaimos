@@ -4,17 +4,17 @@
 // ------------ Kaimos Engine redefinition for Input Codes, from glfw3.h ------------
 namespace Kaimos
 {
-	using KEYCODE = uint16_t;
-	namespace Key
+	using KEY_CODE = uint16_t;
+	namespace KEY
 	{
-		enum KEYCODE
+		enum KEY_CODE
 		{
-			Space = 32,
-			Apostrophe = 39,	/* ' */
-			Comma = 44,			/* , */
-			Minus = 45,			/* - */
-			Period = 46,		/* . */
-			Slash = 47,			/* / */
+			SPACE = 32,
+			APOSTROPHE = 39,	/* ' */
+			COMMA = 44,			/* , */
+			MINUS = 45,			/* - */
+			PERIOD = 46,		/* . */
+			SLASH = 47,			/* / */
 
 			D0 = 48,			/* 0 */
 			D1 = 49,			/* 1 */
@@ -27,8 +27,8 @@ namespace Kaimos
 			D8 = 56,			/* 8 */
 			D9 = 57,			/* 9 */
 
-			Semicolon = 59,		/* ; */
-			Equal = 61,			/* = */
+			SEMICOLON = 59,		/* ; */
+			EQUAL = 61,			/* = */
 
 			A = 65,
 			B = 66,
@@ -57,34 +57,34 @@ namespace Kaimos
 			Y = 89,
 			Z = 90,
 
-			LeftBracket = 91,	/* [ */
-			Backslash = 92,		/* \ */
-			RightBracket = 93,	/* ] */
-			GraveAccent = 96,	/* ` */
+			LEFT_BRACKET = 91,	/* [ */
+			BACK_SLASH = 92,		/* \ */
+			RIGHT_BRACKET = 93,	/* ] */
+			GRAVE_ACCENT = 96,	/* ` */
 
-			World1 = 161,		/* non-US #1 */
-			World2 = 162,		/* non-US #2 */
+			WORLD1 = 161,		/* non-US #1 */
+			WORLD2 = 162,		/* non-US #2 */
 
 			/* Function keys */
-			Escape = 256,
-			Enter = 257,
-			Tab = 258,
-			Backspace = 259,
-			Insert = 260,
-			Delete = 261,
-			Right = 262,
-			Left = 263,
-			Down = 264,
-			Up = 265,
-			PageUp = 266,
-			PageDown = 267,
-			Home = 268,
-			End = 269,
-			CapsLock = 280,
-			ScrollLock = 281,
-			NumLock = 282,
-			PrintScreen = 283,
-			Pause = 284,
+			ESCAPE = 256,
+			ENTER = 257,
+			TAB = 258,
+			BACKSPACE = 259,
+			INSERT = 260,
+			DEL = 261,
+			RIGHT = 262,
+			LEFT = 263,
+			DOWN = 264,
+			UP = 265,
+			PAGE_UP = 266,
+			PAGE_DOWN = 267,
+			HOME = 268,
+			END = 269,
+			CAPSLOCK = 280,
+			SCROLL_LOCK = 281,
+			NUM_LOCK = 282,
+			PRINT_SCREEN = 283,
+			PAUSE = 284,
 			F1 = 290,
 			F2 = 291,
 			F3 = 292,
@@ -122,23 +122,23 @@ namespace Kaimos
 			KP7 = 327,
 			KP8 = 328,
 			KP9 = 329,
-			KPDecimal = 330,
-			KPDivide = 331,
-			KPMultiply = 332,
-			KPSubtract = 333,
-			KPAdd = 334,
-			KPEnter = 335,
-			KPEqual = 336,
+			KP_DECIMAL = 330,
+			KP_DIVIDE = 331,
+			KP_MULTIPLY = 332,
+			KP_SUBTRACT = 333,
+			KP_ADD = 334,
+			KP_ENTER = 335,
+			KP_EQUAL = 336,
 
-			LeftShift = 340,
-			LeftControl = 341,
-			LeftAlt = 342,
-			LeftSuper = 343,
-			RightShift = 344,
-			RightControl = 345,
-			RightAlt = 346,
-			RightSuper = 347,
-			Menu = 348
+			LEFT_SHIFT = 340,
+			LEFT_CONTROL = 341,
+			LEFT_ALT = 342,
+			LEFT_SUPER = 343,
+			RIGHT_SHIFT = 344,
+			RIGHT_CONTROL = 345,
+			RIGHT_ALT = 346,
+			RIGHT_SUPER = 347,
+			MENU = 348
 		};
 	}
 }
@@ -159,24 +159,24 @@ namespace Kaimos
 /* -- Printable keys -- */
 namespace Kaimos
 {
-	using MOUSECODE = uint16_t;
-	namespace Mouse
+	using MOUSE_CODE = uint16_t;
+	namespace MOUSE
 	{
-		enum KEYCODE
+		enum KEY_CODE
 		{
-			Button0 = 0,
-			Button1 = 1,
-			Button2 = 2,
-			Button3 = 3,
-			Button4 = 4,
-			Button5 = 5,
-			Button6 = 6,
-			Button7 = 7,
+			BUTTON0 = 0,
+			BUTTON1 = 1,
+			BUTTON2 = 2,
+			BUTTON3 = 3,
+			BUTTON4 = 4,
+			BUTTON5 = 5,
+			BUTTON6 = 6,
+			BUTTON7 = 7,
 
-			ButtonLeft = Button0,
-			ButtonRight = Button1,
-			ButtonMiddle = Button2,
-			ButtonLast = Button7
+			BUTTON_LEFT = BUTTON0,
+			BUTTON_RIGHT = BUTTON1,
+			BUTTON_MIDDLE = BUTTON2,
+			BUTTON_LAST = BUTTON7
 		};
 	}
 }
@@ -186,27 +186,27 @@ namespace Kaimos
 // ------------ JOYSTICK CODES ------------
 namespace Kaimos
 {
-	using JOYSTICKCODE = uint16_t;
-	namespace Joystick
+	using JOYSTICK_CODE = uint16_t;
+	namespace JOYSTICK
 	{
-		enum JOYSTICKCODE
+		enum JOYSTICK_CODE
 		{
-			Joystick0 = 0,
-			Joystick1 = 1,
-			Joystick2 = 2,
-			Joystick3 = 3,
-			Joystick4 = 4,
-			Joystick5 = 5,
-			Joystick6 = 6,
-			Joystick7 = 7,
-			Joystick8 = 8,
-			Joystick9 = 9,
-			Joystick10 = 10,
-			Joystick11 = 11,
-			Joystick12 = 12,
-			Joystick13 = 13,
-			Joystick14 = 14,
-			Joystick15 = 15
+			JOYSTICK0 = 0,
+			JOYSTICK1 = 1,
+			JOYSTICK2 = 2,
+			JOYSTICK3 = 3,
+			JOYSTICK4 = 4,
+			JOYSTICK5 = 5,
+			JOYSTICK6 = 6,
+			JOYSTICK7 = 7,
+			JOYSTICK8 = 8,
+			JOYSTICK9 = 9,
+			JOYSTICK10 = 10,
+			JOYSTICK11 = 11,
+			JOYSTICK12 = 12,
+			JOYSTICK13 = 13,
+			JOYSTICK14 = 14,
+			JOYSTICK15 = 15
 		};
 	}
 }
@@ -216,32 +216,32 @@ namespace Kaimos
 // ------------ GAMEPAD CODES ------------
 namespace Kaimos
 {
-	using GAMEPADCODE = uint16_t;
-	namespace Gamepad
+	using GAMEPAD_CODE = uint16_t;
+	namespace GAMEPAD
 	{
-		enum GAMEPADCODE
+		enum GAMEPAD_CODE
 		{
-			GamepadBtnA = 0,
-			GamepadBtnB = 1,
-			GamepadBtnX = 2,
-			GamepadBtnY = 3,
-			GamepadBtnLBump = 4,
-			GamepadBtnRBump = 5,
-			GamepadBtnBack = 6,
-			GamepadBtnStart = 7,
-			GamepadBtnGuide = 8,
-			GamepadBtnLThumb = 9,
-			GamepadBtnRThumb = 10,
-			GamepadBtnDP_Up = 11,
-			GamepadBtnDP_Right = 12,
-			GamepadBtnDP_Down = 13,
-			GamepadBtnDP_Left = 14,
-
-			GamepadBtnLast = GamepadBtnDP_Left,
-			GamepadBtnCross = GamepadBtnA,
-			GamepadBtnCircle = GamepadBtnB,
-			GamepadBtnSquare = GamepadBtnX,
-			GamepadBtnTraingle = GamepadBtnY
+			GAMEPAD_BTN_A = 0,
+			GAMEPAD_BTN_B = 1,
+			GAMEPAD_BTN_X = 2,
+			GAMEPAD_BTN_Y = 3,
+			GAMEPAD_BTN_LBUMP = 4,
+			GAMEPAD_BTN_RBUMP = 5,
+			GAMEPAD_BTN_BACK = 6,
+			GAMEPAD_BTN_START = 7,
+			GAMEPAD_BTN_GUIDE = 8,
+			GAMEPAD_BTN_LTHUMB = 9,
+			GAMEPAD_BTN_RTHUMB = 10,
+			GAMEPAD_BTNDP_UP = 11,
+			GAMEPAD_BTNDP_RIGHT = 12,
+			GAMEPAD_BTNDP_DOWN = 13,
+			GAMEPAD_BTNDP_LEFT = 14,
+				   
+			GAMEPAD_BTN_LAST = GAMEPAD_BTNDP_LEFT,
+			GAMEPAD_BTN_CROSS = GAMEPAD_BTN_A,
+			GAMEPAD_BTN_CIRCLE = GAMEPAD_BTN_B,
+			GAMEPAD_BTN_SQUARE = GAMEPAD_BTN_X,
+			GAMEPAD_BTN_TRAINGLE = GAMEPAD_BTN_Y
 		};
 	}
 }
@@ -251,18 +251,18 @@ namespace Kaimos
 /* -- Gamepad Axis -- */
 namespace Kaimos
 {
-	using GAMEPADAXISCODE = uint16_t;
-	namespace GamepadAxis
+	using GAMEPADAXIS_CODE = uint16_t;
+	namespace GAMEPADAXIS
 	{
-		enum GAMEPADAXISCODE
+		enum GAMEPADAXIS_CODE
 		{
-			GamepadAxis_LX = 0,
-			GamepadAxis_LY = 1,
-			GamepadAxis_RX = 2,
-			GamepadAxis_RY = 3,
-			GamepadAxis_LTrigger = 4,
-			GamepadAxis_RTrigger = 5,
-			GamepadAxis_Last = GamepadAxis_RTrigger
+			GAMEPAD_AXIS_LX = 0,
+			GAMEPAD_AXIS_LY = 1,
+			GAMEPAD_AXIS_RX = 2,
+			GAMEPAD_AXIS_RY = 3,
+			GAMEPAD_AXIS_LTRIGGER = 4,
+			GAMEPAD_AXIS_RTRIGGER = 5,
+			GAMEPAD_AXIS_LAST = GAMEPAD_AXIS_RTRIGGER
 		};
 	}
 }

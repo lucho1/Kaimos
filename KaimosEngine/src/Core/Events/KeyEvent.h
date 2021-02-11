@@ -10,13 +10,13 @@ namespace Kaimos {
 	{
 	public:
 
-		inline KEYCODE GetKeyCode() const { return m_KeyCode; }
+		inline KEY_CODE GetKeyCode() const { return m_KeyCode; }
 		EVENT_CLASS_CATEGORY(EVENT_CATEGORY_KEYBOARD | EVENT_CATEGORY_INPUT)
 
 	protected:
 
-		KeyEvent(const KEYCODE keycode) : m_KeyCode(keycode) {}
-		KEYCODE m_KeyCode;
+		KeyEvent(const KEY_CODE keycode) : m_KeyCode(keycode) {}
+		KEY_CODE m_KeyCode;
 	};
 
 
@@ -24,7 +24,7 @@ namespace Kaimos {
 	{
 	public:
 
-		KeyPressedEvent(const KEYCODE keycode, const uint repeatCount) : KeyEvent(keycode), m_RepeatCount(repeatCount) {}
+		KeyPressedEvent(const KEY_CODE keycode, const uint repeatCount) : KeyEvent(keycode), m_RepeatCount(repeatCount) {}
 
 		inline uint GetRepeatCount() const { return m_RepeatCount; }
 		std::string ToString() const override
@@ -45,7 +45,7 @@ namespace Kaimos {
 	{
 	public:
 
-		KeyReleasedEvent(const KEYCODE keycode) : KeyEvent(keycode) {}
+		KeyReleasedEvent(const KEY_CODE keycode) : KeyEvent(keycode) {}
 
 		std::string ToString() const override
 		{
@@ -62,7 +62,7 @@ namespace Kaimos {
 	{
 	public:
 
-		KeyTypedEvent(const KEYCODE keycode) : KeyEvent(keycode) {}
+		KeyTypedEvent(const KEY_CODE keycode) : KeyEvent(keycode) {}
 
 		std::string ToString() const override
 		{

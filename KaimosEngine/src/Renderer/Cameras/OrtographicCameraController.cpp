@@ -18,39 +18,39 @@ namespace Kaimos {
 		KS_PROFILE_FUNCTION();
 
 		// -- Camera Movement --
-		if (Input::IsKeyPressed(Key::D))
+		if (Input::IsKeyPressed(KEY::D))
 		{
 			m_CameraPos.x += cos(glm::radians(m_CameraRotation)) * m_CameraMoveSpeed * dt;
 			m_CameraPos.y += sin(glm::radians(m_CameraRotation)) * m_CameraMoveSpeed * dt;
 		}
 		
-		if (Input::IsKeyPressed(Key::A))
+		if (Input::IsKeyPressed(KEY::A))
 		{
 			m_CameraPos.x -= cos(glm::radians(m_CameraRotation)) * m_CameraMoveSpeed * dt;
 			m_CameraPos.y -= sin(glm::radians(m_CameraRotation)) * m_CameraMoveSpeed * dt;
 		}
 		
-		if (Input::IsKeyPressed(Key::W))
+		if (Input::IsKeyPressed(KEY::W))
 		{
 			m_CameraPos.x += -sin(glm::radians(m_CameraRotation)) * m_CameraMoveSpeed * dt;
 			m_CameraPos.y += cos(glm::radians(m_CameraRotation)) * m_CameraMoveSpeed * dt;
 		}
 		
-		if (Input::IsKeyPressed(Key::S))
+		if (Input::IsKeyPressed(KEY::S))
 		{
 			m_CameraPos.x -= -sin(glm::radians(m_CameraRotation)) * m_CameraMoveSpeed * dt;
 			m_CameraPos.y -= cos(glm::radians(m_CameraRotation)) * m_CameraMoveSpeed * dt;
 		}
 
-		if (Input::IsKeyPressed(Key::F))
+		if (Input::IsKeyPressed(KEY::F))
 			m_CameraPos = glm::vec3(0.0f);
 		
 		// -- Camera Rotation --
 		if (m_RotationActive)
 		{
-			if (Input::IsKeyPressed(Key::E))
+			if (Input::IsKeyPressed(KEY::E))
 				m_CameraRotation -= m_CameraRotSpeed * dt;
-			else if (Input::IsKeyPressed(Key::Q))
+			else if (Input::IsKeyPressed(KEY::Q))
 				m_CameraRotation += m_CameraRotSpeed * dt;
 
 			if (m_CameraRotation > 180.0f)
