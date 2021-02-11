@@ -255,7 +255,7 @@ namespace Kaimos {
 	{
 		m_CameraController.OnEvent(ev);
 		EventDispatcher dispatcher(ev);
-		dispatcher.Dispatch<KeyPressedEvent>(EditorLayer::OnKeyPressed);
+		dispatcher.Dispatch<KeyPressedEvent>(KS_BIND_EVENT_FN(EditorLayer::OnKeyPressed));
 
 		// --- EVENT EXAMPLE ---
 		//KS_EDITOR_TRACE("LayerTest Event: {0}", ev);
