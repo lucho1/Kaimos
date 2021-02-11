@@ -24,6 +24,7 @@ IncludeDir["ImGui"] = "KaimosEngine/vendor/imgui"
 IncludeDir["glm"] = "KaimosEngine/vendor/glm"
 IncludeDir["stb_image"] = "KaimosEngine/vendor/stb_image"
 IncludeDir["entt"] = "KaimosEngine/vendor/entt/include"
+IncludeDir["yaml"] = "KaimosEngine/vendor/yaml/include"
 
 -- How To Add a Library: --
 -- Just include it here, on top, as a new IncludeDir, 
@@ -33,9 +34,10 @@ IncludeDir["entt"] = "KaimosEngine/vendor/entt/include"
 ---------------------------
 
 group "Dependencies"
-    include "KaimosEngine/vendor/GLFW" -- Includes GLFW Premake File
-    include "KaimosEngine/vendor/Glad" -- Includes Glad Premake File
+    include "KaimosEngine/vendor/GLFW"  -- Includes GLFW Premake File
+    include "KaimosEngine/vendor/Glad"  -- Includes Glad Premake File
     include "KaimosEngine/vendor/imgui" -- Includes ImGui Premake File
+    include "KaimosEngine/vendor/yaml"  -- Includes yaml Premake File
 group ""
 
 -- Kaimos Engine Settings --
@@ -82,7 +84,8 @@ project "KaimosEngine"
         "%{IncludeDir.ImGui}",
         "%{IncludeDir.glm}",
         "%{IncludeDir.stb_image}",
-        "%{IncludeDir.entt}"
+        "%{IncludeDir.entt}",
+        "%{IncludeDir.yaml}"
     }
 
     -- Kaimos Engine Project Links --
@@ -91,6 +94,7 @@ project "KaimosEngine"
         "GLFW",
         "Glad",
         "ImGui",
+        "yaml-cpp",
         "opengl32.lib"
     }
 

@@ -1,0 +1,29 @@
+KaimosScene: UnnamedScene
+Entities:
+  - Entity: 123
+    TagComponent:
+      Tag: Square
+    TransformComponent:
+      Translation: [2.79999995, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    SpriteRendererComponent:
+      Color: [0.800000012, 0.400000006, 0.5, 1]
+  - Entity: 123
+    TagComponent:
+      Tag: Camera
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    CameraComponent:
+      Camera:
+        ProjectionType: 1
+        FOV: 45
+        PerspFarClip: 10000
+        PerspNearClip: 0.00999999978
+        OrthoSize: 10
+        OrthoFarClip: 1
+        OrthoNearClip: -1
+      PrimaryCamera: true
+      FixedAR: false

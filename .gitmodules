@@ -14,3 +14,6 @@
 	path = KaimosEngine/vendor/glm
 	url = https://github.com/g-truc/glm
 	branch = master
+[submodule "KaimosEngine/vendor/yaml"]
+	path = KaimosEngine/vendor/yaml
+	url = https://github.com/lucho1/yaml-cpp

@@ -7,6 +7,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include "Scene/SceneSerializer.h"
+
 namespace Kaimos {
 
 	EditorLayer::EditorLayer() : Layer("EditorLayer"), m_CameraController(1280.0f / 720.0f, true)
@@ -27,11 +29,13 @@ namespace Kaimos {
 
 		m_CurrentScene = CreateRef<Scene>();
 
+		/*
 		m_Entity = m_CurrentScene->CreateEntity("Square");
 		m_Entity.AddComponent<SpriteRendererComponent>(glm::vec4(0.8f, 0.4f, 0.5f, 1.0f));
-
+		
 		m_CameraEntity = m_CurrentScene->CreateEntity("Camera");
 		m_CameraEntity.AddComponent<CameraComponent>();
+		
 
 		// ---
 		class CameraController : public ScriptableEntity
@@ -62,7 +66,12 @@ namespace Kaimos {
 		};
 
 		m_CameraEntity.AddComponent<NativeScriptComponent>().Bind<CameraController>();
+		*/
+
 		m_ScenePanel.SetContext(m_CurrentScene);
+		//SceneSerializer m_Serializer(m_CurrentScene);
+		//m_Serializer.Serialize("assets/scenes/SceneSerializationExample.Kaimos");
+		//m_Serializer.Deserialize("assets/scenes/SceneSerializationExample.Kaimos");
 	}
 
 	void EditorLayer::OnDetach()
@@ -175,6 +184,18 @@ namespace Kaimos {
 		{
 			if (ImGui::BeginMenu("File"))
 			{
+				if (ImGui::MenuItem("Save"))
+				{
+					SceneSerializer m_Serializer(m_CurrentScene);
+					m_Serializer.Serialize("assets/scenes/SceneSerializationExample.Kaimos");
+				}
+
+				if (ImGui::MenuItem("Load"))
+				{
+					SceneSerializer m_Serializer(m_CurrentScene);
+					m_Serializer.Deserialize("assets/scenes/SceneSerializationExample.Kaimos");
+				}
+
 				if (ImGui::MenuItem("Exit"))
 					Application::Get().CloseApp();
 

@@ -12,6 +12,7 @@ namespace Kaimos {
 	{
 		friend class Entity;
 		friend class ScenePanel;
+		friend class SceneSerializer;
 	public:
 
 		Scene();
