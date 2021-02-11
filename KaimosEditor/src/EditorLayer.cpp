@@ -1,6 +1,6 @@
 #include "EditorLayer.h"
 
-#include <imgui.h>
+#include <ImGui/imgui.h>
 
 // TODO: TEMP
 #include "Platform/OpenGL/OpenGLShader.h"

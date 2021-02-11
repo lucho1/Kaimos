@@ -1,3 +1,5 @@
+include "./vendor/premake/premake_customization/solution_items.lua"
+
 workspace "Kaimos"
     architecture "x86_64"
     startproject "KaimosEditor"
@@ -9,170 +11,42 @@ workspace "Kaimos"
         "Dist"
     }
 
+    solution_items
+    {
+        ".editorconfig"
+    }
+
     flags
     {
         "MultiProcessorCompile"
     }
 
-outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
+    outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
--- Include directories relative to Root Folder (or Solution Directory)
-IncludeDir = {}
-IncludeDir["GLFW"] = "KaimosEngine/vendor/GLFW/include"
-IncludeDir["Glad"] = "KaimosEngine/vendor/Glad/include"
-IncludeDir["ImGui"] = "KaimosEngine/vendor/imgui"
-IncludeDir["glm"] = "KaimosEngine/vendor/glm"
-IncludeDir["stb_image"] = "KaimosEngine/vendor/stb_image"
-IncludeDir["entt"] = "KaimosEngine/vendor/entt/include"
-IncludeDir["yaml"] = "KaimosEngine/vendor/yaml/include"
+    -- Include directories relative to Root Folder (or Solution Directory)
+    IncludeDir = {}
+    IncludeDir["GLFW"]      = "%{wks.location}/KaimosEngine/vendor/GLFW/include"
+    IncludeDir["Glad"]      = "%{wks.location}/KaimosEngine/vendor/Glad/include"
+    IncludeDir["ImGui"]     = "%{wks.location}/KaimosEngine/vendor/imgui"
+    IncludeDir["glm"]       = "%{wks.location}/KaimosEngine/vendor/glm"
+    IncludeDir["stb_image"] = "%{wks.location}/KaimosEngine/vendor/stb_image"
+    IncludeDir["entt"]      = "%{wks.location}/KaimosEngine/vendor/entt/include"
+    IncludeDir["yaml"]      = "%{wks.location}/KaimosEngine/vendor/yaml/include"
 
--- How To Add a Library: --
--- Just include it here, on top, as a new IncludeDir, 
--- then add it down there in includedirs (under defines{})
--- and finally add it in links if needed (aside anything)
--- needed, such as dlls)
----------------------------
+    -- How To Add a Library: --
+    -- Just include it here, on top, as a new IncludeDir, 
+    -- then add it down there in includedirs (under defines{})
+    -- and finally add it in links if needed (aside anything)
+    -- needed, such as dlls)
+    ---------------------------
 
-group "Dependencies"
-    include "KaimosEngine/vendor/GLFW"  -- Includes GLFW Premake File
-    include "KaimosEngine/vendor/Glad"  -- Includes Glad Premake File
-    include "KaimosEngine/vendor/imgui" -- Includes ImGui Premake File
-    include "KaimosEngine/vendor/yaml"  -- Includes yaml Premake File
-group ""
+    group "Dependencies"
+        include "vendor/premake"
+        include "KaimosEngine/vendor/GLFW"  -- Includes GLFW Premake File
+        include "KaimosEngine/vendor/Glad"  -- Includes Glad Premake File
+        include "KaimosEngine/vendor/imgui" -- Includes ImGui Premake File
+        include "KaimosEngine/vendor/yaml"  -- Includes yaml Premake File
+    group ""
 
--- Kaimos Engine Settings --
-project "KaimosEngine"
-    location "KaimosEngine"
-    kind "StaticLib"
-    language "C++"
-    cppdialect "C++17"
-    staticruntime "On"
-    
-    -- Directories for target (needed build files) and Obj Files (unwanted build files) --
-    targetdir ("bin/" .. outputdir .. "/%{prj.name}")
-    objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
-
-    -- Precompiled Header --
-    pchheader "kspch.h"
-    pchsource "KaimosEngine/src/kspch.cpp"
-
-    -- Files to Add into the VS Project --
-    files
-    {
-        "%{prj.name}/src/**.h",
-        "%{prj.name}/src/**.cpp",
-        "%{prj.name}/vendor/glm/glm/**.hpp",
-        "%{prj.name}/vendor/glm/glm/**.inl",
-        "%{prj.name}/vendor/stb_image/**.cpp",
-        "%{prj.name}/vendor/stb_image/**.h"
-    }
-
-    -- Definitions for the project (global ones)
-    defines
-    {
-        "_CRT_SECURE_NO_WARNINGS",
-        "GLFW_INCLUDE_NONE"
-    }
-
-    -- Include Directories to project (to avoid typing a lot in each #include) --
-    includedirs
-    {
-        "%{prj.name}/src",
-        "%{prj.name}/vendor/spdlog/include",
-        "%{IncludeDir.GLFW}",
-        "%{IncludeDir.Glad}",
-        "%{IncludeDir.ImGui}",
-        "%{IncludeDir.glm}",
-        "%{IncludeDir.stb_image}",
-        "%{IncludeDir.entt}",
-        "%{IncludeDir.yaml}"
-    }
-
-    -- Kaimos Engine Project Links --
-    links
-    {
-        "GLFW",
-        "Glad",
-        "ImGui",
-        "yaml-cpp",
-        "opengl32.lib"
-    }
-
-    -- Systems --
-    filter "system:windows"
-        systemversion "latest"
-
-        defines
-        {
-            --"KS_BUILD_DLL",
-            --"GLFW_INCLUDE_NONE"
-        }
-
-        --postbuildcommands -- Made this upwards!
-        --{
-        --    ("{COPY} %{cfg.buildtarget.relpath} \"../bin/" .. outputdir .. "/KaimosEditor/\"")
-        --}
-
-    -- Configurations --
-    filter "configurations:Debug"
-        defines { "KS_DEBUG", "KS_ENABLE_ASSERTS" }
-        runtime "Debug"
-        symbols "On"
-    filter "configurations:Release"
-        defines { "KS_RELEASE", "KS_ENABLE_ASSERTS" }
-        runtime "Release"
-        optimize "On"
-    filter "configurations:Dist"
-        defines "KS_DIST"
-        runtime "Release"
-        optimize "On"
-
-
--- Kaimos Editor Settings --
-project "KaimosEditor"
-    location "KaimosEditor"
-    kind "ConsoleApp"
-    language "C++"
-    cppdialect "C++17"
-    staticruntime "On"
-
-    targetdir ("bin/" .. outputdir .. "/%{prj.name}")
-    objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
-
-    files
-    {
-        "%{prj.name}/src/**.h",
-        "%{prj.name}/src/**.cpp"
-    }
-
-    includedirs
-    {
-        "KaimosEngine/vendor/spdlog/include",
-        "KaimosEngine/src",
-        "%{IncludeDir.ImGui}",
-        "%{IncludeDir.glm}",
-        "%{IncludeDir.entt}"
-    }
-
-    links
-    {
-        "KaimosEngine"
-    }
-
-    -- Systems --
-    filter "system:windows"
-        systemversion "latest"
-
-    -- Configurations --
-    filter "configurations:Debug"
-        defines "KS_DEBUG"
-        runtime "Debug"
-        symbols "On"
-    filter "configurations:Release"
-        defines "KS_RELEASE"
-        runtime "Release"
-        optimize "On"
-    filter "configurations:Dist"
-        defines "KS_DIST"
-        runtime "Release"
-        optimize "On"
+    include "KaimosEngine"
+    include "KaimosEditor"

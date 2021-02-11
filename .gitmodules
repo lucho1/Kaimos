@@ -1,20 +1,20 @@
 [submodule "KaimosEngine/vendor/spdlog"]
 	path = KaimosEngine/vendor/spdlog
-	url = https://github.com/gabime/spdlog
+	url = ../../gabime/spdlog.git
 	branch = v1.x
 [submodule "KaimosEngine/vendor/GLFW"]
 	path = KaimosEngine/vendor/GLFW
-	url = https://github.com/lucho1/glfw
+	url = ../../lucho1/glfw.git
 	branch = master
 [submodule "KaimosEngine/vendor/imgui"]
 	path = KaimosEngine/vendor/imgui
-	url = https://github.com/lucho1/imgui
+	url = ../../lucho1/imgui.git
 	branch = docking
 [submodule "KaimosEngine/vendor/glm"]
 	path = KaimosEngine/vendor/glm
-	url = https://github.com/g-truc/glm
+	url = ../../g-truc/glm.git
 	branch = master
 [submodule "KaimosEngine/vendor/yaml"]
 	path = KaimosEngine/vendor/yaml
-	url = https://github.com/lucho1/yaml-cpp
+	url = ../../lucho1/yaml-cpp.git
 	branch = master

@@ -2,8 +2,8 @@
 
 #include "Scene/Components.h"
 
-#include <imgui.h>
-#include <imgui_internal.h>
+#include <ImGui/imgui.h>
+#include <ImGui/imgui_internal.h>
 #include <glm/gtc/type_ptr.hpp>
 
 namespace Kaimos {

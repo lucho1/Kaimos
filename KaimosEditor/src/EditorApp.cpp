@@ -3,7 +3,7 @@
 #include <Core/EntryPoint.h>
 
 // --- Other Includes ---
-#include <imgui.h>
+#include <ImGui/imgui.h>
 
 // --- Editor Includes ---
 #include "EditorLayer.h"
