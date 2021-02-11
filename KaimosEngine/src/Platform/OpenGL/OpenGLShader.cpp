@@ -100,7 +100,7 @@ namespace Kaimos {
 				file.read(&ret[0], file_size);	// Put it into the string (passing a ptr to the string beginning), and with the size of the string
 
 				// - Close the string -
-				file.close();
+				//file.close(); // This is actually not needed, ifstream closes itself due to RAII
 				return ret;
 			}
 			else

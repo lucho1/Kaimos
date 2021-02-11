@@ -149,7 +149,7 @@ namespace Kaimos {
 					glVertexAttribPointer(m_VBufferIndex, count,
 						ShaderDataTypeToOpenGLType(element.Type),
 						element.Normalized ? GL_TRUE : GL_FALSE,
-						layout.GetStride(), (const void*)(sizeof(float) * count * i));
+						layout.GetStride(), (const void*)(element.Offset + sizeof(float) * count * i));
 					
 					glVertexAttribDivisor(m_VBufferIndex, 1);
 					++m_VBufferIndex;

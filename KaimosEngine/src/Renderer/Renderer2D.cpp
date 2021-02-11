@@ -140,7 +140,7 @@ namespace Kaimos {
 		s_Data->WhiteTexture = Texture2D::Create(1, 1);
 		s_Data->WhiteTexture->SetData(&whiteTextData, sizeof(whiteTextData)); // or sizeof(uint)
 
-		// Set all TextureSlots to 0 --> Could be also done with a memset or with s_Data->TextureSlots.fill(0);
+		// Set 1st TextureSlot to 0 --> Could be also done with a memset or with s_Data->TextureSlots.fill(0);
 		//for (uint i = 0; i < s_Data->TextureSlots.size(); ++i)
 		//	s_Data->TextureSlots[i] = 0;
 		s_Data->TextureSlots[0] = s_Data->WhiteTexture;
@@ -274,7 +274,7 @@ namespace Kaimos {
 		uint textureIndex = 0;
 		for (uint i = 1; i < s_Data->TextureSlotIndex; ++i)
 		{
-			if (s_Data->TextureSlots[i].get() == texture.get())
+			if (*s_Data->TextureSlots[i] == *texture)
 			{
 				textureIndex = i;
 				break;
