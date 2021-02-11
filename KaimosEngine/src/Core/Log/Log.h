@@ -2,8 +2,11 @@
 #define _LOG_H_
 
 #include "Core/Core.h"
+
+#pragma warning(push, 0)		// To ignore warnings related to external files or headers
 #include <spdlog/spdlog.h>
-#include <spdlog/fmt/ostr.h> // To pass events
+#include <spdlog/fmt/ostr.h>	// To pass events
+#pragma warning(pop)
 
 namespace Kaimos {
 

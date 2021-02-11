@@ -83,7 +83,7 @@ namespace Kaimos {
 
 		if (mainCam)
 		{
-			Renderer2D::BeginScene(mainCam->GetProjection(), camTransform);
+			Renderer2D::BeginScene(*mainCam, camTransform);
 
 			auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
 			for (auto ent : group)
