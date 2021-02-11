@@ -1,9 +1,9 @@
 #ifndef _WINDOW_H_
 #define _WINDOW_H_
 
-#include "kspch.h"
 #include "Core/Core.h"
 #include "Core/Events/Event.h"
+#include <sstream>
 
 namespace Kaimos {
 

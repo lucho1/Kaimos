@@ -55,13 +55,13 @@ namespace Kaimos {
 				glm::vec3& translation = GetComponent<TransformComponent>().Translation;
 				float speed = 10.0f;
 
-				if (Input::IsKeyPressed(KEYCODE::A))
+				if (Input::IsKeyPressed(Key::A))
 					translation.x -= speed * dt;
-				if (Input::IsKeyPressed(KEYCODE::D))
+				if (Input::IsKeyPressed(Key::D))
 					translation.x += speed * dt;
-				if (Input::IsKeyPressed(KEYCODE::W))
+				if (Input::IsKeyPressed(Key::W))
 					translation.y += speed * dt;
-				if (Input::IsKeyPressed(KEYCODE::S))
+				if (Input::IsKeyPressed(Key::S))
 					translation.y -= speed * dt;
 			}
 		};
@@ -245,8 +245,8 @@ namespace Kaimos {
 
 		ImVec2 ViewportPanelSize = ImGui::GetContentRegionAvail();
 		m_ViewportSize = glm::vec2(ViewportPanelSize.x, ViewportPanelSize.y);
-
 		ImGui::Image((ImTextureID)m_Framebuffer->GetFBOTextureID(), ViewportPanelSize, ImVec2(0, 1), ImVec2(1, 0));
+
 		ImGui::PopStyleVar();
 		ImGui::End();
 	}
@@ -278,13 +278,13 @@ namespace Kaimos {
 		bool control_pressed = Input::IsKeyPressed(Key::LeftControl) || Input::IsKeyPressed(Key::RightControl);
 		switch (ev.GetKeyCode())
 		{
-			case KEYCODE::N:
+			case Key::N:
 				if (control_pressed) NewScene();
 				break;
-			case KEYCODE::O:
+			case Key::O:
 				if (control_pressed) OpenScene();
 				break;
-			case KEYCODE::S:
+			case Key::S:
 				if (control_pressed && (Input::IsKeyPressed(Key::LeftShift) || Input::IsKeyPressed(Key::RightShift)))
 					SaveSceneAs();
 				else if (control_pressed) SaveScene();

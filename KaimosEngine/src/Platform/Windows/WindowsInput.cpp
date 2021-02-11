@@ -6,38 +6,35 @@
 
 namespace Kaimos {
 
-	bool Input::IsKeyPressed(KEYCODE key)
+	bool Input::IsKeyPressed(const KEYCODE key)
 	{
-		auto window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
-		auto state = glfwGetKey(window, static_cast<int32_t>(key));
+		GLFWwindow* window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
+		int state = glfwGetKey(window, static_cast<int32_t>(key));
 		return state == GLFW_PRESS || state == GLFW_REPEAT;
 	}
 
-	bool Input::IsMouseButtonPressed(MOUSECODE button)
+	bool Input::IsMouseButtonPressed(const MOUSECODE button)
 	{
-		auto window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
-		auto state = glfwGetMouseButton(window, static_cast<int32_t>(button));
+		GLFWwindow* window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
+		int state = glfwGetMouseButton(window, static_cast<int32_t>(button));
 		return state == GLFW_PRESS;
 	}
 
-	std::pair<float, float> Input::GetMousePos()
+	glm::vec2 Input::GetMousePos()
 	{
 		double x = 0.0, y = 0.0;
-		auto window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
+		GLFWwindow* window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
 		glfwGetCursorPos(window, &x, &y);
 		return { (float)x, (float)y };
 	}
 
 	float Input::GetMouseX()
 	{
-		auto [x, y] = GetMousePos();
-		return x;
+		return GetMousePos().x;
 	}
 
 	float Input::GetMouseY()
 	{
-		auto [x, y] = GetMousePos();
-		return y;
+		return GetMousePos().y;
 	}
-
 }

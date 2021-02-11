@@ -1,6 +1,13 @@
 #ifndef _KSPCH_H_
 #define	_KSPCH_H_
 
+#include "Core/Utils/PlatformDetection.h"
+
+#ifdef KS_PLATFORM_WINDOWS
+	#ifndef NOMINMAX
+		#define NOMINMAX
+	#endif
+#endif
 
 // --- Windows/C++ Standard Library ---
 #include <memory>
@@ -19,6 +26,7 @@
 #include <array>
 
 // --- Engine Includes ---
+#include "Core/Core.h"
 #include "Core/Log/Log.h"
 #include "Core/Time/Profiling/Instrumentor.h"
 

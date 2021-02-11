@@ -2,7 +2,7 @@
 #define	_KEYEVENT_H_
 
 #include "Event.h"
-#include "Core/Input/Input.h"
+#include "Core/Input/KaimosInputCodes.h"
 
 namespace Kaimos {
 
@@ -15,7 +15,7 @@ namespace Kaimos {
 
 	protected:
 
-		KeyEvent(KEYCODE keycode) : m_KeyCode(keycode) {}
+		KeyEvent(const KEYCODE keycode) : m_KeyCode(keycode) {}
 		KEYCODE m_KeyCode;
 	};
 
@@ -24,9 +24,9 @@ namespace Kaimos {
 	{
 	public:
 
-		KeyPressedEvent(KEYCODE keycode, int repeatCount) : KeyEvent(keycode), m_RepeatCount(repeatCount) {}
+		KeyPressedEvent(const KEYCODE keycode, const uint repeatCount) : KeyEvent(keycode), m_RepeatCount(repeatCount) {}
 
-		inline int GetRepeatCount() const { return m_RepeatCount; }
+		inline uint GetRepeatCount() const { return m_RepeatCount; }
 		std::string ToString() const override
 		{
 			std::stringstream ss;
@@ -37,7 +37,7 @@ namespace Kaimos {
 		EVENT_CLASS_TYPE(KEY_PRESSED)
 
 	private:
-		int m_RepeatCount;
+		uint m_RepeatCount;
 	};
 
 
@@ -45,7 +45,7 @@ namespace Kaimos {
 	{
 	public:
 
-		KeyReleasedEvent(KEYCODE keycode) : KeyEvent(keycode) {}
+		KeyReleasedEvent(const KEYCODE keycode) : KeyEvent(keycode) {}
 
 		std::string ToString() const override
 		{
@@ -62,7 +62,7 @@ namespace Kaimos {
 	{
 	public:
 
-		KeyTypedEvent(KEYCODE keycode) : KeyEvent(keycode) {}
+		KeyTypedEvent(const KEYCODE keycode) : KeyEvent(keycode) {}
 
 		std::string ToString() const override
 		{

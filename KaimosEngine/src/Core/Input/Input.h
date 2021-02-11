@@ -1,8 +1,8 @@
 #ifndef _INPUT_H
 #define _INPUT_H
 
-#include "Core/Core.h"
 #include "KaimosInputCodes.h"
+#include <glm/glm.hpp>
 
 namespace Kaimos {
 
@@ -13,7 +13,7 @@ namespace Kaimos {
 		static bool IsKeyPressed(KEYCODE key);
 
 		static bool IsMouseButtonPressed(MOUSECODE button);
-		static std::pair<float, float> GetMousePos();
+		static glm::vec2 GetMousePos();
 		static float GetMouseX();
 		static float GetMouseY();
 	};

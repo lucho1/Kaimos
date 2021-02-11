@@ -1,6 +1,7 @@
 #ifndef _EVENT_H_
 #define	_EVENT_H_
 
+#include <functional>
 #include "Core/Core.h"
 
 namespace Kaimos {

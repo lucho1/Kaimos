@@ -2,7 +2,7 @@
 #define	_MOUSEEVENT_H_
 
 #include "Event.h"
-#include "Core/Input/Input.h"
+#include "Core/Input/KaimosInputCodes.h"
 
 namespace Kaimos {
 
@@ -10,7 +10,7 @@ namespace Kaimos {
 	{
 	public:
 
-		MouseMovedEvent(float x, float y) : m_MouseX(x), m_MouseY(y) {}
+		MouseMovedEvent(const float x, const float y) : m_MouseX(x), m_MouseY(y) {}
 
 		inline float GetX() const { return m_MouseX; }
 		inline float GetY() const { return m_MouseY; }
@@ -34,7 +34,7 @@ namespace Kaimos {
 	{
 	public:
 
-		MouseScrolledEvent(float xOffset, float yOffset) : m_XOffset(xOffset), m_YOffset(yOffset) {}
+		MouseScrolledEvent(const float xOffset, const float yOffset) : m_XOffset(xOffset), m_YOffset(yOffset) {}
 
 		inline float GetXOffset() const { return m_XOffset; }
 		inline float GetYOffset() const { return m_YOffset; }
@@ -63,7 +63,7 @@ namespace Kaimos {
 
 	protected:
 
-		MouseButtonEvent(MOUSECODE button) : m_Button(button) {}
+		MouseButtonEvent(const MOUSECODE button) : m_Button(button) {}
 		MOUSECODE m_Button;
 	};
 
@@ -72,7 +72,7 @@ namespace Kaimos {
 	{
 	public:
 
-		MouseButtonPressedEvent(MOUSECODE button) : MouseButtonEvent(button) {}
+		MouseButtonPressedEvent(const MOUSECODE button) : MouseButtonEvent(button) {}
 
 		std::string ToString() const override
 		{
@@ -89,7 +89,7 @@ namespace Kaimos {
 	{
 	public:
 
-		MouseButtonReleasedEvent(MOUSECODE button) : MouseButtonEvent(button) {}
+		MouseButtonReleasedEvent(const MOUSECODE button) : MouseButtonEvent(button) {}
 
 		std::string ToString() const override
 		{

@@ -138,19 +138,19 @@ namespace Kaimos {
 				{
 					case GLFW_PRESS:
 					{
-						KeyPressedEvent event(static_cast<KEYCODE>(key), 0);
+						KeyPressedEvent event(key, 0);
 						data.EventCallback(event);
 						break;
 					}
 					case GLFW_RELEASE:
 					{
-						KeyReleasedEvent event(static_cast<KEYCODE>(key));
+						KeyReleasedEvent event(key);
 						data.EventCallback(event);
 						break;
 					}
 					case GLFW_REPEAT:
 					{
-						KeyPressedEvent event(static_cast<KEYCODE>(key), 1);
+						KeyPressedEvent event(key, 1);
 						data.EventCallback(event);
 						break;
 					}
@@ -160,7 +160,7 @@ namespace Kaimos {
 		glfwSetCharCallback(m_Window, [](GLFWwindow* window, uint keycode)
 			{
 				WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
-				KeyTypedEvent event(static_cast<KEYCODE>(keycode));
+				KeyTypedEvent event(keycode);
 				data.EventCallback(event);
 			});
 
@@ -174,13 +174,13 @@ namespace Kaimos {
 				{
 				case GLFW_PRESS:
 				{
-					MouseButtonPressedEvent event(static_cast<MOUSECODE>(button));
+					MouseButtonPressedEvent event(button);
 					data.EventCallback(event);
 					break;
 				}
 				case GLFW_RELEASE:
 				{
-					MouseButtonReleasedEvent event(static_cast<MOUSECODE>(button));
+					MouseButtonReleasedEvent event(button);
 					data.EventCallback(event);
 					break;
 				}
