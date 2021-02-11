@@ -17,3 +17,4 @@
 [submodule "KaimosEngine/vendor/yaml"]
 	path = KaimosEngine/vendor/yaml
 	url = https://github.com/lucho1/yaml-cpp
+	branch = master
