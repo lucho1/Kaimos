@@ -8,6 +8,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "Scene/SceneSerializer.h"
+#include "Core/Utils/PlatformUtils.h"
 
 namespace Kaimos {
 
@@ -184,17 +185,17 @@ namespace Kaimos {
 		{
 			if (ImGui::BeginMenu("File"))
 			{
-				if (ImGui::MenuItem("Save"))
-				{
-					SceneSerializer m_Serializer(m_CurrentScene);
-					m_Serializer.Serialize("assets/scenes/SceneSerializationExample.Kaimos");
-				}
+				if (ImGui::MenuItem("New", "Ctrl+N"))
+					NewScene();
 
-				if (ImGui::MenuItem("Load"))
-				{
-					SceneSerializer m_Serializer(m_CurrentScene);
-					m_Serializer.Deserialize("assets/scenes/SceneSerializationExample.Kaimos");
-				}
+				if (ImGui::MenuItem("Open...", "Ctrl+O"))
+					OpenScene();
+
+				if (ImGui::MenuItem("Save", "Ctrl+S"))
+					SaveScene();
+
+				if (ImGui::MenuItem("Save As...", "Ctrl+Shift+S"))
+					SaveSceneAs();
 
 				if (ImGui::MenuItem("Exit"))
 					Application::Get().CloseApp();
@@ -253,6 +254,8 @@ namespace Kaimos {
 	void EditorLayer::OnEvent(Event& ev)
 	{
 		m_CameraController.OnEvent(ev);
+		EventDispatcher dispatcher(ev);
+		dispatcher.Dispatch<KeyPressedEvent>(EditorLayer::OnKeyPressed);
 
 		// --- EVENT EXAMPLE ---
 		//KS_EDITOR_TRACE("LayerTest Event: {0}", ev);
@@ -264,5 +267,68 @@ namespace Kaimos {
 
 		//EventDispatcher dispatcher(ev);
 		//dispatcher.Dispatch<KeyPressedEvent>(KS_BIND_EVENT_FN(LayerTest::OnKeyPressedEvent)); // For a "OnKeyPressedEvent()" function
+	}
+
+	bool EditorLayer::OnKeyPressed(KeyPressedEvent& ev)
+	{
+		// Shortcuts
+		if (ev.GetRepeatCount() > 0)
+			return false;
+
+		bool control_pressed = Input::IsKeyPressed(Key::LeftControl) || Input::IsKeyPressed(Key::RightControl);
+		switch (ev.GetKeyCode())
+		{
+			case KEYCODE::N:
+				if (control_pressed) NewScene();
+				break;
+			case KEYCODE::O:
+				if (control_pressed) OpenScene();
+				break;
+			case KEYCODE::S:
+				if (control_pressed && (Input::IsKeyPressed(Key::LeftShift) || Input::IsKeyPressed(Key::RightShift)))
+					SaveSceneAs();
+				else if (control_pressed) SaveScene();
+				break;
+		}
+
+		return false;
+	}
+
+	// --- Scene Methods ---
+	void EditorLayer::NewScene()
+	{
+		m_CurrentScene = CreateRef<Scene>();
+		m_CurrentScene->SetViewportSize((uint)m_ViewportSize.x, (uint)m_ViewportSize.y);
+		m_ScenePanel.SetContext(m_CurrentScene);
+	}
+
+	void EditorLayer::SaveScene()
+	{
+		SceneSerializer m_Serializer(m_CurrentScene);
+		m_Serializer.Serialize("assets/scenes/SceneSerializationExample.kaimos");
+	}
+
+	void EditorLayer::SaveSceneAs()
+	{
+		// "filter" arg is divided in 2 by the null-terminated string (\0). The 1st is the filter name to show and the 2nd is the actual filter to use
+		// So this will be shown in the filters tab as "Kaimos Scene (*.kaimos) and will filter all the .kaimos files
+		std::string filepath = FileDialogs::SaveFile("Kaimos Scene (*.kaimos)\0*.kaimos\0");
+		if (!filepath.empty())
+		{
+			SceneSerializer m_Serializer(m_CurrentScene);
+			m_Serializer.Serialize(filepath);
+		}
+	}
+
+	void EditorLayer::OpenScene()
+	{
+		// Read explanation avobe (on SaveSceneAs())
+		std::string filepath = FileDialogs::OpenFile("Kaimos Scene (*.kaimos)\0*.kaimos\0");
+		if (!filepath.empty())
+		{
+			NewScene();
+			SceneSerializer m_Serializer(m_CurrentScene);
+			m_Serializer.Deserialize(filepath);
+		}
 	}
 }

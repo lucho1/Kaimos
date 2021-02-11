@@ -21,6 +21,15 @@ namespace Kaimos {
 		virtual void OnEvent(Event& ev) override;
 
 	private:
+		
+		bool OnKeyPressed(KeyPressedEvent& ev);
+
+		void NewScene();
+		void OpenScene();
+		void SaveScene();
+		void SaveSceneAs();
+
+	private:
 
 		// TODO: TEMP
 		// Scene
