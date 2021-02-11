@@ -22,7 +22,7 @@ namespace Kaimos {
 		const ProjectionType GetProjectionType()	const	{ return m_ProjectionType; }
 
 		// Orthographic Camera
-		void SetOrhographicCamera(float size, float nearClip, float farClip);
+		void SetOrthographicCamera(float size, float nearClip, float farClip);
 
 		void SetOrthographicSize(float size)					{ m_OrthoSize = size; RecalculateProjectionMatrix(); }
 		void SetOrthographicClips(float nearP, float farP)		{ m_OrthographicNearClip = nearP; m_OrthographicFarClip = farP; RecalculateProjectionMatrix(); }

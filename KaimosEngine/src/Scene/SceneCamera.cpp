@@ -10,7 +10,7 @@ namespace Kaimos {
 		RecalculateProjectionMatrix();
 	}
 
-	void SceneCamera::SetOrhographicCamera(float size, float nearClip, float farClip)
+	void SceneCamera::SetOrthographicCamera(float size, float nearClip, float farClip)
 	{
 		m_ProjectionType = ProjectionType::ORTHOGRAPHIC;
 
