@@ -22,6 +22,8 @@
 //                  ·The macros at the bottom of the document () - Extracted from the Cherno video too!
 //                  ·The inclusion in the Kaimos namespace
 
+// NOTE - To make instrumentations, use something like chrome://tracing
+
 #ifndef _INSTRUMENTOR_H_
 #define _INSTRUMENTOR_H_
 
