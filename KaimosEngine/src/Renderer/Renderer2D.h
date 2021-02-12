@@ -56,9 +56,9 @@ namespace Kaimos {
 			uint DrawCalls = 0;
 			uint QuadCount = 0;
 
-			uint GetTotalVerticesCount()	{ return QuadCount * 4; }
-			uint GetTotalIndicesCount()		{ return QuadCount * 6; }
-			uint GetTotalTrianglesCount()	{ return QuadCount * 2; }
+			uint GetTotalVerticesCount()	const { return QuadCount * 4; }
+			uint GetTotalIndicesCount()		const { return QuadCount * 6; }
+			uint GetTotalTrianglesCount()	const { return QuadCount * 2; }
 		};
 
 	public:
