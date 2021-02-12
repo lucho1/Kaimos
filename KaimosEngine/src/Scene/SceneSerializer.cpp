@@ -18,6 +18,7 @@ namespace YAML {
 			node.push_back(vec.x);
 			node.push_back(vec.y);
 			node.push_back(vec.z);
+			node.SetStyle(EmitterStyle::Flow);
 			return node;
 		}
 
@@ -43,6 +44,7 @@ namespace YAML {
 			node.push_back(vec.y);
 			node.push_back(vec.z);
 			node.push_back(vec.w);
+			node.SetStyle(EmitterStyle::Flow);
 			return node;
 		}
 
@@ -186,11 +188,7 @@ namespace Kaimos {
 
 	bool SceneSerializer::Deserialize(const std::string& filepath)
 	{
-		std::ifstream file_stream(filepath);
-		std::stringstream str_stream;
-		str_stream << file_stream.rdbuf(); // Passing complete Buffer from the filestream
-
-		YAML::Node data = YAML::Load(str_stream.str());
+		YAML::Node data = YAML::LoadFile(filepath);
 		if (!data["KaimosScene"])
 			return false;
 
