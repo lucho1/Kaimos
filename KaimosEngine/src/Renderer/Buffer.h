@@ -75,7 +75,7 @@ namespace Kaimos {
 		//		BufferLayout layout = {{ ShaderDataType::Float3, "a_Position" }, ...} -- OR -- BufferLayout layout = BufferLayout({{ ShaderDataType::Float3, "a_Position" }, ...})
 		// without having to declare it as a std::vector<BufferElement> layout and having a constructor such as BufferLayout(std::vector<BufferElement>)
 		// so, is way more confortable and readable to have it as this, with an initializer list.
-		BufferLayout(const std::initializer_list<BufferElement>& elements) : m_Elements(elements) { CalculateOffsetAndStride(); }
+		BufferLayout(std::initializer_list<BufferElement> elements) : m_Elements(elements) { CalculateOffsetAndStride(); }
 		BufferLayout() = default;
 
 		// -- Getters --
