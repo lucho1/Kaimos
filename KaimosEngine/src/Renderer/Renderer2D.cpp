@@ -170,13 +170,11 @@ namespace Kaimos {
 	void Renderer2D::BeginScene(const OrthographicCamera& camera)
 	{
 		KS_PROFILE_FUNCTION();
+
 		s_Data->QuadVArray->Bind();
 		s_Data->ColoredTextureShader->Bind();
 		s_Data->ColoredTextureShader->SetUMat4("u_ViewProjection", camera.GetViewProjectionMatrix());
-
-		s_Data->QuadIndicesDrawCount = 0;
-		s_Data->TextureSlotIndex = 1;
-		s_Data->QuadVBufferPtr = s_Data->QuadVBufferBase;
+		StartBatch();
 	}
 
 	void Renderer2D::BeginScene(const Camera& camera, const glm::mat4& camera_transform)
@@ -187,21 +185,26 @@ namespace Kaimos {
 		s_Data->QuadVArray->Bind();
 		s_Data->ColoredTextureShader->Bind();
 		s_Data->ColoredTextureShader->SetUMat4("u_ViewProjection", ViewProj);
-
-		s_Data->QuadIndicesDrawCount = 0;
-		s_Data->TextureSlotIndex = 1;
-		s_Data->QuadVBufferPtr = s_Data->QuadVBufferBase;
+		StartBatch();
 	}
 
 	void Renderer2D::EndScene()
 	{
 		KS_PROFILE_FUNCTION();
-
-		// This cast is because uint8_t is 1 byte large, so the substraction give us the elements in terms of bytes
-		uint dataSize = (uint)((uint8_t*)s_Data->QuadVBufferPtr - (uint8_t*)s_Data->QuadVBufferBase);
-		s_Data->QuadVBuffer->SetData(s_Data->QuadVBufferBase, dataSize);
-
 		Flush();
+	}
+
+	void Renderer2D::NextBatch()
+	{
+		Flush();
+		StartBatch();
+	}
+
+	void Renderer2D::StartBatch()
+	{
+		s_Data->QuadIndicesDrawCount = 0;
+		s_Data->TextureSlotIndex = 1;
+		s_Data->QuadVBufferPtr = s_Data->QuadVBufferBase;
 	}
 
 	void Renderer2D::Flush()
@@ -212,6 +215,10 @@ namespace Kaimos {
 		if (s_Data->QuadIndicesDrawCount == 0)
 			return;
 
+		// This cast is because uint8_t is 1 byte large, so the substraction give us the elements in terms of bytes
+		uint dataSize = (uint)((uint8_t*)s_Data->QuadVBufferPtr - (uint8_t*)s_Data->QuadVBufferBase);
+		s_Data->QuadVBuffer->SetData(s_Data->QuadVBufferBase, dataSize);
+
 		// Bind all Textures to bind
 		for (uint i = 0; i < s_Data->TextureSlotIndex; ++i)
 			s_Data->TextureSlots[i]->Bind(i);
@@ -219,14 +226,6 @@ namespace Kaimos {
 		// Draw VArray
 		RenderCommand::DrawIndexed(s_Data->QuadVArray, s_Data->QuadIndicesDrawCount);
 		++s_Data->RendererStats.DrawCalls;
-	}
-
-	void Renderer2D::StartNewBatch()
-	{
-		EndScene();
-		s_Data->QuadIndicesDrawCount = 0;
-		s_Data->TextureSlotIndex = 1;
-		s_Data->QuadVBufferPtr = s_Data->QuadVBufferBase;
 	}
 
 	void Renderer2D::SetupVertexArray(const glm::mat4& transform, const glm::vec4& color, float texture_index, float texture_tiling)
@@ -256,7 +255,7 @@ namespace Kaimos {
 		KS_PROFILE_FUNCTION();
 
 		if (s_Data->QuadIndicesDrawCount >= s_Data->MaxIndices)
-			StartNewBatch();
+			NextBatch();
 
 		// Vertex Buffer setup
 		SetupVertexArray(transform, color);
@@ -268,7 +267,7 @@ namespace Kaimos {
 		KS_PROFILE_FUNCTION();
 
 		if (s_Data->QuadIndicesDrawCount >= s_Data->MaxIndices)
-			StartNewBatch();
+			NextBatch();
 
 		// Texture Index retrieval
 		uint textureIndex = 0;
@@ -284,7 +283,7 @@ namespace Kaimos {
 		if (textureIndex == 0)
 		{
 			if (s_Data->TextureSlotIndex >= s_Data->MaxTextureSlots)
-				StartNewBatch();
+				NextBatch();
 
 			textureIndex = s_Data->TextureSlotIndex;
 			s_Data->TextureSlots[s_Data->TextureSlotIndex] = texture;

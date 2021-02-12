@@ -47,7 +47,8 @@ namespace Kaimos {
 
 		// --- Rendering Methods ---
 		static void SetupVertexArray(const glm::mat4& transform, const glm::vec4& color, float texture_index = 0.0f, float texture_tiling = 1.0f);
-		static void StartNewBatch();
+		static void StartBatch();
+		static void NextBatch();
 
 		// --- Renderer Statistics ---
 		struct Statistics
