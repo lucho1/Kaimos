@@ -1,0 +1,40 @@
+{
+	"folders": [
+		{
+			"path": ".."
+		}
+	],
+	"settings": {
+
+		"files.exclude" :
+		{
+			"**/.github"			: true,	
+			"**/.git"				: true,
+			"**/.vs/"				: true,	
+			"**/.gitignore"			: true,
+			"**/.gitmodules"		: true,
+			"**/.editorconfig"		: true,
+			"**/.vscode/*.json"		: true,
+			
+			"**/bin/"				: true,
+			"**/bin-int/"			: true,
+			"**/scripts/"			: true,
+			"**/vendor/"			: true,
+			"**/ResultOutputFiles/"	: true,
+			
+			"**/*.user"				: true,	
+			"**/*.vcxproj"			: true,
+			"**/*.vcxproj.*"		: true,
+			
+			"**/*.ini"				: true,
+			"**/*.sln"				: true,
+			"**/*.md"				: true,
+			"**/*.log"				: true,
+			"**/*.lua"				: true,
+			"**/*LICENSE"			: true
+		},
+		"files.associations": {
+			"system_error": "cpp"
+		}
+	}
+}
