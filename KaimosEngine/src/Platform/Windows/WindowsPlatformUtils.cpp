@@ -34,6 +34,11 @@ namespace Kaimos {
 		open_file_name.nFilterIndex = 1;
 		open_file_name.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR; // If this is not here, it will change the working directory
 
+		// Check for current directory and set it if exists
+		CHAR directory[260] = { 0 };
+		if (GetCurrentDirectoryA(256, directory))
+			open_file_name.lpstrInitialDir = directory;
+
 		// If file (Ascii) is open (exists), return it
 		if (GetOpenFileNameA(&open_file_name) == TRUE)
 			return open_file_name.lpstrFile;
@@ -61,7 +66,12 @@ namespace Kaimos {
 		open_file_name.nMaxFile = sizeof(file);
 		open_file_name.lpstrFilter = filter;
 		open_file_name.nFilterIndex = 1;
-		open_file_name.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR; // If this is not here, it will change the working directory
+		open_file_name.lpstrDefExt = strchr(filter, '\0') + 1;								// Default extension (gets it from filter)
+		open_file_name.Flags = OFN_PATHMUSTEXIST | OFN_OVERWRITEPROMPT | OFN_NOCHANGEDIR;	// If this is not here, it will change the working directory
+
+		CHAR directory[260] = { 0 };
+		if (GetCurrentDirectoryA(256, directory))
+			open_file_name.lpstrInitialDir = directory;
 
 		// If file (Ascii) is open (exists), return it
 		if (GetSaveFileNameA(&open_file_name) == TRUE)
