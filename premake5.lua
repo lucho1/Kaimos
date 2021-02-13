@@ -32,6 +32,7 @@ workspace "Kaimos"
     IncludeDir["stb_image"] = "%{wks.location}/KaimosEngine/vendor/stb_image"
     IncludeDir["entt"]      = "%{wks.location}/KaimosEngine/vendor/entt/include"
     IncludeDir["yaml"]      = "%{wks.location}/KaimosEngine/vendor/yaml/include"
+    IncludeDir["ImGuizmo"]      = "%{wks.location}/KaimosEngine/vendor/ImGuizmo"
 
     -- How To Add a Library: --
     -- Just include it here, on top, as a new IncludeDir, 

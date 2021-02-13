@@ -1,6 +1,8 @@
 #include "EditorLayer.h"
+#include "Core/Math/Math.h"
 
 #include <ImGui/imgui.h>
+#include <ImGuizmo/ImGuizmo.h>
 
 // TODO: TEMP
 #include "Platform/OpenGL/OpenGLShader.h"
@@ -241,11 +243,52 @@ namespace Kaimos {
 
 		m_ViewportFocused = ImGui::IsWindowFocused();
 		m_ViewportHovered = ImGui::IsWindowHovered();
-		Application::Get().GetImGuiLayer()->SetBlockEvents(!m_ViewportFocused || !m_ViewportHovered);
+		Application::Get().GetImGuiLayer()->SetBlockEvents(!m_ViewportFocused && !m_ViewportHovered);
 
 		ImVec2 ViewportPanelSize = ImGui::GetContentRegionAvail();
 		m_ViewportSize = glm::vec2(ViewportPanelSize.x, ViewportPanelSize.y);
 		ImGui::Image((ImTextureID)m_Framebuffer->GetFBOTextureID(), ViewportPanelSize, ImVec2(0, 1), ImVec2(1, 0));
+
+		// --- Guizmo ---
+		Entity selected_entity = m_ScenePanel.GetSelectedEntity();
+		if (selected_entity && m_OperationGizmo != -1)
+		{
+			ImGuizmo::SetOrthographic(false);
+			ImGuizmo::SetDrawlist();
+			ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, ImGui::GetWindowWidth(), ImGui::GetWindowHeight());
+
+			Entity camera = m_CurrentScene->GetPrimaryCamera();
+			const Camera& cam = camera.GetComponent<CameraComponent>().Camera;
+			
+			const glm::mat4& cam_proj = cam.GetProjection();
+			glm::mat4 cam_view = glm::inverse(camera.GetComponent<TransformComponent>().GetTransform());
+
+			// Entity Transformation
+			TransformComponent& transform = selected_entity.GetComponent<TransformComponent>();
+			glm::mat4 tr_mat = transform.GetTransform();
+
+			// Snapping
+			bool snap = Input::IsKeyPressed(KEY::LEFT_CONTROL) || Input::IsKeyPressed(KEY::RIGHT_CONTROL);
+			float snap_value = 0.5f;
+			if (m_OperationGizmo == ImGuizmo::OPERATION::ROTATE)
+				snap_value = 10.0f;
+
+			float snap_array[3] = { snap_value, snap_value, snap_value };
+
+			ImGuizmo::Manipulate(glm::value_ptr(cam_view), glm::value_ptr(cam_proj), (ImGuizmo::OPERATION)m_OperationGizmo, ImGuizmo::MODE::LOCAL, glm::value_ptr(tr_mat),
+				nullptr, snap ? snap_array : nullptr);
+
+			if (ImGuizmo::IsUsing())
+			{
+				glm::vec3 translation, rotation, scale;
+				Math::DecomposeTransformation(tr_mat, translation, rotation, scale);
+
+				transform.Translation = translation;
+				transform.Rotation += rotation - transform.Rotation;
+				transform.Scale = scale;
+			}
+		}
+
 
 		ImGui::PopStyleVar();
 		ImGui::End();
@@ -288,6 +331,18 @@ namespace Kaimos {
 				if (control_pressed && (Input::IsKeyPressed(KEY::LEFT_SHIFT) || Input::IsKeyPressed(KEY::RIGHT_SHIFT)))
 					SaveSceneAs();
 				else if (control_pressed) SaveScene();
+				break;
+			case KEY::Q:
+				m_OperationGizmo = -1;
+				break;
+			case KEY::W:
+				m_OperationGizmo = ImGuizmo::OPERATION::TRANSLATE;
+				break;
+			case KEY::E:
+				m_OperationGizmo = ImGuizmo::OPERATION::ROTATE;
+				break;
+			case KEY::R:
+				m_OperationGizmo = ImGuizmo::OPERATION::SCALE;
 				break;
 		}
 

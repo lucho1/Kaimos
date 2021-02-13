@@ -39,6 +39,9 @@ namespace Kaimos {
 
 		ScenePanel m_ScenePanel;
 
+		// Guizmo
+		int m_OperationGizmo = -1;
+
 		// Rendering
 		OrtographicCameraController m_CameraController;
 		Ref<VertexArray> m_VArray;

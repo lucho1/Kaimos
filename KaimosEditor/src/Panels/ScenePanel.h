@@ -21,6 +21,8 @@ namespace Kaimos {
 		void SetContext(const Ref<Scene>& context);
 		void OnUIRender();
 
+		Entity GetSelectedEntity() const { return m_SelectedEntity; }
+
 	private:
 
 		void DrawEntityNode(Entity entity);

@@ -25,6 +25,8 @@ namespace Kaimos {
 		Entity CreateEntity(const std::string& name = "unnamed");
 		void DestroyEntity(Entity entity);
 
+		Entity GetPrimaryCamera();
+
 	private:
 
 		template<typename T>

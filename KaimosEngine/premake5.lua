@@ -21,7 +21,9 @@ project "KaimosEngine"
         "vendor/glm/glm/**.hpp",
         "vendor/glm/glm/**.inl",
         "vendor/stb_image/**.cpp",
-        "vendor/stb_image/**.h"
+        "vendor/stb_image/**.h",
+        "vendor/ImGuizmo/ImGuizmo.h",
+        "vendor/ImGuizmo/ImGuizmo.cpp"
     }
 
     -- Definitions for the project (global ones)
@@ -42,7 +44,8 @@ project "KaimosEngine"
         "%{IncludeDir.glm}",
         "%{IncludeDir.stb_image}",
         "%{IncludeDir.entt}",
-        "%{IncludeDir.yaml}"
+        "%{IncludeDir.yaml}",
+        "%{IncludeDir.ImGuizmo}"
     }
 
     -- Kaimos Engine Project Links --
@@ -54,6 +57,10 @@ project "KaimosEngine"
         "yaml-cpp",
         "opengl32.lib"
     }
+
+    -- Custom Filter specifically for **any** .cpp files of ImGuizmo and its subdirectories --
+    filter "files:vendor/ImGuizmo/**.cpp"
+        flags {"NoPCH"} -- Basically, a flag to state that, for the filter, no PCH on it --
 
     -- Systems --
     filter "system:windows"

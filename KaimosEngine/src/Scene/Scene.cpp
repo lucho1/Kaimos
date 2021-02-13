@@ -109,6 +109,19 @@ namespace Kaimos {
 		m_Registry.destroy(entity);
 	}
 
+	Entity Scene::GetPrimaryCamera()
+	{
+		auto view = m_Registry.view<CameraComponent>();
+		for (auto entity : view)
+		{
+			const auto& camera = view.get<CameraComponent>(entity);
+			if (camera.Primary)
+				return Entity{ entity, this };
+		}
+
+		return {};
+	}
+
 	void Scene::SetViewportSize(uint width, uint height)
 	{
 		m_ViewportWidth = width;

@@ -18,3 +18,7 @@
 	path = KaimosEngine/vendor/yaml
 	url = ../../lucho1/yaml-cpp.git
 	branch = master
+[submodule "ImGuizmo"]
+	path = KaimosEngine/vendor/ImGuizmo
+	url = ../../lucho1/ImGuizmo.git
+	branch = master
