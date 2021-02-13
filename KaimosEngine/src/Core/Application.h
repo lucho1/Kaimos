@@ -52,7 +52,7 @@ namespace Kaimos {
 		// -- Class Variables --
 		bool m_Running = true;
 		bool m_Minimized = false;
-		std::unique_ptr<Window> m_Window; // Having a unique_ptr means we don't have to worry about deleting the Window ourselves on app termination :D
+		ScopePtr<Window> m_Window; // Having a unique_ptr means we don't have to worry about deleting the Window ourselves on app termination :D
 		ImGuiLayer* m_ImGuiLayer;
 		LayerStack m_LayerStack;
 		Timestep m_Timestep;
