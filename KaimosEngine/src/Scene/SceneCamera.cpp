@@ -34,6 +34,9 @@ namespace Kaimos {
 
 	void SceneCamera::SetViewportSize(uint width, uint height)
 	{
+		if (height == 0)
+			return;
+
 		m_AspectRatio = (float)width / (float)height;
 		RecalculateProjectionMatrix();
 	}

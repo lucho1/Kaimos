@@ -226,7 +226,6 @@ namespace Kaimos {
 					YAML::Node& camera_node = cameracomp_node["Camera"];
 
 					cam_comp.Camera.SetProjectionType((SceneCamera::ProjectionType) camera_node["ProjectionType"].as<int>());
-
 					cam_comp.Camera.SetPerspectiveFOV(camera_node["FOV"].as<float>());
 					cam_comp.Camera.SetPerspectiveClips(camera_node["PerspNearClip"].as<float>(), camera_node["PerspFarClip"].as<float>());
 

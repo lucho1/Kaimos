@@ -72,9 +72,9 @@ namespace Kaimos {
 		*/
 
 		m_ScenePanel.SetContext(m_CurrentScene);
-		//SceneSerializer m_Serializer(m_CurrentScene);
-		//m_Serializer.Serialize("assets/scenes/SceneSerializationExample.Kaimos");
-		//m_Serializer.Deserialize("assets/scenes/SceneSerializationExample.Kaimos");
+		SceneSerializer m_Serializer(m_CurrentScene);
+		//m_Serializer.Deserialize("assets/scenes/YellowSquare.Kaimos");
+		m_Serializer.Deserialize("assets/scenes/CubeScene.kaimos");
 	}
 
 	void EditorLayer::OnDetach()
@@ -328,8 +328,7 @@ namespace Kaimos {
 				if (control_pressed) OpenScene();
 				break;
 			case KEY::S:
-				if (control_pressed && (Input::IsKeyPressed(KEY::LEFT_SHIFT) || Input::IsKeyPressed(KEY::RIGHT_SHIFT)))
-					SaveSceneAs();
+				if (control_pressed && (Input::IsKeyPressed(KEY::LEFT_SHIFT) || Input::IsKeyPressed(KEY::RIGHT_SHIFT))) SaveSceneAs();
 				else if (control_pressed) SaveScene();
 				break;
 			case KEY::Q:
@@ -359,8 +358,8 @@ namespace Kaimos {
 
 	void EditorLayer::SaveScene()
 	{
-		SceneSerializer m_Serializer(m_CurrentScene);
-		m_Serializer.Serialize("assets/scenes/SceneSerializationExample.kaimos");
+		//SceneSerializer m_Serializer(m_CurrentScene);
+		//m_Serializer.Serialize("assets/scenes/SceneSerializationExample.kaimos");
 	}
 
 	void EditorLayer::SaveSceneAs()
