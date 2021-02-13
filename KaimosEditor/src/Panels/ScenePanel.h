@@ -1,6 +1,7 @@
 #ifndef _SCENEPANEL_H_
 #define _SCENEPANEL_H_
 
+#include "Kaimos.h"
 #include "Core/Core.h"
 #include "Scene/Scene.h"
 #include "Scene/Entity.h"

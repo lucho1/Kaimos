@@ -6,6 +6,11 @@
 #include <ImGui/imgui_internal.h>
 #include <glm/gtc/type_ptr.hpp>
 
+// C++ Microsoft Compiler doesn't gets C++ standards, so this def. is to disable a warning for std::strncpy()
+#ifdef _MSVC_LANG
+	#define _CRT_SECURE_NO_WARNINGS
+#endif
+
 namespace Kaimos {
 
 	ScenePanel::ScenePanel(const Ref<Scene>& context)
@@ -213,8 +218,9 @@ namespace Kaimos {
 		{
 			std::string& tag = entity.GetComponent<TagComponent>().Tag;
 			char buffer[256];
-			memset(buffer, 0, sizeof(buffer));				// Set it all to 0
-			strcpy_s(buffer, sizeof(buffer), tag.c_str());	// Copy tag to buffer
+			memset(buffer, 0, sizeof(buffer));					// Set it all to 0
+			std::strncpy(buffer, tag.c_str(), sizeof(buffer));	// Copy tag to buffer
+			//strcpy_s(buffer, sizeof(buffer), tag.c_str());	// This is the same, but std::strncpy() is more like a C++ standard
 
 			if (ImGui::InputText("##Tag", buffer, sizeof(buffer)))
 				tag = std::string(buffer);
@@ -231,13 +237,21 @@ namespace Kaimos {
 		{
 			if (ImGui::MenuItem("Camera"))
 			{
-				m_SelectedEntity.AddComponent<CameraComponent>();
+				if (!m_SelectedEntity.HasComponent<CameraComponent>())
+					m_SelectedEntity.AddComponent<CameraComponent>();
+				else
+					KS_EDITOR_WARN("CameraComponent already exists in the Entity!");
+
 				ImGui::CloseCurrentPopup();
 			}
 
 			if (ImGui::MenuItem("Sprite Renderer"))
 			{
-				m_SelectedEntity.AddComponent<SpriteRendererComponent>();
+				if (!m_SelectedEntity.HasComponent<SpriteRendererComponent>())
+					m_SelectedEntity.AddComponent<SpriteRendererComponent>();
+				else
+					KS_EDITOR_WARN("SpriteRendererComponent already exists in the Entity!");
+
 				ImGui::CloseCurrentPopup();
 			}
 
