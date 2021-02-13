@@ -3,6 +3,7 @@
 
 #include "Kaimos.h"
 #include "Panels/ScenePanel.h"
+#include "Renderer/Cameras/EditorCamera.h"
 
 namespace Kaimos {
 
@@ -38,6 +39,8 @@ namespace Kaimos {
 		Entity m_CameraEntity;
 
 		ScenePanel m_ScenePanel;
+
+		EditorCamera m_EditorCamera;
 
 		// Guizmo
 		int m_OperationGizmo = -1;

@@ -1,8 +1,10 @@
 #ifndef _SCENE_H_
 #define _SCENE_H_
 
-#include "entt.hpp"
 #include "Core/Time/Timestep.h"
+#include "Renderer/Cameras/EditorCamera.h"
+
+#include <entt.hpp>
 
 namespace Kaimos {
 
@@ -18,7 +20,8 @@ namespace Kaimos {
 		Scene();
 		~Scene();
 
-		void OnUpdate(Timestep dt);
+		void OnUpdateRuntime(Timestep dt);
+		void OnUpdateEditor(Timestep dt, EditorCamera& camera);
 
 		void SetViewportSize(uint width, uint height);
 

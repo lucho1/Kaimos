@@ -177,6 +177,16 @@ namespace Kaimos {
 		StartBatch();
 	}
 
+	void Renderer2D::BeginScene(const EditorCamera& camera)
+	{
+		KS_PROFILE_FUNCTION();
+
+		s_Data->QuadVArray->Bind();
+		s_Data->ColoredTextureShader->Bind();
+		s_Data->ColoredTextureShader->SetUMat4("u_ViewProjection", camera.GetViewProj());
+		StartBatch();
+	}
+
 	void Renderer2D::BeginScene(const Camera& camera, const glm::mat4& camera_transform)
 	{
 		KS_PROFILE_FUNCTION();

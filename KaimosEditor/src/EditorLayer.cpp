@@ -14,7 +14,7 @@
 
 namespace Kaimos {
 
-	EditorLayer::EditorLayer() : Layer("EditorLayer"), m_CameraController(1280.0f / 720.0f, true)
+	EditorLayer::EditorLayer() : Layer("EditorLayer"), m_CameraController(1280.0f / 720.0f, true), m_EditorCamera(45.0f, 1.778f, 0.1f, 10000.0f)
 	{
 	}
 
@@ -95,11 +95,15 @@ namespace Kaimos {
 			m_CameraController.SetAspectRatio(m_ViewportSize.x, m_ViewportSize.y);
 
 			m_CurrentScene->SetViewportSize((uint)m_ViewportSize.x, (uint)m_ViewportSize.y);
+			m_EditorCamera.SetViewportSize(m_ViewportSize.x, m_ViewportSize.y);
 		}
 
 		// --- CAMERA UPDATE ---
 		if (m_ViewportFocused)
+		{
 			m_CameraController.OnUpdate(dt);
+			m_EditorCamera.OnUpdate(dt);
+		}
 
 		// --- RENDER ---
 		Renderer2D::ResetStats();
@@ -113,7 +117,7 @@ namespace Kaimos {
 		//Renderer2D::DrawQuad(glm::vec3(0.0f, 0.0f, -0.1f), glm::vec2(10.0f), m_CheckerTexture, m_BackgroundTiling, glm::vec4(1.0f));
 
 		// --- SCENE UPDATE ---
-		m_CurrentScene->OnUpdate(dt);
+		m_CurrentScene->OnUpdateEditor(dt, m_EditorCamera);
 
 		/*Renderer2D::DrawQuad(glm::vec2(1.5f, -2.5f), glm::vec2(0.5f, 0.75f), { 0.3f, 0.2f, 0.8f, 1.0f });
 		Renderer2D::DrawQuad(glm::vec2(0.5f, -0.5f), glm::vec2(0.5f, 0.75f), { 0.8f, 0.2f, 0.3f, 1.0f });
@@ -219,6 +223,11 @@ namespace Kaimos {
 
 		//ImGui::ColorEdit4("Squares Color", glm::value_ptr(m_Color));
 		ImGui::SliderFloat("Background Tiling", &m_BackgroundTiling, 1.0f, 100.0f, "%.2f");
+
+		static bool camera_lock = false;
+		ImGui::Checkbox("Lock Camera Rotation", &camera_lock);
+		m_EditorCamera.LockRotation(camera_lock);
+		
 		ImGui::Separator();
 
 		// --- Renderer Settings Floating Window ---
@@ -257,11 +266,13 @@ namespace Kaimos {
 			ImGuizmo::SetDrawlist();
 			ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, ImGui::GetWindowWidth(), ImGui::GetWindowHeight());
 
-			Entity camera = m_CurrentScene->GetPrimaryCamera();
-			const Camera& cam = camera.GetComponent<CameraComponent>().Camera;
-			
-			const glm::mat4& cam_proj = cam.GetProjection();
-			glm::mat4 cam_view = glm::inverse(camera.GetComponent<TransformComponent>().GetTransform());
+			// Camera
+			//Entity camera = m_CurrentScene->GetPrimaryCamera();			
+			//const glm::mat4& cam_proj = camera.GetComponent<CameraComponent>().Camera.GetProjection();
+			//glm::mat4 cam_view = glm::inverse(camera.GetComponent<TransformComponent>().GetTransform());
+
+			const glm::mat4& cam_proj = m_EditorCamera.GetProjection();
+			glm::mat4 cam_view = m_EditorCamera.GetViewMatrix();
 
 			// Entity Transformation
 			TransformComponent& transform = selected_entity.GetComponent<TransformComponent>();
@@ -275,6 +286,7 @@ namespace Kaimos {
 
 			float snap_array[3] = { snap_value, snap_value, snap_value };
 
+			// ImGui Manipulation
 			ImGuizmo::Manipulate(glm::value_ptr(cam_view), glm::value_ptr(cam_proj), (ImGuizmo::OPERATION)m_OperationGizmo, ImGuizmo::MODE::LOCAL, glm::value_ptr(tr_mat),
 				nullptr, snap ? snap_array : nullptr);
 
@@ -297,6 +309,7 @@ namespace Kaimos {
 	void EditorLayer::OnEvent(Event& ev)
 	{
 		m_CameraController.OnEvent(ev);
+		m_EditorCamera.OnEvent(ev);
 		EventDispatcher dispatcher(ev);
 		dispatcher.Dispatch<KeyPressedEvent>(KS_BIND_EVENT_FN(EditorLayer::OnKeyPressed));
 

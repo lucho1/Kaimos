@@ -3,6 +3,8 @@
 
 #include "Cameras/OrthographicCamera.h"
 #include "Cameras/Camera.h"
+#include "Cameras/EditorCamera.h"
+
 #include "Resources/Texture.h"
 
 #include <glm/gtc/matrix_transform.hpp>
@@ -22,6 +24,7 @@ namespace Kaimos {
 		
 		// --- Rendering Methods ---
 		static void BeginScene(const OrthographicCamera& camera); // TODO: Remove this
+		static void BeginScene(const EditorCamera& camera);
 		static void BeginScene(const Camera& camera, const glm::mat4& camera_transform);
 		static void EndScene();
 		static void Flush();

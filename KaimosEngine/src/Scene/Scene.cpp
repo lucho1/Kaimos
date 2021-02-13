@@ -48,8 +48,22 @@ namespace Kaimos {
 	Scene::~Scene()
 	{
 	}
+	
+	void Scene::OnUpdateEditor(Timestep dt, EditorCamera& camera)
+	{
+		Renderer2D::BeginScene(camera);
 
-	void Scene::OnUpdate(Timestep dt)
+		auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
+		for (auto ent : group)
+		{
+			auto& [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(ent);
+			Renderer2D::DrawQuad(transform.GetTransform(), sprite.Color);
+		}
+
+		Renderer2D::EndScene();
+	}
+
+	void Scene::OnUpdateRuntime(Timestep dt)
 	{
 		// Scripts --> This should happen in Scene::OnScenePlay() or similar (pressing the engine's play button)
 		m_Registry.view<NativeScriptComponent>().each([=](auto entity, auto& component) // Lambda that will be called for each of the NativeScriptComponent
