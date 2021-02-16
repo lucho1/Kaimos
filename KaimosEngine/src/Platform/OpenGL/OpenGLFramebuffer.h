@@ -2,6 +2,8 @@
 #define _OPENGLFRAMEBUFFER_H_
 
 #include "Renderer/Resources/Framebuffer.h"
+#include <glad/glad.h>
+
 
 namespace Kaimos {
 
@@ -18,13 +20,23 @@ namespace Kaimos {
 
 
 		virtual const FramebufferSettings& GetFBOSettings() const override { return m_FBOSettings; }
-		virtual const uint GetFBOTextureID() const override { return m_ColorTexture; }
+		// TODO: Caíste en la vieja trampa del assert que no funciona :D
+		virtual const uint GetFBOTextureID(uint index = 0) const override { /*KS_ENGINE_ASSERT(index < m_ColorTextures.size(), "Index is outside bounds (FBO)");*/ return m_ColorTextures[index]; }
+
+	private:
+
+		void SetTexture(bool depth_texture, GLenum format, uint width, uint height, uint samples);
+		void AttachFramebufferTexture(uint texture_id, bool depth_texture, int samples, GLenum format, uint width, uint height, int index);
 
 	private:
 
 		uint m_ID = 0;
-		uint m_ColorTexture = 0, m_DepthTexture = 0;
 		FramebufferSettings m_FBOSettings;
+
+		std::vector<FramebufferTextureSettings> m_ColorAttachmentSettings;
+		std::vector<uint> m_ColorTextures;
+		FramebufferTextureSettings m_DepthAttachmentSetting;
+		uint m_DepthTexture = 0; // TODO: Change name to m_DepthTexture
 	};
 
 }

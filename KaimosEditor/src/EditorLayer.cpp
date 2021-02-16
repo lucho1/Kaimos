@@ -26,8 +26,9 @@ namespace Kaimos {
 		m_LogoTexture = Texture2D::Create("assets/textures/ChernoLogo.png");
 
 		FramebufferSettings fboSettings;
-		fboSettings.width = 1280;
-		fboSettings.height = 720;
+		fboSettings.FBOAttachments = { TEXTURE_FORMAT::RGBA8, TEXTURE_FORMAT::RGBA8, TEXTURE_FORMAT::DEPTH};
+		fboSettings.Width = 1280;
+		fboSettings.Height = 720;
 		m_Framebuffer = Framebuffer::Create(fboSettings);
 
 		m_CurrentScene = CreateRef<Scene>();
@@ -89,7 +90,7 @@ namespace Kaimos {
 		// --- VIEWPORT RESIZE ---
 		if (FramebufferSettings settings = m_Framebuffer->GetFBOSettings();
 			m_ViewportSize.x > 0.0f && m_ViewportSize.y > 0.0f &&
-			(settings.width != (uint)m_ViewportSize.x || settings.height != (uint)m_ViewportSize.y))
+			(settings.Width != (uint)m_ViewportSize.x || settings.Height != (uint)m_ViewportSize.y))
 		{
 			m_Framebuffer->Resize((uint)m_ViewportSize.x, (uint)m_ViewportSize.y);
 			m_CameraController.SetAspectRatio(m_ViewportSize.x, m_ViewportSize.y);
