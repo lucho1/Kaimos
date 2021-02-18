@@ -6,6 +6,19 @@ namespace Kaimos {
 
 	static const uint s_MaxFBOSize = 8192; // TODO: Don't hardcode this, this should be based on render capabilities
 
+	static GLenum GLTextureFormat(TEXTURE_FORMAT format)
+	{
+		switch (format)
+		{
+			case TEXTURE_FORMAT::DEPTH24STENCIL8:	return GL_DEPTH24_STENCIL8;
+			case TEXTURE_FORMAT::RED_INTEGER:		return GL_RED_INTEGER;
+			case TEXTURE_FORMAT::RGBA8:				return GL_RGBA8;
+		}
+
+		KS_ENGINE_ASSERT(false, "Invalid Format Passed!");
+		return GL_NONE;
+	}
+
 	static bool IsDepthFormatTexture(TEXTURE_FORMAT format)
 	{
 		switch (format)
@@ -47,6 +60,13 @@ namespace Kaimos {
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
+	void OpenGLFramebuffer::ClearFBOTexture(uint index, int value)
+	{
+		// TODO: Asserts not working
+		//KS_ENGINE_ASSERT(index < m_ColorTextures.size(), "FBO: Index out of bounds");
+		glClearTexImage(m_ColorTextures[index], 0, GLTextureFormat(m_ColorAttachmentSettings[index].TextureFormat), GL_INT, &value);
+	}
+
 
 	void OpenGLFramebuffer::Resize(uint width, uint height)
 	{
@@ -86,10 +106,14 @@ namespace Kaimos {
 				switch (m_ColorAttachmentSettings[i].TextureFormat)
 				{
 					case TEXTURE_FORMAT::RGBA8:
-						SetTexture(false, GL_RGBA8, m_FBOSettings.Width, m_FBOSettings.Height, m_FBOSettings.Samples);
-						glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, FBOsampling, m_ColorTextures[i], 0);
+						SetTexture(false, GL_RGBA8, GL_RGBA, m_FBOSettings.Width, m_FBOSettings.Height, m_FBOSettings.Samples);
+						break;
+					case TEXTURE_FORMAT::RED_INTEGER:
+						SetTexture(false, GL_R32I, GL_RED_INTEGER, m_FBOSettings.Width, m_FBOSettings.Height, m_FBOSettings.Samples);
 						break;
 				}
+
+				glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, FBOsampling, m_ColorTextures[i], 0);
 			}
 		}
 
@@ -101,10 +125,11 @@ namespace Kaimos {
 			switch (m_DepthAttachmentSetting.TextureFormat)
 			{
 				case TEXTURE_FORMAT::DEPTH24STENCIL8:
-					SetTexture(true, GL_DEPTH24_STENCIL8, m_FBOSettings.Width, m_FBOSettings.Height, m_FBOSettings.Samples);
-					glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, FBOsampling, m_DepthTexture, 0);
+					SetTexture(true, GL_DEPTH24_STENCIL8, GL_NONE, m_FBOSettings.Width, m_FBOSettings.Height, m_FBOSettings.Samples);
 					break;
 			}
+
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, FBOsampling, m_DepthTexture, 0);
 		}
 
 		// --- Draw Buffers ---
@@ -126,23 +151,38 @@ namespace Kaimos {
 	}
 
 
-	void OpenGLFramebuffer::SetTexture(bool depth_texture, GLenum format, uint width, uint height, uint samples)
+	void OpenGLFramebuffer::SetTexture(bool depth_texture, GLenum internal_format, GLenum format, uint width, uint height, uint samples)
 	{
 		if (samples > 1)
 		{
-			glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, format, width, height, GL_FALSE);
+			glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, internal_format, width, height, GL_FALSE);
 			return;
 		}
 
 		if (!depth_texture)
-			glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+			glTexImage2D(GL_TEXTURE_2D, 0, internal_format, width, height, 0, format, GL_UNSIGNED_BYTE, nullptr);
 		else
-			glTexStorage2D(GL_TEXTURE_2D, 1, format, width, height);
+			glTexStorage2D(GL_TEXTURE_2D, 1, internal_format, width, height);
 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);		// Set MIN/MAG Filter for texture
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);	// Set Wraps for texture
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	}
+
+	int OpenGLFramebuffer::GetPixelFromFBO(uint index, int x, int y)
+	{
+		// Make sure index is correct
+		// TODO: LOOOOOL Assertions not working properly xD
+		//KS_ENGINE_ASSERT(index < m_ColorTextures.size(), "FBO: Index passed out of bounds");
+
+		// Select a buffer for reading (a specific color attachment)
+		glReadBuffer(GL_COLOR_ATTACHMENT0 + index);
+
+		// Now read pixels from FBO (x, y with a 1,1 size because we want to read 1 pixel)
+		int pixel;
+		glReadPixels(x, y, 1, 1, GL_RED_INTEGER, GL_INT, &pixel);
+		return pixel;
 	}
 }

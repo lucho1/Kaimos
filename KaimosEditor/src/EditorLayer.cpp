@@ -26,7 +26,7 @@ namespace Kaimos {
 		m_LogoTexture = Texture2D::Create("assets/textures/ChernoLogo.png");
 
 		FramebufferSettings fboSettings;
-		fboSettings.FBOAttachments = { TEXTURE_FORMAT::RGBA8, TEXTURE_FORMAT::RGBA8, TEXTURE_FORMAT::DEPTH};
+		fboSettings.FBOAttachments = { TEXTURE_FORMAT::RGBA8, TEXTURE_FORMAT::RED_INTEGER, TEXTURE_FORMAT::DEPTH};
 		fboSettings.Width = 1280;
 		fboSettings.Height = 720;
 		m_Framebuffer = Framebuffer::Create(fboSettings);
@@ -113,12 +113,31 @@ namespace Kaimos {
 		RenderCommand::SetClearColor(glm::vec4(0.15f, 0.15f, 0.15f, 1.0f));
 		RenderCommand::Clear();
 
+		// Clear EntityID FBO texture (RED_INTEGER), make it -1 so that we can mouse pick (and the empty areas are -1)
+		m_Framebuffer->ClearFBOTexture(1, -1);
+
 		// -- Scene --
 		//Renderer2D::BeginScene(m_CameraController.GetCamera());
 		//Renderer2D::DrawQuad(glm::vec3(0.0f, 0.0f, -0.1f), glm::vec2(10.0f), m_CheckerTexture, m_BackgroundTiling, glm::vec4(1.0f));
 
 		// --- SCENE UPDATE ---
 		m_CurrentScene->OnUpdateEditor(dt, m_EditorCamera);
+
+		// --- Mouse Picking ---
+		// Get Mouse position with respect to the viewport boundaries
+		ImVec2 mouse_pos = ImGui::GetMousePos();
+		mouse_pos.x -= m_ViewportLimits[0].x;
+		mouse_pos.y -= m_ViewportLimits[0].y;
+		
+		// Get viewport size & invert mouse Y (to make 0,0 be on bottom-left and coincide with 0,0 of FBO texture)
+		glm::vec2 viewport_size = m_ViewportLimits[1] - m_ViewportLimits[0];
+		mouse_pos.y = viewport_size.y - mouse_pos.y;
+
+		if (mouse_pos.x >= 0.0f && mouse_pos.y >= 0.0f && mouse_pos.x < viewport_size.x && mouse_pos.y < viewport_size.y)
+		{
+			int pixel_picked = m_Framebuffer->GetPixelFromFBO(1, mouse_pos.x, mouse_pos.y);
+			KS_ENGINE_TRACE("Pixel Picked: {0}", pixel_picked);
+		}
 
 		/*Renderer2D::DrawQuad(glm::vec2(1.5f, -2.5f), glm::vec2(0.5f, 0.75f), { 0.3f, 0.2f, 0.8f, 1.0f });
 		Renderer2D::DrawQuad(glm::vec2(0.5f, -0.5f), glm::vec2(0.5f, 0.75f), { 0.8f, 0.2f, 0.3f, 1.0f });
@@ -254,10 +273,23 @@ namespace Kaimos {
 		m_ViewportFocused = ImGui::IsWindowFocused();
 		m_ViewportHovered = ImGui::IsWindowHovered();
 		Application::Get().GetImGuiLayer()->SetBlockEvents(!m_ViewportFocused && !m_ViewportHovered);
+		
+		// Get the position where the next window begins (including Tab Bar)
+		ImVec2 viewport_offset = ImGui::GetCursorPos();
 
+		// Get viewport size & draw fbo texture
 		ImVec2 ViewportPanelSize = ImGui::GetContentRegionAvail();
 		m_ViewportSize = glm::vec2(ViewportPanelSize.x, ViewportPanelSize.y);
 		ImGui::Image((ImTextureID)m_Framebuffer->GetFBOTextureID(), ViewportPanelSize, ImVec2(0, 1), ImVec2(1, 0));
+
+		// Get viewport window size, & bounds (position + offset, minbound + size)
+		ImVec2 window_size = ImGui::GetWindowSize();
+		ImVec2 min_bound = { ImGui::GetWindowPos().x + viewport_offset.x, ImGui::GetWindowPos().y + viewport_offset.y };
+		ImVec2 max_bound = { min_bound.x + window_size.x, min_bound.y + window_size.y };
+		
+		// Set viewport limits
+		m_ViewportLimits[0] = glm::vec2(min_bound.x, min_bound.y);
+		m_ViewportLimits[1] = glm::vec2(max_bound.x, max_bound.y);
 
 		// --- Guizmo ---
 		Entity selected_entity = m_ScenePanel.GetSelectedEntity();

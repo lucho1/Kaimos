@@ -59,6 +59,7 @@ namespace Kaimos {
 		// Viewport
 		glm::vec2 m_ViewportSize = glm::vec2(0.0f);
 		bool m_ViewportFocused = false, m_ViewportHovered = false;
+		glm::vec2 m_ViewportLimits[2]; // min-max of where the viewport is (bounds)
 	};
 }
 #endif

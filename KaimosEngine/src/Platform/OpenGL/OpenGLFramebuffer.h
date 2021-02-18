@@ -23,10 +23,12 @@ namespace Kaimos {
 		// TODO: Caíste en la vieja trampa del assert que no funciona :D
 		virtual const uint GetFBOTextureID(uint index = 0) const override { /*KS_ENGINE_ASSERT(index < m_ColorTextures.size(), "Index is outside bounds (FBO)");*/ return m_ColorTextures[index]; }
 
+		virtual int GetPixelFromFBO(uint index, int x, int y) override;
+		virtual void ClearFBOTexture(uint index, int value) override;
+
 	private:
 
-		void SetTexture(bool depth_texture, GLenum format, uint width, uint height, uint samples);
-		void AttachFramebufferTexture(uint texture_id, bool depth_texture, int samples, GLenum format, uint width, uint height, int index);
+		void SetTexture(bool depth_texture, GLenum internal_format, GLenum format, uint width, uint height, uint samples);
 
 	private:
 
