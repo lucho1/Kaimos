@@ -135,8 +135,8 @@ namespace Kaimos {
 
 		if (mouse_pos.x >= 0.0f && mouse_pos.y >= 0.0f && mouse_pos.x < viewport_size.x && mouse_pos.y < viewport_size.y)
 		{
-			int pixel_picked = m_Framebuffer->GetPixelFromFBO(1, mouse_pos.x, mouse_pos.y);
-			KS_ENGINE_TRACE("Pixel Picked: {0}", pixel_picked);
+			int pixel_read = m_Framebuffer->GetPixelFromFBO(1, mouse_pos.x, mouse_pos.y);
+			m_HoveredEntity = pixel_read == -1 ? Entity() : Entity((entt::entity)pixel_read, m_CurrentScene.get());
 		}
 
 		/*Renderer2D::DrawQuad(glm::vec2(1.5f, -2.5f), glm::vec2(0.5f, 0.75f), { 0.3f, 0.2f, 0.8f, 1.0f });
@@ -240,6 +240,12 @@ namespace Kaimos {
 		// Little test for Entities (this case: square entity color)
 		ImGui::Separator();
 		ImGui::Begin("Settings");
+
+		std::string hovered_entity = "None";
+		if (m_HoveredEntity)
+			hovered_entity = m_HoveredEntity.GetComponent<TagComponent>().Tag;
+
+		ImGui::Text("Hovered Entity: %s", hovered_entity.c_str());
 
 		//ImGui::ColorEdit4("Squares Color", glm::value_ptr(m_Color));
 		ImGui::SliderFloat("Background Tiling", &m_BackgroundTiling, 1.0f, 100.0f, "%.2f");

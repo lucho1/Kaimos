@@ -7,6 +7,8 @@
 
 #include "Resources/Texture.h"
 
+#include "Scene/Components.h"
+
 #include <glm/gtc/matrix_transform.hpp>
 
 namespace Kaimos {
@@ -30,7 +32,9 @@ namespace Kaimos {
 		static void Flush();
 		
 		// --- Base Drawing Methods ---
-		static void DrawQuad(const glm::mat4& transform, const glm::vec4& color);
+		static void DrawSprite(const glm::mat4& transform, const SpriteRendererComponent& sprite, int entity_id);
+
+		static void DrawQuad(const glm::mat4& transform, const glm::vec4& color, int entity_id = -1);
 		static void DrawQuad(const glm::mat4& transform, const Ref<Texture2D> texture, float tiling = 1.0f, const glm::vec4& tintColor = glm::vec4(1.0f));
 
 		// --- Non-Rotated Quads Drawing Methods (calling Base Drawing Methods) ---
@@ -49,7 +53,7 @@ namespace Kaimos {
 	private:
 
 		// --- Rendering Methods ---
-		static void SetupVertexArray(const glm::mat4& transform, const glm::vec4& color, float texture_index = 0.0f, float texture_tiling = 1.0f);
+		static void SetupVertexArray(const glm::mat4& transform, const glm::vec4& color, int entity_id, float texture_index = 0.0f, float texture_tiling = 1.0f);
 		static void StartBatch();
 		static void NextBatch();
 

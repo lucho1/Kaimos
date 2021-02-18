@@ -139,32 +139,54 @@ namespace Kaimos {
 		const auto& layout = Vbuffer->GetLayout();
 		for (const auto& element : layout)
 		{
-			if (element.Type == ShaderDataType::Mat3 || element.Type == ShaderDataType::Mat4)
+			switch (element.Type)
 			{
-				uint8_t count = element.GetElementTypeCount();
-				for (uint8_t i = 0; i < count; ++i)
+				case ShaderDataType::Float:
+				case ShaderDataType::Float2:
+				case ShaderDataType::Float3:
+				case ShaderDataType::Float4:
 				{
 					glEnableVertexAttribArray(m_VBufferIndex);
-					
-					glVertexAttribPointer(m_VBufferIndex, count,
+					glVertexAttribPointer(m_VBufferIndex, element.GetElementTypeCount(),
 						ShaderDataTypeToOpenGLType(element.Type),
 						element.Normalized ? GL_TRUE : GL_FALSE,
-						layout.GetStride(), (const void*)(element.Offset + sizeof(float) * count * i));
-					
-					glVertexAttribDivisor(m_VBufferIndex, 1);
+						layout.GetStride(), (const void*)element.Offset);
+
 					++m_VBufferIndex;
+					break;
 				}
-			}
-			else
-			{
-				glEnableVertexAttribArray(m_VBufferIndex);
+				case ShaderDataType::Int:
+				case ShaderDataType::Int2:
+				case ShaderDataType::Int3:
+				case ShaderDataType::Int4:
+				case ShaderDataType::Bool:
+				{
+					glEnableVertexAttribArray(m_VBufferIndex);
+					glVertexAttribIPointer(m_VBufferIndex, element.GetElementTypeCount(),
+						ShaderDataTypeToOpenGLType(element.Type),
+						layout.GetStride(), (const void*)element.Offset);
 
-				glVertexAttribPointer(m_VBufferIndex, element.GetElementTypeCount(),
-					ShaderDataTypeToOpenGLType(element.Type),
-					element.Normalized ? GL_TRUE : GL_FALSE,
-					layout.GetStride(), (const void*)element.Offset);
+					++m_VBufferIndex;
+					break;
+				}
+				case ShaderDataType::Mat3:
+				case ShaderDataType::Mat4:
+				{
+					uint8_t count = element.GetElementTypeCount();
+					for (uint8_t i = 0; i < count; ++i)
+					{
+						glEnableVertexAttribArray(m_VBufferIndex);
+						glVertexAttribPointer(m_VBufferIndex, count,
+							ShaderDataTypeToOpenGLType(element.Type),
+							element.Normalized ? GL_TRUE : GL_FALSE,
+							layout.GetStride(), (const void*)(element.Offset + sizeof(float) * count * i));
 
-				++m_VBufferIndex;
+						glVertexAttribDivisor(m_VBufferIndex, 1);
+						++m_VBufferIndex;
+					}
+
+					break;
+				}
 			}
 		}
 

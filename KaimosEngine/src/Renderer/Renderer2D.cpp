@@ -15,6 +15,9 @@ namespace Kaimos {
 		glm::vec4 Color;
 		float TexIndex;
 		float TilingFactor;
+
+		// -- Editor Variables --
+		int EntityID;
 	};
 
 	struct Renderer2DData
@@ -118,7 +121,8 @@ namespace Kaimos {
 			{ ShaderDataType::Float2, "a_TexCoord" },
 			{ ShaderDataType::Float4, "a_Color" },
 			{ ShaderDataType::Float , "a_TexIndex" },
-			{ ShaderDataType::Float , "a_TilingFactor" }
+			{ ShaderDataType::Float , "a_TilingFactor" },
+			{ ShaderDataType::Int ,	  "a_EntityID" }
 		};
 
 		//m_VBuffer->SetLayout(layout);
@@ -238,7 +242,7 @@ namespace Kaimos {
 		++s_Data->RendererStats.DrawCalls;
 	}
 
-	void Renderer2D::SetupVertexArray(const glm::mat4& transform, const glm::vec4& color, float texture_index, float texture_tiling)
+	void Renderer2D::SetupVertexArray(const glm::mat4& transform, const glm::vec4& color, int entity_id, float texture_index, float texture_tiling)
 	{
 		constexpr size_t quadVertexCount = 4;
 		constexpr glm::vec2 texCoords[] = { {0.0f, 0.0f}, {1.0f, 0.0f}, {1.0f, 1.0f}, {0.0f, 1.0f} };
@@ -250,6 +254,7 @@ namespace Kaimos {
 			s_Data->QuadVBufferPtr->Color = color;
 			s_Data->QuadVBufferPtr->TexIndex = texture_index;
 			s_Data->QuadVBufferPtr->TilingFactor = texture_tiling;
+			s_Data->QuadVBufferPtr->EntityID = entity_id;
 			++s_Data->QuadVBufferPtr;
 		}
 
@@ -260,7 +265,12 @@ namespace Kaimos {
 
 
 	// --- Drawing Methods ---
-	void Renderer2D::DrawQuad(const glm::mat4& transform, const glm::vec4& color)
+	void Renderer2D::DrawSprite(const glm::mat4& transform, const SpriteRendererComponent& sprite, int entity_id)
+	{
+		DrawQuad(transform, sprite.Color, entity_id);
+	}
+
+	void Renderer2D::DrawQuad(const glm::mat4& transform, const glm::vec4& color, int entity_id)
 	{
 		KS_PROFILE_FUNCTION();
 
@@ -268,7 +278,7 @@ namespace Kaimos {
 			NextBatch();
 
 		// Vertex Buffer setup
-		SetupVertexArray(transform, color);
+		SetupVertexArray(transform, color, entity_id);
 	}
 
 
@@ -301,7 +311,7 @@ namespace Kaimos {
 		}
 
 		// Vertex Buffer setup
-		SetupVertexArray(transform, tintColor, (float)textureIndex, tiling);
+		SetupVertexArray(transform, tintColor, -1, (float)textureIndex, tiling);
 	}
 
 

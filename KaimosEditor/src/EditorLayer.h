@@ -44,6 +44,7 @@ namespace Kaimos {
 
 		// Guizmo
 		int m_OperationGizmo = -1;
+		Entity m_HoveredEntity;
 
 		// Rendering
 		OrtographicCameraController m_CameraController;
