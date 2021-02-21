@@ -77,9 +77,10 @@ namespace Kaimos {
 			//auto [x, y] = Input::GetMousePos();
 			//KS_ENGINE_TRACE(" {0}, {1}", x, y);
 
-			// -- Window Update --
+			// -- Window & Input Update --
 			{
-				KS_PROFILE_SCOPE("Window Update");
+				KS_PROFILE_SCOPE("Window & Input Update");
+				Input::OnUpdate();
 				m_Window->OnUpdate();
 			}
 		}
