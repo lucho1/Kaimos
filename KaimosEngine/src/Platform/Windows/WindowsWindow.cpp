@@ -133,6 +133,7 @@ namespace Kaimos {
 		glfwSetKeyCallback(m_Window, [](GLFWwindow* window, int key, int scancode, int action, int mods)
 			{
 				WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
+				key = (int)Input::GetCrossKeyboardKey((KEY_CODE)key);
 
 				switch (action)
 				{

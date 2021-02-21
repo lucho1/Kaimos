@@ -16,6 +16,8 @@ namespace Kaimos {
 		static glm::vec2 GetMousePos();
 		static float GetMouseX();
 		static float GetMouseY();
+		
+		static KEY_CODE GetCrossKeyboardKey(KEY_CODE key);
 	};
 }
 
