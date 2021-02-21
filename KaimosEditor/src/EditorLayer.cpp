@@ -281,21 +281,18 @@ namespace Kaimos {
 		Application::Get().GetImGuiLayer()->SetBlockEvents(!m_ViewportFocused && !m_ViewportHovered);
 		
 		// Get the position where the next window begins (including Tab Bar)
-		ImVec2 viewport_offset = ImGui::GetCursorPos();
+		ImVec2 viewport_offset = ImGui::GetWindowPos();
+		ImVec2 max_region = ImGui::GetWindowContentRegionMax();
+		ImVec2 min_region = ImGui::GetWindowContentRegionMin();
+		
+		// Set viewport limits
+		m_ViewportLimits[0] = glm::vec2(min_region.x + viewport_offset.x, min_region.y + viewport_offset.y);
+		m_ViewportLimits[1] = glm::vec2(max_region.x + viewport_offset.x, max_region.y + viewport_offset.y);
 
 		// Get viewport size & draw fbo texture
 		ImVec2 ViewportPanelSize = ImGui::GetContentRegionAvail();
 		m_ViewportSize = glm::vec2(ViewportPanelSize.x, ViewportPanelSize.y);
-		ImGui::Image((ImTextureID)m_Framebuffer->GetFBOTextureID(), ViewportPanelSize, ImVec2(0, 1), ImVec2(1, 0));
-
-		// Get viewport window size, & bounds (position + offset, minbound + size)
-		ImVec2 window_size = ImGui::GetWindowSize();
-		ImVec2 min_bound = { ImGui::GetWindowPos().x + viewport_offset.x, ImGui::GetWindowPos().y + viewport_offset.y };
-		ImVec2 max_bound = { min_bound.x + window_size.x, min_bound.y + window_size.y };
-		
-		// Set viewport limits
-		m_ViewportLimits[0] = glm::vec2(min_bound.x, min_bound.y);
-		m_ViewportLimits[1] = glm::vec2(max_bound.x, max_bound.y);
+		ImGui::Image(reinterpret_cast<void*>(m_Framebuffer->GetFBOTextureID()), ViewportPanelSize, ImVec2(0, 1), ImVec2(1, 0));		
 
 		// --- Guizmo ---
 		Entity selected_entity = m_ScenePanel.GetSelectedEntity();
@@ -303,7 +300,7 @@ namespace Kaimos {
 		{
 			ImGuizmo::SetOrthographic(false);
 			ImGuizmo::SetDrawlist();
-			ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, ImGui::GetWindowWidth(), ImGui::GetWindowHeight());
+			ImGuizmo::SetRect(m_ViewportLimits[0].x, m_ViewportLimits[0].y, m_ViewportLimits[1].x - m_ViewportLimits[0].x, m_ViewportLimits[1].y - m_ViewportLimits[0].y);
 
 			// Camera
 			//Entity camera = m_CurrentScene->GetPrimaryCamera();			
