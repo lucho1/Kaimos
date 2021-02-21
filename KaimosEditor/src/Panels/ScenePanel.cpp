@@ -41,7 +41,19 @@ namespace Kaimos {
 		if (ImGui::BeginPopupContextWindow(0, 1, false))
 		{
 			if(ImGui::MenuItem("Create Empty Entity"))
-				m_Context->CreateEntity("Empty Entity");
+				m_SelectedEntity = m_Context->CreateEntity("Empty Entity");
+
+			if (ImGui::MenuItem("Create Camera"))
+			{
+				m_SelectedEntity = m_Context->CreateEntity("Camera");
+				m_SelectedEntity.AddComponent<CameraComponent>();
+			}
+
+			if (ImGui::MenuItem("Create 2D Sprite"))
+			{
+				m_SelectedEntity = m_Context->CreateEntity("Sprite");
+				m_SelectedEntity.AddComponent<SpriteRendererComponent>();
+			}
 
 			ImGui::EndPopup();
 		}
@@ -57,7 +69,8 @@ namespace Kaimos {
 
 	void ScenePanel::DrawEntityNode(Entity entity)
 	{
-		std::string& tag = entity.GetComponent<TagComponent>().Tag;		
+		TagComponent& tag_comp = entity.GetComponent<TagComponent>();
+		std::string& tag = tag_comp.Tag;
 
 		ImGuiTreeNodeFlags flags = ((m_SelectedEntity == entity) ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_SpanAvailWidth;
 		bool opened = ImGui::TreeNodeEx((void*)(uint)entity, flags, tag.c_str());
@@ -68,10 +81,31 @@ namespace Kaimos {
 		bool entityDeleted = false;
 		if (ImGui::BeginPopupContextItem())
 		{
+			if (ImGui::MenuItem("Rename"))
+				tag_comp.Rename = true;
+
 			if (ImGui::MenuItem("Delete Entity"))
 				entityDeleted = true;
 
 			ImGui::EndPopup();
+		}
+
+		if (tag_comp.Rename)
+		{
+			char buffer[256];
+			memset(buffer, 0, sizeof(buffer));							// Set it all to 0
+			std::strncpy(buffer, tag_comp.Tag.c_str(), sizeof(buffer));	// Copy tag to buffer
+
+			if (ImGui::InputText("##Tag", buffer, sizeof(buffer)))
+				tag = std::string(buffer);
+			
+			// Auto focus Input Text
+			if (ImGui::IsItemHovered() || (ImGui::IsAnyWindowFocused() && !ImGui::IsAnyItemActive() && !ImGui::IsMouseClicked(0)))
+				ImGui::SetKeyboardFocusHere(-1);
+
+			// Close Input Text
+			if ((ImGui::IsMouseClicked(0) && ImGui::IsAnyWindowHovered()) || ImGui::IsKeyDown(KEY::ENTER) || ImGui::IsKeyDown(KEY::ESCAPE))
+				tag_comp.Rename = false;
 		}
 
 		if (opened)
@@ -174,7 +208,6 @@ namespace Kaimos {
 		{
 			ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_FramePadding
 										| ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_SpanAvailWidth;
-
 
 			static char popup_id[64];
 			sprintf_s(popup_id, 64, "ComponentSettings_%s", typeid(T).name());

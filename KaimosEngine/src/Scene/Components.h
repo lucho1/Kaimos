@@ -14,6 +14,7 @@ namespace Kaimos {
 	struct TagComponent
 	{
 		std::string Tag;
+		bool Rename = false;
 
 		TagComponent() = default;
 		TagComponent(const TagComponent&) = default;
