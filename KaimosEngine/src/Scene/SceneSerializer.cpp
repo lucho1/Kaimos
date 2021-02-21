@@ -188,9 +188,19 @@ namespace Kaimos {
 
 	bool SceneSerializer::Deserialize(const std::string& filepath)
 	{
-		YAML::Node data = YAML::LoadFile(filepath);
-		if (!data["KaimosScene"])
+		YAML::Node data;
+		try { data = YAML::LoadFile(filepath); }
+		catch (const YAML::ParserException& exception)
+		{
+			KS_ENGINE_ERROR("Error Loading '{0}' scene file\nError: {1}", filepath.c_str(), exception.what());
 			return false;
+		}
+
+		if (!data["KaimosScene"])
+		{
+			KS_ENGINE_ERROR("Error Loading '{0}' scene file\nError: Wrong File, it has no 'KaimosScene' node", filepath.c_str());
+			return false;
+		}
 
 		std::string scene_name = data["KaimosScene"].as<std::string>();
 		KS_ENGINE_TRACE("Deserializing scene '{0}'", scene_name);
