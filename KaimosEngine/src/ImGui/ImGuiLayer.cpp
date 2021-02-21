@@ -74,8 +74,8 @@ namespace Kaimos {
 
 			// a |= b is the same than a = a | b
 			// a = a | b --> a is true if at least a or b is true, else is false
-			bool handled = e.IsHandled() | e.IsInCategory(EVENT_CATEGORY_MOUSE) & imgui_io.WantCaptureMouse;
-			handled = e.IsHandled() | e.IsInCategory(EVENT_CATEGORY_KEYBOARD) & imgui_io.WantCaptureKeyboard;
+			bool handled = e.IsHandled() | e.IsInCategory(EVENT_CATEGORY::MOUSE) & imgui_io.WantCaptureMouse;
+			handled |= e.IsInCategory(EVENT_CATEGORY::KEYBOARD) & imgui_io.WantCaptureKeyboard;
 
 			e.SetHandled(handled);
 		}

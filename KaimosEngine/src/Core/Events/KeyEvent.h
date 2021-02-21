@@ -11,7 +11,7 @@ namespace Kaimos {
 	public:
 
 		inline KEY_CODE GetKeyCode() const { return m_KeyCode; }
-		EVENT_CLASS_CATEGORY(EVENT_CATEGORY_KEYBOARD | EVENT_CATEGORY_INPUT)
+		EVENT_CLASS_CATEGORY(EVENT_CATEGORY::KEYBOARD | EVENT_CATEGORY::INPUT)
 
 	protected:
 

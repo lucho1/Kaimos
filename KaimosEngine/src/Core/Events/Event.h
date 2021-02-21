@@ -8,7 +8,6 @@ namespace Kaimos {
 
 	// Events are following the Blocking Strategy: when an event occurs, it gets dispatched and dealt inmediately
 	// A better way it could be to buffer events and process them during an "Event" part/step of the Update stage
-
 	enum class EVENT_TYPE
 	{
 		NONE = 0,
@@ -18,21 +17,30 @@ namespace Kaimos {
 		MOUSE_BUTTON_PRESSED, MOUSE_BUTTON_RELEASED, MOUSE_DISPLACED, MOUSE_SCROLLED
 	};
 
-	enum EVENT_CATEGORY
+	enum class EVENT_CATEGORY
 	{
 		NONE = 0,
-		EVENT_CATEGORY_APPLICATION		= BIT(0),
-		EVENT_CATEGORY_INPUT			= BIT(1),
-		EVENT_CATEGORY_KEYBOARD			= BIT(2),
-		EVENT_CATEGORY_MOUSE			= BIT(3),
-		EVENT_CATEGORY_MOUSE_BUTTON		= BIT(4)
+		APPLICATION		= BIT(0),
+		INPUT			= BIT(1),
+		KEYBOARD		= BIT(2),
+		MOUSE			= BIT(3),
+		MOUSE_BUTTON	= BIT(4)
 	};
+
+	EVENT_CATEGORY operator ~(EVENT_CATEGORY right_ev);
+	EVENT_CATEGORY operator |(EVENT_CATEGORY left_ev, EVENT_CATEGORY right_ev);
+	EVENT_CATEGORY operator &(EVENT_CATEGORY left_ev, EVENT_CATEGORY right_ev);
+	EVENT_CATEGORY operator ^(EVENT_CATEGORY left_ev, EVENT_CATEGORY right_ev);
+	EVENT_CATEGORY& operator |=(EVENT_CATEGORY& left_ev, EVENT_CATEGORY right_ev);
+	EVENT_CATEGORY& operator &=(EVENT_CATEGORY& left_ev, EVENT_CATEGORY right_ev);
+	EVENT_CATEGORY& operator ^=(EVENT_CATEGORY& left_ev, EVENT_CATEGORY right_ev);
+
 
 #define EVENT_CLASS_TYPE(type)	static EVENT_TYPE GetStaticType() { return EVENT_TYPE::type; }\
 								virtual EVENT_TYPE GetEventType() const override { return GetStaticType(); }\
 								virtual const char* GetName() const override { return #type; }
 
-#define EVENT_CLASS_CATEGORY(category) virtual int GetCategoryFlags() const override { return category; }
+#define EVENT_CLASS_CATEGORY(category) virtual EVENT_CATEGORY GetCategoryFlags() const override { return (category); }
 
 	class Event
 	{
@@ -43,10 +51,10 @@ namespace Kaimos {
 
 		virtual EVENT_TYPE GetEventType() const = 0;
 		virtual const char* GetName() const = 0;
-		virtual int GetCategoryFlags() const = 0;
+		virtual EVENT_CATEGORY GetCategoryFlags() const = 0;
 		virtual std::string ToString() const { return GetName(); }
 
-		bool IsInCategory(EVENT_CATEGORY category) { return GetCategoryFlags() & category; }
+		bool IsInCategory(EVENT_CATEGORY category) { return static_cast<bool>(GetCategoryFlags() & category); }
 
 		inline bool IsHandled() const { return m_Handled; }
 		inline void SetHandled(bool handled) { m_Handled = handled; }
