@@ -175,8 +175,12 @@ namespace Kaimos {
 			ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_FramePadding
 										| ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_SpanAvailWidth;
 
-			float content_region = ImGui::GetContentRegionAvail().x;
 
+			static char popup_id[64];
+			sprintf_s(popup_id, 64, "ComponentSettings_%s", typeid(T).name());
+			ImGui::PushID(popup_id);
+
+			float content_region = ImGui::GetContentRegionAvail().x;
 			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 4, 4 });
 			float line_height = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
 			ImGui::NewLine();
@@ -197,6 +201,7 @@ namespace Kaimos {
 				ImGui::EndPopup();
 			}
 
+			ImGui::PopID();
 			if (open)
 			{
 				function(entity.GetComponent<T>());
