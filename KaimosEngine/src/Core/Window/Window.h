@@ -40,6 +40,10 @@ namespace Kaimos {
 
 		// This function is implemented per-platform too (Windows window, Mac window...), each platform creates its own windows
 		static ScopePtr<Window> Create(const WindowProps& props = WindowProps());
+
+	public:
+
+		static float s_ScreenDPIScaleFactor;
 	};
 
 	// It's basically an interface, everything is pure virtual,

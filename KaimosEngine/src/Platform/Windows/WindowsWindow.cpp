@@ -13,6 +13,7 @@
 
 namespace Kaimos {
 
+	float Window::s_ScreenDPIScaleFactor = 1.0f;
 	static uint8_t s_WindowCount = 0;
 
 	static void GLFWErrorCallback(int error, const char* desc)
@@ -53,6 +54,15 @@ namespace Kaimos {
 		// -- Window Creation --
 		{
 			KS_PROFILE_SCOPE("GLFW Create Window");
+
+			//GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+			float x, y;
+			glfwGetMonitorContentScale(glfwGetPrimaryMonitor(), &x, &y);
+			if (x > 1.0f || y > 1.0f)
+			{
+				s_ScreenDPIScaleFactor = y;
+				glfwWindowHint(GLFW_SCALE_TO_MONITOR, GLFW_TRUE);
+			}
 
 			#ifdef KS_DEBUG
 				if (Renderer::GetRendererAPI() == RendererAPI::API::OPENGL)

@@ -135,18 +135,18 @@ namespace Kaimos {
 		
 		// --- Fonts Load ---
 		// Default Font + Secondary one
-		io.FontDefault = io.Fonts->AddFontFromFileTTF("../KaimosEngine/res/fonts/Ruda/Ruda-SemiBold.ttf", 13.0f); // You can also try "Opensans/OpenSans-SemiBold.ttf" (in 14.0f)
-		io.Fonts->AddFontFromFileTTF("../KaimosEngine/res/fonts/Ruda/Ruda-Black.ttf", 13.0f);
+		io.FontDefault = io.Fonts->AddFontFromFileTTF("../KaimosEngine/res/fonts/Ruda/Ruda-SemiBold.ttf", Window::s_ScreenDPIScaleFactor * 13.0f); // You can also try "Opensans/OpenSans-SemiBold.ttf" (in 14.0f)
+		io.Fonts->AddFontFromFileTTF("../KaimosEngine/res/fonts/Ruda/Ruda-Black.ttf", Window::s_ScreenDPIScaleFactor * 13.0f);
 		
 		// Load different fonts in different positions so ImGui can handle fonts variations
 		std::string font_path = "../KaimosEngine/res/fonts/Ruda/Ruda-VariableFont_wght.ttf";
-		io.Fonts->AddFontFromFileTTF(font_path.c_str(), 10.0f);
-		io.Fonts->AddFontFromFileTTF(font_path.c_str(), 12.0f);
-		io.Fonts->AddFontFromFileTTF(font_path.c_str(), 16.0f);
-		io.Fonts->AddFontFromFileTTF(font_path.c_str(), 18.0f);
-		io.Fonts->AddFontFromFileTTF(font_path.c_str(), 20.0f);
-		io.Fonts->AddFontFromFileTTF(font_path.c_str(), 22.0f);
-		io.Fonts->AddFontFromFileTTF(font_path.c_str(), 24.0f);
+		io.Fonts->AddFontFromFileTTF(font_path.c_str(), Window::s_ScreenDPIScaleFactor * 10.0f);
+		io.Fonts->AddFontFromFileTTF(font_path.c_str(), Window::s_ScreenDPIScaleFactor * 12.0f);
+		io.Fonts->AddFontFromFileTTF(font_path.c_str(), Window::s_ScreenDPIScaleFactor * 16.0f);
+		io.Fonts->AddFontFromFileTTF(font_path.c_str(), Window::s_ScreenDPIScaleFactor * 18.0f);
+		io.Fonts->AddFontFromFileTTF(font_path.c_str(), Window::s_ScreenDPIScaleFactor * 20.0f);
+		io.Fonts->AddFontFromFileTTF(font_path.c_str(), Window::s_ScreenDPIScaleFactor * 22.0f);
+		io.Fonts->AddFontFromFileTTF(font_path.c_str(), Window::s_ScreenDPIScaleFactor * 24.0f);
 		// --- ---
 
 		// --- UI Style Settings ---
@@ -168,7 +168,9 @@ namespace Kaimos {
 		style->PopupRounding = 2.0f;
 		style->TabBorderSize = 1.0f;
 
+		style->ScaleAllSizes(Window::s_ScreenDPIScaleFactor);
 
+		// --- UI Style Colors ---
 		colors[ImGuiCol_Text] = ImVec4(0.80f, 0.80f, 0.83f, 1.00f);
 		colors[ImGuiCol_TextDisabled] = ImVec4(0.24f, 0.23f, 0.29f, 1.00f);
 		colors[ImGuiCol_WindowBg] = ImVec4(0.06f, 0.05f, 0.07f, 1.00f);
