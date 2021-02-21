@@ -1,6 +1,7 @@
 #ifndef _LOG_H_
 #define _LOG_H_
 
+#include <glm/gtx/string_cast.hpp>
 #include "Core/Core.h"
 
 #pragma warning(push, 0)		// To ignore warnings related to external files or headers
@@ -25,6 +26,26 @@ namespace Kaimos {
 	};
 }
 
+template<typename Ostream, glm::length_t Length, typename T, glm::qualifier Q>
+inline Ostream& operator<<(Ostream& ostream, const glm::vec<Length, T, Q>& vector)
+{
+	return ostream << glm::to_string(vector);
+}
+
+template<typename Ostream, glm::length_t Columns, glm::length_t Rows, typename T, glm::qualifier Q>
+inline Ostream& operator<<(Ostream& ostream, const glm::mat<Columns, Rows, T, Q>& mat)
+{
+	return ostream << glm::to_string(mat);
+}
+
+template<typename Ostream, typename T, glm::qualifier Q>
+inline Ostream& operator<<(Ostream& ostream, const glm::qua<T, Q>& quat)
+{
+	return ostream << glm::to_string(quat);
+}
+
+
+
 // Engine/Core Logging Macros
 #define KS_ENGINE_TRACE(...)	::Kaimos::Log::GetEngineLogger()->trace(__VA_ARGS__)
 #define KS_ENGINE_INFO(...)		::Kaimos::Log::GetEngineLogger()->info(__VA_ARGS__)
@@ -39,4 +60,4 @@ namespace Kaimos {
 #define KS_EDITOR_ERROR(...)	::Kaimos::Log::GetEditorLogger()->error(__VA_ARGS__)
 #define KS_EDITOR_CRITICAL(...)	::Kaimos::Log::GetEditorLogger()->critical(__VA_ARGS__)
 
-#endif
+#endif //_LOG_H_
