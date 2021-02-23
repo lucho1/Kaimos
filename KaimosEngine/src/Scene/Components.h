@@ -53,12 +53,12 @@ namespace Kaimos {
 		Ref<Texture2D> SpriteTexture = nullptr;
 		std::string TextureFilepath = "";
 		float TextureTiling = 1.0f;
+		glm::vec2 TextureUVOffset = glm::vec2(0.0f);
 
 		void RemoveTexture()
 		{
 			SpriteTexture = nullptr;
 			TextureFilepath.clear();
-			TextureTiling = 1.0f;
 		}
 
 		void SetTexture(const std::string& filepath)

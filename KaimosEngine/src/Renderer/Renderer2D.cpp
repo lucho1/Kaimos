@@ -15,6 +15,7 @@ namespace Kaimos {
 		glm::vec4 Color;
 		float TexIndex;
 		float TilingFactor;
+		glm::vec2 UVOffsetFactor;
 
 		// -- Editor Variables --
 		int EntityID;
@@ -122,6 +123,7 @@ namespace Kaimos {
 			{ ShaderDataType::Float4, "a_Color" },
 			{ ShaderDataType::Float , "a_TexIndex" },
 			{ ShaderDataType::Float , "a_TilingFactor" },
+			{ ShaderDataType::Float2, "a_UVOffsetFactor" },
 			{ ShaderDataType::Int ,	  "a_EntityID" }
 		};
 
@@ -242,7 +244,7 @@ namespace Kaimos {
 		++s_Data->RendererStats.DrawCalls;
 	}
 
-	void Renderer2D::SetupVertexArray(const glm::mat4& transform, const glm::vec4& color, int entity_id, float texture_index, float texture_tiling)
+	void Renderer2D::SetupVertexArray(const glm::mat4& transform, const glm::vec4& color, int entity_id, float texture_index, float texture_tiling, glm::vec2 texture_uvoffset)
 	{
 		constexpr size_t quadVertexCount = 4;
 		constexpr glm::vec2 texCoords[] = { {0.0f, 0.0f}, {1.0f, 0.0f}, {1.0f, 1.0f}, {0.0f, 1.0f} };
@@ -254,6 +256,7 @@ namespace Kaimos {
 			s_Data->QuadVBufferPtr->Color = color;
 			s_Data->QuadVBufferPtr->TexIndex = texture_index;
 			s_Data->QuadVBufferPtr->TilingFactor = texture_tiling;
+			s_Data->QuadVBufferPtr->UVOffsetFactor = texture_uvoffset;
 			s_Data->QuadVBufferPtr->EntityID = entity_id;
 			++s_Data->QuadVBufferPtr;
 		}
@@ -268,7 +271,7 @@ namespace Kaimos {
 	void Renderer2D::DrawSprite(const glm::mat4& transform, const SpriteRendererComponent& sprite, int entity_id)
 	{
 		if (sprite.SpriteTexture)
-			DrawQuad(transform, sprite.SpriteTexture, entity_id, sprite.TextureTiling, sprite.Color);
+			DrawQuad(transform, sprite.SpriteTexture, entity_id, sprite.Color, sprite.TextureTiling, sprite.TextureUVOffset);
 		else
 			DrawQuad(transform, sprite.Color, entity_id);
 	}
@@ -285,7 +288,7 @@ namespace Kaimos {
 	}
 
 
-	void Renderer2D::DrawQuad(const glm::mat4& transform, const Ref<Texture2D> texture, int entity_id, float tiling, const glm::vec4& tintColor)
+	void Renderer2D::DrawQuad(const glm::mat4& transform, const Ref<Texture2D> texture, int entity_id, const glm::vec4& tintColor, float tiling, glm::vec2 texture_uvoffset)
 	{
 		KS_PROFILE_FUNCTION();
 
@@ -317,7 +320,7 @@ namespace Kaimos {
 		}
 
 		// Vertex Buffer setup
-		SetupVertexArray(transform, tintColor, entity_id, (float)textureIndex, tiling);
+		SetupVertexArray(transform, tintColor, entity_id, (float)textureIndex, tiling, texture_uvoffset);
 	}
 
 
@@ -340,7 +343,7 @@ namespace Kaimos {
 
 	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2 size, const Ref<Texture2D> texture, float tiling, const glm::vec4& tintColor)
 	{
-		DrawQuad(glm::translate(glm::mat4(1.0f), position) * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f }), texture, -1, tiling, tintColor);
+		DrawQuad(glm::translate(glm::mat4(1.0f), position) * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f }), texture, -1, tintColor, tiling);
 	}
 
 	// Rotated-Quad Methods (the same than previous, but rotated)
@@ -369,6 +372,6 @@ namespace Kaimos {
 							* glm::rotate(glm::mat4(1.0f), glm::radians(rotation), glm::vec3(0, 0, 1))
 							* glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
 
-		DrawQuad(transform, texture, -1, tiling, tintColor);
+		DrawQuad(transform, texture, -1, tintColor, tiling);
 	}
 }

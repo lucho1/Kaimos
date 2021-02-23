@@ -10,6 +10,29 @@
 namespace YAML {
 
 	template<>
+	struct convert<glm::vec2>
+	{
+		static Node encode(const glm::vec2& vec)
+		{
+			Node node;
+			node.push_back(vec.x);
+			node.push_back(vec.y);
+			node.SetStyle(EmitterStyle::Flow);
+			return node;
+		}
+
+		static bool decode(const Node& node, glm::vec2& vec)
+		{
+			if (!node.IsSequence() || node.size() != 2)
+				return false;
+
+			vec.x = node[0].as<float>();
+			vec.y = node[1].as<float>();
+			return true;
+		}
+	};
+
+	template<>
 	struct convert<glm::vec3>
 	{
 		static Node encode(const glm::vec3& vec)
@@ -64,6 +87,13 @@ namespace YAML {
 
 
 namespace Kaimos {
+
+	YAML::Emitter& operator<<(YAML::Emitter& output, const glm::vec2& vec)
+	{
+		output << YAML::Flow;
+		output << YAML::BeginSeq << vec.x << vec.y << YAML::EndSeq;
+		return output;
+	}
 
 	YAML::Emitter& operator<<(YAML::Emitter& output, const glm::vec3& vec)
 	{
@@ -152,6 +182,7 @@ namespace Kaimos {
 			output << YAML::Key << "Color" << YAML::Value << sprite_comp.Color;
 			output << YAML::Key << "TextureFile" << YAML::Value << sprite_comp.TextureFilepath;
 			output << YAML::Key << "TextureTiling" << YAML::Value << sprite_comp.TextureTiling;
+			output << YAML::Key << "TextureUVOffset" << YAML::Value << sprite_comp.TextureUVOffset;
 			output << YAML::EndMap;
 		}
 		
@@ -256,13 +287,17 @@ namespace Kaimos {
 					SpriteRendererComponent& sprite_comp = deserialized_entity.AddComponent<SpriteRendererComponent>();
 					sprite_comp.Color = sprite_node["Color"].as<glm::vec4>();
 
+					auto file_node = sprite_node["TextureFile"];
+					if (file_node && !file_node.as<std::string>().empty())
+						sprite_comp.SetTexture(file_node.as<std::string>());
+
 					auto tile_node = sprite_node["TextureTiling"];
 					if (tile_node)
 						sprite_comp.TextureTiling = tile_node.as<float>();
 
-					auto file_node = sprite_node["TextureFile"];
-					if (file_node && !file_node.as<std::string>().empty())
-						sprite_comp.SetTexture(file_node.as<std::string>());
+					auto offset_node = sprite_node["TextureUVOffset"];
+					if (offset_node)
+						sprite_comp.TextureUVOffset = offset_node.as<glm::vec2>();
 				}
 			}
 		}

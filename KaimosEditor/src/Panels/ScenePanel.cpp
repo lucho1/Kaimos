@@ -412,6 +412,14 @@ namespace Kaimos {
 				ImGui::SameLine(ImGui::GetContentRegionAvail().x * 0.5f - 1.0f);
 				ImGui::SetNextItemWidth(100.0f);
 				ImGui::DragFloat("##tiling_dragfloat", &component.TextureTiling, 0.1f, 0.0f, 0.0f, "%.2f");
+
+				ImGui::Text("UV Offset");
+				ImGui::SameLine(ImGui::GetContentRegionAvail().x * 0.5f - 1.0f);
+				ImGui::SetNextItemWidth(100.0f);
+				ImGui::DragFloat("##offsetx_dragfloat", &component.TextureUVOffset.x, 0.1f, 0.0f, 0.0f, "%.2f");
+				ImGui::SameLine();
+				ImGui::SetNextItemWidth(100.0f);
+				ImGui::DragFloat("##offsety_dragfloat", &component.TextureUVOffset.y, 0.1f, 0.0f, 0.0f, "%.2f");
 			});
 	}
 }
