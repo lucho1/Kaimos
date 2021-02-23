@@ -2,6 +2,50 @@ KaimosScene: UnnamedScene
 Entities:
   - Entity: 123
     TagComponent:
+      Tag: Sprite
+    TransformComponent:
+      Translation: [-1.39999998, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    SpriteRendererComponent:
+      Color: [1, 0, 0, 1]
+      TextureFile: D:\GitHub\Kaimos\KaimosEditor\assets\textures\ChernoLogo.png
+      TextureTiling: 2.70000005
+  - Entity: 123
+    TagComponent:
+      Tag: LeftSquare
+    TransformComponent:
+      Translation: [-0.349999994, 0, 0.349999994]
+      Rotation: [0, -0.785398185, 0]
+      Scale: [1, 1, 1]
+    SpriteRendererComponent:
+      Color: [0, 0.567347765, 0.915492952, 1]
+      TextureFile: ""
+      TextureTiling: 1
+  - Entity: 123
+    TagComponent:
+      Tag: RightSquare
+    TransformComponent:
+      Translation: [0.349999994, 0, 0.349999994]
+      Rotation: [0, 0.785398185, 0]
+      Scale: [1, 1, 1]
+    SpriteRendererComponent:
+      Color: [0, 0.338953316, 0.544600964, 1]
+      TextureFile: ""
+      TextureTiling: 1
+  - Entity: 123
+    TagComponent:
+      Tag: TopSquare
+    TransformComponent:
+      Translation: [0, 0.5, 0]
+      Rotation: [1.57079637, 0.785398185, 0]
+      Scale: [1, 1, 1]
+    SpriteRendererComponent:
+      Color: [0, 0.476274103, 0.765258193, 1]
+      TextureFile: ""
+      TextureTiling: 1
+  - Entity: 123
+    TagComponent:
       Tag: Camera
     TransformComponent:
       Translation: [0, 1.70000005, 4]
@@ -18,30 +62,3 @@ Entities:
         OrthoNearClip: -1
       PrimaryCamera: true
       FixedAR: false
-  - Entity: 123
-    TagComponent:
-      Tag: TopSquare
-    TransformComponent:
-      Translation: [0, 0.5, 0]
-      Rotation: [1.57079637, 0.785398185, 0]
-      Scale: [1, 1, 1]
-    SpriteRendererComponent:
-      Color: [0, 0.476274103, 0.765258193, 1]
-  - Entity: 123
-    TagComponent:
-      Tag: RightSquare
-    TransformComponent:
-      Translation: [0.349999994, 0, 0.349999994]
-      Rotation: [0, 0.785398185, 0]
-      Scale: [1, 1, 1]
-    SpriteRendererComponent:
-      Color: [0, 0.338953316, 0.544600964, 1]
-  - Entity: 123
-    TagComponent:
-      Tag: LeftSquare
-    TransformComponent:
-      Translation: [-0.349999994, 0, 0.349999994]
-      Rotation: [0, -0.785398185, 0]
-      Scale: [1, 1, 1]
-    SpriteRendererComponent:
-      Color: [0, 0.567347765, 0.915492952, 1]

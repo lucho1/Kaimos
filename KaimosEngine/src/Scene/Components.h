@@ -1,8 +1,10 @@
 #ifndef _COMPONENTS_H_
 #define _COMPONENTS_H_
 
+#include "Renderer/Resources/Texture.h"
 #include "SceneCamera.h"
 #include "ScriptableEntity.h"
+
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -48,10 +50,34 @@ namespace Kaimos {
 	struct SpriteRendererComponent
 	{
 		glm::vec4 Color = glm::vec4(1.0f);
+		Ref<Texture2D> SpriteTexture = nullptr;
+		std::string TextureFilepath = "";
+		float TextureTiling = 1.0f;
+
+		void RemoveTexture()
+		{
+			SpriteTexture = nullptr;
+			TextureFilepath.clear();
+			TextureTiling = 1.0f;
+		}
+
+		void SetTexture(const std::string& filepath)
+		{
+			Ref<Texture2D> texture = Texture2D::Create(filepath);
+			if (texture)
+			{
+				SpriteTexture = texture;
+				TextureFilepath = filepath;
+			}
+			else
+				KS_ENGINE_WARN("Couldn't Load Texture from '{0}'", filepath.c_str());
+		}
 
 		SpriteRendererComponent() = default;
 		SpriteRendererComponent(const SpriteRendererComponent&) = default;
 		SpriteRendererComponent(const glm::vec4& color) : Color(color) {}
+		SpriteRendererComponent(const glm::vec4& color, Ref<Texture2D> texture) : Color(color), SpriteTexture(texture) {}
+		SpriteRendererComponent(const glm::vec4& color, const std::string& file) : Color(color) { SetTexture(file); }
 	};
 
 	struct CameraComponent

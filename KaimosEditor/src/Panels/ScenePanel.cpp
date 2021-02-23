@@ -1,5 +1,6 @@
 #include "ScenePanel.h"
 
+#include "Core/Utils/PlatformUtils.h"
 #include "Scene/Components.h"
 
 #include <ImGui/imgui.h>
@@ -121,7 +122,7 @@ namespace Kaimos {
 	}
 
 
-	// ----- TODO: WTF?
+	// ----- TODO WTF?
 	static void DrawVec3Control(const std::string& name, glm::vec3& value, float reset_value = 0.0f, float column_width = 100.0f)
 	{
 		auto bold_font = ImGui::GetIO().Fonts->Fonts[1];
@@ -374,6 +375,43 @@ namespace Kaimos {
 			{
 				ImGuiColorEditFlags color_flags = ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreview | ImGuiColorEditFlags_NoInputs;
 				ImGui::ColorEdit4("Color", glm::value_ptr(component.Color), color_flags);
+
+				const uint id = component.SpriteTexture == nullptr ? 0 : component.SpriteTexture->GetTextureID();
+				ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { 0.0f, 0.0f });
+
+				ImGui::NewLine();
+				ImGui::Text("Texture");
+				ImGui::SameLine(ImGui::GetContentRegionAvail().x * 0.5f);
+
+				ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.25f, 0.25f, 0.25f, 1.0f));
+				ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.35f, 0.35f, 0.35f, 1.0f));
+				ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.25f, 0.25f, 0.25f, 1.0f));
+
+				if (ImGui::ImageButton((ImTextureID)id, { 80.0f, 80.0f }, { 0.0f, 1.0f }, { 1.0f, 0.0f }, 0, { 1.0f, 0.0f, 1.0f, 1.0f }))
+				{
+					std::string texture_file = FileDialogs::OpenFile("Texture (*.png)\0*.png\0");
+					if (!texture_file.empty())
+						component.SetTexture(texture_file);
+				}
+
+				ImGui::PopStyleColor(3);
+
+				ImGui::SameLine();
+				ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.2f, 0.2f, 0.2f, 1.0f });
+				ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.3f, 0.3f, 0.3f, 1.0f });
+				ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.2f, 0.2f, 0.2f, 1.0f });
+
+				if (ImGui::Button("x", { 20.0f, 80.0f }))
+					component.RemoveTexture();
+
+				ImGui::PopStyleColor(3);
+				ImGui::PopStyleVar();
+
+				ImGui::NewLine();
+				ImGui::Text("Tiling");
+				ImGui::SameLine(ImGui::GetContentRegionAvail().x * 0.5f - 1.0f);
+				ImGui::SetNextItemWidth(100.0f);
+				ImGui::DragFloat("##tiling_dragfloat", &component.TextureTiling, 0.1f, 0.0f, 0.0f, "%.2f");
 			});
 	}
 }

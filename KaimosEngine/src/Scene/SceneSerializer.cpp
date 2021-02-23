@@ -145,9 +145,13 @@ namespace Kaimos {
 
 		if (entity.HasComponent<SpriteRendererComponent>())
 		{
+			SpriteRendererComponent& sprite_comp = entity.GetComponent<SpriteRendererComponent>();
+
 			output << YAML::Key << "SpriteRendererComponent";
 			output << YAML::BeginMap;
-			output << YAML::Key << "Color" << YAML::Value << entity.GetComponent<SpriteRendererComponent>().Color;
+			output << YAML::Key << "Color" << YAML::Value << sprite_comp.Color;
+			output << YAML::Key << "TextureFile" << YAML::Value << sprite_comp.TextureFilepath;
+			output << YAML::Key << "TextureTiling" << YAML::Value << sprite_comp.TextureTiling;
 			output << YAML::EndMap;
 		}
 		
@@ -248,7 +252,18 @@ namespace Kaimos {
 
 				YAML::Node sprite_node = entity["SpriteRendererComponent"];
 				if (sprite_node)
-					deserialized_entity.AddComponent<SpriteRendererComponent>().Color = sprite_node["Color"].as<glm::vec4>();
+				{
+					SpriteRendererComponent& sprite_comp = deserialized_entity.AddComponent<SpriteRendererComponent>();
+					sprite_comp.Color = sprite_node["Color"].as<glm::vec4>();
+
+					auto tile_node = sprite_node["TextureTiling"];
+					if (tile_node)
+						sprite_comp.TextureTiling = tile_node.as<float>();
+
+					auto file_node = sprite_node["TextureFile"];
+					if (file_node && !file_node.as<std::string>().empty())
+						sprite_comp.SetTexture(file_node.as<std::string>());
+				}
 			}
 		}
 

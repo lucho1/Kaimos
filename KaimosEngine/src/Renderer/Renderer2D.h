@@ -35,7 +35,7 @@ namespace Kaimos {
 		static void DrawSprite(const glm::mat4& transform, const SpriteRendererComponent& sprite, int entity_id);
 
 		static void DrawQuad(const glm::mat4& transform, const glm::vec4& color, int entity_id = -1);
-		static void DrawQuad(const glm::mat4& transform, const Ref<Texture2D> texture, float tiling = 1.0f, const glm::vec4& tintColor = glm::vec4(1.0f));
+		static void DrawQuad(const glm::mat4& transform, const Ref<Texture2D> texture, int entity_id, float tiling = 1.0f, const glm::vec4& tintColor = glm::vec4(1.0f));
 
 		// --- Non-Rotated Quads Drawing Methods (calling Base Drawing Methods) ---
 		static void DrawQuad(const glm::vec2& position, const glm::vec2 size, const glm::vec4& color);

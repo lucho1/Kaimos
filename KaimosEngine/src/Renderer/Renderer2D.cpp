@@ -267,7 +267,10 @@ namespace Kaimos {
 	// --- Drawing Methods ---
 	void Renderer2D::DrawSprite(const glm::mat4& transform, const SpriteRendererComponent& sprite, int entity_id)
 	{
-		DrawQuad(transform, sprite.Color, entity_id);
+		if (sprite.SpriteTexture)
+			DrawQuad(transform, sprite.SpriteTexture, entity_id, sprite.TextureTiling, sprite.Color);
+		else
+			DrawQuad(transform, sprite.Color, entity_id);
 	}
 
 	void Renderer2D::DrawQuad(const glm::mat4& transform, const glm::vec4& color, int entity_id)
@@ -282,7 +285,7 @@ namespace Kaimos {
 	}
 
 
-	void Renderer2D::DrawQuad(const glm::mat4& transform, const Ref<Texture2D> texture, float tiling, const glm::vec4& tintColor)
+	void Renderer2D::DrawQuad(const glm::mat4& transform, const Ref<Texture2D> texture, int entity_id, float tiling, const glm::vec4& tintColor)
 	{
 		KS_PROFILE_FUNCTION();
 
@@ -291,27 +294,30 @@ namespace Kaimos {
 
 		// Texture Index retrieval
 		uint textureIndex = 0;
-		for (uint i = 1; i < s_Data->TextureSlotIndex; ++i)
+		if (texture)
 		{
-			if (*s_Data->TextureSlots[i] == *texture)
+			for (uint i = 1; i < s_Data->TextureSlotIndex; ++i)
 			{
-				textureIndex = i;
-				break;
+				if (*s_Data->TextureSlots[i] == *texture)
+				{
+					textureIndex = i;
+					break;
+				}
+			}
+
+			if (textureIndex == 0)
+			{
+				if (s_Data->TextureSlotIndex >= s_Data->MaxTextureSlots)
+					NextBatch();
+
+				textureIndex = s_Data->TextureSlotIndex;
+				s_Data->TextureSlots[s_Data->TextureSlotIndex] = texture;
+				++s_Data->TextureSlotIndex;
 			}
 		}
 
-		if (textureIndex == 0)
-		{
-			if (s_Data->TextureSlotIndex >= s_Data->MaxTextureSlots)
-				NextBatch();
-
-			textureIndex = s_Data->TextureSlotIndex;
-			s_Data->TextureSlots[s_Data->TextureSlotIndex] = texture;
-			++s_Data->TextureSlotIndex;
-		}
-
 		// Vertex Buffer setup
-		SetupVertexArray(transform, tintColor, -1, (float)textureIndex, tiling);
+		SetupVertexArray(transform, tintColor, entity_id, (float)textureIndex, tiling);
 	}
 
 
@@ -334,7 +340,7 @@ namespace Kaimos {
 
 	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2 size, const Ref<Texture2D> texture, float tiling, const glm::vec4& tintColor)
 	{
-		DrawQuad(glm::translate(glm::mat4(1.0f), position) * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f }), texture, tiling, tintColor);
+		DrawQuad(glm::translate(glm::mat4(1.0f), position) * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f }), texture, -1, tiling, tintColor);
 	}
 
 	// Rotated-Quad Methods (the same than previous, but rotated)
@@ -363,6 +369,6 @@ namespace Kaimos {
 							* glm::rotate(glm::mat4(1.0f), glm::radians(rotation), glm::vec3(0, 0, 1))
 							* glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
 
-		DrawQuad(transform, texture, tiling, tintColor);
+		DrawQuad(transform, texture, -1, tiling, tintColor);
 	}
 }
