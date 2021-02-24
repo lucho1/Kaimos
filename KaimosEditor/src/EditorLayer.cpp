@@ -390,17 +390,18 @@ namespace Kaimos {
 				if (control_pressed && (Input::IsKeyPressed(KEY::LEFT_SHIFT) || Input::IsKeyPressed(KEY::RIGHT_SHIFT))) SaveSceneAs();
 				else if (control_pressed) SaveScene();
 				break;
+			// Guizmo
 			case KEY::Q:
-				m_OperationGizmo = -1;
+				if(!ImGuizmo::IsUsing()) m_OperationGizmo = -1;
 				break;
 			case KEY::W:
-				m_OperationGizmo = ImGuizmo::OPERATION::TRANSLATE;
+				if (!ImGuizmo::IsUsing()) m_OperationGizmo = ImGuizmo::OPERATION::TRANSLATE;
 				break;
 			case KEY::E:
-				m_OperationGizmo = ImGuizmo::OPERATION::ROTATE;
+				if (!ImGuizmo::IsUsing()) m_OperationGizmo = ImGuizmo::OPERATION::ROTATE;
 				break;
 			case KEY::R:
-				m_OperationGizmo = ImGuizmo::OPERATION::SCALE;
+				if (!ImGuizmo::IsUsing()) m_OperationGizmo = ImGuizmo::OPERATION::SCALE;
 				break;
 		}
 
