@@ -24,6 +24,7 @@ namespace Kaimos {
 	private:
 		
 		bool OnKeyPressed(KeyPressedEvent& ev);
+		bool OnMouseButtonPressed(MouseButtonPressedEvent& ev);
 
 		void NewScene();
 		void OpenScene();
@@ -43,7 +44,7 @@ namespace Kaimos {
 		EditorCamera m_EditorCamera;
 
 		// Guizmo
-		int m_OperationGizmo = -1;
+		int m_OperationGizmo = 0;
 		Entity m_HoveredEntity;
 
 		// Rendering

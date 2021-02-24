@@ -296,7 +296,7 @@ namespace Kaimos {
 
 		// --- Guizmo ---
 		Entity selected_entity = m_ScenePanel.GetSelectedEntity();
-		if (selected_entity && m_OperationGizmo != -1)
+		if (selected_entity && m_OperationGizmo != -1 && !Input::IsKeyPressed(KEY::LEFT_ALT))
 		{
 			ImGuizmo::SetOrthographic(false);
 			ImGuizmo::SetDrawlist();
@@ -346,8 +346,10 @@ namespace Kaimos {
 	{
 		m_CameraController.OnEvent(ev);
 		m_EditorCamera.OnEvent(ev);
+
 		EventDispatcher dispatcher(ev);
 		dispatcher.Dispatch<KeyPressedEvent>(KS_BIND_EVENT_FN(EditorLayer::OnKeyPressed));
+		dispatcher.Dispatch<MouseButtonPressedEvent>(KS_BIND_EVENT_FN(EditorLayer::OnMouseButtonPressed));
 
 		// --- EVENT EXAMPLE ---
 		//KS_EDITOR_TRACE("LayerTest Event: {0}", ev);
@@ -359,6 +361,14 @@ namespace Kaimos {
 
 		//EventDispatcher dispatcher(ev);
 		//dispatcher.Dispatch<KeyPressedEvent>(KS_BIND_EVENT_FN(LayerTest::OnKeyPressedEvent)); // For a "OnKeyPressedEvent()" function
+	}
+
+	bool EditorLayer::OnMouseButtonPressed(MouseButtonPressedEvent& ev)
+	{
+		if (ev.GetMouseButton() == MOUSE::BUTTON_LEFT && m_ViewportHovered && !ImGuizmo::IsUsing() && !ImGuizmo::IsOver() && !Input::IsKeyPressed(KEY::LEFT_ALT))
+			m_ScenePanel.SetSelectedEntity(m_HoveredEntity);
+
+		return false;
 	}
 
 	bool EditorLayer::OnKeyPressed(KeyPressedEvent& ev)

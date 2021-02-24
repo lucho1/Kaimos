@@ -22,6 +22,7 @@ namespace Kaimos {
 		void OnUIRender();
 
 		Entity GetSelectedEntity() const { return m_SelectedEntity; }
+		void SetSelectedEntity(Entity entity) { m_SelectedEntity = entity; }
 
 	private:
 
