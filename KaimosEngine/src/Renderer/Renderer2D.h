@@ -29,9 +29,11 @@ namespace Kaimos {
 		static void BeginScene(const EditorCamera& camera);
 		static void BeginScene(const Camera& camera, const glm::mat4& camera_transform);
 		static void EndScene();
-		static void Flush();
+		static void QuadsFlush();
+		static void LinesFlush();
 		
 		// --- Base Drawing Methods ---
+		static void DrawLine(const glm::mat4& viewproj_mat, const glm::vec3& position, const glm::vec3& destination, float width, const glm::vec4& color = glm::vec4(1.0f));
 		static void DrawSprite(const glm::mat4& transform, const SpriteRendererComponent& sprite, int entity_id);
 
 		static void DrawQuad(const glm::mat4& transform, const glm::vec4& color, int entity_id = -1);
@@ -60,12 +62,22 @@ namespace Kaimos {
 		// --- Renderer Statistics ---
 		struct Statistics
 		{
-			uint DrawCalls = 0;
+			uint QuadDrawCalls = 0;
 			uint QuadCount = 0;
+			uint LineDrawCalls = 0;
+			uint LineCount = 0;
 
-			uint GetTotalVerticesCount()	const { return QuadCount * 4; }
-			uint GetTotalIndicesCount()		const { return QuadCount * 6; }
-			uint GetTotalTrianglesCount()	const { return QuadCount * 2; }
+			uint GetTotalQuadVerticesCount()	const { return QuadCount * 4; }
+			uint GetTotalQuadIndicesCount()		const { return QuadCount * 6; }
+			uint GetTotalTrianglesCount()		const { return QuadCount * 2; }
+
+			uint GetTotalLineVerticesCount()	const { return LineCount * 4; }
+			uint GetTotalLineIndicesCount()		const { return LineCount * 6; }
+
+			uint GetTotalDrawCalls()			const { return LineDrawCalls + QuadDrawCalls; }
+			uint GetTotalObjectsDrawn()			const { return LineCount + QuadCount; }
+			uint GetTotalVerticesCount()		const { return (QuadCount + LineCount) * 4; }
+			uint GetTotalIndicesCount()			const { return (QuadCount + LineCount) * 6; }
 		};
 
 	public:
@@ -73,6 +85,7 @@ namespace Kaimos {
 		static void ResetStats();
 		static const Statistics GetStats();
 		static const uint GetMaxQuads();
+		static const uint GetMaxLines();
 	};
 
 }

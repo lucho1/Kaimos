@@ -60,6 +60,10 @@ namespace Kaimos {
 			Renderer2D::DrawSprite(transform.GetTransform(), sprite, (int)ent);
 		}
 
+		//Kaimos::Renderer2D::DrawLine(camera.GetProjection(), { -0.3f, -0.4f, 0.0f }, { -0.3f, 0.4f, 0.0f }, 3.0f, { 0.2f, 0.2f, 0.2f, 1.0f });
+		Kaimos::Renderer2D::DrawLine(camera.GetViewProj(), { 5.0f, 5.0f, 0.0f }, { 0.0f, 0.0f, 0.0f }, 100.0f, { 1.0f, 0.0f, 0.0f, 1.0f });
+		Kaimos::Renderer2D::DrawLine(camera.GetViewProj(), { -5.0f, 0.0f, 0.0f }, { 5.0f, 0.0f, 0.0f }, 100.0f, { 0.0f, 1.0f, 0.0f, 1.0f });
+
 		Renderer2D::EndScene();
 	}
 

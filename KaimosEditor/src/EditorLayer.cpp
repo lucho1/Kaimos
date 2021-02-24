@@ -123,6 +123,7 @@ namespace Kaimos {
 		// --- SCENE UPDATE ---
 		m_CurrentScene->OnUpdateEditor(dt, m_EditorCamera);
 
+
 		// --- Mouse Picking ---
 		// Get Mouse position with respect to the viewport boundaries
 		ImVec2 mouse_pos = ImGui::GetMousePos();
@@ -261,7 +262,7 @@ namespace Kaimos {
 
 		ImGui::NewLine(); ImGui::NewLine();
 		ImGui::Text("--- 2D RENDERER STATS ---");
-		ImGui::Text("Draw Calls: %d", stats.DrawCalls);
+		ImGui::Text("Draw Calls: %d", stats.QuadDrawCalls);
 		ImGui::Text("Quads Drawn: %d", stats.QuadCount);
 		ImGui::Text("Max Quads per Draw Call: %d", Renderer2D::GetMaxQuads());
 
