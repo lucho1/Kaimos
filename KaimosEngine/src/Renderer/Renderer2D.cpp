@@ -15,7 +15,6 @@ namespace Kaimos {
 		glm::vec4 Color;
 		float TexIndex;
 		float TilingFactor;
-		glm::vec2 UVOffsetFactor;
 
 		// -- Editor Variables --
 		int EntityID;
@@ -123,7 +122,6 @@ namespace Kaimos {
 			{ ShaderDataType::Float4, "a_Color" },
 			{ ShaderDataType::Float , "a_TexIndex" },
 			{ ShaderDataType::Float , "a_TilingFactor" },
-			{ ShaderDataType::Float2, "a_UVOffsetFactor" },
 			{ ShaderDataType::Int ,	  "a_EntityID" }
 		};
 
@@ -252,11 +250,10 @@ namespace Kaimos {
 		for (size_t i = 0; i < quadVertexCount; ++i)
 		{
 			s_Data->QuadVBufferPtr->Pos = transform * s_Data->VerticesPositions[i];
-			s_Data->QuadVBufferPtr->TexCoord = texCoords[i];
+			s_Data->QuadVBufferPtr->TexCoord = texCoords[i] - texture_uvoffset;
 			s_Data->QuadVBufferPtr->Color = color;
 			s_Data->QuadVBufferPtr->TexIndex = texture_index;
 			s_Data->QuadVBufferPtr->TilingFactor = texture_tiling;
-			s_Data->QuadVBufferPtr->UVOffsetFactor = texture_uvoffset;
 			s_Data->QuadVBufferPtr->EntityID = entity_id;
 			++s_Data->QuadVBufferPtr;
 		}
