@@ -14,3 +14,6 @@ The core systems of Kaimos engine were made following a series of tutorials from
 In addition, the mentioned copyright notice requires to cause any modified files from the original source. These are the whole files, since they were made completely manually by the author of this repository (@lucho1), except that they were made following the aforementioned tutorial (its advices, its patterns...), which can lead to have a very similar code in many of the core files of the Kaimos Engine.
 
 Finally, this repository is the project repository to host the practical or development part of a Degree Thesis (which can be found here) by the owner of this repository, Lucho Suaya, that consists on a Material Editor made on top of the Kaimos Engine. Let us guarantee that the parts concerning the important, key, or central files or systems for the project development (the ones that were object of the thesis) were not, under any circumstances, copies, modified or derivative works from any other source, they were completely made by the author with the investigations made for the thesis.
+
+
+Kaimos ©2021 by [Luciano Suaya Leiro](https://github.com/lucho1) is licenced under [Apache License 2.0](https://github.com/lucho1/Kaimos/blob/master/LICENSE).
