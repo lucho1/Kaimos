@@ -22,7 +22,7 @@
 //                  ·The macros at the bottom of the document () - Extracted from the Cherno video too!
 //                  ·The inclusion in the Kaimos namespace
 
-// NOTE - To make instrumentations, use something like chrome://tracing
+// NOTE - To see visual instrumentation of the output files, use something like chrome://tracing
 
 #ifndef _INSTRUMENTOR_H_
 #define _INSTRUMENTOR_H_
@@ -33,10 +33,6 @@
 #include <iomanip>
 #include <string>
 #include <thread>
-//#include <mutex>
-//#include <sstream>
-//
-//#include "Core/Log/Log.h"
 
 namespace Kaimos {
 
@@ -279,4 +275,4 @@ namespace Kaimos {
 #endif
 
 
-#endif // _INSTRUMENTOR_H_
+#endif //_INSTRUMENTOR_H_

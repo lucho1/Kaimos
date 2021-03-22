@@ -1,5 +1,5 @@
-#ifndef _INPUT_H
-#define _INPUT_H
+#ifndef _INPUT_H_
+#define _INPUT_H_
 
 #include "KaimosInputCodes.h"
 #include <glm/glm.hpp>
@@ -21,6 +21,7 @@ namespace Kaimos {
 		static bool IsMouseButtonDown(const MOUSE_CODE button);
 		static bool IsMouseButtonUp(const MOUSE_CODE button);
 
+		// --- Mouse Getters ---
 		static glm::vec2 GetMousePos();
 		static float GetMouseX();
 		static float GetMouseY();
@@ -41,4 +42,4 @@ namespace Kaimos {
 	};
 }
 
-#endif
+#endif //_INPUT_H_

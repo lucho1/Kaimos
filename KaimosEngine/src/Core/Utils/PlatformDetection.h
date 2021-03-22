@@ -1,17 +1,16 @@
 #ifndef _PLATFORM_DETECTION_H_
 #define _PLATFORM_DETECTION_H_
 
-// -- PLATFORM DETECTION - Using Predefined Macros --
-// WINDOWS
+// -- PLATFORM DETECTION (Using Predefined Macros) --
+// Windows
 #ifdef _WIN32
-	// x64/x86
 	#ifdef _WIN64
 		#define KS_PLATFORM_WINDOWS //x64
 	#else
 		#error "Windows x86 is not Supported!" //x86
 	#endif
 
-// APPLE
+// Apple
 #elif defined(__APPLE__) || defined(__MACH__)
 	#include <TargetConditionals.h>
 	// TARGET_OS_MAC exists on all platforms so we must check all of them (in this order)
@@ -39,6 +38,6 @@
 #else
 	#error "Unknown Platform!"
 #endif
-// -- End of PLATFORM DETECTION --
 
+// -- End of PLATFORM DETECTION --
 #endif //_PLATFORM_DETECTION_H_

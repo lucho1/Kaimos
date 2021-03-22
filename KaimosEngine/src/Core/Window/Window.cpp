@@ -5,8 +5,8 @@
 	#include "Platform/Windows/WindowsWindow.h"
 #endif
 
-namespace Kaimos
-{
+namespace Kaimos {
+
 	ScopePtr<Window> Window::Create(const WindowProps& props)
 	{
 		#ifdef KS_PLATFORM_WINDOWS
@@ -16,5 +16,4 @@ namespace Kaimos
 			return nullptr;
 		#endif
 	}
-
 }

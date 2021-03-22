@@ -14,10 +14,14 @@
 
 namespace Kaimos {
 
+	// ----------------------- Public Class Methods -------------------------------------------------------
 	EditorLayer::EditorLayer() : Layer("EditorLayer"), m_CameraController(1280.0f / 720.0f, true), m_EditorCamera(45.0f, 1.778f, 0.1f, 10000.0f)
 	{
 	}
 
+
+
+	// ----------------------- Public Layer Methods -------------------------------------------------------
 	void EditorLayer::OnAttach()
 	{
 		KS_PROFILE_FUNCTION();
@@ -78,16 +82,18 @@ namespace Kaimos {
 		m_Serializer.Deserialize("assets/scenes/CubeScene.kaimos");
 	}
 
+
 	void EditorLayer::OnDetach()
 	{
 		KS_PROFILE_FUNCTION();
 	}
 
+
 	void EditorLayer::OnUpdate(Timestep dt)
 	{
 		KS_PROFILE_FUNCTION();
 
-		// --- VIEWPORT RESIZE ---
+		// -- Viewport Resize --
 		if (FramebufferSettings settings = m_Framebuffer->GetFBOSettings();
 			m_ViewportSize.x > 0.0f && m_ViewportSize.y > 0.0f &&
 			(settings.Width != (uint)m_ViewportSize.x || settings.Height != (uint)m_ViewportSize.y))
@@ -99,14 +105,14 @@ namespace Kaimos {
 			m_EditorCamera.SetViewportSize(m_ViewportSize.x, m_ViewportSize.y);
 		}
 
-		// --- CAMERA UPDATE ---
+		// -- Camera Update --
 		if (m_ViewportFocused)
 		{
 			m_CameraController.OnUpdate(dt);
 			m_EditorCamera.OnUpdate(dt);
 		}
 
-		// --- RENDER ---
+		// -- Render --
 		Renderer2D::ResetStats();
 
 		m_Framebuffer->Bind();
@@ -116,14 +122,14 @@ namespace Kaimos {
 		// Clear EntityID FBO texture (RED_INTEGER), make it -1 so that we can mouse pick (and the empty areas are -1)
 		m_Framebuffer->ClearFBOTexture(1, -1);
 
-		// -- Scene --
+		// Scene
 		//Renderer2D::BeginScene(m_CameraController.GetCamera());
 		//Renderer2D::DrawQuad(glm::vec3(0.0f, 0.0f, -0.1f), glm::vec2(10.0f), m_CheckerTexture, m_BackgroundTiling, glm::vec4(1.0f));
 
-		// --- SCENE UPDATE ---
+		// -- Scene Update --
 		m_CurrentScene->OnUpdateEditor(dt, m_EditorCamera);
 
-		// --- Mouse Picking ---
+		// -- Mouse Picking --
 		// Get Mouse position with respect to the viewport boundaries
 		ImVec2 mouse_pos = ImGui::GetMousePos();
 		mouse_pos.x -= m_ViewportLimits[0].x;
@@ -166,11 +172,12 @@ namespace Kaimos {
 		m_Framebuffer->Unbind();
 	}
 
+
 	void EditorLayer::OnUIRender()
 	{
 		KS_PROFILE_FUNCTION();
 
-		// --- Docking Space ---
+		// -- Docking Space --
 		static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
 		ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
 
@@ -192,7 +199,7 @@ namespace Kaimos {
 		ImGui::PopStyleVar();
 		ImGui::PopStyleVar(2);
 
-		// Set Dockspace & Its minimum size
+		// -- Set Dockspace & Its minimum size --
 		ImGuiIO& io = ImGui::GetIO();
 		ImGuiStyle& style = ImGui::GetStyle();
 		float original_min_size = style.WindowMinSize.x;
@@ -206,7 +213,7 @@ namespace Kaimos {
 		
 		style.WindowMinSize.x = original_min_size;
 
-		// --- Upper Menu Tab Bar ---
+		// -- Upper Menu Tab Bar --
 		if (ImGui::BeginMenuBar())
 		{
 			if (ImGui::BeginMenu("File"))
@@ -234,7 +241,7 @@ namespace Kaimos {
 		
 		ImGui::End();
 
-		// Scene Panel Rendering
+		// -- Scene Panel Rendering --
 		m_ScenePanel.OnUIRender();
 
 		// Little test for Entities (this case: square entity color)
@@ -256,7 +263,7 @@ namespace Kaimos {
 		
 		ImGui::Separator();
 
-		// --- Renderer Settings Floating Window ---
+		// -- Renderer Settings Floating Window --
 		auto stats = Renderer2D::GetStats();
 
 		ImGui::NewLine(); ImGui::NewLine();
@@ -272,7 +279,7 @@ namespace Kaimos {
 
 		ImGui::End();
 
-		// --- Viewport ---
+		// -- Viewport --
 		ImGui::Begin("Viewport");
 		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0.0f, 0.0f));
 
@@ -294,7 +301,7 @@ namespace Kaimos {
 		m_ViewportSize = glm::vec2(ViewportPanelSize.x, ViewportPanelSize.y);
 		ImGui::Image(reinterpret_cast<void*>(m_Framebuffer->GetFBOTextureID()), ViewportPanelSize, ImVec2(0, 1), ImVec2(1, 0));		
 
-		// --- Guizmo ---
+		// -- Guizmo --
 		Entity selected_entity = m_ScenePanel.GetSelectedEntity();
 		if (selected_entity && m_OperationGizmo != -1 && !Input::IsKeyPressed(KEY::LEFT_ALT))
 		{
@@ -322,7 +329,7 @@ namespace Kaimos {
 
 			float snap_array[3] = { snap_value, snap_value, snap_value };
 
-			// ImGui Manipulation
+			// Guizmo Manipulation
 			ImGuizmo::Manipulate(glm::value_ptr(cam_view), glm::value_ptr(cam_proj), (ImGuizmo::OPERATION)m_OperationGizmo, ImGuizmo::MODE::LOCAL, glm::value_ptr(tr_mat),
 				nullptr, snap ? snap_array : nullptr);
 
@@ -342,6 +349,7 @@ namespace Kaimos {
 		ImGui::End();
 	}
 
+
 	void EditorLayer::OnEvent(Event& ev)
 	{
 		m_CameraController.OnEvent(ev);
@@ -351,7 +359,7 @@ namespace Kaimos {
 		dispatcher.Dispatch<KeyPressedEvent>(KS_BIND_EVENT_FN(EditorLayer::OnKeyPressed));
 		dispatcher.Dispatch<MouseButtonPressedEvent>(KS_BIND_EVENT_FN(EditorLayer::OnMouseButtonPressed));
 
-		// --- EVENT EXAMPLE ---
+		// -- Event Example --
 		//KS_EDITOR_TRACE("LayerTest Event: {0}", ev);
 		//if (ev.GetEventType() == EVENT_TYPE::KEY_PRESSED)
 		//{
@@ -363,6 +371,9 @@ namespace Kaimos {
 		//dispatcher.Dispatch<KeyPressedEvent>(KS_BIND_EVENT_FN(LayerTest::OnKeyPressedEvent)); // For a "OnKeyPressedEvent()" function
 	}
 
+
+	
+	// ----------------------- Event Methods --------------------------------------------------------------
 	bool EditorLayer::OnMouseButtonPressed(MouseButtonPressedEvent& ev)
 	{
 		if (ev.GetMouseButton() == MOUSE::BUTTON_LEFT && m_ViewportHovered && !ImGuizmo::IsUsing() && !ImGuizmo::IsOver() && !Input::IsKeyPressed(KEY::LEFT_ALT))
@@ -373,7 +384,7 @@ namespace Kaimos {
 
 	bool EditorLayer::OnKeyPressed(KeyPressedEvent& ev)
 	{
-		// Shortcuts
+		// -- Shortcuts --
 		if (ev.GetRepeatCount() > 0)
 			return false;
 
@@ -408,7 +419,9 @@ namespace Kaimos {
 		return false;
 	}
 
-	// --- Scene Methods ---
+
+	
+	// ----------------------- Private Editor Methods -----------------------------------------------------
 	void EditorLayer::NewScene()
 	{
 		m_CurrentScene = CreateRef<Scene>();
@@ -418,6 +431,7 @@ namespace Kaimos {
 
 	void EditorLayer::SaveScene()
 	{
+		// TODO: Do this
 		//SceneSerializer m_Serializer(m_CurrentScene);
 		//m_Serializer.Serialize("assets/scenes/SceneSerializationExample.kaimos");
 	}

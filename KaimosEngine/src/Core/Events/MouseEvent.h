@@ -100,7 +100,6 @@ namespace Kaimos {
 
 		EVENT_CLASS_TYPE(MOUSE_BUTTON_RELEASED)
 	};
-
 }
 
-#endif
+#endif //_MOUSEEVENT_H_

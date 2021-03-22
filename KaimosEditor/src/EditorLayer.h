@@ -1,5 +1,5 @@
-#ifndef _SANDBOX_2D_
-#define _SANDBOX_2D_
+#ifndef _SANDBOX2D_H_
+#define _SANDBOX2D_H_
 
 #include "Kaimos.h"
 #include "Panels/ScenePanel.h"
@@ -11,9 +11,11 @@ namespace Kaimos {
 	{
 	public:
 
+		// --- Public Class Methods ---
 		EditorLayer();
 		virtual ~EditorLayer() = default;
 
+		// --- Public Layer Methods ---
 		virtual void OnAttach() override;
 		virtual void OnDetach() override;
 
@@ -23,9 +25,11 @@ namespace Kaimos {
 
 	private:
 		
+		// --- Event Methods ---
 		bool OnKeyPressed(KeyPressedEvent& ev);
 		bool OnMouseButtonPressed(MouseButtonPressedEvent& ev);
 
+		// --- Private Editor Methods ---
 		void NewScene();
 		void OpenScene();
 		void SaveScene();
@@ -64,4 +68,5 @@ namespace Kaimos {
 		glm::vec2 m_ViewportLimits[2]; // min-max of where the viewport is (bounds)
 	};
 }
-#endif
+
+#endif //_SANDBOX2D_H_

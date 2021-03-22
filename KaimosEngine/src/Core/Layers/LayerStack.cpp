@@ -3,6 +3,7 @@
 
 namespace Kaimos {
 
+	// ----------------------- Public Class Methods -------------------------------------------------------
 	LayerStack::~LayerStack()
 	{
 		//std::vector<Layer*>::iterator item = m_Layers.begin();
@@ -16,6 +17,9 @@ namespace Kaimos {
 		}
 	}
 
+
+	
+	// ----------------------- LayerStack Public Methods --------------------------------------------------
 	void LayerStack::PushLayer(Layer* layer)
 	{
 		m_Layers.emplace(m_Layers.begin() + m_LayerInsertIndex, layer);
@@ -47,5 +51,4 @@ namespace Kaimos {
 			m_Layers.erase(it);
 		}
 	}
-
 }

@@ -9,12 +9,10 @@
 #include "Layers/LayerStack.h"
 #include "Time/Timestep.h"
 
-// TEMP
-#include "Renderer/Buffer.h"
-#include "Renderer/Cameras/OrthographicCamera.h"
 
-
+// --- Main Declaration, Defined on EntryPoint ---
 int main(int argc, char** argv);
+
 
 namespace Kaimos {
 
@@ -22,49 +20,55 @@ namespace Kaimos {
 	{
 	public:
 
+		// --- Public Class Methods ---
 		Application(const std::string& name = "Kaimos Engine");
 		virtual ~Application();
 
-		// -- Class Methods --
+		// --- Public Application Methods ---
 		void CloseApp()						{ m_Running = false; }
 
-		// -- Events --
-		void OnEvent(Event& e);
-
-		// -- Layers --
+		// --- Layer Methods ---
 		void PushLayer(Layer* layer);
 		void PushOverlay(Layer* layer);
 
-		// -- Getters --
+		// --- Getters ---
 		inline static Application& Get()			{ return *s_Instance; }
 		inline Window& GetWindow()			const	{ return *m_Window; }
 		inline ImGuiLayer* GetImGuiLayer()	const	{ return m_ImGuiLayer; }
 
 	private:
 
-		// -- Class Methods --
+		// --- Private Application Methods ---
 		void Run();
 
-		// -- Events --
+		// --- Event Private Methods ---
 		bool OnWindowClose(WindowCloseEvent& e);
 		bool OnWindowResize(WindowResizeEvent& e);
+		void OnEvent(Event& e);
 
-		// -- Class Variables --
-		bool m_Running = true;
-		bool m_Minimized = false;
+	private:
+
+		// --- Application ---
+		static Application* s_Instance; // Singleton of Application (we only want 1 Application)
+		friend int ::main(int argc, char** argv);
+
 		ScopePtr<Window> m_Window; // Having a unique_ptr means we don't have to worry about deleting the Window ourselves on app termination :D
 		ImGuiLayer* m_ImGuiLayer;
 		LayerStack m_LayerStack;
+		
+		// --- App Properties ---
+		bool m_Running = true;
+		bool m_Minimized = false;
+
+		// --- Delta Time ---
 		Timestep m_Timestep;
 		float m_LastFrameTime = 0.0f;
-
-		static Application* s_Instance; // Singleton of Application (we only want 1 Application)
-		friend int ::main(int argc, char** argv);
 	};
 
 
-	// To be defined in Client (Editor)
+
+	// --- To be defined in Client (Editor) ---
 	Application* CreateApplication();
 }
 
-#endif
+#endif //_APPLICATION_H_

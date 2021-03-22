@@ -1,11 +1,12 @@
 #include "ScenePanel.h"
 
 #include "Core/Utils/PlatformUtils.h"
-#include "Scene/Components.h"
+#include "ImGui/ImGuiUtils.h"
 
 #include <ImGui/imgui.h>
 #include <ImGui/imgui_internal.h>
 #include <glm/gtc/type_ptr.hpp>
+
 
 // C++ Microsoft Compiler doesn't gets C++ standards, so this def. is to disable a warning for std::strncpy()
 #ifdef _MSVC_LANG
@@ -14,45 +15,55 @@
 
 namespace Kaimos {
 
+	// ----------------------- Public Class Methods -------------------------------------------------------
 	ScenePanel::ScenePanel(const Ref<Scene>& context)
 	{
 		SetContext(context);
 	}
+	
 
+	
+	// ----------------------- Getters/Setters ------------------------------------------------------------
 	void ScenePanel::SetContext(const Ref<Scene>& context)
 	{
-		m_Context = context;
+		m_SceneContext = context;
 		m_SelectedEntity = {};
 	}
 
+
+
+	// ----------------------- Public Class Methods -------------------------------------------------------
 	void ScenePanel::OnUIRender()
 	{
 		ImGui::Begin("Scene");
 
-		m_Context->m_Registry.each([&](auto entityID)
+		// -- Entity Display --
+		m_SceneContext->m_Registry.each([&](auto entity_id)
 			{
-				Entity entity{ entityID , m_Context.get() };
-				DrawEntityNode(entity);				
+				Entity entity{ entity_id , m_SceneContext.get() };
+				DrawEntityNode(entity);
 			});
 
+
+		// -- Entity Unselection --
 		if (ImGui::IsWindowHovered() && ImGui::IsMouseDown(0))
 			m_SelectedEntity = {};
 
-		// Right Click on a Blank Space
+		// -- Right Click on a Blank Space --
 		if (ImGui::BeginPopupContextWindow(0, 1, false))
 		{
 			if(ImGui::MenuItem("Create Empty Entity"))
-				m_SelectedEntity = m_Context->CreateEntity("Empty Entity");
+				m_SelectedEntity = m_SceneContext->CreateEntity("Empty Entity");
 
 			if (ImGui::MenuItem("Create Camera"))
 			{
-				m_SelectedEntity = m_Context->CreateEntity("Camera");
+				m_SelectedEntity = m_SceneContext->CreateEntity("Camera");
 				m_SelectedEntity.AddComponent<CameraComponent>();
 			}
 
 			if (ImGui::MenuItem("Create 2D Sprite"))
 			{
-				m_SelectedEntity = m_Context->CreateEntity("Sprite");
+				m_SelectedEntity = m_SceneContext->CreateEntity("Sprite");
 				m_SelectedEntity.AddComponent<SpriteRendererComponent>();
 			}
 
@@ -61,6 +72,7 @@ namespace Kaimos {
 
 		ImGui::End();
 
+		// -- Properties Panel (Components Display) --
 		ImGui::Begin("Properties");
 		if (m_SelectedEntity)
 			DrawComponents(m_SelectedEntity);
@@ -68,29 +80,35 @@ namespace Kaimos {
 		ImGui::End();
 	}
 
+
+
+	// ----------------------- Private Scene Methords -----------------------------------------------------
 	void ScenePanel::DrawEntityNode(Entity entity)
 	{
 		TagComponent& tag_comp = entity.GetComponent<TagComponent>();
-		std::string& tag = tag_comp.Tag;
 
+		// -- Open Tree --
 		ImGuiTreeNodeFlags flags = ((m_SelectedEntity == entity) ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_SpanAvailWidth;
-		bool opened = ImGui::TreeNodeEx((void*)(uint)entity, flags, tag.c_str());
+		bool opened = ImGui::TreeNodeEx((void*)(uint)entity, flags, tag_comp.Tag.c_str());
 
+		// -- Entity Selection --
 		if (ImGui::IsItemClicked())
 			m_SelectedEntity = entity;
 
-		bool entityDeleted = false;
+		// -- Entity Right Click --
+		bool entity_deleted = false;
 		if (ImGui::BeginPopupContextItem())
 		{
 			if (ImGui::MenuItem("Rename"))
 				tag_comp.Rename = true;
 
 			if (ImGui::MenuItem("Delete Entity"))
-				entityDeleted = true;
+				entity_deleted = true;
 
 			ImGui::EndPopup();
 		}
 
+		// -- Entity Rename --
 		if (tag_comp.Rename)
 		{
 			char buffer[256];
@@ -98,7 +116,7 @@ namespace Kaimos {
 			std::strncpy(buffer, tag_comp.Tag.c_str(), sizeof(buffer));	// Copy tag to buffer
 
 			if (ImGui::InputText("##Tag", buffer, sizeof(buffer)))
-				tag = std::string(buffer);
+				tag_comp.Tag = std::string(buffer);
 			
 			// Auto focus Input Text
 			if (ImGui::IsItemHovered() || (ImGui::IsAnyWindowFocused() && !ImGui::IsAnyItemActive() && !ImGui::IsMouseClicked(0)))
@@ -109,99 +127,22 @@ namespace Kaimos {
 				tag_comp.Rename = false;
 		}
 
+		// -- Close Tree --
 		if (opened)
 			ImGui::TreePop();
 
-		if (entityDeleted)
+		// -- Delete Entity --
+		if (entity_deleted)
 		{
 			if (m_SelectedEntity == entity)
 				m_SelectedEntity = {};
 
-			m_Context->DestroyEntity(entity);
+			m_SceneContext->DestroyEntity(entity);
 		}
 	}
 
 
-	// ----- TODO WTF?
-	static void DrawVec3Control(const std::string& name, glm::vec3& value, float reset_value = 0.0f, float column_width = 100.0f)
-	{
-		auto bold_font = ImGui::GetIO().Fonts->Fonts[1];
-
-		// To say to ImGui that this is kind of a new "namespace" a new ID, so we don't have problems of values modifying other values
-		ImGui::PushID(name.c_str());
-
-		// Name Column
-		ImGui::Columns(2);
-		ImGui::SetColumnWidth(0, column_width);
-		ImGui::Text(name.c_str());
-		ImGui::NextColumn();
-
-		// Vector Columns
-		ImGui::PushMultiItemsWidths(3, ImGui::CalcItemWidth());
-		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { 0, 4 });
-
-		// Internal Imgui code, on how ImGui calculates line height
-		float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
-		ImVec2 buttonSize = { lineHeight + 3.0f, lineHeight };
-
-		// X Button and DragFloat
-		ImGui::PushStyleColor(ImGuiCol_Button, { 0.8f, 0.1f, 0.15f, 1.0f });
-		ImGui::PushStyleColor(ImGuiCol_ButtonActive, { 0.8f, 0.1f, 0.15f, 1.0f });
-		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, { 0.9f, 0.2f, 0.2f, 1.0f });
-		ImGui::PushFont(bold_font);
-
-		if (ImGui::Button("X", buttonSize))
-			value.x = reset_value;
-
-		ImGui::PopFont();
-		ImGui::PopStyleColor(3);
-		
-		ImGui::SameLine();
-		ImGui::DragFloat("##X", &value.x, 0.1f, 0.0f, 0.0f, "%.2f");
-		ImGui::PopItemWidth();
-
-
-		// Y Button and DragFloat
-		ImGui::SameLine();
-		ImGui::PushStyleColor(ImGuiCol_Button, { 0.2f, 0.7f, 0.2f, 1.0f });
-		ImGui::PushStyleColor(ImGuiCol_ButtonActive, { 0.2f, 0.7f, 0.2f, 1.0f });
-		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, { 0.3f, 0.8f, 0.3f, 1.0f });
-		ImGui::PushFont(bold_font);
-
-		if (ImGui::Button("Y", buttonSize))
-			value.y = reset_value;
-
-		ImGui::PopFont();
-		ImGui::PopStyleColor(3);
-
-		ImGui::SameLine();
-		ImGui::DragFloat("##Y", &value.y, 0.1f, 0.0f, 0.0f, "%.2f");
-		ImGui::PopItemWidth();
-
-		// Z Button and DragFloat
-		ImGui::SameLine();
-		ImGui::PushStyleColor(ImGuiCol_Button, { 0.1f, 0.25f, 0.8f, 1.0f });
-		ImGui::PushStyleColor(ImGuiCol_ButtonActive, { 0.1f, 0.25f, 0.8f, 1.0f });
-		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, { 0.2f, 0.35f, 0.9f, 1.0f });
-		ImGui::PushFont(bold_font);
-
-		if (ImGui::Button("Z", buttonSize))
-			value.z = reset_value;
-
-		ImGui::PopFont();
-		ImGui::PopStyleColor(3);
-
-		ImGui::SameLine();
-		ImGui::DragFloat("##Z", &value.z, 0.1f, 0.0f, 0.0f, "%.2f");
-		ImGui::PopItemWidth();
-
-		// Pop Initial Pushes
-		ImGui::PopStyleVar();
-		ImGui::Columns(1);
-		ImGui::PopID();
-	}
-
-	// ----- TODO: WTF?
+	// ----- TODO: WTF? -- This requires of an entities/components rework
 	template<typename T, typename UIFunction>
 	static void DrawComponentUI(const std::string& name, Entity entity, UIFunction function)
 	{
@@ -210,31 +151,39 @@ namespace Kaimos {
 			ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_FramePadding
 										| ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_SpanAvailWidth;
 
+			// -- New ID --
 			static char popup_id[64];
 			sprintf_s(popup_id, 64, "ComponentSettings_%s", typeid(T).name());
 			ImGui::PushID(popup_id);
 
+			// -- Content Spacing --
 			float content_region = ImGui::GetContentRegionAvail().x;
 			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 4, 4 });
+
 			float line_height = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
 			ImGui::NewLine();
 			ImGui::Separator();
+			
+			// -- Open Tree --
 			bool open = ImGui::TreeNodeEx((void*)typeid(T).hash_code(), flags, name.c_str());
 			ImGui::PopStyleVar();
 
+			// -- Add Button with Content Spacing + Open Settings Popup --
 			ImGui::SameLine(content_region + 2.0f);
 			if (ImGui::Button("+", { line_height, line_height }))
 				ImGui::OpenPopup("ComponentSettings");
 
-			bool removeComponent = false;
+			// -- Component Settings Popup --
+			bool remove_component = false;
 			if (ImGui::BeginPopup("ComponentSettings"))
 			{
 				if (ImGui::MenuItem("Remove Component"))
-					removeComponent = true;
+					remove_component = true;
 
 				ImGui::EndPopup();
 			}
 
+			// -- Close Tree --
 			ImGui::PopID();
 			if (open)
 			{
@@ -242,17 +191,17 @@ namespace Kaimos {
 				ImGui::TreePop();
 			}
 
-			if (removeComponent)
+			// -- Remove Component --
+			if (remove_component)
 				entity.RemoveComponent<T>();
 		}
 	}
 
 
+	// TODO: This requires of an entities/components rework + An expansion of the UIFunctionalities to reduce ImGui Code
 	void ScenePanel::DrawComponents(Entity entity)
 	{
-		ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_SpanAvailWidth;
-		
-		// Tag Component
+		// -- Tag Component --
 		if (entity.HasComponent<TagComponent>())
 		{
 			std::string& tag = entity.GetComponent<TagComponent>().Tag;
@@ -265,7 +214,7 @@ namespace Kaimos {
 				tag = std::string(buffer);
 		}
 
-		// Add Component Button
+		// -- Add Component Button --
 		ImGui::SameLine();
 		ImGui::PushItemWidth(-1);
 
@@ -297,19 +246,20 @@ namespace Kaimos {
 			ImGui::EndPopup();
 		}
 
-		// Transform Component
+		// -- Transform Component --
 		DrawComponentUI<TransformComponent>("Transform", entity, [](auto& component)
 			{
-				DrawVec3Control("Position", component.Translation);
+				glm::vec3 xcol = { 0.8f, 0.1f, 0.15f }, ycol = { 0.2f, 0.7f, 0.2f }, zcol = { 0.1f, 0.25f, 0.8f };
+				UI::UIFunctionalities::DrawVec3UI("Position", component.Translation, xcol, ycol, zcol);
 
 				glm::vec3 rot = glm::degrees(component.Rotation);
-				DrawVec3Control("Rotation", rot);
+				UI::UIFunctionalities::DrawVec3UI("Rotation", rot, xcol, ycol, zcol);
 				component.Rotation = glm::radians(rot);
 
-				DrawVec3Control("Scale", component.Scale, 1.0f);
+				UI::UIFunctionalities::DrawVec3UI("Scale", component.Scale, xcol, ycol, zcol, 1.0f);
 			});
 
-		// Camera Component
+		// -- Camera Component --
 		DrawComponentUI<CameraComponent>("Camera", entity, [](auto& component)
 			{
 				SceneCamera& camera = component.Camera;
@@ -339,38 +289,38 @@ namespace Kaimos {
 
 				if (camera.GetProjectionType() == SceneCamera::ProjectionType::PERSPECTIVE)
 				{
-					float perspFOV = camera.GetPerspectiveFOV();
-					if (ImGui::DragFloat("FOV", &perspFOV))
-						camera.SetPerspectiveFOV(perspFOV);
+					float persp_FOV = camera.GetPerspectiveFOV();
+					if (ImGui::DragFloat("FOV", &persp_FOV))
+						camera.SetPerspectiveFOV(persp_FOV);
 
-					float nearClip = camera.GetPerspectiveNearClip();
-					float farClip = camera.GetPerspectiveFarClip();
+					float near_clip = camera.GetPerspectiveNearClip();
+					float far_clip = camera.GetPerspectiveFarClip();
 
-					if (ImGui::DragFloat("Near Clip", &nearClip))
-						camera.SetPerspectiveClips(nearClip, farClip);
-					if (ImGui::DragFloat("Far Clip", &farClip))
-						camera.SetPerspectiveClips(nearClip, farClip);
+					if (ImGui::DragFloat("Near Clip", &near_clip))
+						camera.SetPerspectiveClips(near_clip, far_clip);
+					if (ImGui::DragFloat("Far Clip", &far_clip))
+						camera.SetPerspectiveClips(near_clip, far_clip);
 				}
 
 				if (camera.GetProjectionType() == SceneCamera::ProjectionType::ORTHOGRAPHIC)
 				{
 					ImGui::Checkbox("Fixed Aspect Ratio", &component.FixedAspectRatio);
 
-					float orthoSize = camera.GetOrthographicSize();
-					if (ImGui::DragFloat("Size", &orthoSize))
-						camera.SetOrthographicSize(orthoSize);
+					float ortho_size = camera.GetOrthographicSize();
+					if (ImGui::DragFloat("Size", &ortho_size))
+						camera.SetOrthographicSize(ortho_size);
 
-					float nearClip = camera.GetOrthographicNearClip();
-					float farClip = camera.GetOrthographicFarClip();
+					float near_clip = camera.GetOrthographicNearClip();
+					float far_clip = camera.GetOrthographicFarClip();
 
-					if (ImGui::DragFloat("Near Clip", &nearClip))
-						camera.SetOrthographicClips(nearClip, farClip);
-					if (ImGui::DragFloat("Far Clip", &farClip))
-						camera.SetOrthographicClips(nearClip, farClip);
+					if (ImGui::DragFloat("Near Clip", &near_clip))
+						camera.SetOrthographicClips(near_clip, far_clip);
+					if (ImGui::DragFloat("Far Clip", &far_clip))
+						camera.SetOrthographicClips(near_clip, far_clip);
 				}
 			});		
 
-		// Sprite Renderer Component
+		// -- Sprite Renderer Component --
 		DrawComponentUI<SpriteRendererComponent>("Sprite Renderer", entity, [](auto& component)
 			{
 				ImGuiColorEditFlags color_flags = ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreview | ImGuiColorEditFlags_NoInputs;

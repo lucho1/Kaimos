@@ -1,31 +1,34 @@
 #ifndef _CORE_H_
 #define _CORE_H_
 
-// -- PLATFORM DETECTION --
+// --- PLATFORM DETECTION ---
 #include "Core/Utils/PlatformDetection.h"
 
-// -- DYNAMIC LINKING (DLL) SUPPORT --
+
+
+// --- DYNAMIC LINKING (DLL) SUPPORT ---
 // If windows is the current platform (currently not other platform is available)
 #ifdef KS_PLATFORM_WINDOWS
-// Case in which we want to build Kaimos Engine as a dll
-#if KS_DYNAMIC_LINK
-	// Build this dll (the current one of Kaimos Engine project, not for other!)
-	#ifdef KS_BUILD_DLL
-		// When building the DLL (the engine itself), we EXPORT anything after KAIMOS_API
-		#define KAIMOS_API __declspec(dllexport)
+	// Case in which we want to build Kaimos Engine as a dll
+	#if KS_DYNAMIC_LINK
+		// Build this dll (the current one of Kaimos Engine project, not for other!)
+		#ifdef KS_BUILD_DLL
+			// When building the DLL (the engine itself), we EXPORT anything after KAIMOS_API
+			#define KAIMOS_API __declspec(dllexport)
+		#else
+			// Otherwise, when not building the DLL (the engine itself), we IMPORT anything after KAIMOS_API
+			#define KAIMOS_API __declspec(dllimport)
+		#endif
 	#else
-		// Otherwise, when not building the DLL (the engine itself), we IMPORT anything after KAIMOS_API
-		#define KAIMOS_API __declspec(dllimport)
+		#define KAIMOS_API
 	#endif
-#else
-	#define KAIMOS_API
-#endif
 #else
 	#error Kaimos Engine only supports Windows currently
 #endif
-// -- End of DLL SUPPORT --
 
-// -- GLOBALS --
+
+
+// --- GLOBALS ---
 #if KS_DEBUG || KS_RELEASE
 	#define KS_ACTIVATE_PROFILE 1
 	#if defined(KS_PLATFORM_WINDOWS)
@@ -41,7 +44,9 @@
 	#define KS_DEBUGBREAK()
 #endif
 
-// -- Assertions --
+
+
+// --- ASSERTIONS ---
 #if KS_ENABLE_ASSERTS
 	#define KS_EDITOR_ASSERT(x, ...) { if(!x) { KS_EDITOR_CRITICAL("ASSERION FAILED: {0}", __VA_ARGS__); KS_DEBUGBREAK(); }} // Client/Editor Assert
 	#define KS_ENGINE_ASSERT(x, ...) { if(!x) { KS_ENGINE_CRITICAL("ASSERION FAILED: {0}", __VA_ARGS__); KS_DEBUGBREAK(); }} // Core/Engine Assert
@@ -51,7 +56,8 @@
 #endif
 
 
-// -- General Defines --
+
+// --- GENERAL DEFINES ---
 #define BIT(x) (1 << x)
 //#define KS_BIND_EVENT_FN(x) std::bind(&x, this, std::placeholders::_1)
 
@@ -62,13 +68,15 @@
 // Summarizing, the next deduces the return type after the lambda is declared
 #define KS_BIND_EVENT_FN(x) [this](auto&&... args)->decltype(auto) { return this->x(std::forward<decltype(args)>(args)...); }
 
-// -- Typedefs --
+
+
+// --- TYPEDEFS ---
 typedef unsigned int uint; // This is the same than uint32_t
 typedef unsigned short ushort;
 
 #include <memory>
-namespace Kaimos
-{
+namespace Kaimos {
+
 	// There must be a line between a Kaimos Reference (for assets, mem/resource management...)
 	// and an std::_ptr. We still using std::_ptr but not for things that are explicitly only for
 	// Kaimos Engine, and that could, potentially and in the future, be handled by an asset manager
@@ -89,7 +97,5 @@ namespace Kaimos
 		return std::make_shared<T>(std::forward<Args>(args)...);
 	}
 }
-
-// -- END OF GLOBALS --
 
 #endif //_CORE_H_

@@ -11,8 +11,9 @@ namespace Kaimos {
 
 		// If cancelled, returns empty string
 		static std::string OpenFile(const char* filter);
+
+		// If cancelled, returns empty string
 		static std::string SaveFile(const char* filter);
 	};
-
 }
 #endif //_PLATFORMUTILS_H_

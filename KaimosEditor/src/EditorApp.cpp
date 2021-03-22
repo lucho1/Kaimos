@@ -2,9 +2,6 @@
 #include <Kaimos.h>
 #include <Core/EntryPoint.h>
 
-// --- Other Includes ---
-#include <ImGui/imgui.h>
-
 // --- Editor Includes ---
 #include "EditorLayer.h"
 
@@ -15,18 +12,9 @@ namespace Kaimos {
 	{
 	public:
 
-		EditorApp() : Application("Kaimos Editor")
-		{
-			PushLayer(new EditorLayer());
-		}
-
-		~EditorApp()
-		{
-		}
+		EditorApp() : Application("Kaimos Editor") { PushLayer(new EditorLayer()); }
+		~EditorApp() = default;
 	};
 
-	Application* CreateApplication()
-	{
-		return new EditorApp();
-	}
+	Application* CreateApplication() { return new EditorApp(); }
 }

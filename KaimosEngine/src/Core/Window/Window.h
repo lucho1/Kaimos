@@ -3,14 +3,15 @@
 
 #include "Core/Core.h"
 #include "Core/Events/Event.h"
+
 #include <sstream>
 
 namespace Kaimos {
 
 	struct WindowProps
 	{
-		std::string Title;
-		uint Width, Height;
+		std::string Title = "Unnamed";
+		uint Width = 960, Height = 540;
 
 		WindowProps(const std::string& title = "Kaimos Engine", uint w = 1600, uint h = 900)
 			: Title(title), Width(w), Height(h) {}
@@ -18,22 +19,24 @@ namespace Kaimos {
 
 	
 	// -- Platform-independent Window class --
+	// It's basically an interface, everything is pure virtual,
+	// no data at all, every window will be implemented per-platform
 	class Window
 	{
 	public:
 
 		using EventCallbackFn = std::function<void(Event&)>;
 
+		// --- Public Class Methods ---
 		virtual ~Window() = default;
 		virtual void OnUpdate() = 0;
 		
-		// -- Class Methods --
-		virtual uint GetWidth() const = 0;
-		virtual uint GetHeight() const = 0;
+		// --- Getters ---
+		virtual uint GetWidth()			const = 0;
+		virtual uint GetHeight()		const = 0;
+		virtual void* GetNativeWindow()	const = 0;
 
-		virtual void* GetNativeWindow() const = 0;
-
-		// -- Attributes --
+		// --- Setters ---
 		virtual void SetEventCallback(const EventCallbackFn& callback) = 0;
 		virtual void SetVSync(bool enabled) = 0;
 		virtual bool IsVSync() const = 0;
@@ -45,9 +48,6 @@ namespace Kaimos {
 
 		static float s_ScreenDPIScaleFactor;
 	};
-
-	// It's basically an interface, everything is pure virtual,
-	// no data at all, every window will be implemented per-platform
 }
 
-#endif
+#endif //_WINDOW_H_

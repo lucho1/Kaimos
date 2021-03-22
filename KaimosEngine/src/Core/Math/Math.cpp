@@ -4,22 +4,22 @@
 #include <glm/gtx/matrix_decompose.hpp>
 
 
-namespace Kaimos::Math
-{
+namespace Kaimos::Math {
+
 	bool DecomposeTransformation(const glm::mat4& transform, glm::vec3& translation, glm::vec3& rotation, glm::vec3& scale)
 	{
-		// This is from glm::decompose() of glm
+		// -- From glm::decompose() --
 		using namespace glm;
 		using T = float;
 
-		// Matrix to decompose
+		// -- Matrix to decompose --
 		mat4 local_mat(transform);
 
-		// Matrix Normalize
+		// -- Matrix Normalize --
 		if (epsilonEqual(local_mat[3][3], static_cast<float>(0), epsilon<T>()))
 			return false;
 
-		// Isolate Perspective
+		// -- Perspective Isolation --
 		if (epsilonNotEqual(local_mat[0][3], static_cast<T>(0), epsilon<T>()) ||
 			epsilonNotEqual(local_mat[1][3], static_cast<T>(0), epsilon<T>()) ||
 			epsilonNotEqual(local_mat[2][3], static_cast<T>(0), epsilon<T>()))
@@ -29,11 +29,11 @@ namespace Kaimos::Math
 			local_mat[3][3] = static_cast<T>(1);
 		}
 
-		// Translation
+		// -- Translation --
 		translation = vec3(local_mat[3]);
 		local_mat[3] = vec4(0, 0, 0, local_mat[3].w);
 
-		// Scale
+		// -- Scale --
 		vec3 Row[3];
 		for (length_t i = 0; i < 3; ++i)
 			for (length_t j = 0; j < 3; ++j)
@@ -46,7 +46,7 @@ namespace Kaimos::Math
 		Row[1] = detail::scale(Row[1], static_cast<T>(1));
 		Row[2] = detail::scale(Row[2], static_cast<T>(1));
 
-		// Rotation
+		// -- Rotation --
 		rotation.y = asin(-Row[0][2]);
 		if (cos(rotation.y) != 0)
 		{
@@ -58,7 +58,6 @@ namespace Kaimos::Math
 			rotation.x = atan2(-Row[2][0], Row[1][1]);
 			rotation.z = 0;
 		}
-
 
 		return true;
 	}

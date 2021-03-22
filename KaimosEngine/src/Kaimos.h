@@ -38,4 +38,4 @@
 // Entry point must be inicluded only where the EntryPoint (main) is actually
 // needed, otherwise, it would be included everywhere (if included here)
 
-#endif
+#endif //_KAIMOS_H_

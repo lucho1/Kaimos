@@ -11,8 +11,8 @@ namespace Kaimos {
 
 		WindowResizeEvent(uint width, uint height) : m_Width(width), m_Height(height) {}
 
-		inline uint GetWidth() const { return m_Width; }
-		inline uint GetHeight() const { return m_Height; }
+		inline uint GetWidth()	const { return m_Width; }
+		inline uint GetHeight()	const { return m_Height; }
 
 		std::string ToString() const override
 		{
@@ -67,7 +67,6 @@ namespace Kaimos {
 		EVENT_CLASS_TYPE(APP_RENDER)
 		EVENT_CLASS_CATEGORY(EVENT_CATEGORY::APPLICATION)
 	};
-
 }
 
-#endif
+#endif //_APPLICATIONEVENT_H_

@@ -10,10 +10,11 @@ namespace Kaimos {
 
 	Application* Application::s_Instance = nullptr;
 
+	// ----------------------- Public Class Methods -------------------------------------------------------
 	Application::Application(const std::string& name)
 	{
 		KS_PROFILE_FUNCTION();
-		KS_ENGINE_ASSERT(!s_Instance, "There already exist one instance of Application!!"); // Assertion to not to have more than 1 Application instances
+		KS_ENGINE_ASSERT(!s_Instance, "There already exist one instance of Application!!");
 		s_Instance = this;
 
 		m_Window = Window::Create(WindowProps(name));
@@ -35,7 +36,26 @@ namespace Kaimos {
 		Renderer::Shutdown();
 	}
 
-	// -- Class Methods --
+
+
+	// ----------------------- Layer Methods --------------------------------------------------------------
+	void Application::PushLayer(Layer* layer)
+	{
+		KS_PROFILE_FUNCTION();
+		m_LayerStack.PushLayer(layer);
+		layer->OnAttach();
+	}
+
+	void Application::PushOverlay(Layer* layer)
+	{
+		KS_PROFILE_FUNCTION();
+		m_LayerStack.PushOverlay(layer);
+		layer->OnAttach();
+	}
+
+
+	
+	// ----------------------- Private Application Methods ------------------------------------------------
 	void Application::Run()
 	{
 		KS_PROFILE_FUNCTION();
@@ -50,8 +70,10 @@ namespace Kaimos {
 		while (m_Running)
 		{
 			KS_PROFILE_SCOPE("Run Loop");
-			float time = (float)glfwGetTime();//QueryPerformanceFrequency(); QueryPerformanceCounter(); // Platform::GetTime() !!!!!!
-			Timestep timestep = time - m_LastFrameTime; // How long this frame is (dt, current time vs last frame time)
+
+			// -- Delta Time --
+			float time = (float)glfwGetTime();			//QueryPerformanceFrequency(); QueryPerformanceCounter(); // Platform::GetTime() !!!!!!
+			Timestep timestep = time - m_LastFrameTime;	// How long this frame is (dt, current time vs last frame time)
 			m_LastFrameTime = time;
 
 			// -- Layers Update --
@@ -62,7 +84,8 @@ namespace Kaimos {
 					layer->OnUpdate(timestep);
 			}
 
-			// ImGui stills updating when minimized because we don't know its behaviour on minimizing
+			// -- UI & Rendering --
+			// ImGui is still updating when minimized because we don't know its behaviour on minimizing
 			{
 				KS_PROFILE_SCOPE("UI Render");
 				m_ImGuiLayer->Begin();
@@ -86,22 +109,9 @@ namespace Kaimos {
 		}
 	}
 
-	// -- Layers --
-	void Application::PushLayer(Layer* layer)
-	{
-		KS_PROFILE_FUNCTION();
-		m_LayerStack.PushLayer(layer);
-		layer->OnAttach();
-	}
 
-	void Application::PushOverlay(Layer* layer)
-	{
-		KS_PROFILE_FUNCTION();
-		m_LayerStack.PushOverlay(layer);
-		layer->OnAttach();
-	}
-
-	// -- Events --
+	
+	// ----------------------- Event Private Methods ------------------------------------------------------
 	void Application::OnEvent(Event& e)
 	{
 		KS_PROFILE_FUNCTION();
@@ -111,7 +121,7 @@ namespace Kaimos {
 		dispatcher.Dispatch<WindowResizeEvent>(KS_BIND_EVENT_FN(Application::OnWindowResize));
 		//KS_ENGINE_TRACE("{0}", e);
 
-		// Layers Events handling
+		// -- Layers Events Handling --
 		for (auto it = m_LayerStack.rbegin(); it != m_LayerStack.rend(); ++it)
 		{
 			if (e.IsHandled())
@@ -142,5 +152,4 @@ namespace Kaimos {
 		m_Minimized = false;
 		return false;
 	}
-	
 }

@@ -466,7 +466,6 @@ namespace Kaimos {
 }
 
 
-
 // ---------------------------------------
 // ---------------------------------------
-#endif // _KAIMOSINPUTCODES_H_
+#endif //_KAIMOSINPUTCODES_H_
