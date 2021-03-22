@@ -11,12 +11,12 @@ namespace Kaimos {
 		friend class Application;
 	public:
 
-		// --- Keyboard Functions ---
+		// --- Keyboard Methods ---
 		static bool IsKeyPressed(const KEY_CODE key);
 		static bool IsKeyDown(const KEY_CODE key);
 		static bool IsKeyUp(const KEY_CODE key);
 
-		// --- Mouse Functions ---
+		// --- Mouse Methods ---
 		static bool IsMouseButtonPressed(const MOUSE_CODE button);
 		static bool IsMouseButtonDown(const MOUSE_CODE button);
 		static bool IsMouseButtonUp(const MOUSE_CODE button);
@@ -26,18 +26,18 @@ namespace Kaimos {
 		static float GetMouseX();
 		static float GetMouseY();
 		
-		// --- Class Public Methods ---
+		// --- Public Class Methods ---
 		static KEY_CODE GetCrossKeyboardKey(const KEY_CODE key);
 
 	protected:
 
-		// --- Class Protected Methods ---
+		// --- Protected Class Methods ---
 		static bool GetKey(const KEY_CODE key);
 		static bool GetMouseButton(const MOUSE_CODE button);
 
 	private:
 		
-		// --- Class Private Methods ---
+		// --- Private Class Methods ---
 		static void OnUpdate();
 	};
 }

@@ -2,32 +2,24 @@
 #include "ImGuiLayer.h"
 #include "Core/Application.h"
 
-//#include "Platform/OpenGL/ImGuiOGLRenderer.h"
-
 #define IMGUI_IMPL_API
 #include <imgui.h>
 #include <examples/imgui_impl_glfw.h>
 #include <examples/imgui_impl_opengl3.h>
 
-// TEMPORARY
+// TODO: TEMPORARY
 #include <GLFW/glfw3.h>
-#include <glad/glad.h>
-
 #include "ImGuizmo.h"
+
 
 namespace Kaimos {
 
-	ImGuiLayer::ImGuiLayer() : Layer("ImGuiLayer")
-	{
-	}
-
-
-	// -- Layer Methods --
+	// ----------------------- Public Layer Methods -------------------------------------------------------
 	void ImGuiLayer::OnAttach()
 	{
 		KS_PROFILE_FUNCTION();
 
-		// Setup ImGui context
+		// -- Setup ImGui context --
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
 		ImGuiIO& io = ImGui::GetIO(); (void)io;
@@ -38,25 +30,24 @@ namespace Kaimos {
 		//io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoTaskBarIcons;
 		//io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoMerge;
 
-		// Setup Dear ImGui Style (this one is a Kaimos Engine own style based on other 2, see function)
+		// -- Setup ImGui Style (own style based on other 2) --
 		SetEngineUIStyle();
 		//ImGui::StyleColorsDark();
 
-		// When viewports enabled, tweak WindowRounding/WindowBg so plaform windows can look identical to regular ones
+		// -- When viewports enabled, tweak WindowRounding/WindowBg so plaform windows can look identical to regular ones --
 		ImGuiStyle& style = ImGui::GetStyle();
 		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
 		{
 			style.WindowRounding = 0.0f;
 			style.Colors[ImGuiCol_WindowBg].w = 1.0f;
 		}
-
-		Application& app = Application::Get();
-		GLFWwindow* window = static_cast<GLFWwindow*>(app.GetWindow().GetNativeWindow());
-
-		// Setup Platform/Renderer bindings
+		
+		// -- Setup Platform/Renderer Bindings --
+		GLFWwindow* window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
 		ImGui_ImplGlfw_InitForOpenGL(window, true);
 		ImGui_ImplOpenGL3_Init("#version 430");
 	}
+
 
 	void ImGuiLayer::OnDetach()
 	{
@@ -65,6 +56,7 @@ namespace Kaimos {
 		ImGui_ImplGlfw_Shutdown();
 		ImGui::DestroyContext();
 	}
+
 
 	void ImGuiLayer::OnEvent(Event& e)
 	{
@@ -82,7 +74,8 @@ namespace Kaimos {
 	}
 
 
-	// -- Class Methods --
+	
+	// ----------------------- Public ImGui Methods -------------------------------------------------------
 	void ImGuiLayer::Begin()
 	{
 		KS_PROFILE_FUNCTION();
@@ -100,10 +93,6 @@ namespace Kaimos {
 		Application& app = Application::Get();
 		io.DisplaySize = ImVec2((float)app.GetWindow().GetWidth(), (float)app.GetWindow().GetHeight());
 		
-		//float time = (float)glfwGetTime();
-		//m_Time = time;
-		//io.DeltaTime = m_Time > 0.0f ? (time - m_Time) : (1.0f / 60.0f);
-
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
@@ -117,23 +106,18 @@ namespace Kaimos {
 	}
 
 
-	void ImGuiLayer::OnUIRender()
-	{
-		//static bool show = true;
-		//ImGui::ShowDemoWindow(&show);
-	}
 
-
+	// ----------------------- Private ImGui Methods ------------------------------------------------------
 	void ImGuiLayer::SetEngineUIStyle() const
 	{
+		// ImGui Style gotten from a free-to-use style from https://www.unknowncheats.me/forum/c-and-c-/189635-imgui-style-settings.html
+		// & From CronosEngine (style by Roger Leon @rleonborras) with some touches by myself
 		ImGuiIO& io = ImGui::GetIO();
 		ImGuiStyle* style = &ImGui::GetStyle();
 		ImVec4* colors = style->Colors;
 
-		// ImGui Style gotten from a free-to-use style from https://www.unknowncheats.me/forum/c-and-c-/189635-imgui-style-settings.html
-		// & From CronosEngine (style by Roger Leon @rleonborras) with some touches by myself
 		
-		// --- Fonts Load ---
+		// -- Fonts Load --
 		// Default Font + Secondary one
 		io.FontDefault = io.Fonts->AddFontFromFileTTF("../KaimosEngine/res/fonts/Ruda/Ruda-SemiBold.ttf", Window::s_ScreenDPIScaleFactor * 13.0f); // You can also try "Opensans/OpenSans-SemiBold.ttf" (in 14.0f)
 		io.Fonts->AddFontFromFileTTF("../KaimosEngine/res/fonts/Ruda/Ruda-Black.ttf", Window::s_ScreenDPIScaleFactor * 13.0f);
@@ -147,9 +131,9 @@ namespace Kaimos {
 		io.Fonts->AddFontFromFileTTF(font_path.c_str(), Window::s_ScreenDPIScaleFactor * 20.0f);
 		io.Fonts->AddFontFromFileTTF(font_path.c_str(), Window::s_ScreenDPIScaleFactor * 22.0f);
 		io.Fonts->AddFontFromFileTTF(font_path.c_str(), Window::s_ScreenDPIScaleFactor * 24.0f);
-		// --- ---
 
-		// --- UI Style Settings ---
+
+		// -- UI Style Settings --
 		style->WindowPadding = ImVec2(15, 15);
 		style->WindowRounding = 5.0f;
 		style->FramePadding = ImVec2(5, 5);
@@ -170,7 +154,7 @@ namespace Kaimos {
 
 		style->ScaleAllSizes(Window::s_ScreenDPIScaleFactor);
 
-		// --- UI Style Colors ---
+		// -- UI Style Colors --
 		colors[ImGuiCol_Text] = ImVec4(0.80f, 0.80f, 0.83f, 1.00f);
 		colors[ImGuiCol_TextDisabled] = ImVec4(0.24f, 0.23f, 0.29f, 1.00f);
 		colors[ImGuiCol_WindowBg] = ImVec4(0.06f, 0.05f, 0.07f, 1.00f);
@@ -199,7 +183,7 @@ namespace Kaimos {
 		colors[ImGuiCol_TextSelectedBg] = ImVec4(0.25f, 1.00f, 0.00f, 0.43f);
 		colors[ImGuiCol_ModalWindowDarkening] = ImVec4(1.00f, 0.98f, 0.95f, 0.73f);
 		
-		// More Important Stuff (all from web upside):
+		// -- More Important Stuff (all from web upside) --
 		// -- Headers --
 		colors[ImGuiCol_Header] = ImVec4(0.10f, 0.09f, 0.12f, 1.00f);
 		colors[ImGuiCol_HeaderHovered] = ImVec4(0.56f, 0.56f, 0.58f, 1.00f);
@@ -219,11 +203,9 @@ namespace Kaimos {
 		colors[ImGuiCol_TitleBg] = ImVec4(0.10f, 0.09f, 0.12f, 1.00f);
 		colors[ImGuiCol_TitleBgCollapsed] = ImVec4(0.10f, 0.09f, 0.12f, 1.00f);
 		colors[ImGuiCol_TitleBgActive] = ImVec4(0.07f, 0.07f, 0.09f, 1.00f);
-		// -- --
 		
 
-
-		// From here, the style comes from Cronos Engine (https://github.com/lucho1/CronosEngine), owned by me (@lucho1) and @rleonborras
+		// -- From here on, the style comes from Cronos Engine (https://github.com/lucho1/CronosEngine), owned by me (@lucho1) and @rleonborras --
 		colors[ImGuiCol_ChildBg] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
 		colors[ImGuiCol_Separator] = colors[ImGuiCol_Border];
 		colors[ImGuiCol_SeparatorHovered] = ImVec4(0.10f, 0.40f, 0.75f, 0.78f);
@@ -242,7 +224,5 @@ namespace Kaimos {
 		colors[ImGuiCol_TabActive] = ImVec4(0.392f, 0.369f, 0.376f, 1.0f);
 		colors[ImGuiCol_TabUnfocused] = ImVec4(0.392f, 0.369f, 0.376f, 0.5f);
 		colors[ImGuiCol_TabUnfocusedActive] = ImVec4(0.392f, 0.369f, 0.376f, 0.50f);
-		// --- ---
 	}
-
 }

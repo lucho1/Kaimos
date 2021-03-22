@@ -21,6 +21,9 @@ namespace Kaimos {
 		KS_ENGINE_ERROR("GLFW Initialization Error ({0}): {1}", error, desc);
 	}
 
+
+
+	// ----------------------- Public Class Methods -------------------------------------------------------
 	WindowsWindow::WindowsWindow(const WindowProps& props)
 	{
 		KS_PROFILE_FUNCTION();
@@ -33,6 +36,46 @@ namespace Kaimos {
 		Shutdown();
 	}
 
+	void WindowsWindow::OnUpdate()
+	{
+		KS_PROFILE_FUNCTION();
+		glfwPollEvents();
+		m_Context->SwapBuffers();
+	}
+
+
+
+	// ----------------------- Public Window Methods ------------------------------------------------------
+	void WindowsWindow::Shutdown()
+	{
+		KS_PROFILE_FUNCTION();
+		KS_ENGINE_INFO("Destroying GLFW Window '{0}'", m_Data.Title);
+		glfwDestroyWindow(m_Window);
+		--s_WindowCount;
+
+		if (s_WindowCount == 0)
+		{
+			KS_ENGINE_INFO("Terminating GLFW");
+			glfwTerminate();
+		}
+	}
+
+
+
+	// ----------------------- Setters --------------------------------------------------------------------
+	void WindowsWindow::SetVSync(bool enabled)
+	{
+		if (enabled)
+			glfwSwapInterval(1);
+		else
+			glfwSwapInterval(0);
+
+		m_Data.VSync = enabled;
+	}
+	
+
+
+	// ----------------------- Private Window Methods -----------------------------------------------------
 	void WindowsWindow::Init(const WindowProps& props)
 	{
 		KS_PROFILE_FUNCTION();
@@ -85,39 +128,7 @@ namespace Kaimos {
 		SetGLFWEventCallbacks();
 	}
 
-	void WindowsWindow::Shutdown()
-	{
-		KS_PROFILE_FUNCTION();
-		KS_ENGINE_INFO("Destroying GLFW Window '{0}'", m_Data.Title);
-		glfwDestroyWindow(m_Window);
-		--s_WindowCount;
-
-		if (s_WindowCount == 0)
-		{
-			KS_ENGINE_INFO("Terminating GLFW");
-			glfwTerminate();
-		}
-	}
-
-	void WindowsWindow::OnUpdate()
-	{
-		KS_PROFILE_FUNCTION();
-		glfwPollEvents();
-		m_Context->SwapBuffers();
-	}
-
-	void WindowsWindow::SetVSync(bool enabled)
-	{
-		if (enabled)
-			glfwSwapInterval(1);
-		else
-			glfwSwapInterval(0);
-
-		m_Data.VSync = enabled;
-	}
-
-
-	// -- GLFW Event Callbacks --
+	
 	void WindowsWindow::SetGLFWEventCallbacks() const
 	{
 		// Window/Application Events

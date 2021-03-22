@@ -25,7 +25,7 @@ namespace Kaimos {
 		virtual void OnDestroy() {}
 
 	private:
-		Entity m_Entity;
+		Entity m_Entity = {};
 	};
 }
 

@@ -52,16 +52,16 @@ namespace Kaimos {
 		static Application* s_Instance; // Singleton of Application (we only want 1 Application)
 		friend int ::main(int argc, char** argv);
 
-		ScopePtr<Window> m_Window; // Having a unique_ptr means we don't have to worry about deleting the Window ourselves on app termination :D
-		ImGuiLayer* m_ImGuiLayer;
-		LayerStack m_LayerStack;
+		ScopePtr<Window> m_Window = nullptr; // Having a unique_ptr means we don't have to worry about deleting the Window ourselves on app termination :D
+		ImGuiLayer* m_ImGuiLayer = nullptr;
+		LayerStack m_LayerStack = {};
 		
 		// --- App Properties ---
 		bool m_Running = true;
 		bool m_Minimized = false;
 
 		// --- Delta Time ---
-		Timestep m_Timestep;
+		Timestep m_Timestep = {};
 		float m_LastFrameTime = 0.0f;
 	};
 

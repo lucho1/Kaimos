@@ -13,7 +13,7 @@ namespace Kaimos {
 	public:
 
 		// --- Public Class Methods ---
-		Layer(const std::string& name = "Layer") : m_Name(name) {}
+		Layer(const std::string& name = "Unnamed Layer") : m_Name(name) {}
 		virtual ~Layer() = default;
 
 		// --- Public Layer Methods ---

@@ -13,37 +13,42 @@ namespace Kaimos {
 
 	public:
 
+		// --- Public Class Methods ---
 		SceneCamera();
 		virtual ~SceneCamera() = default;
 
+		// --- Public Camera Methods ---
 		void SetViewportSize(uint width, uint height);
 
-		void SetProjectionType(ProjectionType projection)	{ m_ProjectionType = projection; RecalculateProjectionMatrix(); }
-		const ProjectionType GetProjectionType()	const	{ return m_ProjectionType; }
+	public:
 
-		// Orthographic Camera
-		void SetOrthographicCamera(float size, float nearClip, float farClip);
-
-		void SetOrthographicSize(float size)					{ m_OrthoSize = size; RecalculateProjectionMatrix(); }
-		void SetOrthographicClips(float nearP, float farP)		{ m_OrthographicNearClip = nearP; m_OrthographicFarClip = farP; RecalculateProjectionMatrix(); }
+		// --- Orthographic Camera G/Setters ---
+		ProjectionType GetProjectionType()	const { return m_ProjectionType; }
+		float GetOrthographicSize()			const { return m_OrthoSize; }
+		float GetOrthographicNearClip()		const { return m_OrthographicNearClip; }
+		float GetOrthographicFarClip()		const { return m_OrthographicFarClip; }
 		
-		const float GetOrthographicSize()			const	{ return m_OrthoSize; }
-		const float GetOrthographicNearClip()		const	{ return m_OrthographicNearClip; }
-		const float GetOrthographicFarClip()		const	{ return m_OrthographicFarClip; }
+		void SetProjectionType(ProjectionType projection)					{ m_ProjectionType = projection; RecalculateProjectionMatrix(); }
+		void SetOrthographicSize(float size)								{ m_OrthoSize = size; RecalculateProjectionMatrix(); }
+		void SetOrthographicClips(float near_plane, float far_plane)		{ m_OrthographicNearClip = near_plane; m_OrthographicFarClip = far_plane; RecalculateProjectionMatrix(); }
 		
+		void SetOrthographicCamera(float size, float near_clip, float far_clip);
+		
+	public:
 
-		// Perspective Camera
-		void SetPerspectiveCamera(float FOV, float nearClip, float farClip);
-
-		void SetPerspectiveFOV(float FOV)					{ m_PerspectiveFOV = FOV; RecalculateProjectionMatrix(); }
-		void SetPerspectiveClips(float nearP, float farP)	{ m_PerspectiveNearClip = nearP; m_PerspectiveFarClip = farP; RecalculateProjectionMatrix(); }
-
-		const float GetPerspectiveFOV()				const	{ return m_PerspectiveFOV; }
-		const float GetPerspectiveNearClip()		const	{ return m_PerspectiveNearClip; }
-		const float GetPerspectiveFarClip()			const	{ return m_PerspectiveFarClip; }
+		// --- Perspective Camera G/Setters ---
+		float GetPerspectiveFOV()			const	{ return m_PerspectiveFOV; }
+		float GetPerspectiveNearClip()		const	{ return m_PerspectiveNearClip; }
+		float GetPerspectiveFarClip()		const	{ return m_PerspectiveFarClip; }
+		
+		void SetPerspectiveCamera(float FOV, float near_clip, float far_clip);
+		
+		void SetPerspectiveFOV(float FOV)							{ m_PerspectiveFOV = FOV; RecalculateProjectionMatrix(); }
+		void SetPerspectiveClips(float near_plane, float farClip)	{ m_PerspectiveNearClip = near_plane; m_PerspectiveFarClip = farClip; RecalculateProjectionMatrix(); }
 
 	private:
 
+		// --- Private Camera Methods ---
 		void RecalculateProjectionMatrix();
 
 	private:
@@ -59,4 +64,5 @@ namespace Kaimos {
 		float m_AspectRatio = 1.7f;
 	};
 }
+
 #endif //_SCENE_CAMERA_H_

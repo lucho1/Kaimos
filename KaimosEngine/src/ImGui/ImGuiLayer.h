@@ -13,23 +13,23 @@ namespace Kaimos {
 	{
 	public:
 
-		ImGuiLayer();
+		// --- Public Class Methods ---
+		ImGuiLayer() : Layer("ImGui Layer") {}
 		~ImGuiLayer() = default;
 
-		// -- Layer Methods --
-		virtual void OnAttach() override;
-		virtual void OnDetach() override;
-		virtual void OnUIRender() override;
-		virtual void OnEvent(Event& e) override;
+		// --- Public Layer Methods ---
+		virtual void OnAttach()			override;
+		virtual void OnDetach()			override;
+		virtual void OnEvent(Event& e)	override;
 
-		// -- Class Methods --
+		// --- Public ImGui Methods ---
 		void SetBlockEvents(bool block_events) { m_BlockEvents = block_events; }
 		void Begin();
 		void End();
 
 	private:
 
-		// -- Class Methods --
+		// --- Private ImGui Methods ---
 		void SetEngineUIStyle() const;
 
 	private:
@@ -38,4 +38,4 @@ namespace Kaimos {
 	};
 }
 
-#endif
+#endif //_IMGUILAYER_H_

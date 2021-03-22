@@ -15,7 +15,7 @@ namespace Kaimos {
 
 	struct TagComponent
 	{
-		std::string Tag;
+		std::string Tag = "Unnamed";
 		bool Rename = false;
 
 		TagComponent() = default;
@@ -82,7 +82,7 @@ namespace Kaimos {
 
 	struct CameraComponent
 	{
-		Kaimos::SceneCamera Camera;
+		Kaimos::SceneCamera Camera = {};
 		bool Primary = true; // TODO: Move it to scene
 		bool FixedAspectRatio = false;
 
@@ -101,9 +101,9 @@ namespace Kaimos {
 		void Bind()
 		{
 			InstantiateScript = []() { return static_cast<ScriptableEntity*>(new T()); };
-			DestroyScript = [](NativeScriptComponent* scriptComp) { delete scriptComp->EntityInstance; scriptComp->EntityInstance = nullptr; };
+			DestroyScript = [](NativeScriptComponent* script_comp) { delete script_comp->EntityInstance; script_comp->EntityInstance = nullptr; };
 		}
 	};
 }
 
-#endif // _COMPONENTS_H_
+#endif //_COMPONENTS_H_

@@ -39,12 +39,12 @@ namespace Kaimos::UI {
 
 		// -- Line Height --
 		// Internal Imgui code, on how ImGui calculates line heights
-		float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
-		ImVec2 buttonSize = { lineHeight + 3.0f, lineHeight };
+		float line_height = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
+		ImVec2 button_size = { line_height + 3.0f, line_height };
 
 		// -- X Button and DragFloat --
 		SetButton(xcolor, xcolor + hover_sum, bold_font);
-		if (ImGui::Button(std::string{labels[0]}.c_str(), buttonSize))
+		if (ImGui::Button(std::string{labels[0]}.c_str(), button_size))
 			value.x = reset_value;
 
 		ImGui::PopFont();
@@ -58,7 +58,7 @@ namespace Kaimos::UI {
 		// -- Y Button and DragFloat --
 		ImGui::SameLine();
 		SetButton(ycolor, ycolor + hover_sum, bold_font);
-		if (ImGui::Button(std::string{labels[1]}.c_str(), buttonSize))
+		if (ImGui::Button(std::string{labels[1]}.c_str(), button_size))
 			value.y = reset_value;
 
 		ImGui::PopFont();
@@ -71,7 +71,7 @@ namespace Kaimos::UI {
 		// -- Z Button and DragFloat --
 		ImGui::SameLine();
 		SetButton(zcolor, zcolor + hover_sum, bold_font);
-		if (ImGui::Button(&labels[2], buttonSize))
+		if (ImGui::Button(&labels[2], button_size))
 			value.z = reset_value;
 
 		ImGui::PopFont();

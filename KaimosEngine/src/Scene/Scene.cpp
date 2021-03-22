@@ -9,46 +9,40 @@
 
 namespace Kaimos {
 
-		//// -- To operate with entities: --
-		//entt::entity entity = m_Registry.create();
-		//// To add a component type into the registry (and it actually returns the comp. if you want to store it), this case a transform comp. with transform initialized to glm::mat4(1.0f)
-		//m_Registry.emplace<TransformComponent>(entity, glm::mat4(1.0f)); // This component is created on fly (don't need to register them on time)
-		//// To remove a list of components from an entity, this case TransformComponent:
-		//m_Registry.remove<TransformComponent>(entity);
-		//// To remove everything from the registry:
-		//m_Registry.clear();
-		//// To retreive a component:
-		//if(m_Registry.has<TransformComponent>(entity))
-		//	TransformComponent& transf = m_Registry.get<TransformComponent>(entity);
-		//
-		//// To make callbacks to certain events:
-		//m_Registry.on_construct<TransformComponent>().connect(/*function*/); // Function shall be func(entt::registry&, entt::entity)
-		//m_Registry.on_destroy<TransformComponent>().connect(/*function*/);
-		//m_Registry.on_update<TransformComponent>().connect(/*function*/);
-		//
-		//// To iterate through all entities with transform components:
-		//auto view = m_Registry.view<TransformComponent>();
-		//for (auto ent : view)
-		//{
-		//	view.get<MeshComponent>(ent); // This gets the mesh component of the current component's entity
-		//}
-		//
-		//// This also works to retrieve groups of components and other components that their entities have:
-		//auto group = m_Registry.group<TransformComponent>(entt::get<MeshComponent>);
-		//for (auto ent : group)
-		//{
-		//	auto&[transform, mesh] = group.get<TransformComponent, MeshComponent>(ent);
-		//}
+	//// -- To operate with entities: --
+	//entt::entity entity = m_Registry.create();
+	//// To add a component type into the registry (and it actually returns the comp. if you want to store it), this case a transform comp. with transform initialized to glm::mat4(1.0f)
+	//m_Registry.emplace<TransformComponent>(entity, glm::mat4(1.0f)); // This component is created on fly (don't need to register them on time)
+	//// To remove a list of components from an entity, this case TransformComponent:
+	//m_Registry.remove<TransformComponent>(entity);
+	//// To remove everything from the registry:
+	//m_Registry.clear();
+	//// To retreive a component:
+	//if(m_Registry.has<TransformComponent>(entity))
+	//	TransformComponent& transf = m_Registry.get<TransformComponent>(entity);
+	//
+	//// To make callbacks to certain events:
+	//m_Registry.on_construct<TransformComponent>().connect(/*function*/); // Function shall be func(entt::registry&, entt::entity)
+	//m_Registry.on_destroy<TransformComponent>().connect(/*function*/);
+	//m_Registry.on_update<TransformComponent>().connect(/*function*/);
+	//
+	//// To iterate through all entities with transform components:
+	//auto view = m_Registry.view<TransformComponent>();
+	//for (auto ent : view)
+	//{
+	//	view.get<MeshComponent>(ent); // This gets the mesh component of the current component's entity
+	//}
+	//
+	//// This also works to retrieve groups of components and other components that their entities have:
+	//auto group = m_Registry.group<TransformComponent>(entt::get<MeshComponent>);
+	//for (auto ent : group)
+	//{
+	//	auto&[transform, mesh] = group.get<TransformComponent, MeshComponent>(ent);
+	//}
 
 
-	Scene::Scene()
-	{
-	}
 
-	Scene::~Scene()
-	{
-	}
-	
+	// ----------------------- Public Scene Methods -------------------------------------------------------
 	void Scene::OnUpdateEditor(Timestep dt, EditorCamera& camera)
 	{
 		Renderer2D::BeginScene(camera);
@@ -63,9 +57,10 @@ namespace Kaimos {
 		Renderer2D::EndScene();
 	}
 
+
 	void Scene::OnUpdateRuntime(Timestep dt)
 	{
-		// Scripts --> This should happen in Scene::OnScenePlay() or similar (pressing the engine's play button)
+		// -- Scripts (should be in Scene::OnScenePlay() or similar, upon pressing engine's play button) --
 		m_Registry.view<NativeScriptComponent>().each([=](auto entity, auto& component) // Lambda that will be called for each of the NativeScriptComponent
 			{
 				if (!component.EntityInstance)
@@ -78,26 +73,27 @@ namespace Kaimos {
 				component.EntityInstance->OnUpdate(dt);
 			});
 
-		// Render
-		Camera* mainCam = nullptr;
-		glm::mat4 camTransform;
+
+		// -- Render --
+		Camera* main_cam = nullptr;
+		glm::mat4 cam_transform;
 
 		auto view = m_Registry.view<TransformComponent, CameraComponent>();
 		for (auto ent : view)
 		{
-			auto&[transform, camera] = view.get<TransformComponent, CameraComponent>(ent);
-			
+			auto& [transform, camera] = view.get<TransformComponent, CameraComponent>(ent);
+
 			if (camera.Primary)
 			{
-				mainCam = &camera.Camera;
-				camTransform = transform.GetTransform();
+				main_cam = &camera.Camera;
+				cam_transform = transform.GetTransform();
 				break;
 			}
 		}
 
-		if (mainCam)
+		if (main_cam)
 		{
-			Renderer2D::BeginScene(*mainCam, camTransform);
+			Renderer2D::BeginScene(*main_cam, cam_transform);
 
 			auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
 			for (auto ent : group)
@@ -110,6 +106,24 @@ namespace Kaimos {
 		}
 	}
 
+	void Scene::SetViewportSize(uint width, uint height)
+	{
+		m_ViewportWidth = width;
+		m_ViewportHeight = height;
+
+		// -- Resize Cameras with non-fixed AR --
+		auto view = m_Registry.view<CameraComponent>();
+		for (auto entity : view)
+		{
+			auto& camComp = view.get<CameraComponent>(entity);
+			if (!camComp.FixedAspectRatio)
+				camComp.Camera.SetViewportSize(width, height);
+		}
+	}
+
+
+	
+	// ----------------------- Public Entities Methods ---------------------------------------------------
 	Entity Scene::CreateEntity(const std::string& name)
 	{
 		Entity entity = { m_Registry.create(), this };
@@ -136,22 +150,9 @@ namespace Kaimos {
 		return {};
 	}
 
-	void Scene::SetViewportSize(uint width, uint height)
-	{
-		m_ViewportWidth = width;
-		m_ViewportHeight = height;
+	
 
-		// Resize cameras which have non-fixed AR
-		auto view = m_Registry.view<CameraComponent>();
-		for (auto entity : view)
-		{
-			auto& camComp = view.get<CameraComponent>(entity);
-			if (!camComp.FixedAspectRatio)
-				camComp.Camera.SetViewportSize(width, height);
-		}
-	}
-
-
+	// ----------------------- Private Entities Methods --------------------------------------------------
 	template<typename T>
 	void Scene::OnComponentAdded(Entity entity, T& component)
 	{
@@ -172,7 +173,7 @@ namespace Kaimos {
 	void Scene::OnComponentAdded<CameraComponent>(Entity entity, CameraComponent& component)
 	{
 		component.Camera.SetViewportSize(m_ViewportWidth, m_ViewportHeight);
-	}	
+	}
 
 	template<>
 	void Scene::OnComponentAdded<SpriteRendererComponent>(Entity entity, SpriteRendererComponent& component)

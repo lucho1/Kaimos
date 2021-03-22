@@ -7,8 +7,11 @@
 #include <yaml-cpp/yaml.h>
 
 
+// ---------------------------------------------------------------------------------------------------
+// ----------------------- YAML Additions Static Methods ---------------------------------------------
+// TODO: Make this in another place ???
 namespace YAML {
-
+	
 	template<>
 	struct convert<glm::vec2>
 	{
@@ -84,10 +87,14 @@ namespace YAML {
 		}
 	};
 }
+// ---------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------
 
 
 namespace Kaimos {
 
+	// ----------------------- YAML Operator Methods -----------------------------------------------------
+	// TODO: Maybe move this to another place ???
 	YAML::Emitter& operator<<(YAML::Emitter& output, const glm::vec2& vec)
 	{
 		output << YAML::Flow;
@@ -112,13 +119,11 @@ namespace Kaimos {
 
 
 
-	SceneSerializer::SceneSerializer(const Ref<Scene>& scene) : m_Scene(scene)
-	{
-	}
-
+	// ----------------------- Global Static Serialization Method ----------------------------------------
+	// TODO: Move this to another place ???
 	static void SerializeEntity(YAML::Emitter& output, Entity entity)
 	{
-		// Begin Entity Map
+		// -- Begin Entity Map --
 		output << YAML::BeginMap;
 		output << YAML::Key << "Entity" << YAML::Value << "123"; // TODO: Entity ID goes here
 
@@ -154,7 +159,7 @@ namespace Kaimos {
 			SceneCamera& camera = cam_comp.Camera;
 			output << YAML::Key << "Camera" << YAML::Value;
 
-			// Begin Cam Map
+			// -- Begin Cam Map --
 			output << YAML::BeginMap;
 			output << YAML::Key << "ProjectionType" << YAML::Value << (int)camera.GetProjectionType();
 			
@@ -166,7 +171,7 @@ namespace Kaimos {
 			output << YAML::Key << "OrthoFarClip" << YAML::Value << camera.GetOrthographicFarClip();
 			output << YAML::Key << "OrthoNearClip" << YAML::Value << camera.GetOrthographicNearClip();
 			output << YAML::EndMap;
-			// End Cam Map
+			// -- End Cam Map --
 
 			output << YAML::Key << "PrimaryCamera" << YAML::Value << cam_comp.Primary;
 			output << YAML::Key << "FixedAR" << YAML::Value << cam_comp.FixedAspectRatio;
@@ -187,10 +192,13 @@ namespace Kaimos {
 		}
 		
 		
-		// End Entity Map
+		// -- End Entity Map --
 		output << YAML::EndMap;
 	}
 
+
+
+	// ----------------------- Public Serialization Methods ----------------------------------------------
 	void SceneSerializer::Serialize(const std::string& filepath)
 	{
 		YAML::Emitter output;
@@ -215,12 +223,9 @@ namespace Kaimos {
 		file << output.c_str();
 	}
 
-	void SceneSerializer::SerializeRuntime(const std::string& filepath)
-	{
-		// Not implemented
-		KS_ENGINE_ASSERT(false, "");
-	}
 
+
+	// ----------------------- Public Deserialization Methods --------------------------------------------
 	bool SceneSerializer::Deserialize(const std::string& filepath)
 	{
 		YAML::Node data;
@@ -303,12 +308,5 @@ namespace Kaimos {
 		}
 
 		return true;
-	}
-
-	bool SceneSerializer::DeserializeRuntime(const std::string& filepath)
-	{
-		// Not implemented
-		KS_ENGINE_ASSERT(false, "");
-		return false;
 	}
 }

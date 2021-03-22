@@ -82,7 +82,7 @@ namespace Kaimos {
 
 
 
-	// ----------------------- Private Scene Methords -----------------------------------------------------
+	// ----------------------- Private Scene Methods -----------------------------------------------------
 	void ScenePanel::DrawEntityNode(Entity entity)
 	{
 		TagComponent& tag_comp = entity.GetComponent<TagComponent>();

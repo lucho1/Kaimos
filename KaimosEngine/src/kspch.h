@@ -36,4 +36,4 @@
 	#include <Windows.h>
 #endif
 
-#endif
+#endif //_KSPCH_H_

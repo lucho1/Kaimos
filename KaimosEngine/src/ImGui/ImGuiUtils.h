@@ -21,9 +21,8 @@ namespace Kaimos::UI {
 		
 		// --- Public UI Methods ---
 
-		// To draw an Unreal-like controller of vec3: name is the controller label ("position"), value is the value to modify, xyz
-		// colors are the colors that the controller will use for each of the 3 axis, chars are the names for each of the values,
-		// reset value is the value to reset the number when pressing on an axis button, and column width is the width of each of the elements of the controller
+		// Draw controller of vec3 (ue4-like): name = label ("position"), value = ref to vec3, xyz colors = vec3 axis colors,
+		// reset value = reset on pressing axis button, labels = names for axis (xyz, rgb...), column width = width of controller elements
 		static void DrawVec3UI(const std::string& name, glm::vec3& value, const glm::vec3& xcolor, const glm::vec3& ycolor, const glm::vec3& zcolor, float reset_value = 0.0f, const std::string& labels = {"XYZ"}, float column_width = 100.0f);
 		
 	private:
@@ -32,6 +31,5 @@ namespace Kaimos::UI {
 		static void SetButton(const glm::vec3& active_color, const glm::vec3& hover_color, ImFont* font);
 	};
 }
-
 
 #endif //_IMGUIUTILS_H_

@@ -13,13 +13,13 @@ namespace Kaimos {
 	static std::unordered_map<GAMEPADAXIS_CODE, bool>	s_GamepadAxisMap(false);
 
 
-	// --- Keyboard Functions ---
+
+	// ----------------------- Keyboard Methods -----------------------------------------------------------
 	bool Input::IsKeyPressed(const KEY_CODE key)
 	{
-		KEY_CODE k = Input::GetCrossKeyboardKey(key);
 		GLFWwindow* window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
+		int state = glfwGetKey(window, static_cast<int32_t>(Input::GetCrossKeyboardKey(key)));
 
-		int state = glfwGetKey(window, static_cast<int32_t>(k));
 		return state == GLFW_PRESS || state == GLFW_REPEAT;
 	}
 
@@ -34,11 +34,13 @@ namespace Kaimos {
 	}
 
 
-	// --- Mouse Functions ---
+	
+	// ----------------------- Mouse Methods --------------------------------------------------------------
 	bool Input::IsMouseButtonPressed(const MOUSE_CODE button)
 	{
 		GLFWwindow* window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
 		int state = glfwGetMouseButton(window, static_cast<int32_t>(button));
+
 		return state == GLFW_PRESS;
 	}
 
@@ -52,6 +54,9 @@ namespace Kaimos {
 		return !GetMouseButton(button) && s_MouseMap[button];
 	}
 
+
+
+	// ----------------------- Mouse Getters --------------------------------------------------------------
 	glm::vec2 Input::GetMousePos()
 	{
 		double x = 0.0, y = 0.0;
@@ -71,29 +76,32 @@ namespace Kaimos {
 	}
 
 
-	// --- Class Public Methods ---
+
+	// ----------------------- Public Class Methods -------------------------------------------------------
 	KEY_CODE Input::GetCrossKeyboardKey(const KEY_CODE key)
 	{
 		const char* key_char = glfwGetKeyName(int(key), glfwGetKeyScancode(int(key)));
 
-		// Key is between A and Z
+		// -- Key is between A and Z --
 		if (key >= KEY::A && key <= KEY::Z)
 		{
 			if (key_char != nullptr)
 				return KEY_CODE(int(KEY::A) + (std::toupper(key_char[0]) - 'A'));
 		}
-		// Key is other key (like punctuation keys)
+		// -- Key is other key (like punctuation keys) --
 		else if (key > KEY::SPACE && key < KEY::WORLD2)
 		{
 			if (key_char != nullptr)
 				return KEY_CODE(int(KEY::SPACE) + (std::toupper(key_char[0]) - ' '));
 		}
 		
-		// Other keys are independent of the keyboard (like shift, control, space...) as well as digits, treated as they are regardless of keyboard
+		// -- Other keys are independent of the keyboard (like shift, control, space...) as well as digits, treated as they are regardless of keyboard --
 		return key;
 	}
 
-	// --- Class Protected Methods ---
+
+
+	// ----------------------- Protected Class Methods ----------------------------------------------------
 	bool Input::GetKey(const KEY_CODE key)
 	{
 		return GLFW_PRESS == glfwGetKey(static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow()), static_cast<int32_t>(key));
@@ -105,7 +113,8 @@ namespace Kaimos {
 	}
 
 
-	// --- Class Private Methods ---
+	
+	// ----------------------- Private Class Methods ------------------------------------------------------
 	void Input::OnUpdate()
 	{
 		for (KEY_CODE key : s_KeysVec)

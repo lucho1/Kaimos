@@ -24,7 +24,7 @@ namespace Kaimos {
 		virtual void OnEvent(Event& ev) override;
 
 	private:
-		
+
 		// --- Event Methods ---
 		bool OnKeyPressed(KeyPressedEvent& ev);
 		bool OnMouseButtonPressed(MouseButtonPressedEvent& ev);
@@ -39,26 +39,26 @@ namespace Kaimos {
 
 		// TODO: TEMP
 		// Scene
-		Ref<Scene> m_CurrentScene;
-		Entity m_Entity;
-		Entity m_CameraEntity;
+		Ref<Scene> m_CurrentScene = nullptr;
+		Entity m_Entity = {};
+		Entity m_CameraEntity = {};
 
-		ScenePanel m_ScenePanel;
+		ScenePanel m_ScenePanel = {};
 
-		EditorCamera m_EditorCamera;
+		EditorCamera m_EditorCamera = {};
 
 		// Guizmo
 		int m_OperationGizmo = 0;
-		Entity m_HoveredEntity;
+		Entity m_HoveredEntity = {};
 
 		// Rendering
 		OrtographicCameraController m_CameraController;
-		Ref<VertexArray> m_VArray;
+		Ref<VertexArray> m_VArray = nullptr;
 		
-		Ref<Framebuffer> m_Framebuffer;
-		Ref<Shader> m_Shader;
-		Ref<Texture2D> m_CheckerTexture;
-		Ref<Texture2D> m_LogoTexture;
+		Ref<Framebuffer> m_Framebuffer = nullptr;
+		Ref<Shader> m_Shader = nullptr;
+		Ref<Texture2D> m_CheckerTexture = nullptr;
+		Ref<Texture2D> m_LogoTexture = nullptr;
 		float m_BackgroundTiling = 10.0f;
 		glm::vec4 m_Color = { 1.0f, 0.9f, 0.8f, 1.0f };
 

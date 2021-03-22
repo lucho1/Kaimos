@@ -61,4 +61,4 @@ namespace Kaimos {
 	};
 }
 
-#endif // _ENTITY_H_
+#endif //_ENTITY_H_

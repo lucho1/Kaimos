@@ -11,44 +11,47 @@ namespace Kaimos {
 	{
 	public:
 
+		// --- Public Class Methods ---
 		WindowsWindow(const WindowProps& props);
 		virtual ~WindowsWindow();
-		
-		// -- Layer Methods --
-		void OnUpdate() override;
 
-		// -- Class Methods --
-		inline uint GetWidth() const override { return m_Data.Width; }
-		inline uint GetHeight() const override { return m_Data.Height; }
+		void OnUpdate() override;
+		
+		// --- Public Window Methods ---
 		virtual void Shutdown();
 
-		inline void* GetNativeWindow() const override { return m_Window; }
+		// --- Getters ---
+		inline uint GetWidth()			const override { return m_Data.Width; }
+		inline uint GetHeight()			const override { return m_Data.Height; }
 
-		// -- Attributes --
-		inline void SetEventCallback(const EventCallbackFn& callback) override { m_Data.EventCallback = callback; }
-		void SetVSync(bool enabled) override;
-		bool IsVSync() const override { return m_Data.VSync; }
+		inline void* GetNativeWindow()	const override { return m_Window; }
+
+		// --- Setters ---
+		void SetVSync(bool enabled)										override;
+		inline bool IsVSync()											const override	{ return m_Data.VSync; }
+		inline void SetEventCallback(const EventCallbackFn& callback)	override		{ m_Data.EventCallback = callback; }
 
 	private:
 
+		// --- Private Window Methods ---
 		virtual void Init(const WindowProps& props);
 		void SetGLFWEventCallbacks() const;
 
 	private:
 		
-		// Actual Window Data for GLFW callback events (so we don't pass the entire class)
+		// Window Data for GLFW callback events (so we don't pass the entire class)
 		struct WindowData
 		{
 			EventCallbackFn EventCallback;
 			uint Width = 0, Height = 0;
-			std::string Title = "";
+			std::string Title = "Unnamed";
 			bool VSync = true;
 		};
 
-		GLFWwindow* m_Window;
+		ScopePtr<GraphicsContext> m_Context = nullptr;
+		GLFWwindow* m_Window = nullptr;
 		WindowData m_Data;
-		ScopePtr<GraphicsContext> m_Context;
 	};
 }
 
-#endif
+#endif //_WINDOWSWINDOW_H_

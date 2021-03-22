@@ -26,7 +26,7 @@ namespace Kaimos {
 		EVENT_CLASS_CATEGORY(EVENT_CATEGORY::MOUSE | EVENT_CATEGORY::INPUT)
 
 	private:
-		float m_MouseX = 0.0f, m_MouseY = 0.0f;
+		float m_MouseX, m_MouseY;
 	};
 
 
@@ -34,7 +34,7 @@ namespace Kaimos {
 	{
 	public:
 
-		MouseScrolledEvent(const float xOffset, const float yOffset) : m_XOffset(xOffset), m_YOffset(yOffset) {}
+		MouseScrolledEvent(const float xoffset, const float yoffset) : m_XOffset(xoffset), m_YOffset(yoffset) {}
 
 		inline float GetXOffset() const { return m_XOffset; }
 		inline float GetYOffset() const { return m_YOffset; }
@@ -50,7 +50,7 @@ namespace Kaimos {
 		EVENT_CLASS_CATEGORY(EVENT_CATEGORY::MOUSE | EVENT_CATEGORY::INPUT)
 
 	private:
-		float m_XOffset = 0.0f, m_YOffset = 0.0f;
+		float m_XOffset, m_YOffset;
 	};
 
 

@@ -5,33 +5,15 @@
 
 namespace Kaimos {
 
+	// ----------------------- Public Class Methods ------------------------------------------------------
 	SceneCamera::SceneCamera()
 	{
 		RecalculateProjectionMatrix();
 	}
 
-	void SceneCamera::SetOrthographicCamera(float size, float nearClip, float farClip)
-	{
-		m_ProjectionType = ProjectionType::ORTHOGRAPHIC;
 
-		m_OrthoSize = size;
-		m_OrthographicNearClip = nearClip;
-		m_OrthographicFarClip = farClip;
 
-		RecalculateProjectionMatrix();
-	}
-
-	void SceneCamera::SetPerspectiveCamera(float FOV, float nearClip, float farClip)
-	{
-		m_ProjectionType = ProjectionType::PERSPECTIVE;
-
-		m_PerspectiveFOV = FOV;
-		m_PerspectiveNearClip = nearClip;
-		m_PerspectiveFarClip = farClip;
-
-		RecalculateProjectionMatrix();
-	}
-
+	// ----------------------- Public Camera Methods ----------------------------------------------------
 	void SceneCamera::SetViewportSize(uint width, uint height)
 	{
 		if (height == 0)
@@ -41,6 +23,37 @@ namespace Kaimos {
 		RecalculateProjectionMatrix();
 	}
 
+
+
+	// ----------------------- Orthographic Camera G/Setters ---------------------------------------------
+	void SceneCamera::SetOrthographicCamera(float size, float near_clip, float far_clip)
+	{
+		m_ProjectionType = ProjectionType::ORTHOGRAPHIC;
+
+		m_OrthoSize = size;
+		m_OrthographicNearClip = near_clip;
+		m_OrthographicFarClip = far_clip;
+
+		RecalculateProjectionMatrix();
+	}
+
+
+
+	// ----------------------- Perspective Camera G/Setters ----------------------------------------------
+	void SceneCamera::SetPerspectiveCamera(float FOV, float near_clip, float far_clip)
+	{
+		m_ProjectionType = ProjectionType::PERSPECTIVE;
+
+		m_PerspectiveFOV = FOV;
+		m_PerspectiveNearClip = near_clip;
+		m_PerspectiveFarClip = far_clip;
+
+		RecalculateProjectionMatrix();
+	}
+
+	
+
+	// ----------------------- Private Camera Methods ----------------------------------------------------
 	void SceneCamera::RecalculateProjectionMatrix()
 	{
 		if (m_ProjectionType == ProjectionType::PERSPECTIVE)

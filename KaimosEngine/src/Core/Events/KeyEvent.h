@@ -24,7 +24,7 @@ namespace Kaimos {
 	{
 	public:
 
-		KeyPressedEvent(const KEY_CODE keycode, const uint repeatCount) : KeyEvent(keycode), m_RepeatCount(repeatCount) {}
+		KeyPressedEvent(const KEY_CODE keycode, const uint repeat_count) : KeyEvent(keycode), m_RepeatCount(repeat_count) {}
 
 		inline uint GetRepeatCount() const { return m_RepeatCount; }
 		std::string ToString() const override

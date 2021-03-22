@@ -25,7 +25,7 @@ namespace Kaimos {
 		EVENT_CLASS_CATEGORY(EVENT_CATEGORY::APPLICATION)
 
 	private:
-		uint m_Width = 0, m_Height = 0;
+		uint m_Width, m_Height;
 	};
 
 
