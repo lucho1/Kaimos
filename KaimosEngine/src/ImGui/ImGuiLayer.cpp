@@ -45,7 +45,7 @@ namespace Kaimos {
 		// -- Setup Platform/Renderer Bindings --
 		GLFWwindow* window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
 		ImGui_ImplGlfw_InitForOpenGL(window, true);
-		ImGui_ImplOpenGL3_Init("#version 430");
+		ImGui_ImplOpenGL3_Init("#version 460");
 	}
 
 
@@ -76,7 +76,7 @@ namespace Kaimos {
 
 	
 	// ----------------------- Public ImGui Methods -------------------------------------------------------
-	void ImGuiLayer::Begin()
+	void ImGuiLayer::Begin() const
 	{
 		KS_PROFILE_FUNCTION();
 		ImGui_ImplOpenGL3_NewFrame();
@@ -86,7 +86,7 @@ namespace Kaimos {
 	}
 
 
-	void ImGuiLayer::End()
+	void ImGuiLayer::End() const
 	{
 		KS_PROFILE_FUNCTION();
 		ImGuiIO& io = ImGui::GetIO();

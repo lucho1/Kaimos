@@ -36,11 +36,11 @@ namespace Kaimos {
 	EVENT_CATEGORY& operator ^=(EVENT_CATEGORY& left_ev, EVENT_CATEGORY right_ev);
 
 
-#define EVENT_CLASS_TYPE(type)	static EVENT_TYPE GetStaticType()	{ return EVENT_TYPE::type; }\
-								virtual EVENT_TYPE GetEventType()	const override { return GetStaticType(); }\
-								virtual const char* GetName()		const override { return #type; }
+#define EVENT_CLASS_TYPE(type)	inline static EVENT_TYPE GetStaticType()	{ return EVENT_TYPE::type; }\
+								inline virtual EVENT_TYPE GetEventType()	const override { return GetStaticType(); }\
+								inline virtual const char* GetName()		const override { return #type; }
 
-#define EVENT_CLASS_CATEGORY(category) virtual EVENT_CATEGORY GetCategoryFlags() const override { return (category); }
+#define EVENT_CLASS_CATEGORY(category) inline virtual EVENT_CATEGORY GetCategoryFlags() const override { return (category); }
 
 
 	// ----------------------- Classes -----------------------------------------------------
@@ -54,12 +54,13 @@ namespace Kaimos {
 		virtual EVENT_TYPE GetEventType()			const = 0;
 		virtual const char* GetName()				const = 0;
 		virtual EVENT_CATEGORY GetCategoryFlags()	const = 0;
-		virtual std::string ToString()				const { return GetName(); }
+		inline virtual std::string ToString()		const { return GetName(); }
 
-		bool IsInCategory(EVENT_CATEGORY category)	{ return static_cast<bool>(GetCategoryFlags() & category); }
 
 		inline bool IsHandled()						const { return m_Handled; }
 		inline void SetHandled(bool handled)		{ m_Handled = handled; }
+
+		inline bool IsInCategory(EVENT_CATEGORY category)	{ return static_cast<bool>(GetCategoryFlags() & category); }
 
 	protected:
 		bool m_Handled = false;
@@ -79,7 +80,7 @@ namespace Kaimos {
 		//bool Dispatch(EventFn<T> func) --> Then m_Event.m_Handled = func(*(T*)&m_Event);
 		// This is better than std::function (performance)... 'F' will be deduced by compiler
 		template<typename T, typename F>
-		bool Dispatch(const F& func)
+		bool Dispatch(const F& func) const
 		{
 			if (m_Event.GetEventType() == T::GetStaticType())
 			{

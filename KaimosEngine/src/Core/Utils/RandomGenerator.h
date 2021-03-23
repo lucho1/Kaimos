@@ -6,8 +6,8 @@
 
 namespace Kaimos::Random
 {
-	typedef std::uniform_int_distribution<int> IntDist;
-	typedef std::uniform_real_distribution<double> DoubleDist;
+	typedef std::uniform_int_distribution<int>		IntDist;
+	typedef std::uniform_real_distribution<double>	DoubleDist;
 
 	static struct RNGData
 	{

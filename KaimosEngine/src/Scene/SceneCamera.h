@@ -23,10 +23,10 @@ namespace Kaimos {
 	public:
 
 		// --- Orthographic Camera G/Setters ---
-		ProjectionType GetProjectionType()	const { return m_ProjectionType; }
-		float GetOrthographicSize()			const { return m_OrthoSize; }
-		float GetOrthographicNearClip()		const { return m_OrthographicNearClip; }
-		float GetOrthographicFarClip()		const { return m_OrthographicFarClip; }
+		inline ProjectionType GetProjectionType()	const { return m_ProjectionType; }
+		inline float GetOrthographicSize()			const { return m_OrthoSize; }
+		inline float GetOrthographicNearClip()		const { return m_OrthographicNearClip; }
+		inline float GetOrthographicFarClip()		const { return m_OrthographicFarClip; }
 		
 		void SetProjectionType(ProjectionType projection)					{ m_ProjectionType = projection; RecalculateProjectionMatrix(); }
 		void SetOrthographicSize(float size)								{ m_OrthoSize = size; RecalculateProjectionMatrix(); }
@@ -37,9 +37,9 @@ namespace Kaimos {
 	public:
 
 		// --- Perspective Camera G/Setters ---
-		float GetPerspectiveFOV()			const	{ return m_PerspectiveFOV; }
-		float GetPerspectiveNearClip()		const	{ return m_PerspectiveNearClip; }
-		float GetPerspectiveFarClip()		const	{ return m_PerspectiveFarClip; }
+		inline float GetPerspectiveFOV()			const	{ return m_PerspectiveFOV; }
+		inline float GetPerspectiveNearClip()		const	{ return m_PerspectiveNearClip; }
+		inline float GetPerspectiveFarClip()		const	{ return m_PerspectiveFarClip; }
 		
 		void SetPerspectiveCamera(float FOV, float near_clip, float far_clip);
 		

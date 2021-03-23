@@ -13,7 +13,7 @@ namespace Kaimos {
 		virtual ~ScriptableEntity() = default;
 
 		template<typename T>
-		T& GetComponent()
+		inline T& GetComponent() const
 		{
 			return m_Entity.GetComponent<T>();
 		}

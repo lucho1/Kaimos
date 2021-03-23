@@ -31,13 +31,13 @@ namespace Kaimos {
 		Entity CreateEntity(const std::string& name = "unnamed");
 		void DestroyEntity(Entity entity);
 
-		Entity GetPrimaryCamera();
+		Entity GetPrimaryCamera(); //TODO: Handle this with cameras rework!
 
 	private:
 
 		// --- Private Entities Methods ---
 		template<typename T>
-		void OnComponentAdded(Entity entity, T& component);
+		void OnComponentAdded(Entity entity, T& component) const;
 
 	private:
 

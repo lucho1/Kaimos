@@ -23,9 +23,9 @@ namespace Kaimos {
 		virtual void OnEvent(Event& e)	override;
 
 		// --- Public ImGui Methods ---
-		void SetBlockEvents(bool block_events) { m_BlockEvents = block_events; }
-		void Begin();
-		void End();
+		inline void SetBlockEvents(bool block_events) { m_BlockEvents = block_events; }
+		void Begin() const;
+		void End() const;
 
 	private:
 

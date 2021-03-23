@@ -199,7 +199,7 @@ namespace Kaimos {
 
 
 	// ----------------------- Public Serialization Methods ----------------------------------------------
-	void SceneSerializer::Serialize(const std::string& filepath)
+	void SceneSerializer::Serialize(const std::string& filepath) const
 	{
 		YAML::Emitter output;
 
@@ -226,7 +226,7 @@ namespace Kaimos {
 
 
 	// ----------------------- Public Deserialization Methods --------------------------------------------
-	bool SceneSerializer::Deserialize(const std::string& filepath)
+	bool SceneSerializer::Deserialize(const std::string& filepath) const
 	{
 		YAML::Node data;
 		try { data = YAML::LoadFile(filepath); }
