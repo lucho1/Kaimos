@@ -5,6 +5,7 @@
 
 namespace Kaimos {
 
+	// TODO: Delete this on Camera Rework
 	class SceneCamera : public Camera
 	{
 	public:

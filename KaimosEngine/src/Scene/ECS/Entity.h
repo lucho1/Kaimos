@@ -1,7 +1,7 @@
 #ifndef _ENTITY_H_
 #define _ENTITY_H_
 
-#include "Scene.h"
+#include "Scene/Scene.h"
 #include "entt.hpp"
 
 namespace Kaimos {

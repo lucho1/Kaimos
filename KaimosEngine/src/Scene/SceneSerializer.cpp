@@ -1,8 +1,8 @@
 #include "kspch.h"
 #include "SceneSerializer.h"
 
-#include "Entity.h"
-#include "Components.h"
+#include "ECS/Entity.h"
+#include "ECS/Components.h"
 
 #include <yaml-cpp/yaml.h>
 

@@ -2,7 +2,7 @@
 #define _COMPONENTS_H_
 
 #include "Renderer/Resources/Texture.h"
-#include "SceneCamera.h"
+#include "Scene/SceneCamera.h"
 #include "ScriptableEntity.h"
 
 #include <glm/glm.hpp>

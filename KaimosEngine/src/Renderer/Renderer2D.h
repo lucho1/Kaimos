@@ -6,7 +6,7 @@
 #include "Cameras/EditorCamera.h"
 
 #include "Resources/Texture.h"
-#include "Scene/Components.h"
+#include "Scene/ECS/Components.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 

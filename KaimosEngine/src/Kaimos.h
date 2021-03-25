@@ -16,9 +16,9 @@
 #include "ImGui/ImGuiLayer.h"
 
 #include "Scene/Scene.h"
-#include "Scene/Entity.h"
-#include "Scene/ScriptableEntity.h"
-#include "Scene/Components.h"
+#include "Scene/ECS/Entity.h"
+#include "Scene/ECS/ScriptableEntity.h"
+#include "Scene/ECS/Components.h"
 
 // -- Engine Renderer --
 #include "Renderer/Renderer.h"
@@ -32,7 +32,6 @@
 
 #include "Renderer/Cameras/OrthographicCamera.h"
 #include "Renderer/Cameras/OrtographicCameraController.h"
-
 
 // --- Entry Point ---
 // Entry point must be inicluded only where the EntryPoint (main) is actually
