@@ -1,5 +1,5 @@
 #include "kspch.h"
-#include "OpenGLRendererAPI.h"
+#include "OGLRendererAPI.h"
 
 #include <glad/glad.h>
 
@@ -36,7 +36,7 @@ namespace Kaimos {
 
 
 	// ----------------------- Public Class Methods -------------------------------------------------------
-	void OpenGLRendererAPI::Init()
+	void OGLRendererAPI::Init()
 	{
 		KS_PROFILE_FUNCTION();
 
@@ -55,24 +55,24 @@ namespace Kaimos {
 
 	
 	// ----------------------- Public RendererAPI Methods -------------------------------------------------
-	void OpenGLRendererAPI::SetClearColor(const glm::vec4& color) const
+	void OGLRendererAPI::SetClearColor(const glm::vec4& color) const
 	{
 		glClearColor(color.r, color.g, color.b, color.a);
 	}
 
-	void OpenGLRendererAPI::Clear() const
+	void OGLRendererAPI::Clear() const
 	{
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	}
 
-	void OpenGLRendererAPI::DrawIndexed(const Ref<VertexArray>& vertex_array, uint index_count) const
+	void OGLRendererAPI::DrawIndexed(const Ref<VertexArray>& vertex_array, uint index_count) const
 	{
 		uint count = index_count ? index_count : vertex_array->GetIndexBuffer()->GetCount();
 		glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, nullptr);
 		glBindTexture(GL_TEXTURE_2D, 0); // TODO/OJU: Should we actually do this? Take it into account on materials system/3D Renderer
 	}
 
-	void OpenGLRendererAPI::SetViewport(uint x, uint y, uint width, uint height)
+	void OGLRendererAPI::SetViewport(uint x, uint y, uint width, uint height)
 	{
 		glViewport(x, y, width, height);
 	}

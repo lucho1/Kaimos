@@ -2,7 +2,7 @@
 #include "Texture.h"
 
 #include "Renderer/Renderer.h"
-#include "Platform/OpenGL/OpenGLTexture.h"
+#include "Platform/OpenGL/OGLTexture.h"
 
 namespace Kaimos {
 
@@ -11,7 +11,7 @@ namespace Kaimos {
 	{
 		switch (Renderer::GetRendererAPI())
 		{
-			case RendererAPI::API::OPENGL:		return CreateRef<OpenGLTexture2D>(width, height);
+			case RendererAPI::API::OPENGL:		return CreateRef<OGLTexture2D>(width, height);
 			case RendererAPI::API::NONE:		KS_ENGINE_ASSERT(false, "RendererAPI is set to NONE (unsupported)!"); return nullptr;
 		}
 
@@ -23,7 +23,7 @@ namespace Kaimos {
 	{
 		switch (Renderer::GetRendererAPI())
 		{
-			case RendererAPI::API::OPENGL:		return CreateRef<OpenGLTexture2D>(path);
+			case RendererAPI::API::OPENGL:		return CreateRef<OGLTexture2D>(path);
 			case RendererAPI::API::NONE:		KS_ENGINE_ASSERT(false, "RendererAPI is set to NONE (unsupported)!"); return nullptr;
 		}
 

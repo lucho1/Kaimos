@@ -5,7 +5,7 @@
 
 namespace Kaimos {
 
-	class OpenGLRendererAPI : public RendererAPI
+	class OGLRendererAPI : public RendererAPI
 	{
 	public:
 
@@ -19,7 +19,6 @@ namespace Kaimos {
 		virtual void DrawIndexed(const Ref<VertexArray>& vertex_array, uint index_count = 0) const override;
 		virtual void SetViewport(uint x, uint y, uint width, uint height) override;
 	};
-
 }
 
-#endif
+#endif //_OPENGLRENDERERAPI_

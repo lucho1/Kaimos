@@ -6,14 +6,14 @@
 
 namespace Kaimos {
 
-	class OpenGLTexture2D : public Texture2D
+	class OGLTexture2D : public Texture2D
 	{
 	public:
 
 		// --- Public Class Methods ---
-		OpenGLTexture2D(uint width, uint height);
-		OpenGLTexture2D(const std::string& path);
-		virtual ~OpenGLTexture2D();
+		OGLTexture2D(uint width, uint height);
+		OGLTexture2D(const std::string& path);
+		virtual ~OGLTexture2D();
 
 		// --- Public Texture Methods ---
 		virtual void SetData(void* data, uint size) override;
@@ -25,7 +25,7 @@ namespace Kaimos {
 		virtual uint GetTextureID()	const override { return m_ID; }
 
 		// --- Operators ---
-		virtual bool operator==(const Texture& texture) const override { return m_ID == ((OpenGLTexture2D&)texture).m_ID; }
+		virtual bool operator==(const Texture& texture) const override { return m_ID == ((OGLTexture2D&)texture).m_ID; }
 
 	private:
 
@@ -35,7 +35,6 @@ namespace Kaimos {
 
 		GLenum m_InternalFormat = 0, m_DataFormat = 0;
 	};
-
 }
 
 #endif //_OPENGLTEXTURE_H_

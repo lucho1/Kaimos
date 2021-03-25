@@ -7,12 +7,12 @@ struct GLFWwindow;
 
 namespace Kaimos {
 
-	class OpenGLContext : public GraphicsContext
+	class OGLContext : public GraphicsContext
 	{
 	public:
 
 		// --- Public Class Methods ---
-		OpenGLContext(GLFWwindow* glfw_window_handle);
+		OGLContext(GLFWwindow* glfw_window_handle);
 		virtual void Init() override;
 
 		// --- Public RendererAPI Methods ---

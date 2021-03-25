@@ -7,7 +7,7 @@
 #include "Core/Events/MouseEvent.h"
 #include "Core/Events/KeyEvent.h"
 
-#include "Platform/OpenGL/OpenGLContext.h"
+#include "Platform/OpenGL/OGLContext.h"
 #include "Renderer/Renderer.h"
 
 

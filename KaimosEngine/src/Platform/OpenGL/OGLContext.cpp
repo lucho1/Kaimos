@@ -1,5 +1,5 @@
 #include "kspch.h"
-#include "OpenGLContext.h"
+#include "OGLContext.h"
 
 #include <GLFW/glfw3.h>
 #include <glad/glad.h>
@@ -7,13 +7,13 @@
 namespace Kaimos {
 
 	// ----------------------- Public Class Methods -------------------------------------------------------
-	OpenGLContext::OpenGLContext(GLFWwindow* glfw_window_handle)
+	OGLContext::OGLContext(GLFWwindow* glfw_window_handle)
 		: m_WindowHandle(glfw_window_handle)
 	{
 		KS_ENGINE_ASSERT(glfw_window_handle, "GLFW Window Handle is null or incorrect!");
 	}
 
-	void OpenGLContext::Init()
+	void OGLContext::Init()
 	{
 		KS_PROFILE_FUNCTION();
 
@@ -34,7 +34,7 @@ namespace Kaimos {
 
 
 	// ----------------------- Public RendererAPI Methods -------------------------------------------------
-	void OpenGLContext::SwapBuffers()
+	void OGLContext::SwapBuffers()
 	{
 		KS_PROFILE_FUNCTION();
 		glfwSwapBuffers(m_WindowHandle);

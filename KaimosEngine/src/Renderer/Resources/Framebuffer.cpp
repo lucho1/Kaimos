@@ -2,7 +2,7 @@
 #include "Framebuffer.h"
 
 #include "Renderer/Renderer.h"
-#include "Platform/OpenGL/OpenGLFrameBuffer.h"
+#include "Platform/OpenGL/OGLFrameBuffer.h"
 
 namespace Kaimos {
 
@@ -10,7 +10,7 @@ namespace Kaimos {
 	{
 		switch (Renderer::GetRendererAPI())
 		{
-			case RendererAPI::API::OPENGL:		return CreateRef<OpenGLFramebuffer>(settings);
+			case RendererAPI::API::OPENGL:		return CreateRef<OGLFramebuffer>(settings);
 			case RendererAPI::API::NONE:		KS_ENGINE_ASSERT(false, "RendererAPI is set to NONE (unsupported)!"); return nullptr;
 		}
 

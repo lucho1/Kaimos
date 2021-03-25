@@ -2,7 +2,7 @@
 #include "Shader.h"
 
 #include "Renderer/Renderer.h"
-#include "Platform/OpenGL/OpenGLShader.h"
+#include "Platform/OpenGL/OGLShader.h"
 
 namespace Kaimos {
 
@@ -13,7 +13,7 @@ namespace Kaimos {
 	{
 		switch (Renderer::GetRendererAPI())
 		{
-			case RendererAPI::API::OPENGL:		return CreateRef<OpenGLShader>(filepath);
+			case RendererAPI::API::OPENGL:		return CreateRef<OGLShader>(filepath);
 			case RendererAPI::API::NONE:		KS_ENGINE_ASSERT(false, "RendererAPI is set to NONE (unsupported)!"); return nullptr;
 		}
 
@@ -26,7 +26,7 @@ namespace Kaimos {
 	{
 		switch (Renderer::GetRendererAPI())
 		{
-			case RendererAPI::API::OPENGL:		return CreateRef<OpenGLShader>(name, vertex_src, fragment_src);
+			case RendererAPI::API::OPENGL:		return CreateRef<OGLShader>(name, vertex_src, fragment_src);
 			case RendererAPI::API::NONE:		KS_ENGINE_ASSERT(false, "RendererAPI is set to NONE (unsupported)!"); return nullptr;
 		}
 

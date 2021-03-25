@@ -10,14 +10,14 @@ typedef unsigned int GLenum;
 
 namespace Kaimos {
 
-	class OpenGLShader : public Shader
+	class OGLShader : public Shader
 	{
 	public:
 
 		// --- Public Class Methods ---
-		OpenGLShader(const std::string& name, const std::string& vertex_src, const std::string& fragment_Src);
-		OpenGLShader(const std::string& filepath);
-		virtual ~OpenGLShader();
+		OGLShader(const std::string& name, const std::string& vertex_src, const std::string& fragment_Src);
+		OGLShader(const std::string& filepath);
+		virtual ~OGLShader();
 
 		// --- Public Shader Methods ---
 		virtual void Bind() const override;

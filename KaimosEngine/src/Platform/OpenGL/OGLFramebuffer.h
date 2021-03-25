@@ -7,13 +7,13 @@
 
 namespace Kaimos {
 
-	class OpenGLFramebuffer : public Framebuffer
+	class OGLFramebuffer : public Framebuffer
 	{
 	public:
 
 		// --- Public Class Methods ---
-		OpenGLFramebuffer(const FramebufferSettings& settings);
-		virtual ~OpenGLFramebuffer();
+		OGLFramebuffer(const FramebufferSettings& settings);
+		virtual ~OGLFramebuffer();
 
 		// --- Public FBO Methods ---
 		virtual void Bind() override;

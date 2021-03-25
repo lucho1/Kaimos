@@ -1,5 +1,5 @@
 #include "kspch.h"
-#include "OpenGLShader.h"
+#include "OGLShader.h"
 
 #include <glad/glad.h>
 #include <glm/gtc/type_ptr.hpp>
@@ -33,7 +33,7 @@ namespace Kaimos {
 
 	
 	// ----------------------- Public Class Methods -------------------------------------------------------
-	OpenGLShader::OpenGLShader(const std::string& filepath)
+	OGLShader::OGLShader(const std::string& filepath)
 	{
 		KS_PROFILE_FUNCTION();
 
@@ -59,7 +59,7 @@ namespace Kaimos {
 	}
 
 
-	OpenGLShader::OpenGLShader(const std::string& name, const std::string& vertex_src, const std::string& fragment_Src) : m_Name(name)
+	OGLShader::OGLShader(const std::string& name, const std::string& vertex_src, const std::string& fragment_Src) : m_Name(name)
 	{
 		KS_PROFILE_FUNCTION();
 
@@ -73,7 +73,7 @@ namespace Kaimos {
 	}
 
 	
-	OpenGLShader::~OpenGLShader()
+	OGLShader::~OGLShader()
 	{
 		KS_PROFILE_FUNCTION();
 		glDeleteProgram(m_ShaderID);
@@ -82,13 +82,13 @@ namespace Kaimos {
 
 
 	// ----------------------- Public Shader Methods ------------------------------------------------------
-	void OpenGLShader::Bind() const
+	void OGLShader::Bind() const
 	{
 		KS_PROFILE_FUNCTION();
 		glUseProgram(m_ShaderID);
 	}
 
-	void OpenGLShader::Unbind() const
+	void OGLShader::Unbind() const
 	{
 		KS_PROFILE_FUNCTION();
 		glUseProgram(0);
@@ -97,7 +97,7 @@ namespace Kaimos {
 
 	
 	// ----------------------- Private OGL Shader Methods -------------------------------------------------
-	const std::string OpenGLShader::ReadShaderFile(const std::string& filepath)
+	const std::string OGLShader::ReadShaderFile(const std::string& filepath)
 	{
 		KS_PROFILE_FUNCTION();
 
@@ -136,7 +136,7 @@ namespace Kaimos {
 	}
 
 
-	const std::unordered_map<GLenum, std::string> OpenGLShader::PreProcessShader(const std::string& source)
+	const std::unordered_map<GLenum, std::string> OGLShader::PreProcessShader(const std::string& source)
 	{
 		KS_PROFILE_FUNCTION();
 
@@ -201,7 +201,7 @@ namespace Kaimos {
 	}
 
 
-	void OpenGLShader::CompileShader(const std::unordered_map<GLenum, std::string>& shader_sources)
+	void OGLShader::CompileShader(const std::unordered_map<GLenum, std::string>& shader_sources)
 	{
 		KS_PROFILE_FUNCTION();
 
@@ -298,37 +298,37 @@ namespace Kaimos {
 
 	
 	// ----------------------- Uniforms -------------------------------------------------------------------
-	void OpenGLShader::SetUFloat(const std::string& name, float value)
+	void OGLShader::SetUFloat(const std::string& name, float value)
 	{
 		KS_PROFILE_FUNCTION();
 		UploadUniformFloat(name, value);
 	}
 
-	void OpenGLShader::SetUFloat3(const std::string& name, const glm::vec3& value)
+	void OGLShader::SetUFloat3(const std::string& name, const glm::vec3& value)
 	{
 		KS_PROFILE_FUNCTION();
 		UploadUniformFloat3(name, value);
 	}
 
-	void OpenGLShader::SetUFloat4(const std::string& name, const glm::vec4& value)
+	void OGLShader::SetUFloat4(const std::string& name, const glm::vec4& value)
 	{
 		KS_PROFILE_FUNCTION();
 		UploadUniformFloat4(name, value);
 	}
 
-	void OpenGLShader::SetUMat4(const std::string& name, const glm::mat4& value)
+	void OGLShader::SetUMat4(const std::string& name, const glm::mat4& value)
 	{
 		KS_PROFILE_FUNCTION();
 		UploadUniformMat4(name, value);
 	}
 	
-	void OpenGLShader::SetUInt(const std::string& name, int value)
+	void OGLShader::SetUInt(const std::string& name, int value)
 	{
 		KS_PROFILE_FUNCTION();
 		UploadUniformInt(name, value);
 	}
 
-	void OpenGLShader::SetUIntArray(const std::string& name, int* values_array, uint size)
+	void OGLShader::SetUIntArray(const std::string& name, int* values_array, uint size)
 	{
 		KS_PROFILE_FUNCTION();
 		UploadUniformIntArray(name, values_array, size);
@@ -337,49 +337,49 @@ namespace Kaimos {
 
 
 	// ----------------------- Uniforms Upload ------------------------------------------------------------
-	void OpenGLShader::UploadUniformInt(const std::string& name, const int& value)
+	void OGLShader::UploadUniformInt(const std::string& name, const int& value)
 	{
 		GLint loc = glGetUniformLocation(m_ShaderID, name.c_str());
 		glUniform1i(loc, value);
 	}
 
-	void OpenGLShader::UploadUniformIntArray(const std::string& name, const int* values_array, uint size)
+	void OGLShader::UploadUniformIntArray(const std::string& name, const int* values_array, uint size)
 	{
 		GLint loc = glGetUniformLocation(m_ShaderID, name.c_str());
 		glUniform1iv(loc, size, values_array);
 	}
 
-	void OpenGLShader::UploadUniformFloat(const std::string& name, const float& value)
+	void OGLShader::UploadUniformFloat(const std::string& name, const float& value)
 	{
 		GLint loc = glGetUniformLocation(m_ShaderID, name.c_str());
 		glUniform1f(loc, value);
 	}
 
-	void OpenGLShader::UploadUniformFloat2(const std::string& name, const glm::vec2& value)
+	void OGLShader::UploadUniformFloat2(const std::string& name, const glm::vec2& value)
 	{
 		GLint loc = glGetUniformLocation(m_ShaderID, name.c_str());
 		glUniform2f(loc, value.x, value.y);
 	}
 
-	void OpenGLShader::UploadUniformFloat3(const std::string& name, const glm::vec3& value)
+	void OGLShader::UploadUniformFloat3(const std::string& name, const glm::vec3& value)
 	{
 		GLint loc = glGetUniformLocation(m_ShaderID, name.c_str());
 		glUniform3f(loc, value.x, value.y, value.z);
 	}
 
-	void OpenGLShader::UploadUniformFloat4(const std::string& name, const glm::vec4& value)
+	void OGLShader::UploadUniformFloat4(const std::string& name, const glm::vec4& value)
 	{
 		GLint loc = glGetUniformLocation(m_ShaderID, name.c_str());
 		glUniform4f(loc, value.x, value.y, value.z, value.w);
 	}
 
-	void OpenGLShader::UploadUniformMat3(const std::string& name, const glm::mat3& matrix)
+	void OGLShader::UploadUniformMat3(const std::string& name, const glm::mat3& matrix)
 	{
 		GLint loc = glGetUniformLocation(m_ShaderID, name.c_str());
 		glUniformMatrix3fv(loc, 1, GL_FALSE, glm::value_ptr(matrix));
 	}
 
-	void OpenGLShader::UploadUniformMat4(const std::string& name, const glm::mat4& matrix)
+	void OGLShader::UploadUniformMat4(const std::string& name, const glm::mat4& matrix)
 	{
 		GLint loc = glGetUniformLocation(m_ShaderID, name.c_str());
 		glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(matrix));

@@ -1,5 +1,5 @@
 #include "kspch.h"
-#include "OpenGLFramebuffer.h"
+#include "OGLFramebuffer.h"
 
 
 namespace Kaimos {
@@ -33,7 +33,7 @@ namespace Kaimos {
 
 	
 	// ----------------------- Public Class Methods -------------------------------------------------------
-	OpenGLFramebuffer::OpenGLFramebuffer(const FramebufferSettings& settings) : m_FBOSettings(settings)
+	OGLFramebuffer::OGLFramebuffer(const FramebufferSettings& settings) : m_FBOSettings(settings)
 	{
 		for (FramebufferTextureSettings settings : m_FBOSettings.FBOAttachments.TextureAttachments)
 		{
@@ -46,7 +46,7 @@ namespace Kaimos {
 		Resize(settings.Width, settings.Height);
 	}
 	
-	OpenGLFramebuffer::~OpenGLFramebuffer()
+	OGLFramebuffer::~OGLFramebuffer()
 	{
 		glDeleteFramebuffers(1, &m_ID);
 		glDeleteTextures(m_ColorTextures.size(), m_ColorTextures.data());
@@ -56,18 +56,18 @@ namespace Kaimos {
 
 	
 	// ----------------------- Public FBO Methods ---------------------------------------------------------
-	void OpenGLFramebuffer::Bind()
+	void OGLFramebuffer::Bind()
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, m_ID);
 		glViewport(0, 0, m_FBOSettings.Width, m_FBOSettings.Height);
 	}
 
-	void OpenGLFramebuffer::Unbind()
+	void OGLFramebuffer::Unbind()
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
-	void OpenGLFramebuffer::ClearFBOTexture(uint index, int value)
+	void OGLFramebuffer::ClearFBOTexture(uint index, int value)
 	{
 		// TODO: Asserts not working
 		//KS_ENGINE_ASSERT(index < m_ColorTextures.size(), "FBO: Index out of bounds");
@@ -75,7 +75,7 @@ namespace Kaimos {
 	}
 
 
-	void OpenGLFramebuffer::Resize(uint width, uint height)
+	void OGLFramebuffer::Resize(uint width, uint height)
 	{
 		if (width == 0 || height == 0 || width > s_MaxFBOSize || height > s_MaxFBOSize)
 		{
@@ -160,14 +160,14 @@ namespace Kaimos {
 
 	
 	// ----------------------- Getters --------------------------------------------------------------------
-	uint OpenGLFramebuffer::GetFBOTextureID(uint index) const
+	uint OGLFramebuffer::GetFBOTextureID(uint index) const
 	{
 		// TODO: Caíste en la vieja trampa del assert que no funciona :D
 		/*KS_ENGINE_ASSERT(index < m_ColorTextures.size(), "Index is outside bounds (FBO)");*/
 		return m_ColorTextures[index];
 	}
 
-	int OpenGLFramebuffer::GetPixelFromFBO(uint index, int x, int y)
+	int OGLFramebuffer::GetPixelFromFBO(uint index, int x, int y)
 	{
 		// Make sure index is correct
 		// TODO: LOOOOOL Assertions not working properly xD
@@ -185,7 +185,7 @@ namespace Kaimos {
 
 
 	// ----------------------- Private FBO Methods --------------------------------------------------------
-	void OpenGLFramebuffer::SetTexture(bool depth_texture, GLenum internal_format, GLenum format, uint width, uint height, uint samples)
+	void OGLFramebuffer::SetTexture(bool depth_texture, GLenum internal_format, GLenum format, uint width, uint height, uint samples)
 	{
 		if (samples > 1)
 		{

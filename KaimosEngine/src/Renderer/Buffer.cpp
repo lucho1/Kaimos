@@ -2,7 +2,7 @@
 #include "Buffer.h"
 #include "Renderer.h"
 
-#include "Platform/OpenGL/OpenGLBuffer.h"
+#include "Platform/OpenGL/OGLBuffer.h"
 
 namespace Kaimos {
 
@@ -13,7 +13,7 @@ namespace Kaimos {
 	{
 		switch (Renderer::GetRendererAPI())
 		{
-			case RendererAPI::API::OPENGL:		return CreateRef<OpenGLVertexBuffer>(vertices, size);
+			case RendererAPI::API::OPENGL:		return CreateRef<OGLVertexBuffer>(vertices, size);
 			case RendererAPI::API::NONE:		KS_ENGINE_ASSERT(false, "RendererAPI is set to NONE (unsupported)!"); return nullptr;
 		}
 
@@ -25,7 +25,7 @@ namespace Kaimos {
 	{
 		switch (Renderer::GetRendererAPI())
 		{
-			case RendererAPI::API::OPENGL:		return CreateRef<OpenGLVertexBuffer>(size);
+			case RendererAPI::API::OPENGL:		return CreateRef<OGLVertexBuffer>(size);
 			case RendererAPI::API::NONE:		KS_ENGINE_ASSERT(false, "RendererAPI is set to NONE (unsupported)!"); return nullptr;
 		}
 
@@ -40,7 +40,7 @@ namespace Kaimos {
 	{
 		switch (Renderer::GetRendererAPI())
 		{
-			case RendererAPI::API::OPENGL:		return CreateRef<OpenGLIndexBuffer>(vertices, count);
+			case RendererAPI::API::OPENGL:		return CreateRef<OGLIndexBuffer>(vertices, count);
 			case RendererAPI::API::NONE:		KS_ENGINE_ASSERT(false, "RendererAPI is set to NONE (unsupported)!"); return nullptr;
 		}
 
@@ -55,7 +55,7 @@ namespace Kaimos {
 	{
 		switch (Renderer::GetRendererAPI())
 		{
-			case RendererAPI::API::OPENGL:		return CreateRef<OpenGLVertexArray>();
+			case RendererAPI::API::OPENGL:		return CreateRef<OGLVertexArray>();
 			case RendererAPI::API::NONE:		KS_ENGINE_ASSERT(false, "RendererAPI is set to NONE (unsupported)!"); return nullptr;
 		}
 

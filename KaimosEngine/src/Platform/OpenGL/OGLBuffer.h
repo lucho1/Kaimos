@@ -1,19 +1,19 @@
-#ifndef _OPENGLBUFFER_H_
-#define _OPENGLBUFFER_H_
+#ifndef _OGLBUFFER_H_
+#define _OGLBUFFER_H_
 
 #include "Renderer/Buffer.h"
 
 namespace Kaimos {
 
 	// ---- VERTEX BUFFER ----
-	class OpenGLVertexBuffer : public VertexBuffer
+	class OGLVertexBuffer : public VertexBuffer
 	{
 	public:
 
 		// --- Public Class Methods ---
-		OpenGLVertexBuffer(float* vertices, uint size);
-		OpenGLVertexBuffer(uint size);
-		virtual ~OpenGLVertexBuffer();
+		OGLVertexBuffer(float* vertices, uint size);
+		OGLVertexBuffer(uint size);
+		virtual ~OGLVertexBuffer();
 
 		// --- Public Vertex Buffer Methods ---
 		virtual void Bind() const override;
@@ -34,13 +34,13 @@ namespace Kaimos {
 
 
 	// ---- INDEX BUFFER ----
-	class OpenGLIndexBuffer : public IndexBuffer
+	class OGLIndexBuffer : public IndexBuffer
 	{
 	public:
 
 		// --- Public Class Methods ---
-		OpenGLIndexBuffer(uint* vertices, uint count);
-		virtual ~OpenGLIndexBuffer();
+		OGLIndexBuffer(uint* vertices, uint count);
+		virtual ~OGLIndexBuffer();
 
 		// --- Public Index Buffer Methods ---
 		virtual void Bind() const override;
@@ -58,13 +58,13 @@ namespace Kaimos {
 
 
 	// ---- VERTEX ARRAY ----
-	class OpenGLVertexArray : public VertexArray
+	class OGLVertexArray : public VertexArray
 	{
 	public:
 
 		// --- Public Class Methods ---
-		OpenGLVertexArray();
-		virtual ~OpenGLVertexArray();
+		OGLVertexArray();
+		virtual ~OGLVertexArray();
 
 		// --- Public Vertex Array Methods ---
 		virtual void Bind() const override;
@@ -87,4 +87,4 @@ namespace Kaimos {
 	};
 }
 
-#endif //_OPENGLBUFFER_H_
+#endif //_OGLBUFFER_H_

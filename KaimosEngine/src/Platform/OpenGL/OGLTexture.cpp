@@ -1,12 +1,12 @@
 #include "kspch.h"
-#include "OpenGLTexture.h"
+#include "OGLTexture.h"
 
 #include <stb_image.h>
 
 namespace Kaimos {
 
 	// ----------------------- Public Class Methods -------------------------------------------------------
-	OpenGLTexture2D::OpenGLTexture2D(uint width, uint height) : m_Width(width), m_Height(height)
+	OGLTexture2D::OGLTexture2D(uint width, uint height) : m_Width(width), m_Height(height)
 	{
 		KS_PROFILE_FUNCTION();
 		m_InternalFormat = GL_RGBA8;
@@ -27,7 +27,7 @@ namespace Kaimos {
 	}
 
 
-	OpenGLTexture2D::OpenGLTexture2D(const std::string& path) : m_Path(path)
+	OGLTexture2D::OGLTexture2D(const std::string& path) : m_Path(path)
 	{
 		// -- Texture Load --
 		KS_PROFILE_FUNCTION();
@@ -35,7 +35,7 @@ namespace Kaimos {
 		stbi_set_flip_vertically_on_load(1);
 		stbi_uc* texture_data = nullptr;
 		{
-			KS_PROFILE_SCOPE("TEXTURE STBI LOAD - OpenGLTexture2D::OpenGLTexture2D(const std::string & path)");
+			KS_PROFILE_SCOPE("TEXTURE STBI LOAD - OGLTexture2D::OGLTexture2D(const std::string & path)");
 			texture_data = stbi_load(path.c_str(), &w, &h, &channels, 0);
 			KS_ENGINE_ASSERT(texture_data, "Failed to load texture data from path: {0}", path.c_str());
 		}
@@ -78,7 +78,7 @@ namespace Kaimos {
 	}
 
 
-	OpenGLTexture2D::~OpenGLTexture2D()
+	OGLTexture2D::~OGLTexture2D()
 	{
 		KS_PROFILE_FUNCTION();
 		glDeleteTextures(1, &m_ID);
@@ -87,7 +87,7 @@ namespace Kaimos {
 
 	
 	// ----------------------- Public Texture Methods -----------------------------------------------------
-	void OpenGLTexture2D::SetData(void* data, uint size)
+	void OGLTexture2D::SetData(void* data, uint size)
 	{
 		KS_PROFILE_FUNCTION();
 
@@ -98,7 +98,7 @@ namespace Kaimos {
 		glTextureSubImage2D(m_ID, 0, 0, 0, m_Width, m_Height, m_DataFormat, GL_UNSIGNED_BYTE, data);
 	}
 
-	void OpenGLTexture2D::Bind(uint slot) const
+	void OGLTexture2D::Bind(uint slot) const
 	{
 		KS_PROFILE_FUNCTION();
 		glBindTextureUnit(slot, m_ID); //Slot/Unit refers to the (opengl) slot in which the texture is bound, in case we bind +1 textures at a time
