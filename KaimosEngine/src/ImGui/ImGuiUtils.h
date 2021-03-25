@@ -20,6 +20,7 @@ namespace Kaimos::UI {
 	public:
 		
 		// --- Public UI Methods ---
+		static void DrawHelpMarker(const std::string& help_text);
 
 		// Draw controller of vec3 (ue4-like): name = label ("position"), value = ref to vec3, xyz colors = vec3 axis colors,
 		// reset value = reset on pressing axis button, labels = names for axis (xyz, rgb...), column width = width of controller elements
