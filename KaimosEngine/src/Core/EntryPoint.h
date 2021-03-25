@@ -43,6 +43,7 @@
 
 		KS_ENGINE_INFO("--- Creating Kaimos Application ---");
 		Kaimos::Application* app = Kaimos::CreateApplication();
+		
 		KS_PROFILE_END_SESSION();
 
 		// -- Application Update --
@@ -50,6 +51,7 @@
 
 		KS_ENGINE_INFO("--- Running Kaimos Application ---");
 		app->Run();
+
 		KS_PROFILE_END_SESSION();
 
 		// -- Application Shutdown --
@@ -57,6 +59,7 @@
 
 		KS_ENGINE_INFO("--- Shutting Down Kaimos Application ---");
 		delete app;
+		
 		KS_PROFILE_END_SESSION();
 
 		return 0;

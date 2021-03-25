@@ -74,6 +74,7 @@ namespace Kaimos {
 	// ----------------------- Getters/Setters ------------------------------------------------------------
 	void OGLVertexBuffer::SetData(const void* data, uint size)
 	{
+		KS_PROFILE_FUNCTION();
 		glBindBuffer(GL_ARRAY_BUFFER, m_BufferID);
 		glBufferSubData(GL_ARRAY_BUFFER, 0, size, data);
 	}

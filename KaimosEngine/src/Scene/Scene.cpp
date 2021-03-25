@@ -45,6 +45,7 @@ namespace Kaimos {
 	// ----------------------- Public Scene Methods -------------------------------------------------------
 	void Scene::OnUpdateEditor(Timestep dt, EditorCamera& camera)
 	{
+		KS_PROFILE_FUNCTION();
 		Renderer2D::BeginScene(camera);
 
 		auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
@@ -60,6 +61,8 @@ namespace Kaimos {
 
 	void Scene::OnUpdateRuntime(Timestep dt)
 	{
+		KS_PROFILE_FUNCTION();
+
 		// -- Scripts (should be in Scene::OnScenePlay() or similar, upon pressing engine's play button) --
 		m_Registry.view<NativeScriptComponent>().each([=](auto entity, auto& component) // Lambda that will be called for each of the NativeScriptComponent
 			{
@@ -126,6 +129,7 @@ namespace Kaimos {
 	// ----------------------- Public Entities Methods ---------------------------------------------------
 	Entity Scene::CreateEntity(const std::string& name)
 	{
+		KS_PROFILE_FUNCTION();
 		Entity entity = { m_Registry.create(), this };
 		entity.AddComponent<TransformComponent>();
 		entity.AddComponent<TagComponent>(name);

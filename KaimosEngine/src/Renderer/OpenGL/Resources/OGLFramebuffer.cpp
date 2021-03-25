@@ -35,6 +35,7 @@ namespace Kaimos {
 	// ----------------------- Public Class Methods -------------------------------------------------------
 	OGLFramebuffer::OGLFramebuffer(const FramebufferSettings& settings) : m_FBOSettings(settings)
 	{
+		KS_PROFILE_FUNCTION();
 		for (FramebufferTextureSettings settings : m_FBOSettings.FBOAttachments.TextureAttachments)
 		{
 			if (IsDepthFormatTexture(settings.TextureFormat))
@@ -48,6 +49,7 @@ namespace Kaimos {
 	
 	OGLFramebuffer::~OGLFramebuffer()
 	{
+		KS_PROFILE_FUNCTION();
 		glDeleteFramebuffers(1, &m_ID);
 		glDeleteTextures(m_ColorTextures.size(), m_ColorTextures.data());
 		glDeleteTextures(1, &m_DepthTexture);
@@ -58,17 +60,20 @@ namespace Kaimos {
 	// ----------------------- Public FBO Methods ---------------------------------------------------------
 	void OGLFramebuffer::Bind()
 	{
+		KS_PROFILE_FUNCTION();
 		glBindFramebuffer(GL_FRAMEBUFFER, m_ID);
 		glViewport(0, 0, m_FBOSettings.Width, m_FBOSettings.Height);
 	}
 
 	void OGLFramebuffer::Unbind()
 	{
+		KS_PROFILE_FUNCTION();
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
 	void OGLFramebuffer::ClearFBOTexture(uint index, int value)
 	{
+		KS_PROFILE_FUNCTION();
 		// TODO: Asserts not working
 		//KS_ENGINE_ASSERT(index < m_ColorTextures.size(), "FBO: Index out of bounds");
 		glClearTexImage(m_ColorTextures[index], 0, GLTextureFormat(m_ColorAttachmentSettings[index].TextureFormat), GL_INT, &value);
@@ -77,6 +82,7 @@ namespace Kaimos {
 
 	void OGLFramebuffer::Resize(uint width, uint height)
 	{
+		KS_PROFILE_FUNCTION();
 		if (width == 0 || height == 0 || width > s_MaxFBOSize || height > s_MaxFBOSize)
 		{
 			KS_ENGINE_WARN("Warning: Tried to resize FBO to {0}x{1}, aborting operation", width, height);
@@ -169,6 +175,7 @@ namespace Kaimos {
 
 	int OGLFramebuffer::GetPixelFromFBO(uint index, int x, int y)
 	{
+		KS_PROFILE_FUNCTION();
 		// Make sure index is correct
 		// TODO: LOOOOOL Assertions not working properly xD
 		//KS_ENGINE_ASSERT(index < m_ColorTextures.size(), "FBO: Index passed out of bounds");
@@ -187,6 +194,7 @@ namespace Kaimos {
 	// ----------------------- Private FBO Methods --------------------------------------------------------
 	void OGLFramebuffer::SetTexture(bool depth_texture, GLenum internal_format, GLenum format, uint width, uint height, uint samples)
 	{
+		KS_PROFILE_FUNCTION();
 		if (samples > 1)
 		{
 			glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, internal_format, width, height, GL_FALSE);

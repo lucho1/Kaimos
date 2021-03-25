@@ -215,6 +215,7 @@ namespace Kaimos {
 	// ----------------------- Private Renderer Methods ---------------------------------------------------
 	void Renderer2D::NextBatch()
 	{
+		KS_PROFILE_FUNCTION();
 		Flush();
 		StartBatch();
 	}
@@ -222,6 +223,7 @@ namespace Kaimos {
 
 	void Renderer2D::StartBatch()
 	{
+		KS_PROFILE_FUNCTION();
 		s_Data->QuadIndicesDrawCount = 0;
 		s_Data->TextureSlotIndex = 1;
 		s_Data->QuadVBufferPtr = s_Data->QuadVBufferBase;

@@ -123,6 +123,8 @@ namespace Kaimos {
 	// TODO: Move this to another place ???
 	static void SerializeEntity(YAML::Emitter& output, Entity entity)
 	{
+		KS_PROFILE_FUNCTION();
+
 		// -- Begin Entity Map --
 		output << YAML::BeginMap;
 		output << YAML::Key << "Entity" << YAML::Value << "123"; // TODO: Entity ID goes here
@@ -201,6 +203,8 @@ namespace Kaimos {
 	// ----------------------- Public Serialization Methods ----------------------------------------------
 	void SceneSerializer::Serialize(const std::string& filepath) const
 	{
+		KS_PROFILE_FUNCTION();
+
 		YAML::Emitter output;
 
 		output << YAML::BeginMap;
@@ -228,6 +232,8 @@ namespace Kaimos {
 	// ----------------------- Public Deserialization Methods --------------------------------------------
 	bool SceneSerializer::Deserialize(const std::string& filepath) const
 	{
+		KS_PROFILE_FUNCTION();
+
 		YAML::Node data;
 		try { data = YAML::LoadFile(filepath); }
 		catch (const YAML::ParserException& exception)

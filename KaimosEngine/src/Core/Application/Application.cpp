@@ -87,7 +87,7 @@ namespace Kaimos {
 			// -- UI & Rendering --
 			// ImGui is still updating when minimized because we don't know its behaviour on minimizing
 			{
-				KS_PROFILE_SCOPE("UI Render");
+				KS_PROFILE_SCOPE("Engine UI Rendering");
 				m_ImGuiLayer->Begin();
 
 				for (Layer* layer : m_LayerStack)

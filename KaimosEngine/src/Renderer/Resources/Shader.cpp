@@ -59,6 +59,7 @@ namespace Kaimos {
 
 	Ref<Shader> ShaderLibrary::Load(const std::string& filepath)
 	{
+		KS_PROFILE_FUNCTION();
 		Ref<Shader>shader = Shader::Create(filepath);
 		Add(shader);
 		return shader;
@@ -66,6 +67,7 @@ namespace Kaimos {
 
 	Ref<Shader> ShaderLibrary::Load(const std::string& name, const std::string& filepath)
 	{
+		KS_PROFILE_FUNCTION();
 		Ref<Shader>shader = Shader::Create(filepath);
 		Add(name, shader);
 		return shader;

@@ -117,6 +117,7 @@ namespace Kaimos {
 	// ----------------------- Private Class Methods ------------------------------------------------------
 	void Input::OnUpdate()
 	{
+		KS_PROFILE_FUNCTION();
 		for (KEY_CODE key : s_KeysVec)
 			s_KeyMap[key] = GetKey(key);
 
