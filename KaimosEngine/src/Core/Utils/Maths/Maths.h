@@ -3,7 +3,7 @@
 
 #include <glm/glm.hpp>
 
-namespace Kaimos::Math
+namespace Kaimos::Maths
 {
 	bool DecomposeTransformation(const glm::mat4& transform, glm::vec3& translation, glm::vec3& rotation, glm::vec3& scale);
 }

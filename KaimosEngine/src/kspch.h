@@ -27,8 +27,8 @@
 
 // --- Engine Includes ---
 #include "Core/Core.h"
-#include "Core/Log/Log.h"
-#include "Core/Time/Profiling/Instrumentor.h"
+#include "Core/Utils/Log/Log.h"
+#include "Core/Utils/Time/Profiling/Instrumentor.h"
 
 
 // --- Windows Include ---

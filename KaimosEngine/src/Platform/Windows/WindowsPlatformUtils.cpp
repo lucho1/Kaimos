@@ -1,6 +1,6 @@
 #include "kspch.h"
 #include "Core/Utils/PlatformUtils.h"
-#include "Core/Application.h"
+#include "Core/Application/Application.h"
 
 // --- To get usage of windows file dialogs ---
 #include <commdlg.h>

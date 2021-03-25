@@ -2,8 +2,8 @@
 #include "OrthographicCamera.h"
 #include "OrtographicCameraController.h"
 
-#include "Core/Input/Input.h"
-#include "Core//Input/KaimosInputCodes.h"
+#include "Core/Application/Input/Input.h"
+#include "Core/Application/Input/KaimosInputCodes.h"
 
 namespace Kaimos {
 

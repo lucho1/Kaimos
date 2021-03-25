@@ -1,11 +1,10 @@
 #include "kspch.h"
 #include "WindowsWindow.h"
 
-#include "Core/Input/Input.h"
-
-#include "Core/Events/ApplicationEvent.h"
-#include "Core/Events/MouseEvent.h"
-#include "Core/Events/KeyEvent.h"
+#include "Core/Application/Input/Input.h"
+#include "Core/Application/Events/ApplicationEvent.h"
+#include "Core/Application/Events/MouseEvent.h"
+#include "Core/Application/Events/KeyEvent.h"
 
 #include "Platform/OpenGL/OGLContext.h"
 #include "Renderer/Renderer.h"

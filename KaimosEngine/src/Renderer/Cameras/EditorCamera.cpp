@@ -1,8 +1,8 @@
 #include "kspch.h"
 #include "EditorCamera.h"
 
-#include "Core/Input/Input.h"
-#include "Core/Input/KaimosInputCodes.h"
+#include "Core/Application/Input/Input.h"
+#include "Core/Application/Input/KaimosInputCodes.h"
 
 #include <GLFW/glfw3.h>
 

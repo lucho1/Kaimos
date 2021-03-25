@@ -1,10 +1,10 @@
 #include "kspch.h"
-#include "Math.h"
+#include "Maths.h"
 
 #include <glm/gtx/matrix_decompose.hpp>
 
 
-namespace Kaimos::Math {
+namespace Kaimos::Maths {
 
 	bool DecomposeTransformation(const glm::mat4& transform, glm::vec3& translation, glm::vec3& rotation, glm::vec3& scale)
 	{

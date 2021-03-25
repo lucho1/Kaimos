@@ -1,5 +1,5 @@
 #include "EditorLayer.h"
-#include "Core/Math/Math.h"
+#include "Core/Utils/Maths/Maths.h"
 
 #include <ImGui/imgui.h>
 #include <ImGuizmo/ImGuizmo.h>
@@ -336,7 +336,8 @@ namespace Kaimos {
 			if (ImGuizmo::IsUsing())
 			{
 				glm::vec3 translation, rotation, scale;
-				Math::DecomposeTransformation(tr_mat, translation, rotation, scale);
+				Maths::DecomposeTransformation(tr_mat, translation, rotation, scale);
+				
 
 				transform.Translation = translation;
 				transform.Rotation += rotation - transform.Rotation;

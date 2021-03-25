@@ -2,9 +2,9 @@
 #define _EDITORCAMERA_H_
 
 #include "Camera.h"
-#include "Core/Time/Timestep.h"
-#include "Core/Events/Event.h"
-#include "Core/Events/MouseEvent.h"
+#include "Core/Utils/Time/Timestep.h"
+#include "Core/Application/Events/Event.h"
+#include "Core/Application/Events/MouseEvent.h"
 
 #include <glm/glm.hpp>
 

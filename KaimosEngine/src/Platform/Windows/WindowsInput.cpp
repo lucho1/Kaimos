@@ -1,7 +1,7 @@
 #include "kspch.h"
-#include "Core/Input/Input.h"
+#include "Core/Application/Input/Input.h"
+#include "Core/Application/Application.h"
 
-#include "Core/Application.h"
 #include <GLFW/glfw3.h>
 
 namespace Kaimos {

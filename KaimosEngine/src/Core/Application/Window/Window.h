@@ -2,9 +2,7 @@
 #define _WINDOW_H_
 
 #include "Core/Core.h"
-#include "Core/Events/Event.h"
-
-#include <sstream>
+#include "Core/Application/Events/Event.h"
 
 namespace Kaimos {
 

@@ -3,8 +3,8 @@
 
 #include "kspch.h"
 #include "Core/Core.h"
-#include "Core/Time/Timestep.h"
-#include "Core/Events/Event.h"
+#include "Core/Utils/Time/Timestep.h"
+#include "Core/Application/Events/Event.h"
 
 namespace Kaimos {
 

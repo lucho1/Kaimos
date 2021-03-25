@@ -1,7 +1,7 @@
 #ifndef _SCENE_H_
 #define _SCENE_H_
 
-#include "Core/Time/Timestep.h"
+#include "Core/Utils/Time/Timestep.h"
 #include "Renderer/Cameras/EditorCamera.h"
 
 #include <entt.hpp>

@@ -1,11 +1,11 @@
 #ifndef _IMGUILAYER_H_
 #define _IMGUILAYER_H_
 
-#include "Core/Layers/Layer.h"
+#include "Core/Application/Layers/Layer.h"
 
-#include "Core/Events/KeyEvent.h"
-#include "Core/Events/MouseEvent.h"
-#include "Core/Events/ApplicationEvent.h"
+#include "Core/Application/Events/KeyEvent.h"
+#include "Core/Application/Events/MouseEvent.h"
+#include "Core/Application/Events/ApplicationEvent.h"
 
 namespace Kaimos {
 

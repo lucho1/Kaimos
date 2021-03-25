@@ -2,7 +2,7 @@
 #define	_KEYEVENT_H_
 
 #include "Event.h"
-#include "Core/Input/KaimosInputCodes.h"
+#include "Core/Application/Input/KaimosInputCodes.h"
 
 namespace Kaimos {
 

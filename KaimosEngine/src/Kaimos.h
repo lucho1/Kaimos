@@ -5,13 +5,13 @@
 #include "Core/Core.h"
 
 // --- Engine Basic Stuff ---
-#include "Core/Application.h"
-#include "Core/Layers/Layer.h"
-#include "Core/Log/Log.h"
-#include "Core/Time/Timestep.h"
+#include "Core/Application/Application.h"
+#include "Core/Application/Layers/Layer.h"
+#include "Core/Application/Input/Input.h"
+#include "Core/Application/Input/KaimosInputCodes.h"
 
-#include "Core/Input/Input.h"
-#include "Core/Input/KaimosInputCodes.h"
+#include "Core/Utils/Log/Log.h"
+#include "Core/Utils/Time/Timestep.h"
 
 #include "ImGui/ImGuiLayer.h"
 

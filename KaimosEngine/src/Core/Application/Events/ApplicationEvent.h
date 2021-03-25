@@ -2,6 +2,7 @@
 #define _APPLICATIONEVENT_H_
 
 #include "Event.h"
+#include <sstream>
 
 namespace Kaimos {
 

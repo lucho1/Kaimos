@@ -1,13 +1,14 @@
 #ifndef _APPLICATION_H_
 #define _APPLICATION_H_
 
-#include "Core.h"
-#include "Core/Window/Window.h"
+#include "Core/Core.h"
+#include "Core/Utils/Time/Timestep.h"
 
-#include "ImGui/ImGuiLayer.h"
 #include "Events/ApplicationEvent.h"
 #include "Layers/LayerStack.h"
-#include "Time/Timestep.h"
+#include "Window/Window.h"
+
+#include "ImGui/ImGuiLayer.h"
 
 
 // --- Main Declaration, Defined on EntryPoint ---

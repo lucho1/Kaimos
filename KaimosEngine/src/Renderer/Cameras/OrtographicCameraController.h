@@ -2,10 +2,10 @@
 #define _ORTOGRAPHIC_CAMERA_CONTROLLER_H_
 
 #include "OrthographicCamera.h"
-#include "Core/Time/Timestep.h"
+#include "Core/Utils/Time/Timestep.h"
 
-#include "Core/Events/ApplicationEvent.h"
-#include "Core/Events/MouseEvent.h"
+#include "Core/Application/Events/ApplicationEvent.h"
+#include "Core/Application/Events/MouseEvent.h"
 
 namespace Kaimos {
 
