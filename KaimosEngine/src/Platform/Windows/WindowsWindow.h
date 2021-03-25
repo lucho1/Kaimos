@@ -2,7 +2,7 @@
 #define _WINDOWSWINDOW_H_
 
 #include "Core/Application/Window/Window.h"
-#include "Renderer/GraphicsContext.h"
+#include "Renderer/Foundations/GraphicsContext.h"
 #include <GLFW/glfw3.h>
 
 namespace Kaimos {

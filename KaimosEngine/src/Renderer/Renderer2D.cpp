@@ -1,9 +1,9 @@
 #include "kspch.h"
 #include "Renderer2D.h"
 
-#include "Buffer.h"
+#include "Foundations/RenderCommand.h"
+#include "Resources/Buffer.h"
 #include "Resources/Shader.h"
-#include "RenderCommand.h"
 
 
 namespace Kaimos {
@@ -19,8 +19,8 @@ namespace Kaimos {
 		static const uint MaxTextureSlots = 32; // TODO: RenderCapabilities - Variables based on what the hardware can do
 
 		uint QuadIndicesDrawCount = 0;
-		QuadVertex* QuadVBufferBase = nullptr;
-		QuadVertex* QuadVBufferPtr	= nullptr;
+		QuadVertex* QuadVBufferBase			= nullptr;
+		QuadVertex* QuadVBufferPtr			= nullptr;
 
 		Ref<VertexArray> QuadVArray			= nullptr;
 		Ref<VertexBuffer> QuadVBuffer		= nullptr;

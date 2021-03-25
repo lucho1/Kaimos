@@ -1,9 +1,9 @@
 #ifndef _RENDERER_H_
 #define _RENDERER_H_
 
-#include "RenderCommand.h"
-#include "Renderer/Cameras/OrthographicCamera.h"
+#include "Foundations/RenderCommand.h"
 #include "Renderer/Resources/Shader.h"
+#include "Renderer/Cameras/OrthographicCamera.h"
 
 namespace Kaimos {
 

@@ -1,6 +1,6 @@
 #include "kspch.h"
 #include "RenderCommand.h"
-#include "Platform/OpenGL/OGLRendererAPI.h"
+#include "Renderer/OpenGL/OGLRendererAPI.h"
 
 namespace Kaimos
 {

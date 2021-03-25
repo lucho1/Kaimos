@@ -1,7 +1,7 @@
 #ifndef _OPENGLCONTEXT_H_
 #define _OPENGLCONTEXT_H_
 
-#include "Renderer/GraphicsContext.h"
+#include "Renderer/Foundations/GraphicsContext.h"
 
 struct GLFWwindow;
 

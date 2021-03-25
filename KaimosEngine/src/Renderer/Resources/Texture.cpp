@@ -2,7 +2,7 @@
 #include "Texture.h"
 
 #include "Renderer/Renderer.h"
-#include "Platform/OpenGL/OGLTexture.h"
+#include "Renderer/OpenGL/Resources/OGLTexture.h"
 
 namespace Kaimos {
 

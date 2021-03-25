@@ -2,7 +2,7 @@
 #define _RENDERERAPI_H_
 
 #include <glm/glm.hpp>
-#include "Buffer.h"
+#include "Renderer/Resources/Buffer.h"
 
 namespace Kaimos {
 

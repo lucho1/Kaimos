@@ -1,7 +1,7 @@
 #ifndef _OPENGLRENDERERAPI_
 #define _OPENGLRENDERERAPI_
 
-#include "Renderer/RendererAPI.h"
+#include "Renderer/Foundations/RendererAPI.h"
 
 namespace Kaimos {
 

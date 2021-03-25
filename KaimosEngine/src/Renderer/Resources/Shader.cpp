@@ -2,7 +2,7 @@
 #include "Shader.h"
 
 #include "Renderer/Renderer.h"
-#include "Platform/OpenGL/OGLShader.h"
+#include "Renderer/OpenGL/Resources/OGLShader.h"
 
 namespace Kaimos {
 

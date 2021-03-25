@@ -1,7 +1,7 @@
 #ifndef _OGLBUFFER_H_
 #define _OGLBUFFER_H_
 
-#include "Renderer/Buffer.h"
+#include "Renderer/Resources/Buffer.h"
 
 namespace Kaimos {
 

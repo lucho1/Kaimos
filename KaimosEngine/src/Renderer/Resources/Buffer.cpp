@@ -1,8 +1,8 @@
 #include "kspch.h"
 #include "Buffer.h"
-#include "Renderer.h"
+#include "Renderer/Renderer.h"
 
-#include "Platform/OpenGL/OGLBuffer.h"
+#include "Renderer/OpenGL/Resources/OGLBuffer.h"
 
 namespace Kaimos {
 

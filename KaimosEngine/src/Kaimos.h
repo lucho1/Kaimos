@@ -23,9 +23,9 @@
 // -- Engine Renderer --
 #include "Renderer/Renderer.h"
 #include "Renderer/Renderer2D.h"
-#include "Renderer/RenderCommand.h"
+#include "Renderer/Foundations/RenderCommand.h"
 
-#include "Renderer/Buffer.h"
+#include "Renderer/Resources/Buffer.h"
 #include "Renderer/Resources/Shader.h"
 #include "Renderer/Resources/Framebuffer.h"
 #include "Renderer/Resources/Texture.h"

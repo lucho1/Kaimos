@@ -5,7 +5,7 @@
 #include <ImGuizmo/ImGuizmo.h>
 
 // TODO: TEMP
-#include "Platform/OpenGL/OGLShader.h"
+#include "Renderer/OpenGL/Resources/OGLShader.h"
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 

@@ -2,7 +2,7 @@
 #include "Framebuffer.h"
 
 #include "Renderer/Renderer.h"
-#include "Platform/OpenGL/OGLFrameBuffer.h"
+#include "Renderer/OpenGL/Resources/OGLFrameBuffer.h"
 
 namespace Kaimos {
 

@@ -2,7 +2,7 @@
 #include "GraphicsContext.h"
 
 #include "Renderer/Renderer.h"
-#include "Platform/OpenGL/OGLContext.h"
+#include "Renderer/OpenGL/OGLContext.h"
 
 namespace Kaimos {
 
