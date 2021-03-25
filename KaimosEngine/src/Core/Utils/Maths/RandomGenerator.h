@@ -2,6 +2,7 @@
 #define _RANDOMGENERATOR_H_
 
 #include "Core/Core.h"
+#include "Core/Utils/Log/Log.h"
 #include <random>
 
 namespace Kaimos::Random
@@ -18,13 +19,19 @@ namespace Kaimos::Random
 
 
 	// Returns a random int in range (including both)
-	// If both values are 0, it will return an un-ranged random int
+	// If both values are 0 or left default, it will return an un-ranged random int
 	static int GetRandomInt(int range_min = 0, int range_max = 0)
 	{
 		if (range_min == 0 && range_max == 0)
 			return IntDist()(RNGData.s_Engine);
 
-		KS_ENGINE_ASSERT(range_min < range_max, "RangeMin has to be lower than RangeMax"); //TODO: Assertion
+		KS_ENGINE_ASSERT(range_min < range_max, "RangeMin has to be lower than RangeMax");
+		if (range_min > range_max)
+		{
+			KS_ENGINE_ERROR("RangeMin has to be lower than RangeMax");
+			return 0;
+		}
+
 
 		IntDist dist(range_min, range_max);
 		return dist(RNGData.s_Engine);
@@ -33,11 +40,18 @@ namespace Kaimos::Random
 
 
 	// Returns a random vector of ints in range (including both)
-	// If both values are 0, it will return an un-ranged random int vector
+	// If both values are 0 or left default, it will return an un-ranged random int vector
 	static std::vector<int> GetRandomIntVector(int vec_size, int range_min = 0, int range_max = 0)
 	{
 		std::vector<int> ret;
 		IntDist* dist;
+
+		KS_ENGINE_ASSERT(range_min < range_max, "RangeMin has to be lower than RangeMax");
+		if (range_min > range_max)
+		{
+			KS_ENGINE_ERROR("RangeMin has to be lower than RangeMax");
+			return ret;
+		}
 
 		if (range_min == 0 && range_max == 0)
 			dist = &IntDist();
@@ -53,14 +67,19 @@ namespace Kaimos::Random
 
 
 	// Returns a random float in range (including both)
-	// If both values are 0, it will return a random float,
+	// If both values are 0 or left default, it will return a random float,
 	// but between 0 and 1, so a multiplication might be needed
 	static float GetRandomFloat(int range_min = 0, int range_max = 0)
 	{
 		if (range_min == 0 && range_max == 0)
 			return (float)DoubleDist()(RNGData.s_Engine);
 
-		KS_ENGINE_ASSERT(range_min < range_max, "RangeMin has to be lower than RangeMax"); // TODO: Assertion
+		KS_ENGINE_ASSERT(range_min < range_max, "RangeMin has to be lower than RangeMax");
+		if (range_min > range_max)
+		{
+			KS_ENGINE_ERROR("RangeMin has to be lower than RangeMax");
+			return 0.0f;
+		}
 
 		DoubleDist dist((double)range_min, (double)range_max);
 		return (float)dist(RNGData.s_Engine);
@@ -75,6 +94,13 @@ namespace Kaimos::Random
 	{
 		std::vector<float> ret;
 		DoubleDist* dist;
+
+		KS_ENGINE_ASSERT(range_min < range_max, "RangeMin has to be lower than RangeMax");
+		if (range_min > range_max)
+		{
+			KS_ENGINE_ERROR("RangeMin has to be lower than RangeMax");
+			return ret;
+		}
 
 		if (range_min == 0 && range_max == 0)
 			dist = &DoubleDist();

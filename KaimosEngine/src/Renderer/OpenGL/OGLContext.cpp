@@ -25,10 +25,10 @@ namespace Kaimos {
 		KS_ENGINE_ASSERT(status, "Couldn't Initialize Glad!");
 		KS_ENGINE_TRACE("OpenGL Renderer Info: {0} {1} {2}", glGetString(GL_VENDOR), glGetString(GL_RENDERER), glGetString(GL_VERSION));
 
-		int vMaj, vMin;
-		glGetIntegerv(GL_MAJOR_VERSION, &vMaj);
-		glGetIntegerv(GL_MINOR_VERSION, &vMin);
-		//KS_ENGINE_ASSERT(vMaj > 4 || (vMaj == 4 && vMin >= 5), "OpenGL version should be over 4.5!"); // TODO: Fix asserts pls and review this
+		int v_maj, v_min;
+		glGetIntegerv(GL_MAJOR_VERSION, &v_maj);
+		glGetIntegerv(GL_MINOR_VERSION, &v_min);
+		KS_ENGINE_ASSERT(v_maj == 4 && v_min <= 6, "Wrong OpenGL version!");
 	}
 
 

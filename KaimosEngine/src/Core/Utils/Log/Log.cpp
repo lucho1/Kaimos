@@ -20,14 +20,14 @@ namespace Kaimos {
 		logSinks[1]->set_pattern("[%T] [%l] %n: %v");
 
 		// -- Setup Engine Logger --
-		s_EngineLogger = CreateRef<spdlog::logger>("Kaimos Engine", begin(logSinks), end(logSinks));
+		s_EngineLogger = CreateRef<spdlog::logger>("KAIMOS ENGINE LOG", begin(logSinks), end(logSinks));
 		
 		spdlog::register_logger(s_EngineLogger);
 		s_EngineLogger->set_level(spdlog::level::trace);
 		s_EngineLogger->flush_on(spdlog::level::trace);
 
 		// -- Setup Editor Logger --
-		s_EditorLogger = CreateRef<spdlog::logger>("Kaimos Editor", begin(logSinks), end(logSinks));
+		s_EditorLogger = CreateRef<spdlog::logger>("KAIMOS EDITOR LOG", begin(logSinks), end(logSinks));
 		
 		spdlog::register_logger(s_EditorLogger);
 		s_EditorLogger->set_level(spdlog::level::trace);

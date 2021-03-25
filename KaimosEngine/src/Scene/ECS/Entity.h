@@ -19,7 +19,7 @@ namespace Kaimos {
 		template<typename T, typename...Args>
 		T& AddComponent(Args&&... args) const
 		{
-			KS_ENGINE_ASSERT(!HasComponent<T>(), "Entity already has component");
+			KS_ENGINE_ASSERT(!HasComponent<T>(), "Entity already has the component");
 			T& comp = m_Scene->m_Registry.emplace<T>(m_Entity, std::forward<Args>(args)...);
 			m_Scene->OnComponentAdded<T>(*this, comp);
 			return comp;
@@ -28,7 +28,7 @@ namespace Kaimos {
 		template<typename T>
 		T& GetComponent() const
 		{
-			KS_ENGINE_ASSERT(HasComponent<T>(), "Entity doesn't has component");
+			KS_ENGINE_ASSERT(HasComponent<T>(), "Entity doesn't has the component");
 			return m_Scene->m_Registry.get<T>(m_Entity);
 		}
 

@@ -74,8 +74,7 @@ namespace Kaimos {
 	void OGLFramebuffer::ClearFBOTexture(uint index, int value)
 	{
 		KS_PROFILE_FUNCTION();
-		// TODO: Asserts not working
-		//KS_ENGINE_ASSERT(index < m_ColorTextures.size(), "FBO: Index out of bounds");
+		KS_ENGINE_ASSERT(index < m_ColorTextures.size(), "FBO: Index out of bounds");
 		glClearTexImage(m_ColorTextures[index], 0, GLTextureFormat(m_ColorAttachmentSettings[index].TextureFormat), GL_INT, &value);
 	}
 
@@ -148,8 +147,7 @@ namespace Kaimos {
 		// -- Draw Buffers --
 		if (m_ColorTextures.size() > 1)
 		{
-			// TODO: Same old problem with assertions, this is not working, and it should be <= 4
-			KS_ENGINE_ASSERT(m_ColorTextures.size() >= 4, "Kaimos doesn't allows more than 4 color attachments!");
+			KS_ENGINE_ASSERT(m_ColorTextures.size() <= 4, "Kaimos doesn't allows more than 4 color attachments!");
 
 			GLenum color_buffers[4] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
 			glDrawBuffers(m_ColorTextures.size(), color_buffers);
@@ -158,8 +156,12 @@ namespace Kaimos {
 			glDrawBuffer(GL_NONE);
 
 		// -- Unbind FBO --
-		// TODO: Assertions are not working, in this case, whether FBO is complete or not, it won't assert, and if I put a != instead, it will assert if it's complete
-		KS_ENGINE_ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == (bool)GL_FRAMEBUFFER_COMPLETE, "Framebuffer Incompleted!");
+		bool fbo_status = glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE;
+		KS_ENGINE_ASSERT(fbo_status, "Framebuffer Incompleted!");
+
+		if (!fbo_status)
+			KS_ENGINE_ERROR("Framebuffer Incompleted");
+
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
@@ -168,22 +170,19 @@ namespace Kaimos {
 	// ----------------------- Getters --------------------------------------------------------------------
 	uint OGLFramebuffer::GetFBOTextureID(uint index) const
 	{
-		// TODO: Caíste en la vieja trampa del assert que no funciona :D
-		/*KS_ENGINE_ASSERT(index < m_ColorTextures.size(), "Index is outside bounds (FBO)");*/
+		KS_ENGINE_ASSERT(index < m_ColorTextures.size(), "FBO - Index is outside bounds");
 		return m_ColorTextures[index];
 	}
 
 	int OGLFramebuffer::GetPixelFromFBO(uint index, int x, int y)
 	{
 		KS_PROFILE_FUNCTION();
-		// Make sure index is correct
-		// TODO: LOOOOOL Assertions not working properly xD
-		//KS_ENGINE_ASSERT(index < m_ColorTextures.size(), "FBO: Index passed out of bounds");
+		KS_ENGINE_ASSERT(index < m_ColorTextures.size(), "FBO - Index is outside bounds");
 
-		// Select a buffer for reading (a specific color attachment)
+		// -- Select a buffer for reading (a specific color attachment) --
 		glReadBuffer(GL_COLOR_ATTACHMENT0 + index);
 
-		// Now read pixels from FBO (x, y with a 1,1 size because we want to read 1 pixel)
+		// -- Read pixels from FBO (x, y with a 1,1 size because we want to read 1 pixel) --
 		int pixel;
 		glReadPixels(x, y, 1, 1, GL_RED_INTEGER, GL_INT, &pixel);
 		return pixel;

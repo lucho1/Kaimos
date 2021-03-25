@@ -34,14 +34,21 @@ namespace Kaimos {
 		int w, h, channels;
 		stbi_set_flip_vertically_on_load(1);
 		stbi_uc* texture_data = nullptr;
+
 		{
 			KS_PROFILE_SCOPE("TEXTURE STBI LOAD - OGLTexture2D::OGLTexture2D(const std::string & path)");
 			texture_data = stbi_load(path.c_str(), &w, &h, &channels, 0);
-			KS_ENGINE_ASSERT(texture_data, "Failed to load texture data from path: {0}", path.c_str());
 		}
 
-		m_Width = w;
-		m_Height = h;
+		// -- Check for Failure --
+		KS_ENGINE_ASSERT(texture_data, "Failed to load texture data from path: {0}", path.c_str());
+		if (texture_data == nullptr)
+		{
+			KS_ENGINE_ERROR("Failed to load texture data from path: {0}", path.c_str());
+			return;
+		}
+
+		m_Width = w; m_Height = h;
 
 		// -- Image channels (RGBA) processing --
 		if (channels == 4)
@@ -55,7 +62,7 @@ namespace Kaimos {
 			m_DataFormat = GL_RGB;
 		}
 
-		KS_ENGINE_ASSERT(m_InternalFormat & m_InternalFormat, "Image Format not Supported!"); // It'll be 0 if either of them is 0 (what we want)
+		KS_ENGINE_ASSERT(m_InternalFormat & m_DataFormat, "Image Format not Supported!"); // It'll be false (0) if either of them is 0 (what we want)
 
 		// -- Texture Creation --
 		glCreateTextures(GL_TEXTURE_2D, 1, &m_ID);
@@ -93,8 +100,6 @@ namespace Kaimos {
 
 		uint bpp = m_DataFormat == GL_RGBA ? 4 : 3; // Bytes per pixel
 		KS_ENGINE_ASSERT(size == m_Width * m_Height * bpp, "Data passed must be the same size than the entire texture size");
-		KS_ENGINE_ASSERT((m_DataFormat == GL_RGBA || m_DataFormat == GL_RGB), "Texture format was wrong");
-
 		glTextureSubImage2D(m_ID, 0, 0, 0, m_Width, m_Height, m_DataFormat, GL_UNSIGNED_BYTE, data);
 	}
 

@@ -158,8 +158,12 @@ namespace Kaimos {
 
 
 			// -- Syntax Error: eol is shader end (null, since pos isn't) --
-			// TODO: Fix assertions pls and make sure this works
-			//KS_ENGINE_ASSERT(eol != std::string::npos, "Syntax Error!");
+			KS_ENGINE_ASSERT(eol != std::string::npos, "Syntax Error");
+			if (eol == std::string::npos)
+			{
+				KS_ENGINE_ERROR("Shader Syntax Error - Shader End Of Line is null");
+				return {};
+			}
 			
 
 			// -- Start of shader type name (after '#type') --
@@ -172,26 +176,36 @@ namespace Kaimos {
 			std::string shader_type = source.substr(begin, eol - begin); 
 
 
-			// -- Assert if shader type invalid or not supported --
-			KS_ENGINE_ASSERT(ShaderTypeFromString(shader_type), "Invalid ShaderType specification or not supported");
+			// -- Error if shader type invalid or not supported --
+			GLenum gl_shader_type = ShaderTypeFromString(shader_type);
+			KS_ENGINE_ASSERT(gl_shader_type, "Invalid ShaderType specification or not supported");
+			if (gl_shader_type == 0)
+			{
+				KS_ENGINE_ERROR("Shader Syntax Error - Invalid Shader Type specification or not supported");
+				return {};
+			}
 			
 			// -- Start of shader code after shader type declaration line --
 			// Find, from the end of previous line, the next line, which will be the first that we will find not being "\r\n" (an end of line)
-			size_t nextLinePos = source.find_first_not_of("\r\n", eol);
+			size_t next_line_pos = source.find_first_not_of("\r\n", eol);
 
-			// TODO: Assert not working
 			// -- Syntax Error --
-			//KS_ENGINE_ASSERT(nextLinePos != std::string::npos, "Syntax Error");
+			KS_ENGINE_ASSERT(next_line_pos != std::string::npos, "Syntax Error");
+			if (next_line_pos == std::string::npos)
+			{
+				KS_ENGINE_ERROR("Shader Syntax Error - The keyword #type (or the following lines), specificating the Shader Type, could not be found or was wrong");
+				return {};
+			}
 
 			// Start of next shader type declaration line - Find the next "#type" word from the next line of the previous "#type X" statement,
 			// and put 'pos' in there (new size for pos, we are now getting, finally, the whole shader strings code)
-			pos = source.find(type_token, nextLinePos);			
-			ret[ShaderTypeFromString(shader_type)] = (pos == std::string::npos) ? source.substr(nextLinePos) : source.substr(nextLinePos, pos - nextLinePos);
+			pos = source.find(type_token, next_line_pos);
+			ret[ShaderTypeFromString(shader_type)] = (pos == std::string::npos) ? source.substr(next_line_pos) : source.substr(next_line_pos, pos - next_line_pos);
 
 
 			//ret[ShaderTypeFromString(shaderType)] = source.substr(nextLinePos,
 			//														pos - (nextLinePos == std::string::npos ? source.size() - 1 : nextLinePos));
-			// Here we have to put, into the final shader string (the final shader source code), everything between 'nextLinePos' (the line just below the "#type X" line) and
+			// Here we have to put, into the final shader string (the final shader source code), everything between 'next_line_pos' (the line just below the "#type X" line) and
 			// 'pos', which is now at the end of the shader (being this just before the next "#type X" or the end of the file). That's done with 'substr()'
 			// So pos - nextLinePos... Except when nextLinePos is the end of the shader file, case in which we use, to calculate, the shader file size - 1 (so we don't have errors or 0s around)
 			// Then we ho back up, where loop still runs and decides what to do based on what pos is (end of file, a new #type token...)
@@ -211,11 +225,11 @@ namespace Kaimos {
 		// -- Vector for the Shader Parts (vertex sh, pixel sh, ...)
 		std::vector<GLenum> gl_shader_IDs;
 		gl_shader_IDs.reserve(shader_sources.size());
+		KS_ENGINE_ASSERT(shader_sources.size() <= 2, "Only 2 shader types are supported currently!");
 		// Instead, an array can be used (much better): std::array<GLenum, 2> glShaderIDs;
 		// int glShaderIDIndex = 0; // In this case, the gl_shader_IDs.push_back() should be substituted by a glShaderIDs[glShaderIDIndex++] = shader; (downwards)
 
-		// TODO: LOL ASSERT
-		//KS_ENGINE_ASSERT(shaderSources.size() <= 2, "Only 2 shader types are supported currently!");
+
 		for (auto&& [key, value] : shader_sources)
 		{
 			GLenum type = key;

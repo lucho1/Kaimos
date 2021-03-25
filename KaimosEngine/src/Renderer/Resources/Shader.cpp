@@ -52,7 +52,8 @@ namespace Kaimos {
 	
 	void ShaderLibrary::Add(const std::string name, const Ref<Shader>& shader)
 	{
-		KS_ENGINE_ASSERT(!Exists(name), "Shader Already Exists!"); // Check that the name doesn't exists already!
+		// -- Check name doesn't exists already --
+		KS_ENGINE_ASSERT(Exists(name), "Shader Already Exists!");
 		m_Shaders[name] = shader;
 	}
 
@@ -76,7 +77,8 @@ namespace Kaimos {
 
 	Ref<Shader> ShaderLibrary::Get(const std::string& name)
 	{
-		KS_ENGINE_ASSERT(Exists(name), "Shader Not Found!"); // Check that the name doesn't exists already!
+		// -- Check name doesn't exists already --
+		KS_ENGINE_ASSERT(Exists(name), "Shader Not Found!");
 		return m_Shaders[name];
 	}
 }

@@ -88,6 +88,7 @@ namespace Kaimos {
 		{
 			KS_PROFILE_SCOPE("GLFW Init");
 			KS_ENGINE_INFO("Initializing GLFW");
+
 			int success = glfwInit();
 			KS_ENGINE_ASSERT(success, "Couldn't Initialize GLFW!");
 			glfwSetErrorCallback(GLFWErrorCallback);

@@ -6,6 +6,8 @@
 #include "Renderer/Renderer.h"
 #include <GLFW/glfw3.h>
 
+#include "Core/Utils/Maths/RandomGenerator.h"
+
 namespace Kaimos {
 
 	Application* Application::s_Instance = nullptr;
@@ -14,11 +16,10 @@ namespace Kaimos {
 	Application::Application(const std::string& name)
 	{
 		KS_PROFILE_FUNCTION();
-		KS_ENGINE_ASSERT(!s_Instance, "There already exist one instance of Application!!");
+		KS_ENGINE_ASSERT(!s_Instance, "One instance of Application already Exists!");
 		s_Instance = this;
-
-		m_Window = Window::Create(WindowProps(name));
 		
+		m_Window = Window::Create(WindowProps(name));
 		Renderer::Init();
 
 		m_ImGuiLayer = new ImGuiLayer(); // It will be deleted with all the other layers in the ~LayerStack()

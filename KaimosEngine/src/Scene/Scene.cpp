@@ -1,8 +1,8 @@
 #include "kspch.h"
 #include "Scene.h"
 
-#include "Entity.h"
-#include "Components.h"
+#include "ECS/Entity.h"
+#include "ECS/Components.h"
 #include "Renderer/Renderer2D.h"
 
 #include <glm/glm.hpp>
