@@ -4,8 +4,9 @@
 #include <glad/glad.h>
 
 namespace Kaimos {
-
-	static void APIENTRY OpenGLMessageCallback(GLenum msg_source, GLenum msg_type, GLuint msg_id, GLenum msg_severity, GLsizei msg_length, const GLchar* msg, const void* userParam)
+		
+	// ----------------------- Static Global Methods ------------------------------------------------------
+	static void APIENTRY OpenGLMessageCallback(GLenum msg_source, GLenum msg_type, GLuint msg_id, GLenum msg_severity, GLsizei msg_length, const GLchar* msg, const void* user_param)
 	{
 		// Take into account that "ShaderRecompilation" message (#131218) warns you that there is a shader already bound on a shader-bind call
 		std::string error_message = " --- OpenGL Error (#" + std::to_string(msg_id) +"): ";
@@ -22,16 +23,19 @@ namespace Kaimos {
 
 		switch (msg_severity)
 		{
-			case GL_DEBUG_SEVERITY_HIGH:         KS_ENGINE_CRITICAL((error_message + " - High Sev. -" + msg).c_str());	return;
-			case GL_DEBUG_SEVERITY_MEDIUM:       KS_ENGINE_ERROR((error_message + " - Mid Sev. -" + msg).c_str());		return;
-			case GL_DEBUG_SEVERITY_LOW:          KS_ENGINE_WARN((error_message + " - Low Sev. -" + msg).c_str());		return;
-			case GL_DEBUG_SEVERITY_NOTIFICATION: KS_ENGINE_TRACE((error_message + " - Notification -" + msg).c_str());	return;
+			case GL_DEBUG_SEVERITY_HIGH:			KS_ENGINE_CRITICAL((error_message + " - High Sev. -" + msg).c_str());	return;
+			case GL_DEBUG_SEVERITY_MEDIUM:			KS_ENGINE_ERROR((error_message + " - Mid Sev. -" + msg).c_str());		return;
+			case GL_DEBUG_SEVERITY_LOW:				KS_ENGINE_WARN((error_message + " - Low Sev. -" + msg).c_str());		return;
+			case GL_DEBUG_SEVERITY_NOTIFICATION:	KS_ENGINE_TRACE((error_message + " - Notification -" + msg).c_str());	return;
 		}
 
 		KS_ENGINE_CRITICAL((error_message + " - UNKNOWN SEVERITY -" + msg).c_str());
 		KS_ENGINE_ASSERT(false, "Error of Unknown Severity Level!");
 	}
 
+
+
+	// ----------------------- Public Class Methods -------------------------------------------------------
 	void OpenGLRendererAPI::Init()
 	{
 		KS_PROFILE_FUNCTION();
@@ -48,6 +52,9 @@ namespace Kaimos {
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	}
 
+
+	
+	// ----------------------- Public RendererAPI Methods -------------------------------------------------
 	void OpenGLRendererAPI::SetClearColor(const glm::vec4& color) const
 	{
 		glClearColor(color.r, color.g, color.b, color.a);
@@ -58,11 +65,11 @@ namespace Kaimos {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	}
 
-	void OpenGLRendererAPI::DrawIndexed(const Ref<VertexArray>& vertexArray, uint indexCount) const
+	void OpenGLRendererAPI::DrawIndexed(const Ref<VertexArray>& vertex_array, uint index_count) const
 	{
-		uint count = indexCount ? indexCount : vertexArray->GetIndexBuffer()->GetCount();
+		uint count = index_count ? index_count : vertex_array->GetIndexBuffer()->GetCount();
 		glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, nullptr);
-		glBindTexture(GL_TEXTURE_2D, 0); // TODO/OJU: Should we actually do this?
+		glBindTexture(GL_TEXTURE_2D, 0); // TODO/OJU: Should we actually do this? Take it into account on materials system/3D Renderer
 	}
 
 	void OpenGLRendererAPI::SetViewport(uint x, uint y, uint width, uint height)

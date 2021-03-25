@@ -10,13 +10,15 @@ namespace Kaimos {
 	class RenderCommand
 	{
 	public:
-		
+
+		// --- Public Class Methods ---
 		inline static void Init()																		{ s_RendererAPI->Init(); }
+
+		// --- Public RendererAPI Methods ---
 		inline static void Clear()																		{ s_RendererAPI->Clear(); }
 		inline static void SetClearColor(const glm::vec4& color)										{ s_RendererAPI->SetClearColor(color); }
 
-		inline static void DrawIndexed(const Ref<VertexArray>& vertexArray, uint indexCount = 0)		{ s_RendererAPI->DrawIndexed(vertexArray, indexCount); }
-
+		inline static void DrawIndexed(const Ref<VertexArray>& vertex_array, uint index_count = 0)		{ s_RendererAPI->DrawIndexed(vertex_array, index_count); }
 		inline static void SetViewport(uint x, uint y, uint width, uint height)							{ s_RendererAPI->SetViewport(x, y, width, height); }
 
 	private:
@@ -26,4 +28,4 @@ namespace Kaimos {
 
 }
 
-#endif
+#endif //_RENDERCOMMAND_H_

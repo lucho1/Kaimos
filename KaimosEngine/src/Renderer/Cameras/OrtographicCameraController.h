@@ -11,16 +11,16 @@ namespace Kaimos {
 
 	struct OrthographicCameraBounds
 	{
-		float Left, Right, Bottom, Top;
-
-		float GetWidth()	{ return Right - Left;}
-		float GetHeight()	{ return Top - Bottom;}
+		float Left = 0.0f, Right = 1.0f, Bottom = 0.0f, Top = 1.0f;
+		float GetWidth()	const { return Right - Left;}
+		float GetHeight()	const { return Top - Bottom;}
 	};
 
 	class OrtographicCameraController
 	{
 	public:
 		
+		// --- Public Class/Event Methods ---
 		OrtographicCameraController(float aspect_ratio, bool activate_rotation = false);
 
 		void OnUpdate(Timestep dt);
@@ -29,18 +29,18 @@ namespace Kaimos {
 	public:
 
 		// --- Getters ---
-		const OrthographicCamera& GetCamera()		const { return m_Camera; }
-		const OrthographicCameraBounds& GetBounds()	const { return m_CamBounds; }
+		inline const OrthographicCamera& GetCamera()		const { return m_Camera; }
+		inline const OrthographicCameraBounds& GetBounds()	const { return m_CamBounds; }
 
-		inline const float GetZoomLevel()			const { return m_ZoomLevel; }
-		inline const float GetAspectRatio()			const { return m_AspectRatio; }
+		inline float GetZoomLevel()							const { return m_ZoomLevel; }
+		inline float GetAspectRatio()						const { return m_AspectRatio; }
 
-		inline const float GetRotationSpeed()		const { return m_CameraRotSpeed; }
-		inline const float GetMovementSpeed()		const { return m_SpeedMultiplier; }
+		inline float GetRotationSpeed()						const { return m_CameraRotSpeed; }
+		inline float GetMovementSpeed()						const { return m_SpeedMultiplier; }
 		
-		inline const glm::vec3 GetPosition()		const { return m_CameraPos; }
-		inline const float GetRotation()			const { return m_CameraRotation; }
-		inline const bool IsRotationActive()		const { return m_RotationActive; }
+		inline glm::vec3 GetPosition()						const { return m_CameraPos; }
+		inline float GetRotation()							const { return m_CameraRotation; }
+		inline bool IsRotationActive()						const { return m_RotationActive; }
 
 		// --- Setters ---
 		void SetZoomLevel(float zoom_level);
@@ -52,11 +52,12 @@ namespace Kaimos {
 
 		inline void SetPosition(const glm::vec3& pos)	{ m_CameraPos = pos; }
 		inline void SetRotation(float rot)				{ m_CameraRotation = rot; }
-		inline void SetRotationActive(bool activate)	{ m_RotationActive = activate; }
+		inline void ActivateRotation(bool activate)		{ m_RotationActive = activate; }
 
 
 	private:
 
+		// --- Private Event Methods ---
 		// Scroll changes zoom level whereas resize changes Aspect Ratio
 		bool OnMouseScrolled(MouseScrolledEvent& e);
 		bool OnWindowResized(WindowResizeEvent& e);
@@ -75,4 +76,4 @@ namespace Kaimos {
 	};
 }
 
-#endif
+#endif //_ORTOGRAPHIC_CAMERA_CONTROLLER_H_

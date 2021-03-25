@@ -7,11 +7,14 @@
 
 namespace Kaimos {
 
+
+	// ----------------------- Public Class/Event Methods -------------------------------------------------
 	OrtographicCameraController::OrtographicCameraController(float aspect_ratio, bool activate_rotation)
 		: m_AspectRatio(aspect_ratio), m_RotationActive(activate_rotation), m_CamBounds({-m_AspectRatio * m_ZoomLevel, m_AspectRatio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel}), // From -AR to +AR (X) and -Zoom to +Zoom (Y)
 		m_Camera(m_CamBounds.Left, m_CamBounds.Right, m_CamBounds.Bottom, m_CamBounds.Top)
 	{
 	}
+
 
 	void OrtographicCameraController::OnUpdate(Timestep dt)
 	{
@@ -20,26 +23,26 @@ namespace Kaimos {
 		// -- Camera Movement --
 		if (Input::IsKeyPressed(KEY::D))
 		{
-			m_CameraPos.x += cos(glm::radians(m_CameraRotation)) * m_CameraMoveSpeed * dt;
-			m_CameraPos.y += sin(glm::radians(m_CameraRotation)) * m_CameraMoveSpeed * dt;
+			m_CameraPos.x += glm::cos(glm::radians(m_CameraRotation)) * m_CameraMoveSpeed * dt;
+			m_CameraPos.y += glm::sin(glm::radians(m_CameraRotation)) * m_CameraMoveSpeed * dt;
 		}
 		
 		if (Input::IsKeyPressed(KEY::A))
 		{
-			m_CameraPos.x -= cos(glm::radians(m_CameraRotation)) * m_CameraMoveSpeed * dt;
-			m_CameraPos.y -= sin(glm::radians(m_CameraRotation)) * m_CameraMoveSpeed * dt;
+			m_CameraPos.x -= glm::cos(glm::radians(m_CameraRotation)) * m_CameraMoveSpeed * dt;
+			m_CameraPos.y -= glm::sin(glm::radians(m_CameraRotation)) * m_CameraMoveSpeed * dt;
 		}
 		
 		if (Input::IsKeyPressed(KEY::W))
 		{
-			m_CameraPos.x += -sin(glm::radians(m_CameraRotation)) * m_CameraMoveSpeed * dt;
-			m_CameraPos.y += cos(glm::radians(m_CameraRotation)) * m_CameraMoveSpeed * dt;
+			m_CameraPos.x += -glm::sin(glm::radians(m_CameraRotation)) * m_CameraMoveSpeed * dt;
+			m_CameraPos.y += glm::cos(glm::radians(m_CameraRotation)) * m_CameraMoveSpeed * dt;
 		}
 		
 		if (Input::IsKeyPressed(KEY::S))
 		{
-			m_CameraPos.x -= -sin(glm::radians(m_CameraRotation)) * m_CameraMoveSpeed * dt;
-			m_CameraPos.y -= cos(glm::radians(m_CameraRotation)) * m_CameraMoveSpeed * dt;
+			m_CameraPos.x -= -glm::sin(glm::radians(m_CameraRotation)) * m_CameraMoveSpeed * dt;
+			m_CameraPos.y -= glm::cos(glm::radians(m_CameraRotation)) * m_CameraMoveSpeed * dt;
 		}
 
 		if (Input::IsKeyPressed(KEY::F))
@@ -64,6 +67,7 @@ namespace Kaimos {
 			m_Camera.RecalculateViewMatrix(m_CameraPos);
 	}
 
+
 	void OrtographicCameraController::OnEvent(Event& e)
 	{
 		KS_PROFILE_FUNCTION();
@@ -73,6 +77,9 @@ namespace Kaimos {
 		dispatcher.Dispatch<WindowResizeEvent>(KS_BIND_EVENT_FN(OrtographicCameraController::OnWindowResized));
 	}
 
+
+
+	// ----------------------- Private Event Methods ------------------------------------------------------
 	bool OrtographicCameraController::OnMouseScrolled(MouseScrolledEvent& e)
 	{
 		KS_PROFILE_FUNCTION();
@@ -87,7 +94,9 @@ namespace Kaimos {
 		return false;
 	}
 
-	// --- Setters ---
+	
+
+	// ----------------------- Setters --------------------------------------------------------------------
 	void OrtographicCameraController::SetZoomLevel(float zoom_level)
 	{
 		KS_PROFILE_FUNCTION();

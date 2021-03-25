@@ -5,31 +5,33 @@
 
 namespace Kaimos {
 
-	// --- Function to cast data type to OpenGL data type ---
-	static GLenum ShaderDataTypeToOpenGLType(ShaderDataType type)
+	// ----------------------- Globals --------------------------------------------------------------------
+	// Cast own data type to OpenGL data type
+	static GLenum ShaderDataTypeToOpenGLType(SHADER_DATATYPE type)
 	{
 		switch (type)
 		{
-			case ShaderDataType::Float:			return GL_FLOAT;
-			case ShaderDataType::Float2:		return GL_FLOAT;
-			case ShaderDataType::Float3:		return GL_FLOAT;
-			case ShaderDataType::Float4:		return GL_FLOAT;
-			case ShaderDataType::Mat3:			return GL_FLOAT;
-			case ShaderDataType::Mat4:			return GL_FLOAT;
-			case ShaderDataType::Int:			return GL_INT;
-			case ShaderDataType::Int2:			return GL_INT;
-			case ShaderDataType::Int3:			return GL_INT;
-			case ShaderDataType::Int4:			return GL_INT;
-			case ShaderDataType::Bool:			return GL_BOOL;
+			case SHADER_DATATYPE::FLOAT:		return GL_FLOAT;
+			case SHADER_DATATYPE::FLOAT2:		return GL_FLOAT;
+			case SHADER_DATATYPE::FLOAT3:		return GL_FLOAT;
+			case SHADER_DATATYPE::FLOAT4:		return GL_FLOAT;
+			case SHADER_DATATYPE::MAT3:			return GL_FLOAT;
+			case SHADER_DATATYPE::MAT4:			return GL_FLOAT;
+			case SHADER_DATATYPE::INT:			return GL_INT;
+			case SHADER_DATATYPE::INT2:			return GL_INT;
+			case SHADER_DATATYPE::INT3:			return GL_INT;
+			case SHADER_DATATYPE::INT4:			return GL_INT;
+			case SHADER_DATATYPE::BOOL:			return GL_BOOL;
 		}
 
 		KS_ENGINE_ASSERT(false, "ShaderDataType passed Unknown or Incorrect!");
 		return (GLenum)0;
 	}
 
+	
 
-	// --- VERTEX BUFFER ---
-	// ------------------------------------------------------------------------
+	// ---------------------------- VERTEX BUFFER ---------------------------------------------------------
+	// ----------------------- Public Class Methods -------------------------------------------------------
 	OpenGLVertexBuffer::OpenGLVertexBuffer(float* vertices, uint size)
 	{
 		KS_PROFILE_FUNCTION();
@@ -52,6 +54,9 @@ namespace Kaimos {
 		glDeleteBuffers(1, &m_BufferID);
 	}
 
+	
+
+	// ----------------------- Public Vertex Buffer Methods -----------------------------------------------
 	void OpenGLVertexBuffer::Bind() const
 	{
 		KS_PROFILE_FUNCTION();
@@ -64,14 +69,19 @@ namespace Kaimos {
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 	}
 
+	
+
+	// ----------------------- Getters/Setters ------------------------------------------------------------
 	void OpenGLVertexBuffer::SetData(const void* data, uint size)
 	{
 		glBindBuffer(GL_ARRAY_BUFFER, m_BufferID);
 		glBufferSubData(GL_ARRAY_BUFFER, 0, size, data);
 	}
 
-	// --- INDEX BUFFER ---
-	// ------------------------------------------------------------------------
+
+
+	// ---------------------------- INDEX BUFFER ----------------------------------------------------------
+	// ----------------------- Public Class Methods -------------------------------------------------------
 	OpenGLIndexBuffer::OpenGLIndexBuffer(uint* vertices, uint count)
 		: m_Count(count)
 	{
@@ -91,6 +101,9 @@ namespace Kaimos {
 		glDeleteBuffers(1, &m_BufferID);
 	}
 
+	
+
+	// ----------------------- Public Index Buffer Methods ------------------------------------------------
 	void OpenGLIndexBuffer::Bind() const
 	{
 		KS_PROFILE_FUNCTION();
@@ -103,8 +116,10 @@ namespace Kaimos {
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	}
 
-	// --- VERTEX ARRAY ---
-	// ------------------------------------------------------------------------
+
+
+	// ---------------------------- VERTEX ARRAY ----------------------------------------------------------
+	// ----------------------- Public Class Methods -------------------------------------------------------
 	OpenGLVertexArray::OpenGLVertexArray()
 	{
 		KS_PROFILE_FUNCTION();
@@ -117,6 +132,9 @@ namespace Kaimos {
 		glDeleteVertexArrays(1, &m_VArrayID);
 	}
 
+
+	
+	// ----------------------- Public Vertex Array Methods ------------------------------------------------
 	void OpenGLVertexArray::Bind() const
 	{
 		KS_PROFILE_FUNCTION();
@@ -129,22 +147,23 @@ namespace Kaimos {
 		glBindVertexArray(0);
 	}
 
-	void OpenGLVertexArray::AddVertexBuffer(const Ref<VertexBuffer>& Vbuffer)
+
+	void OpenGLVertexArray::AddVertexBuffer(const Ref<VertexBuffer>& vertex_buffer)
 	{
 		KS_PROFILE_FUNCTION();
-		KS_ENGINE_ASSERT(Vbuffer->GetLayout().GetElements().size(), "VertexBuffer has not layouts!");
+		KS_ENGINE_ASSERT(vertex_buffer->GetLayout().GetElements().size(), "VertexBuffer has not layouts!");
 		glBindVertexArray(m_VArrayID);
-		Vbuffer->Bind();
+		vertex_buffer->Bind();
 
-		const auto& layout = Vbuffer->GetLayout();
+		const auto& layout = vertex_buffer->GetLayout();
 		for (const auto& element : layout)
 		{
 			switch (element.Type)
 			{
-				case ShaderDataType::Float:
-				case ShaderDataType::Float2:
-				case ShaderDataType::Float3:
-				case ShaderDataType::Float4:
+				case SHADER_DATATYPE::FLOAT:
+				case SHADER_DATATYPE::FLOAT2:
+				case SHADER_DATATYPE::FLOAT3:
+				case SHADER_DATATYPE::FLOAT4:
 				{
 					glEnableVertexAttribArray(m_VBufferIndex);
 					glVertexAttribPointer(m_VBufferIndex, element.GetElementTypeCount(),
@@ -155,11 +174,11 @@ namespace Kaimos {
 					++m_VBufferIndex;
 					break;
 				}
-				case ShaderDataType::Int:
-				case ShaderDataType::Int2:
-				case ShaderDataType::Int3:
-				case ShaderDataType::Int4:
-				case ShaderDataType::Bool:
+				case SHADER_DATATYPE::INT:
+				case SHADER_DATATYPE::INT2:
+				case SHADER_DATATYPE::INT3:
+				case SHADER_DATATYPE::INT4:
+				case SHADER_DATATYPE::BOOL:
 				{
 					glEnableVertexAttribArray(m_VBufferIndex);
 					glVertexAttribIPointer(m_VBufferIndex, element.GetElementTypeCount(),
@@ -169,8 +188,8 @@ namespace Kaimos {
 					++m_VBufferIndex;
 					break;
 				}
-				case ShaderDataType::Mat3:
-				case ShaderDataType::Mat4:
+				case SHADER_DATATYPE::MAT3:
+				case SHADER_DATATYPE::MAT4:
 				{
 					uint8_t count = element.GetElementTypeCount();
 					for (uint8_t i = 0; i < count; ++i)
@@ -190,16 +209,16 @@ namespace Kaimos {
 			}
 		}
 
-		m_VertexBuffers.push_back(Vbuffer);
+		m_VertexBuffers.push_back(vertex_buffer);
 	}
 
-	void OpenGLVertexArray::SetIndexBuffer(const Ref<IndexBuffer>& Ibuffer)
+
+	void OpenGLVertexArray::SetIndexBuffer(const Ref<IndexBuffer>& index_buffer)
 	{
 		KS_PROFILE_FUNCTION();
 		glBindVertexArray(m_VArrayID);
-		Ibuffer->Bind();
+		index_buffer->Bind();
 
-		m_IndexBuffer = Ibuffer;
+		m_IndexBuffer = index_buffer;
 	}
-
 }

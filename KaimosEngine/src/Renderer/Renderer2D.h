@@ -1,49 +1,64 @@
 #ifndef _RENDERER_2D_
 #define _RENDERER_2D_
 
-#include "Cameras/OrthographicCamera.h"
+#include "Cameras/OrthographicCamera.h" // TODO: Reduce this on camera rework
 #include "Cameras/Camera.h"
 #include "Cameras/EditorCamera.h"
 
 #include "Resources/Texture.h"
-
 #include "Scene/Components.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 
 namespace Kaimos {
 
-	//A renderer is a high-level class, a full-on renderer (doesn't deals with commands such as ClearScene), it deals with high-level constructs (scenes, meshes...)
+	struct QuadVertex
+	{
+		// --- Vertex Variables ---
+		glm::vec3 Pos		= glm::vec3(0.0f);
+		glm::vec2 TexCoord	= glm::vec2(0.0f);
+		glm::vec4 Color		= glm::vec4(1.0f);
+		float TexIndex		= 0.0f;
+		float TilingFactor	= 1.0f;
+
+		// --- Editor Variables ---
+		int EntityID		= 0;
+	};
+
+
+
+	//A renderer is a high-level class, a full-on renderer: doesn't deals with commands such as ClearScene, deals with high-level constructs (scenes, meshes...)
 	//RenderCommands should NOT do multiple things, they are just commands (unless specifically suposed-to)
 	class Renderer2D // Won't deal with Storage (will have 0 storage), no static stuff, just render commands
 	{
 		friend struct Renderer2DData;
 	public:
 
-		// --- Class Methods ---
+		// --- Public Class Methods ---
 		static void Init();
 		static void Shutdown();
-		
-		// --- Rendering Methods ---
-		static void BeginScene(const OrthographicCamera& camera); // TODO: Remove this
+
+		// --- Public Renderer Methods ---
+		static void BeginScene(const OrthographicCamera& camera); // TODO: Remove this - Upon Camera Rework
 		static void BeginScene(const EditorCamera& camera);
 		static void BeginScene(const Camera& camera, const glm::mat4& camera_transform);
 		static void EndScene();
 		static void Flush();
-		
-		// --- Base Drawing Methods ---
+
+		// --- Public Drawing Methods ---
 		static void DrawSprite(const glm::mat4& transform, const SpriteRendererComponent& sprite, int entity_id);
 
 		static void DrawQuad(const glm::mat4& transform, const glm::vec4& color, int entity_id = -1);
 		static void DrawQuad(const glm::mat4& transform, const Ref<Texture2D> texture, int entity_id, const glm::vec4& tintColor = glm::vec4(1.0f), float tiling = 1.0f, glm::vec2 texture_uvoffset = glm::vec2(0.0f));
 
-		// --- Non-Rotated Quads Drawing Methods (calling Base Drawing Methods) ---
+		// TODO: Delete unused functions!! And remove useless ones!
+		// Non-Rotated Quads Drawing Methods (calling Base Drawing Methods)
 		static void DrawQuad(const glm::vec2& position, const glm::vec2 size, const glm::vec4& color);
 		static void DrawQuad(const glm::vec3& position, const glm::vec2 size, const glm::vec4& color);		
 		static void DrawQuad(const glm::vec2& position, const glm::vec2 size, const Ref<Texture2D> texture, float tiling = 1.0f, const glm::vec4& tintColor = glm::vec4(1.0f));		
 		static void DrawQuad(const glm::vec3& position, const glm::vec2 size, const Ref<Texture2D> texture, float tiling = 1.0f, const glm::vec4& tintColor = glm::vec4(1.0f));
 		
-		// --- Rotated Quads Drawing Methods (calling Base Drawing Methods) ---
+		// Rotated Quads Drawing Methods (calling Base Drawing Methods)
 		static void DrawRotatedQuad(const glm::vec2& position, const glm::vec2 size, float rotation, const glm::vec4& color);		
 		static void DrawRotatedQuad(const glm::vec3& position, const glm::vec2 size, float rotation, const glm::vec4& color);		
 		static void DrawRotatedQuad(const glm::vec2& position, const glm::vec2 size, float rotation, const Ref<Texture2D> texture, float tiling = 1.0f, const glm::vec4& tintColor = glm::vec4(1.0f));		
@@ -52,16 +67,15 @@ namespace Kaimos {
 
 	private:
 
-		// --- Rendering Methods ---
-		static void SetupVertexArray(const glm::mat4& transform, const glm::vec4& color, int entity_id, float texture_index = 0.0f, float texture_tiling = 1.0f, glm::vec2 texture_uvoffset = glm::vec2(0.0f));
+		// --- Private Renderer Methods ---
 		static void StartBatch();
 		static void NextBatch();
+		static void SetupVertexArray(const glm::mat4& transform, const glm::vec4& color, int entity_id, float texture_index = 0.0f, float texture_tiling = 1.0f, glm::vec2 texture_uvoffset = glm::vec2(0.0f));
 
 		// --- Renderer Statistics ---
 		struct Statistics
 		{
-			uint DrawCalls = 0;
-			uint QuadCount = 0;
+			uint DrawCalls = 0, QuadCount = 0;
 
 			uint GetTotalVerticesCount()	const { return QuadCount * 4; }
 			uint GetTotalIndicesCount()		const { return QuadCount * 6; }
@@ -70,11 +84,11 @@ namespace Kaimos {
 
 	public:
 
+		// --- Renderer Statistics Methods ---
 		static void ResetStats();
 		static const Statistics GetStats();
 		static const uint GetMaxQuads();
 	};
-
 }
 
-#endif
+#endif //_RENDERER_2D_

@@ -8,6 +8,8 @@ namespace Kaimos {
 
 	ScopePtr<Renderer::SceneData> Renderer::s_SceneData = CreateScopePtr<Renderer::SceneData>();
 
+
+	// ----------------------- Public Class Methods -------------------------------------------------------
 	void Renderer::Init()
 	{
 		KS_PROFILE_FUNCTION();
@@ -20,9 +22,12 @@ namespace Kaimos {
 		Renderer2D::Shutdown();
 	}
 
+
+
+	// ----------------------- Public Renderer Methods -------------------------------------------------------
+	// Takes all scene parameters & makes sure shaders we use get the right uniforms
 	void Renderer::BeginScene(const OrthographicCamera& camera)
 	{
-		// Takes all scene parameters and makes sure the shaders we use get the right uniforms
 		s_SceneData->ViewProjectionMatrix = camera.GetViewProjectionMatrix();
 	}
 
@@ -30,16 +35,16 @@ namespace Kaimos {
 	{
 	}
 
-	void Renderer::Submit(const Ref<Shader>& shader, const Ref<VertexArray>& vertexArray, const glm::mat4& transformation)
+	void Renderer::Submit(const Ref<Shader>& shader, const Ref<VertexArray>& vertex_array, const glm::mat4& transformation)
 	{
 		shader->Bind();
 		shader->SetUMat4("u_ViewProjection", s_SceneData->ViewProjectionMatrix);
 		shader->SetUMat4("u_Model", transformation);
 
-		// Vertex Array bound here since RenderCommands should NOT do multiple things, they are just commands (unless specifically suposed-to)
-		vertexArray->Bind();
-		RenderCommand::DrawIndexed(vertexArray);
-		//vertexArray->Unbind();
+		// -- Vertex Array bound here since RenderCommands should NOT do multiple things, they are just commands (unless specifically suposed-to) --
+		vertex_array->Bind();
+		RenderCommand::DrawIndexed(vertex_array);
+		//vertexArray->Unbind(); //TODO: ?
 	}
 
 	// --- Resize Event ---

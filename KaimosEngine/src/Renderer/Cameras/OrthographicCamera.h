@@ -11,25 +11,27 @@ namespace Kaimos {
 		friend OrtographicCameraController;
 	public:
 
+		// --- Public Class/Camera Methods ---
 		OrthographicCamera(float left, float right, float bottom, float top);
 		void SetProjection(float left, float right, float bottom, float top);
 		
-		// -- Getters --
-		const glm::mat4& GetProjectionMatrix() const { return m_ProjectionMatrix; }
-		const glm::mat4& GetViewMatrix() const { return m_ViewMatrix; }
-		const glm::mat4& GetViewProjectionMatrix() const { return m_ViewProjectionMatrix; }
+		// --- Getters ---
+		const glm::mat4& GetProjectionMatrix()		const { return m_ProjectionMatrix; }
+		const glm::mat4& GetViewMatrix()			const { return m_ViewMatrix; }
+		const glm::mat4& GetViewProjectionMatrix()	const { return m_ViewProjectionMatrix; }
 
 	private:
 
+		// --- Private Camera Methods ---
 		void RecalculateViewMatrix(glm::vec3 pos, float rotation = 0.0f);
 
 	private:
 
-		glm::mat4 m_ProjectionMatrix;
-		glm::mat4 m_ViewMatrix;
-		glm::mat4 m_ViewProjectionMatrix;
+		glm::mat4 m_ProjectionMatrix		= glm::mat4(1.0f);
+		glm::mat4 m_ViewMatrix				= glm::mat4(1.0f);
+		glm::mat4 m_ViewProjectionMatrix	= glm::mat4(1.0f);
 	};
 
 }
 
-#endif
+#endif //_ORTHOGRAPHICCAMERA_H_

@@ -6,6 +6,7 @@
 
 namespace Kaimos {
 
+	// ----------------------- Public Texture2D Methods ---------------------------------------------------
 	Ref<Texture2D> Texture2D::Create(uint width, uint height)
 	{
 		switch (Renderer::GetRendererAPI())

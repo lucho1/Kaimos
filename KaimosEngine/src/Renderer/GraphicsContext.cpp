@@ -10,8 +10,8 @@ namespace Kaimos {
 	{
 		switch (Renderer::GetRendererAPI())
 		{
-			case RendererAPI::API::NONE: KS_ENGINE_ASSERT(false, "RendererAPI::NONE is currently not supported!"); return nullptr;
-			case RendererAPI::API::OPENGL: return CreateScopePtr<OpenGLContext>(static_cast<GLFWwindow*>(window));
+			case RendererAPI::API::NONE:	KS_ENGINE_ASSERT(false, "RendererAPI::NONE is currently not supported!"); return nullptr;
+			case RendererAPI::API::OPENGL:	return CreateScopePtr<OpenGLContext>(static_cast<GLFWwindow*>(window));
 		}
 
 		KS_ENGINE_ASSERT(false, "Unknown RendererAPI!");

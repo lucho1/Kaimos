@@ -1,7 +1,6 @@
 #ifndef _FRAMEBUFFER_H_
 #define _FRAMEBUFFER_H_
 
-
 namespace Kaimos {
 
 	enum class TEXTURE_FORMAT
@@ -46,20 +45,25 @@ namespace Kaimos {
 	{
 	public:
 
+		// --- Public Class Methods ---
 		virtual ~Framebuffer() = default;
 
+		// --- Public FBO Methods ---
 		virtual void Bind() = 0;
 		virtual void Unbind() = 0;
 
-		virtual const FramebufferSettings& GetFBOSettings() const = 0;
-		virtual const uint GetFBOTextureID(uint index = 0) const = 0;
 		virtual void Resize(uint width, uint height) = 0;
-
-		virtual int GetPixelFromFBO(uint index, int x, int y) = 0;
 		virtual void ClearFBOTexture(uint index, int value) = 0;
-
+		
 		static Ref<Framebuffer> Create(const FramebufferSettings& settings);
-	};
+		
+	public:
 
+		// --- Getters ---
+		virtual int GetPixelFromFBO(uint index, int x, int y) = 0;
+		virtual uint GetFBOTextureID(uint index = 0)		const = 0;
+		virtual const FramebufferSettings& GetFBOSettings()	const = 0;
+	};
 }
+
 #endif //_FRAMEBUFFER_H_

@@ -14,24 +14,29 @@ namespace Kaimos {
 	{
 	public:
 
-		OpenGLShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc);
+		// --- Public Class Methods ---
+		OpenGLShader(const std::string& name, const std::string& vertex_src, const std::string& fragment_Src);
 		OpenGLShader(const std::string& filepath);
 		virtual ~OpenGLShader();
 
+		// --- Public Shader Methods ---
 		virtual void Bind() const override;
 		virtual void Unbind() const override;
-		virtual const std::string& GetName() const override { return m_Name; }
+
+		// --- Getters ---
+		inline virtual const std::string& GetName() const override { return m_Name; }
 		
 	public:
 
-		// Upload --> API-Specific Call (opengl --> glUniform...)
-		// Set --> high-level call/concept, it might be set inside a uniform buffer, might set it individually (not tied to API)...
-		virtual void SetUFloat(const std::string& name, float value) override;
-		virtual void SetUFloat3(const std::string& name, const glm::vec3& value) override;
-		virtual void SetUFloat4(const std::string& name, const glm::vec4& value) override;
-		virtual void SetUMat4(const std::string& name, const glm::mat4& value) override;
-		virtual void SetUInt(const std::string& name, int value) override;
-		virtual void SetUIntArray(const std::string& name, int* values_array, uint size) override;
+		// --- Uniforms Set/Upload ---
+		// Upload:	API-Specific Call (opengl -> glUniform...)
+		// Set:		high-level call/concept, it might be set inside a uniform buffer, might set it individually (not API-tied)...
+		virtual void SetUFloat(const std::string& name, float value)						override;
+		virtual void SetUFloat3(const std::string& name, const glm::vec3& value)			override;
+		virtual void SetUFloat4(const std::string& name, const glm::vec4& value)			override;
+		virtual void SetUMat4(const std::string& name, const glm::mat4& value)				override;
+		virtual void SetUInt(const std::string& name, int value)							override;
+		virtual void SetUIntArray(const std::string& name, int* values_array, uint size)	override;
 
 		void UploadUniformIntArray(const std::string& name, const int* values_array, uint size);
 		void UploadUniformInt(const std::string& name, const int& value);
@@ -44,15 +49,17 @@ namespace Kaimos {
 
 	private:
 
-		void CompileShader(const std::unordered_map<GLenum, std::string>&shaderSources);
-		const std::unordered_map<GLenum, std::string> PreProcessShader(const std::string& source);
+		// --- Private OGL Shader Methods ---
 		const std::string ReadShaderFile(const std::string& filepath);
+		const std::unordered_map<GLenum, std::string> PreProcessShader(const std::string& source);
+		
+		void CompileShader(const std::unordered_map<GLenum, std::string>&shader_sources);
 
 	private:
 
-		uint m_ShaderID;
-		std::string m_Name;
+		uint m_ShaderID = 0;
+		std::string m_Name = "Unnamed Shader";
 	};
-
 }
-#endif
+
+#endif //_OPENGLSHADER_H_

@@ -7,13 +7,15 @@ namespace Kaimos {
 	{
 	public:
 
+		// --- Public Class Methods ---
 		virtual ~GraphicsContext() = default;
-
 		virtual void Init() = 0;
+
+		// --- Public RendererAPI Methods ---
 		virtual void SwapBuffers() = 0;
 
 		static ScopePtr<GraphicsContext> Create(void* window);
 	};
 }
 
-#endif
+#endif //_GRAPHICSCONTEXT_H_

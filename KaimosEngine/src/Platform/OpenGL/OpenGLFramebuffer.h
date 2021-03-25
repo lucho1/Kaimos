@@ -11,23 +11,28 @@ namespace Kaimos {
 	{
 	public:
 
+		// --- Public Class Methods ---
 		OpenGLFramebuffer(const FramebufferSettings& settings);
 		virtual ~OpenGLFramebuffer();
 
-		virtual void Resize(uint width, uint height) override;
+		// --- Public FBO Methods ---
 		virtual void Bind() override;
 		virtual void Unbind() override;
-
-
-		virtual const FramebufferSettings& GetFBOSettings() const override { return m_FBOSettings; }
-		// TODO: Caíste en la vieja trampa del assert que no funciona :D
-		virtual const uint GetFBOTextureID(uint index = 0) const override { /*KS_ENGINE_ASSERT(index < m_ColorTextures.size(), "Index is outside bounds (FBO)");*/ return m_ColorTextures[index]; }
-
-		virtual int GetPixelFromFBO(uint index, int x, int y) override;
+		
+		virtual void Resize(uint width, uint height) override;
 		virtual void ClearFBOTexture(uint index, int value) override;
+
+	public:
+
+		// --- Getters ---
+		virtual int GetPixelFromFBO(uint index, int x, int y) override;
+		virtual uint GetFBOTextureID(uint index = 0) const override;
+
+		virtual const FramebufferSettings& GetFBOSettings() const override { return m_FBOSettings; }		
 
 	private:
 
+		// --- Private FBO Methods ---
 		void SetTexture(bool depth_texture, GLenum internal_format, GLenum format, uint width, uint height, uint samples);
 
 	private:
@@ -35,11 +40,13 @@ namespace Kaimos {
 		uint m_ID = 0;
 		FramebufferSettings m_FBOSettings;
 
+		// --- Attachments ---
 		std::vector<FramebufferTextureSettings> m_ColorAttachmentSettings;
 		std::vector<uint> m_ColorTextures;
-		FramebufferTextureSettings m_DepthAttachmentSetting;
-		uint m_DepthTexture = 0; // TODO: Change name to m_DepthTexture
-	};
 
+		FramebufferTextureSettings m_DepthAttachmentSetting;
+		uint m_DepthTexture = 0;
+	};
 }
+
 #endif //_OPENGL_FRAMEBUFFER_H_

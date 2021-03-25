@@ -28,7 +28,7 @@ namespace Kaimos {
 	// ----------------------- Orthographic Camera G/Setters ---------------------------------------------
 	void SceneCamera::SetOrthographicCamera(float size, float near_clip, float far_clip)
 	{
-		m_ProjectionType = ProjectionType::ORTHOGRAPHIC;
+		m_ProjectionType = PROJECTION_TYPE::ORTHOGRAPHIC;
 
 		m_OrthoSize = size;
 		m_OrthographicNearClip = near_clip;
@@ -42,7 +42,7 @@ namespace Kaimos {
 	// ----------------------- Perspective Camera G/Setters ----------------------------------------------
 	void SceneCamera::SetPerspectiveCamera(float FOV, float near_clip, float far_clip)
 	{
-		m_ProjectionType = ProjectionType::PERSPECTIVE;
+		m_ProjectionType = PROJECTION_TYPE::PERSPECTIVE;
 
 		m_PerspectiveFOV = FOV;
 		m_PerspectiveNearClip = near_clip;
@@ -56,7 +56,7 @@ namespace Kaimos {
 	// ----------------------- Private Camera Methods ----------------------------------------------------
 	void SceneCamera::RecalculateProjectionMatrix()
 	{
-		if (m_ProjectionType == ProjectionType::PERSPECTIVE)
+		if (m_ProjectionType == PROJECTION_TYPE::PERSPECTIVE)
 			m_ProjectionMatrix = glm::perspective(glm::radians(m_PerspectiveFOV), m_AspectRatio, m_PerspectiveNearClip, m_PerspectiveFarClip);
 		else
 		{

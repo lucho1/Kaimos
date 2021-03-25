@@ -6,10 +6,11 @@
 
 namespace Kaimos {
 
-	OpenGLContext::OpenGLContext(GLFWwindow* glfw_windowHandle)
-		: m_WindowHandle(glfw_windowHandle)
+	// ----------------------- Public Class Methods -------------------------------------------------------
+	OpenGLContext::OpenGLContext(GLFWwindow* glfw_window_handle)
+		: m_WindowHandle(glfw_window_handle)
 	{
-		KS_ENGINE_ASSERT(glfw_windowHandle, "GLFW Window Handle is null or incorrect!");
+		KS_ENGINE_ASSERT(glfw_window_handle, "GLFW Window Handle is null or incorrect!");
 	}
 
 	void OpenGLContext::Init()
@@ -30,10 +31,12 @@ namespace Kaimos {
 		//KS_ENGINE_ASSERT(vMaj > 4 || (vMaj == 4 && vMin >= 5), "OpenGL version should be over 4.5!"); // TODO: Fix asserts pls and review this
 	}
 
+
+
+	// ----------------------- Public RendererAPI Methods -------------------------------------------------
 	void OpenGLContext::SwapBuffers()
 	{
 		KS_PROFILE_FUNCTION();
 		glfwSwapBuffers(m_WindowHandle);
 	}
-
 }

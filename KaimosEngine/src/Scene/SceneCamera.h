@@ -9,7 +9,7 @@ namespace Kaimos {
 	{
 	public:
 
-		enum class ProjectionType { PERSPECTIVE = 0, ORTHOGRAPHIC = 1 };
+		enum class PROJECTION_TYPE { PERSPECTIVE = 0, ORTHOGRAPHIC = 1 };
 
 	public:
 
@@ -23,12 +23,12 @@ namespace Kaimos {
 	public:
 
 		// --- Orthographic Camera G/Setters ---
-		inline ProjectionType GetProjectionType()	const { return m_ProjectionType; }
+		inline PROJECTION_TYPE GetProjectionType()	const { return m_ProjectionType; }
 		inline float GetOrthographicSize()			const { return m_OrthoSize; }
 		inline float GetOrthographicNearClip()		const { return m_OrthographicNearClip; }
 		inline float GetOrthographicFarClip()		const { return m_OrthographicFarClip; }
 		
-		void SetProjectionType(ProjectionType projection)					{ m_ProjectionType = projection; RecalculateProjectionMatrix(); }
+		void SetProjectionType(PROJECTION_TYPE projection)					{ m_ProjectionType = projection; RecalculateProjectionMatrix(); }
 		void SetOrthographicSize(float size)								{ m_OrthoSize = size; RecalculateProjectionMatrix(); }
 		void SetOrthographicClips(float near_plane, float far_plane)		{ m_OrthographicNearClip = near_plane; m_OrthographicFarClip = far_plane; RecalculateProjectionMatrix(); }
 		
@@ -53,7 +53,7 @@ namespace Kaimos {
 
 	private:
 
-		ProjectionType m_ProjectionType = ProjectionType::ORTHOGRAPHIC;
+		PROJECTION_TYPE m_ProjectionType = PROJECTION_TYPE::ORTHOGRAPHIC;
 
 		float m_OrthoSize = 10.0f;
 		float m_OrthographicNearClip = -1.0f, m_OrthographicFarClip = 1.0f;

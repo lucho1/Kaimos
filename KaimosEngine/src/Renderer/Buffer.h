@@ -1,26 +1,29 @@
 #ifndef _BUFFER_H_
 #define _BUFFER_H_
 
-// Pure virtual interface for different buffers for the different Rendering APIs (VTable?) -- No constructors
+
+// --- Pure virtual interface for different buffers for the different Rendering APIs (VTable?) - No constructors ---
 namespace Kaimos {
 
-	enum class ShaderDataType { None = 0, Float, Float2, Float3, Float4, Mat3, Mat4, Int, Int2, Int3, Int4, Bool };
 
-	static uint ShaderDataTypeSize(ShaderDataType type)
+	enum class SHADER_DATATYPE { NONE = 0, FLOAT, FLOAT2, FLOAT3, FLOAT4, MAT3, MAT4, INT, INT2, INT3, INT4, BOOL };
+
+
+	static uint ShaderDataTypeSize(SHADER_DATATYPE type)
 	{
 		switch (type)
 		{
-			case ShaderDataType::Float:		return 4;			// sizeof(float)
-			case ShaderDataType::Float2:	return 4 * 2;		// sizeof(float) * 2 ... and so on
-			case ShaderDataType::Float3:	return 4 * 3;
-			case ShaderDataType::Float4:	return 4 * 4;
-			case ShaderDataType::Mat3:		return 4 * 3 * 3;	// same here sizeof(float) * 3 * 3 --> Matrix of 3x3
-			case ShaderDataType::Mat4:		return 4 * 4 * 4;
-			case ShaderDataType::Int:		return 4;
-			case ShaderDataType::Int2:		return 4 * 2;
-			case ShaderDataType::Int3:		return 4 * 3;
-			case ShaderDataType::Int4:		return 4 * 4;
-			case ShaderDataType::Bool:		return 1;			// sizeof(bool)
+			case SHADER_DATATYPE::FLOAT:	return 4;			// sizeof(float)
+			case SHADER_DATATYPE::FLOAT2:	return 4 * 2;		// sizeof(float) * 2 ... and so on
+			case SHADER_DATATYPE::FLOAT3:	return 4 * 3;
+			case SHADER_DATATYPE::FLOAT4:	return 4 * 4;
+			case SHADER_DATATYPE::MAT3:		return 4 * 3 * 3;	// same here sizeof(float) * 3 * 3 --> Matrix of 3x3
+			case SHADER_DATATYPE::MAT4:		return 4 * 4 * 4;
+			case SHADER_DATATYPE::INT:		return 4;
+			case SHADER_DATATYPE::INT2:		return 4 * 2;
+			case SHADER_DATATYPE::INT3:		return 4 * 3;
+			case SHADER_DATATYPE::INT4:		return 4 * 4;
+			case SHADER_DATATYPE::BOOL:		return 1;			// sizeof(bool)
 		}
 
 		KS_ENGINE_ASSERT(false, "Unknown ShaderDataType passed!");
@@ -28,19 +31,21 @@ namespace Kaimos {
 	}
 
 
+
+	// ---- Elements of a Buffer struct definition ----
 	struct BufferElement
 	{
-		// -- Variables --
+		// --- Variables ---
 		std::string Name = "";
-		ShaderDataType Type = ShaderDataType::None;
+		SHADER_DATATYPE Type = SHADER_DATATYPE::NONE;
 		size_t Offset = 0;
 		uint Size = 0;
 		bool Normalized = false;
 
-		// -- Functions --
+		// --- Functions ---
 		BufferElement() = default;
 
-		BufferElement(ShaderDataType type, const std::string& name, bool normalized = false)
+		BufferElement(SHADER_DATATYPE type, const std::string& name, bool normalized = false)
 			: Name(name), Type(type), Size(ShaderDataTypeSize(type)), Normalized(normalized)
 		{
 		}
@@ -49,17 +54,17 @@ namespace Kaimos {
 		{
 			switch (Type)
 			{
-				case ShaderDataType::Float:		return 1;
-				case ShaderDataType::Float2:	return 2;
-				case ShaderDataType::Float3:	return 3;
-				case ShaderDataType::Float4:	return 4;
-				case ShaderDataType::Mat3:		return 3 * 3;
-				case ShaderDataType::Mat4:		return 4 * 4;
-				case ShaderDataType::Int:		return 1;
-				case ShaderDataType::Int2:		return 2;
-				case ShaderDataType::Int3:		return 3;
-				case ShaderDataType::Int4:		return 4;
-				case ShaderDataType::Bool:		return 1;
+				case SHADER_DATATYPE::FLOAT:	return 1;
+				case SHADER_DATATYPE::FLOAT2:	return 2;
+				case SHADER_DATATYPE::FLOAT3:	return 3;
+				case SHADER_DATATYPE::FLOAT4:	return 4;
+				case SHADER_DATATYPE::MAT3:		return 3 * 3;
+				case SHADER_DATATYPE::MAT4:		return 4 * 4;
+				case SHADER_DATATYPE::INT:		return 1;
+				case SHADER_DATATYPE::INT2:		return 2;
+				case SHADER_DATATYPE::INT3:		return 3;
+				case SHADER_DATATYPE::INT4:		return 4;
+				case SHADER_DATATYPE::BOOL:		return 1;
 			}
 
 			KS_ENGINE_ASSERT(false, "The element has an unknown ShaderDataType!");
@@ -67,29 +72,32 @@ namespace Kaimos {
 		}
 	};
 
+
+
+	// ---- Class to define a Buffer Layout ----
 	class BufferLayout
 	{
 	public:
 
-		// The initializer list allows us to initialize this as
-		//		BufferLayout layout = {{ ShaderDataType::Float3, "a_Position" }, ...} -- OR -- BufferLayout layout = BufferLayout({{ ShaderDataType::Float3, "a_Position" }, ...})
-		// without having to declare it as a std::vector<BufferElement> layout and having a constructor such as BufferLayout(std::vector<BufferElement>)
-		// so, is way more confortable and readable to have it as this, with an initializer list.
+		// --- Public Class Methods ---
+		// The initializer list allows us to initialize as:	BufferLayout layout = {{ ShaderDataType::Float3, "a_Position" }, ...}
+		// without declaring it as a std::vector<BufferElement> and having a constructor such as BufferLayout(std::vector<BufferElement>).
 		BufferLayout(std::initializer_list<BufferElement> elements) : m_Elements(elements) { CalculateOffsetAndStride(); }
 		BufferLayout() = default;
 
 		// -- Getters --
-		inline const std::vector<BufferElement>& GetElements() const { return m_Elements; }
-		inline const uint GetStride() const { return m_Stride; }
+		inline const std::vector<BufferElement>& GetElements()	const	{ return m_Elements; }
+		inline const uint GetStride()							const	{ return m_Stride; }
 
-		// -- Elements Vector Iterators Getters --
-		std::vector<BufferElement>::iterator begin() { return m_Elements.begin(); }
-		std::vector<BufferElement>::iterator end() { return m_Elements.end(); }
-		std::vector<BufferElement>::const_iterator begin() const { return m_Elements.begin(); }
-		std::vector<BufferElement>::const_iterator end() const { return m_Elements.end(); }
+		// -- Iterators --
+		std::vector<BufferElement>::const_iterator begin()		const	{ return m_Elements.begin(); }
+		std::vector<BufferElement>::const_iterator end()		const	{ return m_Elements.end(); }
+		std::vector<BufferElement>::iterator begin()					{ return m_Elements.begin(); }
+		std::vector<BufferElement>::iterator end()						{ return m_Elements.end(); }
 
 	private:
 
+		// --- Private Class Methods ---
 		void CalculateOffsetAndStride()
 		{
 			size_t offset = 0;
@@ -109,60 +117,71 @@ namespace Kaimos {
 	};
 
 
+
+	// ---- Class to define a Vertex Buffer (virtual interface) ----
 	class VertexBuffer
 	{
 	public:
 
+		// --- Public Class Methods ---
 		virtual ~VertexBuffer() = default;
 
+		// --- Public Vertex Buffer Methods ---
 		virtual void Bind() const = 0;
 		virtual void Unbind() const = 0;
 
+		static Ref<VertexBuffer> Create(float* vertices, uint size); // This is the "Class Constructor", we take anything we want here (static because doesn't belong to this class)
+		static Ref<VertexBuffer> Create(uint size);
+
+		// --- Getters/Setters ---
 		virtual const BufferLayout& GetLayout() const = 0;
 		virtual void SetLayout(const BufferLayout& layout) = 0;
-
 		virtual void SetData(const void* data, uint size) = 0;
-
-		static Ref<VertexBuffer> Create(float* vertices, uint size); // This is the "Constructor", we take anything we want here (static cause doesn't belong to this class)
-		static Ref<VertexBuffer> Create(uint size);
 	};
 
 
+
+	// ---- Class to define an Index Buffer (virtual interface) ----
 	class IndexBuffer
 	{
 	public:
 
+		// --- Public Class Methods ---
 		virtual ~IndexBuffer() = default;
 
+		// --- Public Index Buffer Methods ---
 		virtual void Bind() const = 0;
 		virtual void Unbind() const = 0;
 
-		static Ref <IndexBuffer> Create(uint* vertices, uint count); // This is the "Constructor", we take anything we want here (static cause doesn't belong to this class)
+		static Ref <IndexBuffer> Create(uint* vertices, uint count);
 		
 		// -- Getters --
 		virtual uint GetCount() const = 0;
 	};
 
 
+
+	// ---- Class to define a Vertex Array (virtual interface) ----
 	class VertexArray
 	{
 	public:
 
+		// --- Public Class Methods ---
 		virtual ~VertexArray() = default;
 
+		// --- Public Vertex Array Methods ---
 		virtual void Bind() const = 0;
 		virtual void Unbind() const = 0;
 
 		virtual void AddVertexBuffer(const Ref<VertexBuffer>& Vbuffer) = 0;
 		virtual void SetIndexBuffer(const Ref<IndexBuffer>& Ibuffer) = 0;
+		
+		static Ref<VertexArray> Create();
 
-		virtual const std::vector<Ref<VertexBuffer>>& GetVertexBuffers() const = 0;
+		// --- Getters ---
 		virtual const Ref<IndexBuffer>& GetIndexBuffer() const = 0;
-
-		static Ref<VertexArray> Create(); // This is the "Constructor", we take anything we want here (static cause doesn't belong to this class)
+		virtual const std::vector<Ref<VertexBuffer>>& GetVertexBuffers() const = 0;
 	};
-
 }
 
-
-#endif
+#endif //_BUFFER_H_

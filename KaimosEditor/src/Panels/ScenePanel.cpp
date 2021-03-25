@@ -276,7 +276,7 @@ namespace Kaimos {
 						if (ImGui::Selectable(projection_options[i], selected))
 						{
 							current_projection = projection_options[i];
-							camera.SetProjectionType((SceneCamera::ProjectionType)i);
+							camera.SetProjectionType((SceneCamera::PROJECTION_TYPE)i);
 						}
 
 						if (selected)
@@ -287,7 +287,7 @@ namespace Kaimos {
 				}
 
 
-				if (camera.GetProjectionType() == SceneCamera::ProjectionType::PERSPECTIVE)
+				if (camera.GetProjectionType() == SceneCamera::PROJECTION_TYPE::PERSPECTIVE)
 				{
 					float persp_FOV = camera.GetPerspectiveFOV();
 					if (ImGui::DragFloat("FOV", &persp_FOV))
@@ -302,7 +302,7 @@ namespace Kaimos {
 						camera.SetPerspectiveClips(near_clip, far_clip);
 				}
 
-				if (camera.GetProjectionType() == SceneCamera::ProjectionType::ORTHOGRAPHIC)
+				if (camera.GetProjectionType() == SceneCamera::PROJECTION_TYPE::ORTHOGRAPHIC)
 				{
 					ImGui::Checkbox("Fixed Aspect Ratio", &component.FixedAspectRatio);
 

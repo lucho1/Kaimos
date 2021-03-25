@@ -12,13 +12,17 @@
 
 namespace Kaimos {
 
-	// --- CLASS METHODS ---
-	Kaimos::EditorCamera::EditorCamera(float FOV, float aspect_ratio, float nClip, float fClip)
-		: m_FOV(FOV), m_AspectRatio(aspect_ratio), m_NearClip(nClip), m_FarClip(fClip), Camera(glm::perspective(glm::radians(FOV), aspect_ratio, nClip, fClip))
+
+	// ----------------------- Public Class Methods -------------------------------------------------------
+	Kaimos::EditorCamera::EditorCamera(float FOV, float aspect_ratio, float near_clip, float far_clip)
+		: m_FOV(FOV), m_AspectRatio(aspect_ratio), m_NearClip(near_clip), m_FarClip(far_clip), Camera(glm::perspective(glm::radians(FOV), aspect_ratio, near_clip, far_clip))
 	{
 		UpdateViewMatrix();
 	}
 
+	
+
+	// ----------------------- Public Class/Event Methods -------------------------------------------------
 	void Kaimos::EditorCamera::OnUpdate(Timestep dt)
 	{
 		if (Input::IsKeyPressed(KEY::LEFT_ALT))
@@ -45,7 +49,13 @@ namespace Kaimos {
 	}
 
 
-	// --- CAMERA METHODS ---
+
+	// ----------------------- Getters --------------------------------------------------------------------
+	glm::quat Kaimos::EditorCamera::GetOrientation() const
+	{
+		return glm::quat(glm::vec3(-m_Pitch, -m_Yaw, 0.0f));
+	}
+
 	glm::vec3 Kaimos::EditorCamera::GetUpVector() const
 	{
 		return glm::rotate(GetOrientation(), glm::vec3(0.0f, 1.0f, 0.0f));
@@ -61,22 +71,9 @@ namespace Kaimos {
 		return glm::rotate(GetOrientation(), glm::vec3(0.0f, 0.0f, -1.0f));
 	}
 
-	glm::quat Kaimos::EditorCamera::GetOrientation() const
-	{
-		return glm::quat(glm::vec3(-m_Pitch, -m_Yaw, 0.0f));
-	}
+	
 
-	glm::vec3 Kaimos::EditorCamera::CalculatePosition()
-	{
-		return m_FocalPoint - GetForwardVector() * m_Distance;
-	}
-
-	void Kaimos::EditorCamera::UpdateProjectionMatrix()
-	{
-		m_AspectRatio = m_ViewportWidth / m_ViewportHeight;
-		m_ProjectionMatrix = glm::perspective(glm::radians(m_FOV), m_AspectRatio, m_NearClip, m_FarClip);
-	}
-
+	// ----------------------- Private Camera Methods -----------------------------------------------------
 	void Kaimos::EditorCamera::UpdateViewMatrix()
 	{
 		//Lock Cam Rotation
@@ -92,14 +89,25 @@ namespace Kaimos {
 		m_ViewMatrix = glm::inverse(m_ViewMatrix);
 	}
 
-
-	// --- EVENTS METHODS ---
-	bool Kaimos::EditorCamera::OnMouseScroll(MouseScrolledEvent& ev)
+	void Kaimos::EditorCamera::UpdateProjectionMatrix()
 	{
-		float zoom = ev.GetYOffset() * 0.1f;
-		MouseZoom(zoom);
-		UpdateViewMatrix();
-		return false;
+		m_AspectRatio = m_ViewportWidth / m_ViewportHeight;
+		m_ProjectionMatrix = glm::perspective(glm::radians(m_FOV), m_AspectRatio, m_NearClip, m_FarClip);
+	}
+
+	glm::vec3 Kaimos::EditorCamera::CalculatePosition()
+	{
+		return m_FocalPoint - GetForwardVector() * m_Distance;
+	}
+	
+
+	
+	// ----------------------- Private Camera Settings Methods --------------------------------------------
+	void Kaimos::EditorCamera::MouseRotate(const glm::vec2& rot)
+	{
+		float yaw = GetUpVector().y < 0.0f ? -1.0f : 1.0f;
+		m_Yaw += yaw * rot.x * RotationSpeed();
+		m_Pitch += rot.y * RotationSpeed();
 	}
 
 	void Kaimos::EditorCamera::MousePan(const glm::vec2& pan)
@@ -107,13 +115,6 @@ namespace Kaimos {
 		glm::vec2 speed = PanSpeed();
 		m_FocalPoint += -GetRightVector() * pan.x * speed.x * m_Distance;
 		m_FocalPoint += GetUpVector() * pan.y * speed.y * m_Distance;
-	}
-
-	void Kaimos::EditorCamera::MouseRotate(const glm::vec2& rot)
-	{
-		float yaw = GetUpVector().y < 0.0f ? -1.0f : 1.0f;
-		m_Yaw += yaw * rot.x * RotationSpeed();
-		m_Pitch += rot.y * RotationSpeed();
 	}
 
 	void Kaimos::EditorCamera::MouseZoom(float zoom)
@@ -124,6 +125,11 @@ namespace Kaimos {
 			m_FocalPoint += GetForwardVector();
 			m_Distance = 1.0f;
 		}
+	}
+
+	float Kaimos::EditorCamera::RotationSpeed() const
+	{
+		return 0.8f;
 	}
 
 	glm::vec2 Kaimos::EditorCamera::PanSpeed() const
@@ -138,15 +144,21 @@ namespace Kaimos {
 		return { dx, dy };
 	}
 
-	float Kaimos::EditorCamera::RotationSpeed() const
-	{
-		return 0.8f;
-	}
-
 	float Kaimos::EditorCamera::ZoomSpeed() const
 	{
 		float d = std::max(m_Distance * 0.2f, 0.0f);
 		float speed = std::min(d * d, 100.0f); // Max Speed is 100
 		return speed;
+	}
+
+
+	
+	// ----------------------- Private Event Methods ------------------------------------------------------
+	bool Kaimos::EditorCamera::OnMouseScroll(MouseScrolledEvent& ev)
+	{
+		float zoom = ev.GetYOffset() * 0.1f;
+		MouseZoom(zoom);
+		UpdateViewMatrix();
+		return false;
 	}
 }

@@ -14,17 +14,23 @@ namespace Kaimos {
 
 	public:
 
+		// --- Public Class Methods ---
 		virtual ~RendererAPI() = default;
-
 		virtual void Init() = 0;
+
+
+		// --- Public RendererAPI Methods ---
 		virtual void SetClearColor(const glm::vec4& color) const = 0;
 		virtual void Clear() const = 0;
 		
-		virtual void DrawIndexed(const Ref<VertexArray>& vertexArray, uint indexCount = 0) const = 0;
+		virtual void DrawIndexed(const Ref<VertexArray>& vertex_array, uint index_count = 0) const = 0;
 		virtual void SetViewport(uint x, uint y, uint width, uint height) = 0;
 
-		inline static const API GetAPI() { return s_API; }
+
 		static ScopePtr<RendererAPI> Create();
+		
+		// --- Getters ---
+		inline static const API GetAPI() { return s_API; }
 
 	private:
 
@@ -32,5 +38,4 @@ namespace Kaimos {
 	};
 }
 
-
-#endif
+#endif //_RENDERERAPI_H_

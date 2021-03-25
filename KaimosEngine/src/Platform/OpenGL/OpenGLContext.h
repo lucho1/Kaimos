@@ -11,16 +11,17 @@ namespace Kaimos {
 	{
 	public:
 
-		OpenGLContext(GLFWwindow* glfw_windowHandle);
-
+		// --- Public Class Methods ---
+		OpenGLContext(GLFWwindow* glfw_window_handle);
 		virtual void Init() override;
+
+		// --- Public RendererAPI Methods ---
 		virtual void SwapBuffers() override;
 
 	private:
 
-		GLFWwindow* m_WindowHandle;
+		GLFWwindow* m_WindowHandle = nullptr;
 	};
-
 }
 
-#endif
+#endif //_OPENGLCONTEXT_H_

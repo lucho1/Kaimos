@@ -9,28 +9,38 @@ namespace Kaimos {
 	{
 	public:
 
+		// --- Public Class Methods ---
 		virtual ~Shader() = default;
-
+		
+		// --- Public Shader Methods ---
 		virtual void Bind() const = 0;
 		virtual void Unbind() const = 0;
 
+		static Ref<Shader> Create(const std::string& filepath);
+		static Ref<Shader> Create(const std::string& name, const std::string& vertex_src, const std::string& fragment_src);
+
+		// --- Getters ---
+		virtual const std::string& GetName() const = 0;
+
+	public:
+
+		// --- Uniforms ---
 		virtual void SetUFloat(const std::string& name, float value) = 0;
 		virtual void SetUFloat3(const std::string& name, const glm::vec3& value) = 0;
 		virtual void SetUFloat4(const std::string& name, const glm::vec4& value) = 0;
 		virtual void SetUMat4(const std::string& name,  const glm::mat4& value) = 0;
 		virtual void SetUInt(const std::string& name, int value) = 0;
 		virtual void SetUIntArray(const std::string& name, int* values_array, uint size) = 0;
-
-		virtual const std::string& GetName() const = 0;
-
-		static Ref<Shader> Create(const std::string& filepath);
-		static Ref<Shader> Create(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc);
 	};
+
 
 
 	class ShaderLibrary
 	{
 	public:
+
+		// --- Public ShaderLib Methods ---
+		bool Exists(const std::string& name) const;
 
 		void Add(const Ref<Shader>& shader);
 		void Add(const std::string name, const Ref<Shader>& shader);
@@ -38,13 +48,13 @@ namespace Kaimos {
 		Ref<Shader> Load(const std::string& filepath);
 		Ref<Shader> Load(const std::string& name, const std::string& filepath);
 
+		// --- Getters ---
 		Ref<Shader> Get(const std::string& name);
 
-		bool Exists(const std::string& name) const;
-
 	private:
-		std::unordered_map<std::string, Ref<Shader>> m_Shaders; // name & shader itself
+
+		std::unordered_map<std::string, Ref<Shader>> m_Shaders; // name & shader reference
 	};
 }
 
-#endif
+#endif //_SHADER_H_

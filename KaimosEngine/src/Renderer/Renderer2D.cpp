@@ -7,19 +7,8 @@
 
 
 namespace Kaimos {
-
-	struct QuadVertex
-	{
-		glm::vec3 Pos;
-		glm::vec2 TexCoord;
-		glm::vec4 Color;
-		float TexIndex;
-		float TilingFactor;
-
-		// -- Editor Variables --
-		int EntityID;
-	};
-
+	
+	// ----------------------- Globals --------------------------------------------------------------------
 	struct Renderer2DData
 	{
 		Renderer2D::Statistics RendererStats;
@@ -27,28 +16,28 @@ namespace Kaimos {
 		static const uint MaxQuads = 20000;
 		static const uint MaxVertices = MaxQuads * 4;
 		static const uint MaxIndices = MaxQuads * 6;
-		static const uint MaxTextureSlots = 32; // TODO: RenderCapabilities
+		static const uint MaxTextureSlots = 32; // TODO: RenderCapabilities - Variables based on what the hardware can do
 
 		uint QuadIndicesDrawCount = 0;
 		QuadVertex* QuadVBufferBase = nullptr;
-		QuadVertex* QuadVBufferPtr = nullptr;
+		QuadVertex* QuadVBufferPtr	= nullptr;
 
-		Ref<VertexArray> QuadVArray;
-		Ref<VertexBuffer> QuadVBuffer;
-		Ref<Shader> ColoredTextureShader;
-		Ref<Texture2D> WhiteTexture;
+		Ref<VertexArray> QuadVArray			= nullptr;
+		Ref<VertexBuffer> QuadVBuffer		= nullptr;
+		Ref<Shader> ColoredTextureShader	= nullptr;
+		Ref<Texture2D> WhiteTexture			= nullptr;
 
 		std::array<Ref<Texture2D>, MaxTextureSlots> TextureSlots;
-		uint TextureSlotIndex = 1; // Slot 0 is for White Texture 
+		uint TextureSlotIndex = 1;									// Slot 0 is for White Texture 
 
-		glm::vec4 VerticesPositions[4]; // It's a vec4 so it's easier to multiply by a matrix (4th has to be 1)
+		glm::vec4 VerticesPositions[4] = {};						// It's a vec4 so it's easier to multiply by a matrix (4th has to be 1)
 	};
 	
-	static Renderer2DData* s_Data;	// On shutdown, this is deleted, and ~VertexArray() called, freeing GPU Memory too
-										// (the whole renderer has to be shutdown while we still have a context, otherwise, it will crash!)
+	static Renderer2DData* s_Data = nullptr;	// On shutdown, this is deleted, and ~VertexArray() called, freeing GPU Memory too
+												// (the whole renderer has to be shutdown while we still have a context, otherwise, it will crash!)
 
 	
-	// --- Statistics Methods ---
+	// ----------------------- Renderer Statistics Methods ------------------------------------------------
 	void Renderer2D::ResetStats()
 	{
 		memset(&s_Data->RendererStats, 0, sizeof(Statistics));
@@ -65,94 +54,80 @@ namespace Kaimos {
 	}
 
 
-
-	// --- Class Methods ---
+	
+	// ----------------------- Public Class Methods -------------------------------------------------------
 	void Renderer2D::Init()
 	{
 		KS_PROFILE_FUNCTION();
 		s_Data = new Renderer2DData();
 
-		// --- Vertices Positioning ---
+		// -- Vertices Positions --
 		s_Data->VerticesPositions[0] = { -0.5f, -0.5f, 0.0f, 1.0f };
 		s_Data->VerticesPositions[1] = {  0.5f, -0.5f, 0.0f, 1.0f };
 		s_Data->VerticesPositions[2] = {  0.5f,  0.5f, 0.0f, 1.0f };
 		s_Data->VerticesPositions[3] = { -0.5f,  0.5f, 0.0f, 1.0f };
 
-
-		// --- Vertex Array & Buffers ---
-		//Ref<VertexBuffer> m_VBuffer;
-		//uint indices[6] = { 0, 1, 2, 2, 3, 0 };
-
-		//float vertices[5 * 4] = {
-		//		-0.5f,	-0.5f,	0.0f, 0.0f, 0.0f,		// For negative X positions, UV should be 0, for positive, 1
-		//		 0.5f,	-0.5f,	0.0f, 1.0f, 0.0f,		// If you render, on a square, the texCoords (as color = vec4(tC, 0, 1)), the colors of the square in its corners are
-		//		 0.5f,	 0.5f,	0.0f, 1.0f, 1.0f,		// (0,0,0,1) - Black, (1,0,0,1) - Red, (1,1,0,0) - Yellow, (0,1,0,1) - Green
-		//		-0.5f,	 0.5f,	0.0f, 0.0f, 1.0f
-		//};
-
-
-		Ref<IndexBuffer> m_IBuffer;
-		uint* quadIndices = new uint[s_Data->MaxIndices];
+		// -- Index Buffer --
+		Ref<IndexBuffer> index_buffer;
+		uint* quad_indices = new uint[s_Data->MaxIndices];
 
 		uint offset = 0;
 		for (uint i = 0; i < s_Data->MaxIndices; i += 6)
 		{
-			quadIndices[i + 0] = offset + 0;
-			quadIndices[i + 1] = offset + 1;
-			quadIndices[i + 2] = offset + 2;
+			quad_indices[i + 0] = offset + 0;
+			quad_indices[i + 1] = offset + 1;
+			quad_indices[i + 2] = offset + 2;
 
-			quadIndices[i + 3] = offset + 2;
-			quadIndices[i + 4] = offset + 3;
-			quadIndices[i + 5] = offset + 0;
+			quad_indices[i + 3] = offset + 2;
+			quad_indices[i + 4] = offset + 3;
+			quad_indices[i + 5] = offset + 0;
 
 			offset += 4;
 		}
-
-		//m_VBuffer = VertexBuffer::Create(vertices, sizeof(vertices));
-		//m_IBuffer = IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint));
 		
+		// -- Vertex Buffer & Array --
 		s_Data->QuadVBufferBase = new QuadVertex[s_Data->MaxVertices];
 		s_Data->QuadVArray = VertexArray::Create();
 		s_Data->QuadVBuffer = VertexBuffer::Create(s_Data->MaxVertices * sizeof(QuadVertex));
-		m_IBuffer = IndexBuffer::Create(quadIndices, s_Data->MaxIndices);
 
+		// -- Vertex Layout & Index Buffer Creation --
+		index_buffer = IndexBuffer::Create(quad_indices, s_Data->MaxIndices);
 		BufferLayout layout = {
-			{ ShaderDataType::Float3, "a_Position" },
-			{ ShaderDataType::Float2, "a_TexCoord" },
-			{ ShaderDataType::Float4, "a_Color" },
-			{ ShaderDataType::Float , "a_TexIndex" },
-			{ ShaderDataType::Float , "a_TilingFactor" },
-			{ ShaderDataType::Int ,	  "a_EntityID" }
+			{ SHADER_DATATYPE::FLOAT3,	"a_Position" },
+			{ SHADER_DATATYPE::FLOAT2,	"a_TexCoord" },
+			{ SHADER_DATATYPE::FLOAT4,	"a_Color" },
+			{ SHADER_DATATYPE::FLOAT ,	"a_TexIndex" },
+			{ SHADER_DATATYPE::FLOAT ,	"a_TilingFactor" },
+			{ SHADER_DATATYPE::INT ,	"a_EntityID" }
 		};
 
-		//m_VBuffer->SetLayout(layout);
-		//s_Data->QuadVArray->AddVertexBuffer(m_VBuffer);		
+		// -- Vertex Array Filling --
 		s_Data->QuadVBuffer->SetLayout(layout);
 		s_Data->QuadVArray->AddVertexBuffer(s_Data->QuadVBuffer);
-		s_Data->QuadVArray->SetIndexBuffer(m_IBuffer);
+		s_Data->QuadVArray->SetIndexBuffer(index_buffer);
 
+		// -- Arrays Unbinding & Indices Deletion --
 		s_Data->QuadVArray->Unbind();
 		s_Data->QuadVBuffer->Unbind();
-		m_IBuffer->Unbind();
-		delete[] quadIndices;
+		index_buffer->Unbind();
+		delete[] quad_indices;
 		
-		// --- Shader ---
+		// -- Shader Creation --
 		s_Data->ColoredTextureShader = Shader::Create("assets/shaders/ColoredTextureShader.glsl");
 		
-		// --- Texture ---
+		// -- White Texture Creation --
 		uint whiteTextData = 0xffffffff; // Full Fs for every channel there (2x4 channels - rgba -)
 		s_Data->WhiteTexture = Texture2D::Create(1, 1);
 		s_Data->WhiteTexture->SetData(&whiteTextData, sizeof(whiteTextData)); // or sizeof(uint)
 
-		// Set 1st TextureSlot to 0 --> Could be also done with a memset or with s_Data->TextureSlots.fill(0);
-		//for (uint i = 0; i < s_Data->TextureSlots.size(); ++i)
-		//	s_Data->TextureSlots[i] = 0;
+		// -- Texture Slots Filling --
 		s_Data->TextureSlots[0] = s_Data->WhiteTexture;
 		int texture_samplers[s_Data->MaxTextureSlots];
 
 		for (uint i = 0; i < s_Data->MaxTextureSlots; ++i)
 			texture_samplers[i] = i;
 
+		// -- Shader Uniform of Texture Slots --
 		s_Data->ColoredTextureShader->Bind();
 		s_Data->ColoredTextureShader->SetUIntArray("u_Textures", texture_samplers, s_Data->MaxTextureSlots);
 		s_Data->ColoredTextureShader->Unbind();
@@ -169,8 +144,8 @@ namespace Kaimos {
 	}
 
 
-
-	// --- Rendering Methods ---
+	
+	// ----------------------- Public Renderer Methods ----------------------------------------------------
 	void Renderer2D::BeginScene(const OrthographicCamera& camera)
 	{
 		KS_PROFILE_FUNCTION();
@@ -181,26 +156,29 @@ namespace Kaimos {
 		StartBatch();
 	}
 
+
 	void Renderer2D::BeginScene(const EditorCamera& camera)
 	{
 		KS_PROFILE_FUNCTION();
 
 		s_Data->QuadVArray->Bind();
 		s_Data->ColoredTextureShader->Bind();
-		s_Data->ColoredTextureShader->SetUMat4("u_ViewProjection", camera.GetViewProj());
+		s_Data->ColoredTextureShader->SetUMat4("u_ViewProjection", camera.GetViewProjection());
 		StartBatch();
 	}
+
 
 	void Renderer2D::BeginScene(const Camera& camera, const glm::mat4& camera_transform)
 	{
 		KS_PROFILE_FUNCTION();
-		glm::mat4 ViewProj = camera.GetProjection() * glm::inverse(camera_transform);
+		glm::mat4 view_proj = camera.GetProjection() * glm::inverse(camera_transform);
 
 		s_Data->QuadVArray->Bind();
 		s_Data->ColoredTextureShader->Bind();
-		s_Data->ColoredTextureShader->SetUMat4("u_ViewProjection", ViewProj);
+		s_Data->ColoredTextureShader->SetUMat4("u_ViewProjection", view_proj);
 		StartBatch();
 	}
+
 
 	void Renderer2D::EndScene()
 	{
@@ -208,11 +186,39 @@ namespace Kaimos {
 		Flush();
 	}
 
+
+	void Renderer2D::Flush()
+	{
+		KS_PROFILE_FUNCTION();
+
+		// -- Check if something to draw --
+		if (s_Data->QuadIndicesDrawCount == 0)
+			return;
+
+		// -- Cast (uint8_t is 1 byte large, the substraction give us elements in terms of bytes) --
+		uint data_size = (uint)((uint8_t*)s_Data->QuadVBufferPtr - (uint8_t*)s_Data->QuadVBufferBase);
+
+		// -- Set Vertex Buffer Data --
+		s_Data->QuadVBuffer->SetData(s_Data->QuadVBufferBase, data_size);
+
+		// -- Bind all Textures --
+		for (uint i = 0; i < s_Data->TextureSlotIndex; ++i)
+			s_Data->TextureSlots[i]->Bind(i);
+
+		// -- Draw Vertex Array --
+		RenderCommand::DrawIndexed(s_Data->QuadVArray, s_Data->QuadIndicesDrawCount);
+		++s_Data->RendererStats.DrawCalls;
+	}
+
+
+	
+	// ----------------------- Private Renderer Methods ---------------------------------------------------
 	void Renderer2D::NextBatch()
 	{
 		Flush();
 		StartBatch();
 	}
+
 
 	void Renderer2D::StartBatch()
 	{
@@ -220,37 +226,17 @@ namespace Kaimos {
 		s_Data->TextureSlotIndex = 1;
 		s_Data->QuadVBufferPtr = s_Data->QuadVBufferBase;
 	}
-
-	void Renderer2D::Flush()
-	{
-		KS_PROFILE_FUNCTION();
-
-		// Check if something to draw
-		if (s_Data->QuadIndicesDrawCount == 0)
-			return;
-
-		// This cast is because uint8_t is 1 byte large, so the substraction give us the elements in terms of bytes
-		uint dataSize = (uint)((uint8_t*)s_Data->QuadVBufferPtr - (uint8_t*)s_Data->QuadVBufferBase);
-		s_Data->QuadVBuffer->SetData(s_Data->QuadVBufferBase, dataSize);
-
-		// Bind all Textures to bind
-		for (uint i = 0; i < s_Data->TextureSlotIndex; ++i)
-			s_Data->TextureSlots[i]->Bind(i);
-
-		// Draw VArray
-		RenderCommand::DrawIndexed(s_Data->QuadVArray, s_Data->QuadIndicesDrawCount);
-		++s_Data->RendererStats.DrawCalls;
-	}
+		
 
 	void Renderer2D::SetupVertexArray(const glm::mat4& transform, const glm::vec4& color, int entity_id, float texture_index, float texture_tiling, glm::vec2 texture_uvoffset)
 	{
-		constexpr size_t quadVertexCount = 4;
-		constexpr glm::vec2 texCoords[] = { {0.0f, 0.0f}, {1.0f, 0.0f}, {1.0f, 1.0f}, {0.0f, 1.0f} };
+		constexpr size_t quad_vertex_count = 4;
+		constexpr glm::vec2 tex_coords[] = { {0.0f, 0.0f}, {1.0f, 0.0f}, {1.0f, 1.0f}, {0.0f, 1.0f} };
 
-		for (size_t i = 0; i < quadVertexCount; ++i)
+		for (size_t i = 0; i < quad_vertex_count; ++i)
 		{
 			s_Data->QuadVBufferPtr->Pos = transform * s_Data->VerticesPositions[i];
-			s_Data->QuadVBufferPtr->TexCoord = texCoords[i] - texture_uvoffset;
+			s_Data->QuadVBufferPtr->TexCoord = tex_coords[i] - texture_uvoffset;
 			s_Data->QuadVBufferPtr->Color = color;
 			s_Data->QuadVBufferPtr->TexIndex = texture_index;
 			s_Data->QuadVBufferPtr->TilingFactor = texture_tiling;
@@ -263,8 +249,8 @@ namespace Kaimos {
 	}
 
 
-
-	// --- Drawing Methods ---
+	
+	// ----------------------- Public Drawing Methods -----------------------------------------------------
 	void Renderer2D::DrawSprite(const glm::mat4& transform, const SpriteRendererComponent& sprite, int entity_id)
 	{
 		if (sprite.SpriteTexture)
@@ -277,10 +263,11 @@ namespace Kaimos {
 	{
 		KS_PROFILE_FUNCTION();
 
+		// -- New Batch if Needed --
 		if (s_Data->QuadIndicesDrawCount >= s_Data->MaxIndices)
 			NextBatch();
 
-		// Vertex Buffer setup
+		// -- Set Vertex Array --
 		SetupVertexArray(transform, color, entity_id);
 	}
 
@@ -289,40 +276,43 @@ namespace Kaimos {
 	{
 		KS_PROFILE_FUNCTION();
 
+		// -- New Batch if Needed --
 		if (s_Data->QuadIndicesDrawCount >= s_Data->MaxIndices)
 			NextBatch();
 
-		// Texture Index retrieval
-		uint textureIndex = 0;
+		// -- Texture Index Retrieval --
+		uint texture_index = 0;
 		if (texture)
 		{
 			for (uint i = 1; i < s_Data->TextureSlotIndex; ++i)
 			{
 				if (*s_Data->TextureSlots[i] == *texture)
 				{
-					textureIndex = i;
+					texture_index = i;
 					break;
 				}
 			}
 
-			if (textureIndex == 0)
+			if (texture_index == 0)
 			{
+				// -- New Batch if Needed --
 				if (s_Data->TextureSlotIndex >= s_Data->MaxTextureSlots)
 					NextBatch();
 
-				textureIndex = s_Data->TextureSlotIndex;
+				// -- Set Texture --
+				texture_index = s_Data->TextureSlotIndex;
 				s_Data->TextureSlots[s_Data->TextureSlotIndex] = texture;
 				++s_Data->TextureSlotIndex;
 			}
 		}
 
-		// Vertex Buffer setup
-		SetupVertexArray(transform, tintColor, entity_id, (float)textureIndex, tiling, texture_uvoffset);
+		// -- Set Vertex Array --
+		SetupVertexArray(transform, tintColor, entity_id, (float)texture_index, tiling, texture_uvoffset);
 	}
 
 
-
-	// --- Drawing Methods depending on other drawing methods above ---
+	
+	// ----------------------- Drawing Methods depending on other drawing methods above -------------------
 	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2 size, const glm::vec4& color)
 	{
 		DrawQuad({ position.x, position.y, 0.0f }, size, color);

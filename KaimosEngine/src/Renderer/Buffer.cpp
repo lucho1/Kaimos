@@ -1,6 +1,5 @@
 #include "kspch.h"
 #include "Buffer.h"
-
 #include "Renderer.h"
 
 #include "Platform/OpenGL/OpenGLBuffer.h"
@@ -8,6 +7,7 @@
 namespace Kaimos {
 
 
+	// ----------------------- Vertex Buffer Creation -----------------------------------------------------
 	// Here we decide which rendering API we are using, thus which kind of class type we instantiate/return
 	Ref<VertexBuffer> VertexBuffer::Create(float* vertices, uint size)
 	{
@@ -33,7 +33,9 @@ namespace Kaimos {
 		return nullptr;
 	}
 
-	// Here we decide which rendering API we are using, thus which kind of class type we instantiate/return
+	
+
+	// ----------------------- Index Buffer Creation ------------------------------------------------------
 	Ref<IndexBuffer> IndexBuffer::Create(uint* vertices, uint count)
 	{
 		switch (Renderer::GetRendererAPI())
@@ -46,7 +48,9 @@ namespace Kaimos {
 		return nullptr;
 	}
 
-	// Here we decide which rendering API we are using, thus which kind of class type we instantiate/return
+
+	
+	// ----------------------- Vertex Array Creation ------------------------------------------------------
 	Ref<VertexArray> VertexArray::Create()
 	{
 		switch (Renderer::GetRendererAPI())
@@ -58,5 +62,4 @@ namespace Kaimos {
 		KS_ENGINE_ASSERT(false, "RendererAPI is unknown, not selected or failed!");
 		return nullptr;
 	}
-
 }
