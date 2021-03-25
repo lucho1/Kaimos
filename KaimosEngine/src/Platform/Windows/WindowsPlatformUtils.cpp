@@ -44,7 +44,7 @@ namespace Kaimos {
 	}
 
 
-	std::string FileDialogs::SaveFile(const char* filter)
+	std::string FileDialogs::SaveFile(const char* filter, const char* filename)
 	{
 		// -- Initialize OPENFILENAME to 0 (Common Dialog Box Structure) --
 		OPENFILENAMEA open_file_name;
@@ -56,6 +56,12 @@ namespace Kaimos {
 
 		// -- Buffer File --
 		CHAR file[260] = { 0 };
+		if (filename)
+		{
+			std::strncpy(file, filename, sizeof(file));	// Copy filename to file[]
+			file[sizeof(file) - 1] = 0;					// Add null-terminator at the end (in case filename is >= than the file[] max size)
+		}
+
 		open_file_name.lpstrFile = file;
 		open_file_name.nMaxFile = sizeof(file);
 		open_file_name.lpstrFilter = filter;

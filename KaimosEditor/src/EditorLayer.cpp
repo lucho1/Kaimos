@@ -140,8 +140,8 @@ namespace Kaimos {
 
 		if (mouse_pos.x >= 0.0f && mouse_pos.y >= 0.0f && mouse_pos.x < viewport_size.x && mouse_pos.y < viewport_size.y)
 		{
-			int pixel_read = m_Framebuffer->GetPixelFromFBO(1, mouse_pos.x, mouse_pos.y);
-			m_HoveredEntity = pixel_read == -1 ? Entity() : Entity((entt::entity)pixel_read, m_CurrentScene.get());
+			int pixel_read = m_Framebuffer->GetPixelFromFBO(1, (int)mouse_pos.x, (int)mouse_pos.y);
+			m_HoveredEntity = pixel_read == -1 ? Entity() : Entity((entt::entity)pixel_read, m_CurrentScene.get()); //TODO: Change this entt::entity upon entities rework
 		}
 
 		/*Renderer2D::DrawQuad(glm::vec2(1.5f, -2.5f), glm::vec2(0.5f, 0.75f), { 0.3f, 0.2f, 0.8f, 1.0f });
@@ -444,7 +444,7 @@ namespace Kaimos {
 	{
 		// "filter" arg is divided in 2 by the null-terminated string (\0). The 1st is the filter name to show and the 2nd is the actual filter to use
 		// So this will be shown in the filters tab as "Kaimos Scene (*.kaimos) and will filter all the .kaimos files
-		std::string filepath = FileDialogs::SaveFile("Kaimos Scene (*.kaimos)\0*.kaimos\0");
+		std::string filepath = FileDialogs::SaveFile("Kaimos Scene (*.kaimos)\0*.kaimos\0", m_CurrentScene->GetName().c_str());
 		if (!filepath.empty())
 		{
 			// TODO: This should be handled by a filepath class/assets class or something

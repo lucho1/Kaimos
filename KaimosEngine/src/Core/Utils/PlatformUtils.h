@@ -13,7 +13,7 @@ namespace Kaimos {
 		static std::string OpenFile(const char* filter);
 
 		// If cancelled, returns empty string
-		static std::string SaveFile(const char* filter);
+		static std::string SaveFile(const char* filter, const char* filename);
 	};
 }
 #endif //_PLATFORMUTILS_H_

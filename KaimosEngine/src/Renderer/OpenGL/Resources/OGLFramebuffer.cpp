@@ -150,7 +150,7 @@ namespace Kaimos {
 			KS_ENGINE_ASSERT(m_ColorTextures.size() <= 4, "Kaimos doesn't allows more than 4 color attachments!");
 
 			GLenum color_buffers[4] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
-			glDrawBuffers(m_ColorTextures.size(), color_buffers);
+			glDrawBuffers((GLsizei)m_ColorTextures.size(), color_buffers);
 		}
 		else if (m_ColorTextures.empty()) // Depth pass
 			glDrawBuffer(GL_NONE);
