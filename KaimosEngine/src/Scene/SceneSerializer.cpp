@@ -93,8 +93,7 @@ namespace YAML {
 
 namespace Kaimos {
 
-	// ----------------------- YAML Operator Methods -----------------------------------------------------
-	// TODO: Maybe move this to another place ???
+	// ----------------------- YAML Operators Methods ----------------------------------------------------
 	YAML::Emitter& operator<<(YAML::Emitter& output, const glm::vec2& vec)
 	{
 		output << YAML::Flow;
@@ -120,14 +119,14 @@ namespace Kaimos {
 
 
 	// ----------------------- Global Static Serialization Method ----------------------------------------
-	// TODO: Move this to another place ???
+	// TODO: Move this to another place ??? In the entities/Comps rework
 	static void SerializeEntity(YAML::Emitter& output, Entity entity)
 	{
 		KS_PROFILE_FUNCTION();
 
 		// -- Begin Entity Map --
 		output << YAML::BeginMap;
-		output << YAML::Key << "Entity" << YAML::Value << "123"; // TODO: Entity ID goes here
+		output << YAML::Key << "Entity" << YAML::Value << "123"; // TODO: Entity ID goes here - on Comps/Ent rework
 
 		if (entity.HasComponent<TagComponent>())
 		{

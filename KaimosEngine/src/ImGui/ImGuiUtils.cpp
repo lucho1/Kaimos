@@ -34,8 +34,6 @@ namespace Kaimos::UI {
 
 	void UIFunctionalities::DrawVec3UI(const std::string& name, glm::vec3& value, const glm::vec3& xcolor, const glm::vec3& ycolor, const glm::vec3& zcolor, float reset_value, const std::string& labels, float column_width)
 	{
-		// TODO: Assert here, the string HAS to be of size 3, no more, no less
-
 		ImFont* bold_font = ImGui::GetIO().Fonts->Fonts[1];
 		glm::vec3 hover_sum = glm::vec3(0.1f);
 

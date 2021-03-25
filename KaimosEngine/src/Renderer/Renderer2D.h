@@ -47,23 +47,9 @@ namespace Kaimos {
 
 		// --- Public Drawing Methods ---
 		static void DrawSprite(const glm::mat4& transform, const SpriteRendererComponent& sprite, int entity_id);
-
+		
 		static void DrawQuad(const glm::mat4& transform, const glm::vec4& color, int entity_id = -1);
 		static void DrawQuad(const glm::mat4& transform, const Ref<Texture2D> texture, int entity_id, const glm::vec4& tintColor = glm::vec4(1.0f), float tiling = 1.0f, glm::vec2 texture_uvoffset = glm::vec2(0.0f));
-
-		// TODO: Delete unused functions!! And remove useless ones!
-		// Non-Rotated Quads Drawing Methods (calling Base Drawing Methods)
-		static void DrawQuad(const glm::vec2& position, const glm::vec2 size, const glm::vec4& color);
-		static void DrawQuad(const glm::vec3& position, const glm::vec2 size, const glm::vec4& color);		
-		static void DrawQuad(const glm::vec2& position, const glm::vec2 size, const Ref<Texture2D> texture, float tiling = 1.0f, const glm::vec4& tintColor = glm::vec4(1.0f));		
-		static void DrawQuad(const glm::vec3& position, const glm::vec2 size, const Ref<Texture2D> texture, float tiling = 1.0f, const glm::vec4& tintColor = glm::vec4(1.0f));
-		
-		// Rotated Quads Drawing Methods (calling Base Drawing Methods)
-		static void DrawRotatedQuad(const glm::vec2& position, const glm::vec2 size, float rotation, const glm::vec4& color);		
-		static void DrawRotatedQuad(const glm::vec3& position, const glm::vec2 size, float rotation, const glm::vec4& color);		
-		static void DrawRotatedQuad(const glm::vec2& position, const glm::vec2 size, float rotation, const Ref<Texture2D> texture, float tiling = 1.0f, const glm::vec4& tintColor = glm::vec4(1.0f));		
-		static void DrawRotatedQuad(const glm::vec3& position, const glm::vec2 size, float rotation, const Ref<Texture2D> texture, float tiling = 1.0f, const glm::vec4& tintColor = glm::vec4(1.0f));
-
 
 	private:
 
