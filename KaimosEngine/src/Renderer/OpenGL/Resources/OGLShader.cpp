@@ -43,15 +43,15 @@ namespace Kaimos {
 		// -- Shader Name --
 		// Shader name from filepath --> Substring between last '/' or '\' and the last '.' (assets/textureSh.glsl = textureSh)
 		// rfind is the same but will find exactly the character you pass (find_last will find any of the characters passed)
-		size_t lastSlash = filepath.find_last_of("/\\");
-		size_t lastDot = filepath.rfind('.');
+		size_t last_slash = filepath.find_last_of("/\\");
+		size_t last_dot = filepath.rfind('.');
 
 		// lastSlash + 1 is to get "TextureSh" and not "/TextureSh" (and npos is in case we don't have slashes or previous paths)
 		// If no '.', then we take the end of the string until the last slash (assets/TextureSh --> TextureSh), otherwise, we take from the '.' pos to the lastSlash (remember we are dealing with sizes,
 		// if we begin the substr() at last "/" and end it at last "." and not "." - last"/", we will have errors of empty characters because the end pos will be bigger than it has to actually be!
-		lastSlash = lastSlash == std::string::npos ? 0 : lastSlash + 1;
-		lastDot = (lastDot == std::string::npos ? filepath.size() : lastDot) - lastSlash;
-		m_Name = filepath.substr(lastSlash, lastDot);
+		last_slash = last_slash == std::string::npos ? 0 : last_slash + 1;
+		last_dot = (last_dot == std::string::npos ? filepath.size() : last_dot) - last_slash;
+		m_Name = filepath.substr(last_slash, last_dot);
 
 		// This might be better:
 		//std::filesystem::path path = filepath;

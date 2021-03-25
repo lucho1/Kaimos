@@ -1,14 +1,24 @@
-KaimosScene: UnnamedScene
+KaimosScene: WhiteSquare
 Entities:
   - Entity: 123
     TagComponent:
       Tag: Empty Entity
     TransformComponent:
-      Translation: [0, 0, 0]
+      Translation: [0.510650039, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 123
+    TagComponent:
+      Tag: Empty Entity
+    TransformComponent:
+      Translation: [-1.32039964, 0.0782461464, 0]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     SpriteRendererComponent:
-      Color: [1, 1, 1, 1]
+      Color: [0.671361506, 0.671354771, 0.671354771, 1]
+      TextureFile: ""
+      TextureTiling: 1
+      TextureUVOffset: [0, 0]
   - Entity: 123
     TagComponent:
       Tag: Cam

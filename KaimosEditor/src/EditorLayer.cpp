@@ -78,7 +78,6 @@ namespace Kaimos {
 
 		m_ScenePanel.SetContext(m_CurrentScene);
 		SceneSerializer m_Serializer(m_CurrentScene);
-		//m_Serializer.Deserialize("assets/scenes/YellowSquare.Kaimos");
 		m_Serializer.Deserialize("assets/scenes/CubeScene.kaimos");
 	}
 
@@ -432,9 +431,13 @@ namespace Kaimos {
 
 	void EditorLayer::SaveScene()
 	{
-		// TODO: Do this
-		//SceneSerializer m_Serializer(m_CurrentScene);
-		//m_Serializer.Serialize("assets/scenes/SceneSerializationExample.kaimos");
+		SceneSerializer m_Serializer(m_CurrentScene);
+
+		// TODO: This should be handled by a filepath class/assets class or something
+		if(m_CurrentScene->GetPath().empty())
+			m_Serializer.Serialize("assets/scenes/" + m_CurrentScene->GetName() + ".kaimos");
+		else
+			m_Serializer.Serialize(m_CurrentScene->GetPath());
 	}
 
 	void EditorLayer::SaveSceneAs()
@@ -444,6 +447,19 @@ namespace Kaimos {
 		std::string filepath = FileDialogs::SaveFile("Kaimos Scene (*.kaimos)\0*.kaimos\0");
 		if (!filepath.empty())
 		{
+			// TODO: This should be handled by a filepath class/assets class or something
+			// -- Get File Name --
+			size_t last_slash = filepath.find_last_of("/\\");
+			last_slash = last_slash == std::string::npos ? 0 : last_slash + 1;
+
+			size_t last_dot = filepath.rfind('.');
+			last_dot = last_dot == std::string::npos ? filepath.size() : last_dot;
+
+			// -- Set Scene Data --
+			m_CurrentScene->SetPath(filepath);
+			m_CurrentScene->SetName(filepath.substr(last_slash, last_dot - last_slash));
+
+			// -- Save --
 			SceneSerializer m_Serializer(m_CurrentScene);
 			m_Serializer.Serialize(filepath);
 		}
@@ -451,7 +467,7 @@ namespace Kaimos {
 
 	void EditorLayer::OpenScene()
 	{
-		// Read explanation avobe (on SaveSceneAs())
+		// -- Read explanation avobe (on SaveSceneAs()) --
 		std::string filepath = FileDialogs::OpenFile("Kaimos Scene (*.kaimos)\0*.kaimos\0");
 		if (!filepath.empty())
 		{

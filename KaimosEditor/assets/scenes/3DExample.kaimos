@@ -1,5 +1,17 @@
-KaimosScene: UnnamedScene
+KaimosScene: 3DExample
 Entities:
+  - Entity: 123
+    TagComponent:
+      Tag: Square
+    TransformComponent:
+      Translation: [0, 0, -8]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    SpriteRendererComponent:
+      Color: [0.246379688, 0.760563374, 0.376736134, 1]
+      TextureFile: ""
+      TextureTiling: 1
+      TextureUVOffset: [0, 0]
   - Entity: 123
     TagComponent:
       Tag: Camera
@@ -18,12 +30,3 @@ Entities:
         OrthoNearClip: -1
       PrimaryCamera: true
       FixedAR: false
-  - Entity: 123
-    TagComponent:
-      Tag: Square
-    TransformComponent:
-      Translation: [0, 0, -8]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    SpriteRendererComponent:
-      Color: [0.246379688, 0.760563374, 0.376736134, 1]

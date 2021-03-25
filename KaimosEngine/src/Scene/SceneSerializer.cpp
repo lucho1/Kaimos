@@ -203,12 +203,11 @@ namespace Kaimos {
 	void SceneSerializer::Serialize(const std::string& filepath) const
 	{
 		KS_PROFILE_FUNCTION();
-
+		
 		YAML::Emitter output;
-
 		output << YAML::BeginMap;
-		output << YAML::Key << "KaimosScene" << YAML::Value << "UnnamedScene";	// Save Scene as Key + SceneName as value
-		output << YAML::Key << "Entities" << YAML::Value << YAML::BeginSeq;		// Save Entites as a sequence (like an array)
+		output << YAML::Key << "KaimosScene" << YAML::Value << m_Scene->GetName().c_str();	// Save Scene as Key + SceneName as value
+		output << YAML::Key << "Entities" << YAML::Value << YAML::BeginSeq;					// Save Entites as a sequence (like an array)
 
 		m_Scene->m_Registry.each([&](auto entityID)
 			{
@@ -224,6 +223,7 @@ namespace Kaimos {
 
 		std::ofstream file(filepath);
 		file << output.c_str();
+		m_Scene->SetPath(filepath);
 	}
 
 
@@ -233,6 +233,7 @@ namespace Kaimos {
 	{
 		KS_PROFILE_FUNCTION();
 
+		// -- File Load --
 		YAML::Node data;
 		try { data = YAML::LoadFile(filepath); }
 		catch (const YAML::ParserException& exception)
@@ -247,9 +248,13 @@ namespace Kaimos {
 			return false;
 		}
 
+		// -- Scene Setup --
 		std::string scene_name = data["KaimosScene"].as<std::string>();
 		KS_ENGINE_TRACE("Deserializing scene '{0}'", scene_name);
+		m_Scene->SetName(scene_name);
+		m_Scene->SetPath(filepath);
 
+		// -- Entities Load --
 		YAML::Node entities = data["Entities"];
 		if (entities)
 		{

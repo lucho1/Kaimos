@@ -1,14 +1,5 @@
-KaimosScene: UnnamedScene
+KaimosScene: YellowSquare
 Entities:
-  - Entity: 123
-    TagComponent:
-      Tag: Empty Entity
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    SpriteRendererComponent:
-      Color: [0.898809075, 1, 0, 1]
   - Entity: 123
     TagComponent:
       Tag: Cam
@@ -27,3 +18,15 @@ Entities:
         OrthoNearClip: -1
       PrimaryCamera: true
       FixedAR: false
+  - Entity: 123
+    TagComponent:
+      Tag: Empty Entity
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    SpriteRendererComponent:
+      Color: [0.898809075, 1, 0, 1]
+      TextureFile: ""
+      TextureTiling: 1
+      TextureUVOffset: [0, 0]

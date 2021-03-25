@@ -19,6 +19,7 @@ namespace Kaimos {
 
 		// --- Public Class Methods ---
 		Scene() = default;
+		Scene(const std::string& name) : m_Name(name) {}
 		~Scene() = default;
 
 		// --- Public Scene Methods ---
@@ -31,7 +32,13 @@ namespace Kaimos {
 		Entity CreateEntity(const std::string& name = "unnamed");
 		void DestroyEntity(Entity entity);
 
+		// --- Getters/Setters ---
 		Entity GetPrimaryCamera(); //TODO: Handle this with cameras rework!
+
+		const inline std::string GetName()				const { return m_Name; }
+		const inline std::string GetPath()				const { return m_Path; }
+		inline void SetName(const std::string& name)	{ m_Name = name; }
+		inline void SetPath(const std::string& path)	{ m_Path = path; }
 
 	private:
 
@@ -41,6 +48,8 @@ namespace Kaimos {
 
 	private:
 
+		std::string m_Name = "KaimosUnnamedScene";
+		std::string m_Path = "";
 		entt::registry m_Registry = {};
 		uint m_ViewportWidth = 0, m_ViewportHeight = 0;
 	};
