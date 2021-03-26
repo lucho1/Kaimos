@@ -17,6 +17,34 @@ int main(int argc, char** argv);
 
 namespace Kaimos {
 
+	// --- Memory Usage ---
+	class MemoryMetrics
+	{
+	public:
+
+		uint GetAllocations()			const { return m_Allocations; }
+		uint GetDeallocations()			const { return m_Deallocations; }
+		uint GetAllocationsSize()		const { return m_TotalAllocated; }
+		uint GetDeallocationsSize()		const { return m_TotalFreed; }
+
+		uint GetCurrentMemoryUsage()	const { return m_TotalAllocated - m_TotalFreed; }
+		uint GetCurrentAllocations()	const { return m_Allocations - m_Deallocations; }
+
+		void AddAllocation(uint size)	const { m_TotalAllocated += size; ++m_Allocations; }
+		void AddDeallocation(uint size)	const { m_TotalFreed += size; ++m_Deallocations; }
+
+	private:
+
+		mutable uint m_TotalAllocated = 0;
+		mutable uint m_Allocations = 0;
+
+		mutable uint m_TotalFreed = 0;
+		mutable uint m_Deallocations = 0;
+	};
+
+
+
+	// --- Application ---
 	class Application
 	{
 	public:
@@ -26,16 +54,18 @@ namespace Kaimos {
 		virtual ~Application();
 
 		// --- Public Application Methods ---
-		void CloseApp()						{ m_Running = false; }
+		void CloseApp()							  { m_Running = false; }
 
 		// --- Layer Methods ---
 		void PushLayer(Layer* layer);
 		void PushOverlay(Layer* layer);
 
 		// --- Getters ---
-		inline static Application& Get()			{ return *s_Instance; }
-		inline Window& GetWindow()			const	{ return *m_Window; }
-		inline ImGuiLayer* GetImGuiLayer()	const	{ return m_ImGuiLayer; }
+		inline static Application& Get()		  { return *s_Instance; }
+		inline Window& GetWindow()			const { return *m_Window; }
+		inline ImGuiLayer* GetImGuiLayer()	const { return m_ImGuiLayer; }
+		
+		inline static const MemoryMetrics& GetMemoryMetrics() { return s_MemoryMetrics; }
 
 	private:
 
@@ -48,6 +78,9 @@ namespace Kaimos {
 		void OnEvent(Event& e);
 
 	private:
+
+		// --- Memory ---
+		static MemoryMetrics s_MemoryMetrics;
 
 		// --- Application ---
 		static Application* s_Instance; // Singleton of Application (we only want 1 Application)
@@ -65,7 +98,7 @@ namespace Kaimos {
 		Timestep m_Timestep = {};
 		float m_LastFrameTime = 0.0f;
 	};
-
+	
 
 
 	// --- To be defined in Client (Editor) ---

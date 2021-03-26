@@ -8,9 +8,34 @@
 
 #include "Core/Utils/Maths/RandomGenerator.h"
 
-namespace Kaimos {
 
+// ----------------------- Memory Usage ---------------------------------------------------------------
+Kaimos::MemoryMetrics Kaimos::Application::s_MemoryMetrics = {};
+void* operator new(size_t size)
+{
+	Kaimos::Application::GetMemoryMetrics().AddAllocation((uint)size);
+	return malloc(size);
+}
+
+void operator delete(void* memory, size_t size)
+{
+	Kaimos::Application::GetMemoryMetrics().AddDeallocation((uint)size);
+	free(memory);
+}
+
+//void operator delete(void* memory)
+//{
+//	Kaimos::Application::GetMemoryMetrics().AddDeallocation((uint32_t)sizeof(memory));
+//	free(memory);
+//}
+// ----------------------------------------------------------------------------------------------------
+
+
+
+namespace Kaimos {	
+	
 	Application* Application::s_Instance = nullptr;
+
 
 	// ----------------------- Public Class Methods -------------------------------------------------------
 	Application::Application(const std::string& name)

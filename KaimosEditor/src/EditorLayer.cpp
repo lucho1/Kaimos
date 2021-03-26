@@ -262,7 +262,52 @@ namespace Kaimos {
 		
 		ImGui::Separator();
 
-		// -- Renderer Settings Floating Window --
+
+		// -- Settings Window --
+		// Memory Stats
+		ImGui::NewLine(); ImGui::NewLine();
+
+		static const MemoryMetrics& m = Application::Get().GetMemoryMetrics();
+		KS_EDITOR_INFO("ALLOCATIONS: {0} ({1} Bytes) - DEALLOCATIONS: {2} ({3} Bytes)", m.GetAllocations(), m.GetAllocationsSize(), m.GetDeallocations(), m.GetDeallocationsSize());
+		KS_EDITOR_INFO("MEMORY USAGE: {0} ({1} Bytes)", m.GetCurrentAllocations(), m.GetCurrentMemoryUsage());
+
+		static uint allocs = m.GetAllocations(),				deallocs = m.GetDeallocations();
+		static uint allocs_size = m.GetAllocationsSize(),		deallocs_size = m.GetDeallocationsSize();
+		static uint current_allocs = m.GetCurrentAllocations(),	current_usage = m.GetCurrentMemoryUsage();
+
+		static bool stop = false;
+		ImGui::Checkbox("Stop", &stop);
+		if (!stop)
+		{
+			if (m_MemoryAllocationsIndex == 90)
+				m_MemoryAllocationsIndex = 0;
+
+			m_MemoryAllocations[m_MemoryAllocationsIndex] = m.GetCurrentAllocations();
+			++m_MemoryAllocationsIndex;
+
+			allocs = m.GetAllocations();				deallocs = m.GetDeallocations();			
+			allocs_size = m.GetAllocationsSize();		deallocs_size = m.GetDeallocationsSize();			
+			current_allocs = m.GetCurrentAllocations();	current_usage = m.GetCurrentMemoryUsage();			
+		}
+
+		float float_mem_allocs[90];
+		for (uint i = 0; i < 90; ++i)
+			float_mem_allocs[i] = (float)m_MemoryAllocations[i];
+
+		char overlay[50];
+		sprintf(overlay, "Current Allocations: %i (%i MB)", current_allocs, BTOMB(current_usage));
+
+		ImGui::PlotLines("Memory Usage", float_mem_allocs, IM_ARRAYSIZE(float_mem_allocs), 0, overlay, 0.0f, 5000.0f, ImVec2(0.0f, 100.0f));
+		ImGui::PlotHistogram("Memory Usage Histogram", float_mem_allocs, IM_ARRAYSIZE(float_mem_allocs), 0, overlay, 0.0f, 5000.0f, ImVec2(0.0f, 100.0f));
+		
+		ImGui::NewLine();
+		ImGui::Text("Allocations: %i (%i MB)", allocs, BTOMB(allocs_size));
+		ImGui::Text("Deallocations: %i (%i MB)", deallocs, BTOMB(deallocs_size));
+		ImGui::Text("Current Memory Usage: %i Allocated (%i MB)", current_allocs, BTOMB(current_usage));
+
+
+		// Renderer Settings
+		ImGui::NewLine(); ImGui::NewLine();
 		auto stats = Renderer2D::GetStats();
 
 		ImGui::NewLine(); ImGui::NewLine();

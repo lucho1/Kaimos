@@ -38,6 +38,10 @@ namespace Kaimos {
 	private:
 
 		// TODO: TEMP
+		// Memory Stats UI
+		uint m_MemoryAllocations[90] = { 0 };
+		uint m_MemoryAllocationsIndex = 0;
+
 		// Scene
 		Ref<Scene> m_CurrentScene = nullptr;
 		Entity m_Entity = {};

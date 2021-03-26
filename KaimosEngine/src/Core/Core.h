@@ -28,7 +28,7 @@
 
 
 
-// --- GLOBALS ---
+// --- PLATFORM GLOBALS ---
 #if KS_DEBUG || KS_RELEASE
 	#define KS_ACTIVATE_PROFILE 1
 	#if defined(KS_PLATFORM_WINDOWS)
@@ -67,6 +67,13 @@
 //  you are dealing with a reference or a value. decltype(auto) gives you that ability"
 // Summarizing, the next deduces the return type after the lambda is declared
 #define KS_BIND_EVENT_FN(x) [this](auto&&... args)->decltype(auto) { return this->x(std::forward<decltype(args)>(args)...); }
+
+
+// Data Conversors
+#define BTOKB(count)	(count/1024)
+#define KBTOMB(count)	(count/1024)
+#define MBTOGB(count)	(count/1024)
+#define BTOMB(count)	(KBTOMB(BTOKB(count)))
 
 
 
