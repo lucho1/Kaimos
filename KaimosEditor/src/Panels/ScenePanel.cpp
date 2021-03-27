@@ -177,9 +177,11 @@ namespace Kaimos {
 			bool remove_component = false;
 			if (ImGui::BeginPopup("ComponentSettings"))
 			{
-				if (ImGui::MenuItem("Remove Component"))
-					remove_component = true;
-
+				if (!std::is_same<T, TransformComponent>::value)
+				{
+					if (ImGui::MenuItem("Remove Component"))
+						remove_component = true;
+				}
 				ImGui::EndPopup();
 			}
 
@@ -199,17 +201,29 @@ namespace Kaimos {
 
 
 	// TODO: This requires of an entities/components rework + An expansion of the UIFunctionalities to reduce ImGui Code
-	void ScenePanel::DrawComponents(Entity entity)
+	void ScenePanel::DrawComponents(Entity& entity)
 	{
 		// -- Tag Component --
 		if (entity.HasComponent<TagComponent>())
 		{
+			// - Activation -
+			if (entity.HasComponent<TransformComponent>())
+			{
+				TransformComponent& transf_comp = entity.GetComponent<TransformComponent>();
+
+				bool active = transf_comp.EntityActive;
+				if (ImGui::Checkbox("##ent_active", &active))
+					transf_comp.EntityActive = active;
+			}
+
+			// - Tag Modification -
 			std::string& tag = entity.GetComponent<TagComponent>().Tag;
 			char buffer[256];
 			memset(buffer, 0, sizeof(buffer));					// Set it all to 0
 			std::strncpy(buffer, tag.c_str(), sizeof(buffer));	// Copy tag to buffer
 			//strcpy_s(buffer, sizeof(buffer), tag.c_str());	// This is the same, but std::strncpy() is more like a C++ standard
 
+			ImGui::SameLine();
 			if (ImGui::InputText("##Tag", buffer, sizeof(buffer)))
 				tag = std::string(buffer);
 		}
@@ -250,6 +264,7 @@ namespace Kaimos {
 		// -- Transform Component --
 		DrawComponentUI<TransformComponent>("Transform", entity, [](auto& component)
 			{
+				// - Transformation Control -
 				glm::vec3 xcol = { 0.8f, 0.1f, 0.15f }, ycol = { 0.2f, 0.7f, 0.2f }, zcol = { 0.1f, 0.25f, 0.8f };
 				UI::UIFunctionalities::DrawVec3UI("Position", component.Translation, xcol, ycol, zcol);
 

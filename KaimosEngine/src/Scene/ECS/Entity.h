@@ -20,16 +20,12 @@ namespace Kaimos {
 
 		// --- Getters/Setters ---
 		inline uint GetID()								const	{ return (uint)m_EntityID; }
-		inline bool IsActive()							const	{ return m_Active; }
-		inline void SetActive(bool active)						{ m_Active = active; }
 
 
 	// -- (Exception) vars here for readability, many templated long functions below --
 	private:
 		
 		entt::entity m_EntityID = entt::null;
-		bool m_Active = true;
-
 		Scene* m_Scene = nullptr;
 
 

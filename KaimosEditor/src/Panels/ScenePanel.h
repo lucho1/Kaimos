@@ -25,7 +25,7 @@ namespace Kaimos {
 
 		// --- Private Scene Methods ---
 		void DrawEntityNode(Entity entity);
-		void DrawComponents(Entity entity);
+		void DrawComponents(Entity& entity);
 
 	private:
 

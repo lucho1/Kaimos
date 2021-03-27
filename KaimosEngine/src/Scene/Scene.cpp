@@ -40,13 +40,14 @@ namespace Kaimos {
 		for (auto ent : group)
 		{
 			auto& [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(ent);
-			Renderer2D::DrawSprite(transform.GetTransform(), sprite, (int)ent);
+			if (transform.EntityActive)
+				Renderer2D::DrawSprite(transform.GetTransform(), sprite, (int)ent);
 		}
 
 		Renderer2D::EndScene();
 	}
 
-
+	// TODO: Remake this in the Camera Rework
 	void Scene::OnUpdateRuntime(Timestep dt)
 	{
 		KS_PROFILE_FUNCTION();
