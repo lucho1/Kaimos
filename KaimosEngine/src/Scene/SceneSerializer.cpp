@@ -144,6 +144,8 @@ namespace Kaimos {
 			output << YAML::BeginMap;
 
 			TransformComponent& transform = entity.GetComponent<TransformComponent>();
+
+			output << YAML::Key << "EntityActive" << YAML::Value << transform.EntityActive;
 			output << YAML::Key << "Translation" << YAML::Value << transform.Translation;
 			output << YAML::Key << "Rotation" << YAML::Value << transform.Rotation;
 			output << YAML::Key << "Scale" << YAML::Value << transform.Scale;
@@ -274,6 +276,8 @@ namespace Kaimos {
 				if (transform_node)
 				{
 					TransformComponent& transform_comp = deserialized_entity.GetComponent<TransformComponent>();
+
+					transform_comp.EntityActive = transform_node["EntityActive"].as<bool>();
 					transform_comp.Translation = transform_node["Translation"].as<glm::vec3>();
 					transform_comp.Rotation = transform_node["Rotation"].as<glm::vec3>();
 					transform_comp.Scale = transform_node["Scale"].as<glm::vec3>();

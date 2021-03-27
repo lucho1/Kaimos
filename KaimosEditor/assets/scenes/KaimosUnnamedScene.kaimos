@@ -1,50 +1,28 @@
 KaimosScene: KaimosUnnamedScene
 Entities:
-  - Entity: 826864891
+  - Entity: 1874308559
     TagComponent:
       Tag: Sprite
     TransformComponent:
+      EntityActive: true
+      Translation: [1.21650887, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    SpriteRendererComponent:
+      Color: [0.143490031, 0.390388399, 0.727699518, 1]
+      TextureFile: ""
+      TextureTiling: 1
+      TextureUVOffset: [0, 0]
+  - Entity: 801596712
+    TagComponent:
+      Tag: Sprite
+    TransformComponent:
+      EntityActive: true
       Translation: [0, 0, 0]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     SpriteRendererComponent:
-      Color: [0.125041306, 0.2299155, 0.85915494, 1]
-      TextureFile: ""
-      TextureTiling: 1
-      TextureUVOffset: [0, 0]
-  - Entity: 1487309330
-    TagComponent:
-      Tag: Sprite
-    TransformComponent:
-      Translation: [1.86264515e-09, 1.37736487, 0]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    SpriteRendererComponent:
       Color: [1, 1, 1, 1]
-      TextureFile: ""
-      TextureTiling: 1
-      TextureUVOffset: [0, 0]
-  - Entity: 718426763
-    TagComponent:
-      Tag: Sprite
-    TransformComponent:
-      Translation: [-1.63876665, 0, 0]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    SpriteRendererComponent:
-      Color: [0.85915494, 0.116974153, 0.116974153, 1]
-      TextureFile: ""
-      TextureTiling: 1
-      TextureUVOffset: [0, 0]
-  - Entity: 299931833
-    TagComponent:
-      Tag: Sprite
-    TransformComponent:
-      Translation: [1.93032694, 0, 0]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    SpriteRendererComponent:
-      Color: [0.370074958, 0.92957747, 0.152747497, 1]
       TextureFile: ""
       TextureTiling: 1
       TextureUVOffset: [0, 0]

@@ -4,6 +4,7 @@ Entities:
     TagComponent:
       Tag: Camera
     TransformComponent:
+      EntityActive: true
       Translation: [0, 1.70000005, 4]
       Rotation: [-0.404916406, 0, 0]
       Scale: [1, 1, 1]
@@ -22,6 +23,7 @@ Entities:
     TagComponent:
       Tag: Sprite
     TransformComponent:
+      EntityActive: true
       Translation: [-1.60000002, 0, 0]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
@@ -34,6 +36,7 @@ Entities:
     TagComponent:
       Tag: LeftSquare
     TransformComponent:
+      EntityActive: true
       Translation: [-0.349999994, 0, 0.349999994]
       Rotation: [0, -0.785398185, 0]
       Scale: [1, 1, 1]
@@ -46,6 +49,7 @@ Entities:
     TagComponent:
       Tag: TopSquare
     TransformComponent:
+      EntityActive: true
       Translation: [0, 0.5, 0]
       Rotation: [1.57079637, 0.785398185, 0]
       Scale: [1, 1, 1]
@@ -58,6 +62,7 @@ Entities:
     TagComponent:
       Tag: RightSquare
     TransformComponent:
+      EntityActive: true
       Translation: [0.349999994, 0, 0.349999994]
       Rotation: [0, 0.785398185, 0]
       Scale: [1, 1, 1]
