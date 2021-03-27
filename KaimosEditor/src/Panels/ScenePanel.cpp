@@ -210,10 +210,7 @@ namespace Kaimos {
 			if (entity.HasComponent<TransformComponent>())
 			{
 				TransformComponent& transf_comp = entity.GetComponent<TransformComponent>();
-
-				bool active = transf_comp.EntityActive;
-				if (ImGui::Checkbox("##ent_active", &active))
-					transf_comp.EntityActive = active;
+				ImGui::Checkbox("##ent_active", &transf_comp.EntityActive);
 			}
 
 			// - Tag Modification -
