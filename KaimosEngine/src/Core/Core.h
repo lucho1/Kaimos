@@ -50,9 +50,11 @@
 #if KS_ENABLE_ASSERTS
 	#define KS_EDITOR_ASSERT(x, ...) { if(!(x)) { KS_EDITOR_CRITICAL("KAIMOS ASSERION: {0}", __VA_ARGS__); KS_DEBUGBREAK(); }} // Client/Editor Assert
 	#define KS_ENGINE_ASSERT(x, ...) { if(!(x)) { KS_ENGINE_CRITICAL("KAIMOS ASSERION: {0}", __VA_ARGS__); KS_DEBUGBREAK(); }} // Core/Engine Assert
+	#define KS_ERROR_AND_ASSERT(msg) { KS_ENGINE_ERROR(msg); KS_ENGINE_ASSERT(false, msg); }
 #else
 	#define KS_EDITOR_ASSERT(x, ...)
 	#define KS_ENGINE_ASSERT(x, ...)
+	#define KS_ERROR_AND_ASSERT(msg) { KS_ENGINE_ERROR(msg); }
 #endif
 
 

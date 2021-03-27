@@ -25,12 +25,13 @@ namespace Kaimos {
 		// --- Public Scene Methods ---
 		void OnUpdateEditor(Timestep dt, EditorCamera& camera);
 		void OnUpdateRuntime(Timestep dt);
-
 		void SetViewportSize(uint width, uint height);
 
 		// --- Public Entities Methods ---
-		Entity CreateEntity(const std::string& name = "unnamed");
+		Entity CreateEntity(const std::string& name = "unnamed", uint entity_id = 0);
 		void DestroyEntity(Entity entity);
+
+	public:
 
 		// --- Getters/Setters ---
 		Entity GetPrimaryCamera(); //TODO: Handle this with cameras rework!

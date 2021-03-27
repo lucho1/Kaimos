@@ -126,7 +126,7 @@ namespace Kaimos {
 
 		// -- Begin Entity Map --
 		output << YAML::BeginMap;
-		output << YAML::Key << "Entity" << YAML::Value << "123"; // TODO: Entity ID goes here - on Comps/Ent rework
+		output << YAML::Key << "Entity" << YAML::Value << entity.GetID();
 
 		if (entity.HasComponent<TagComponent>())
 		{
@@ -260,15 +260,15 @@ namespace Kaimos {
 		{
 			for (auto entity : entities)
 			{
-				uint uuid = entity["Entity"].as<uint>(); // TODO: Make UUIDs
+				uint entity_id = entity["Entity"].as<uint>();
 				
 				std::string name;
 				auto tag_component = entity["TagComponent"];
 				if (tag_component)
 					name = tag_component["Tag"].as<std::string>();
 
-				KS_ENGINE_TRACE("Deserialized Entity with ID = {0} and name = '{1}'", uuid, name.c_str());
-				Entity deserialized_entity = m_Scene->CreateEntity(name); // Create also with uuid
+				KS_ENGINE_TRACE("Deserialized Entity with ID = {0} and name = '{1}'", entity_id, name.c_str());
+				Entity deserialized_entity = m_Scene->CreateEntity(name, entity_id);
 
 				YAML::Node transform_node = entity["TransformComponent"];
 				if (transform_node)

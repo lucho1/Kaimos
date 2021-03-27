@@ -221,6 +221,7 @@ namespace Kaimos {
 		if (ImGui::Button("Add Component"))
 			ImGui::OpenPopup("AddComponent");
 
+		ImGui::Text("ID: %i", entity.GetID()); // ID Display
 		if (ImGui::BeginPopup("AddComponent"))
 		{
 			if (ImGui::MenuItem("Camera"))

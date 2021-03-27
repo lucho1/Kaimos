@@ -141,7 +141,7 @@ namespace Kaimos {
 		if (mouse_pos.x >= 0.0f && mouse_pos.y >= 0.0f && mouse_pos.x < viewport_size.x && mouse_pos.y < viewport_size.y)
 		{
 			int pixel_read = m_Framebuffer->GetPixelFromFBO(1, (int)mouse_pos.x, (int)mouse_pos.y);
-			m_HoveredEntity = pixel_read == -1 ? Entity() : Entity((entt::entity)pixel_read, m_CurrentScene.get()); //TODO: Change this entt::entity upon entities rework
+			m_HoveredEntity = pixel_read == -1 ? Entity() : Entity(pixel_read, m_CurrentScene.get());
 		}
 
 		/*Renderer2D::DrawQuad(glm::vec2(1.5f, -2.5f), glm::vec2(0.5f, 0.75f), { 0.3f, 0.2f, 0.8f, 1.0f });
@@ -268,9 +268,6 @@ namespace Kaimos {
 		ImGui::NewLine(); ImGui::NewLine();
 
 		static const MemoryMetrics& m = Application::Get().GetMemoryMetrics();
-		KS_EDITOR_INFO("ALLOCATIONS: {0} ({1} Bytes) - DEALLOCATIONS: {2} ({3} Bytes)", m.GetAllocations(), m.GetAllocationsSize(), m.GetDeallocations(), m.GetDeallocationsSize());
-		KS_EDITOR_INFO("MEMORY USAGE: {0} ({1} Bytes)", m.GetCurrentAllocations(), m.GetCurrentMemoryUsage());
-
 		static uint allocs = m.GetAllocations(),				deallocs = m.GetDeallocations();
 		static uint allocs_size = m.GetAllocationsSize(),		deallocs_size = m.GetDeallocationsSize();
 		static uint current_allocs = m.GetCurrentAllocations(),	current_usage = m.GetCurrentMemoryUsage();
@@ -514,7 +511,7 @@ namespace Kaimos {
 	{
 		// -- Read explanation avobe (on SaveSceneAs()) --
 		std::string filepath = FileDialogs::OpenFile("Kaimos Scene (*.kaimos)\0*.kaimos\0");
-		if (!filepath.empty())
+		if (!filepath.empty() && filepath != m_CurrentScene->GetPath()) // TODO: Compare the relative paths or scenes ids/names! Requires filesystem or scene IDs
 		{
 			NewScene();
 			SceneSerializer m_Serializer(m_CurrentScene);

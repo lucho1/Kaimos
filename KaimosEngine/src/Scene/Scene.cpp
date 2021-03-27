@@ -5,47 +5,35 @@
 #include "ECS/Components.h"
 #include "Renderer/Renderer2D.h"
 
+#include "Core/Utils/Maths/RandomGenerator.h"
 #include <glm/glm.hpp>
 
 namespace Kaimos {
 
-	//// -- To operate with entities: --
-	//entt::entity entity = m_Registry.create();
-	//// To add a component type into the registry (and it actually returns the comp. if you want to store it), this case a transform comp. with transform initialized to glm::mat4(1.0f)
-	//m_Registry.emplace<TransformComponent>(entity, glm::mat4(1.0f)); // This component is created on fly (don't need to register them on time)
-	//// To remove a list of components from an entity, this case TransformComponent:
-	//m_Registry.remove<TransformComponent>(entity);
-	//// To remove everything from the registry:
-	//m_Registry.clear();
-	//// To retreive a component:
-	//if(m_Registry.has<TransformComponent>(entity))
-	//	TransformComponent& transf = m_Registry.get<TransformComponent>(entity);
-	//
-	//// To make callbacks to certain events:
-	//m_Registry.on_construct<TransformComponent>().connect(/*function*/); // Function shall be func(entt::registry&, entt::entity)
-	//m_Registry.on_destroy<TransformComponent>().connect(/*function*/);
-	//m_Registry.on_update<TransformComponent>().connect(/*function*/);
-	//
-	//// To iterate through all entities with transform components:
-	//auto view = m_Registry.view<TransformComponent>();
-	//for (auto ent : view)
-	//{
-	//	view.get<MeshComponent>(ent); // This gets the mesh component of the current component's entity
-	//}
-	//
-	//// This also works to retrieve groups of components and other components that their entities have:
-	//auto group = m_Registry.group<TransformComponent>(entt::get<MeshComponent>);
-	//for (auto ent : group)
-	//{
-	//	auto&[transform, mesh] = group.get<TransformComponent, MeshComponent>(ent);
-	//}
+	// entt::entity entity = registry.create();						-- To create entities in the registry
+	// registry.clear();											-- To clear the registry (remove all in it)
+
+	// registry.emplace<Comp>(ent, CompInits);						-- To add a component in the registry (returns the component!) - CompInits are initializators (Transform -> TransfMatrix)
+	// registry.remove<Comp>(ent);									-- Remove a list of components from an entity
+	// registry.get<Comp>(ent);										-- To get a given component from an entity
+
+	// if (registry.has<Comp>(ent)) registry.get<Comp>(ent)			-- Retrieves a component if exists in "ent" (get() returns it) 
+
+	// registry.on_construct<Comp>().connect(func);					-- Callbacks to events (also: on_destroy, on_update...) - "func" = func(entt::registry&, entt::entity)
+
+	// view = registry.view<Comp>(); for(ent : view) {}				-- To iterate through all entities with a given component
+	// group = registry.group<Comp1>(entt::get<Comp2>);				-- To retrieve entities with 2 given components.
+	//																-- If "group" is iterated, we could code "auto&[c1, c2] = group.get<Comp1, Comp2>(ent)" (c1, c2 being variables)
 
 
 
 	// ----------------------- Public Scene Methods -------------------------------------------------------
+	// TODO: Remake this in the Camera Rework
 	void Scene::OnUpdateEditor(Timestep dt, EditorCamera& camera)
 	{
 		KS_PROFILE_FUNCTION();
+
+		// -- Render --
 		Renderer2D::BeginScene(camera);
 
 		auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
@@ -127,10 +115,13 @@ namespace Kaimos {
 
 	
 	// ----------------------- Public Entities Methods ---------------------------------------------------
-	Entity Scene::CreateEntity(const std::string& name)
+	Entity Scene::CreateEntity(const std::string& name, uint entity_id)
 	{
 		KS_PROFILE_FUNCTION();
-		Entity entity = { m_Registry.create(), this };
+
+		uint id = entity_id == 0 ? (uint)Random::GetRandomInt() : entity_id;
+		Entity entity = { m_Registry.create(entt::entity{id}), this };
+
 		entity.AddComponent<TransformComponent>();
 		entity.AddComponent<TagComponent>(name);
 		return entity;
@@ -138,7 +129,7 @@ namespace Kaimos {
 
 	void Scene::DestroyEntity(Entity entity)
 	{
-		m_Registry.destroy(entity);
+		m_Registry.destroy((entt::entity)entity.GetID());
 	}
 
 	Entity Scene::GetPrimaryCamera()
