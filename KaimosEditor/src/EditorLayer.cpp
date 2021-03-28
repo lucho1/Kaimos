@@ -212,8 +212,17 @@ namespace Kaimos {
 		
 		style.WindowMinSize.x = original_min_size;
 
-		// -- Upper Menu Tab Bar --
+		
+		// -- Show Windows Booleans --
+		static bool show_scene_panel = true;
+		static bool show_project_panel = true;
+		static bool show_console_panel = true;
+		static bool show_files_panel = true;
+		static bool show_settings_panel = true;
+		static bool show_viewport_panel = true;
 		static bool show_uidemo = false;
+		
+		// -- Upper Menu Tab Bar --
 		if (ImGui::BeginMenuBar())
 		{
 			if (ImGui::BeginMenu("File"))
@@ -238,8 +247,13 @@ namespace Kaimos {
 
 			if (ImGui::BeginMenu("Window"))
 			{
-				if (ImGui::MenuItem("Show UI Demo"))
-					show_uidemo = !show_uidemo;
+				ImGui::MenuItem("Scene Panel", nullptr, &show_scene_panel);
+				ImGui::MenuItem("Viewport", nullptr, &show_viewport_panel);
+				ImGui::MenuItem("Settings & Performance", nullptr, &show_settings_panel);
+				ImGui::MenuItem("Project Panel", nullptr, &show_project_panel);
+				ImGui::MenuItem("Console", nullptr, &show_console_panel);
+				ImGui::MenuItem("Files", nullptr, &show_files_panel);
+				ImGui::MenuItem("UI Demo", nullptr, &show_uidemo);
 
 				ImGui::EndMenu();
 			}
@@ -253,156 +267,104 @@ namespace Kaimos {
 		if (show_uidemo)
 			ImGui::ShowDemoWindow();
 
-
 		// -- Scene Panel Rendering --
-		m_ScenePanel.OnUIRender();
+		if(show_scene_panel)
+			m_ScenePanel.OnUIRender();
 
-		// Little test for Entities (this case: square entity color)
-		ImGui::Separator();
-		ImGui::Begin("Settings");
+		// -- Settings Panel Rendering --
+		if(show_settings_panel)
+			m_SettingsPanel.OnUIRender(m_HoveredEntity, m_EditorCamera);
 
-		std::string hovered_entity = "None";
-		if (m_HoveredEntity)
-			hovered_entity = m_HoveredEntity.GetComponent<TagComponent>().Tag;
-
-		ImGui::Text("Hovered Entity: %s", hovered_entity.c_str());
-
-		//ImGui::ColorEdit4("Squares Color", glm::value_ptr(m_Color));
-		//ImGui::SliderFloat("Background Tiling", &m_BackgroundTiling, 1.0f, 100.0f, "%.2f");
-
-		static bool camera_lock = false;
-		ImGui::Checkbox("Lock Camera Rotation", &camera_lock);
-		m_EditorCamera.LockRotation(camera_lock);
-		
-		ImGui::Separator();
-
-
-		// -- Settings Window --
-		// Memory Stats
-		ImGui::NewLine(); ImGui::NewLine();
-
-		static const MemoryMetrics& m = Application::Get().GetMemoryMetrics();
-		static uint allocs = m.GetAllocations(),				deallocs = m.GetDeallocations();
-		static uint allocs_size = m.GetAllocationsSize(),		deallocs_size = m.GetDeallocationsSize();
-		static uint current_allocs = m.GetCurrentAllocations(),	current_usage = m.GetCurrentMemoryUsage();
-
-		static bool stop = false;
-		ImGui::Checkbox("Stop", &stop);
-		if (!stop)
+		// -- Project & Console Panels --
+		if (show_files_panel)
 		{
-			if (m_MemoryAllocationsIndex == 90)
-				m_MemoryAllocationsIndex = 0;
-
-			m_MemoryAllocations[m_MemoryAllocationsIndex] = m.GetCurrentAllocations();
-			++m_MemoryAllocationsIndex;
-
-			allocs = m.GetAllocations();				deallocs = m.GetDeallocations();			
-			allocs_size = m.GetAllocationsSize();		deallocs_size = m.GetDeallocationsSize();			
-			current_allocs = m.GetCurrentAllocations();	current_usage = m.GetCurrentMemoryUsage();			
+			ImGui::Begin("Folders");
+			ImGui::End();
 		}
 
-		float float_mem_allocs[90];
-		for (uint i = 0; i < 90; ++i)
-			float_mem_allocs[i] = (float)m_MemoryAllocations[i];
+		if (show_project_panel)
+		{
+			ImGui::Begin("Project");
+			ImGui::End();
+		}
 
-		char overlay[50];
-		sprintf(overlay, "Current Allocations: %i (%i MB)", current_allocs, BTOMB(current_usage));
-
-		ImGui::PlotLines("Memory Usage", float_mem_allocs, IM_ARRAYSIZE(float_mem_allocs), 0, overlay, 0.0f, 5000.0f, ImVec2(0.0f, 100.0f));
-		ImGui::PlotHistogram("Memory Usage Histogram", float_mem_allocs, IM_ARRAYSIZE(float_mem_allocs), 0, overlay, 0.0f, 5000.0f, ImVec2(0.0f, 100.0f));
-		
-		ImGui::NewLine();
-		ImGui::Text("Allocations: %i (%i MB)", allocs, BTOMB(allocs_size));
-		ImGui::Text("Deallocations: %i (%i MB)", deallocs, BTOMB(deallocs_size));
-		ImGui::Text("Current Memory Usage: %i Allocated (%i MB)", current_allocs, BTOMB(current_usage));
-
-
-		// Renderer Settings
-		ImGui::NewLine(); ImGui::NewLine();
-		auto stats = Renderer2D::GetStats();
-
-		ImGui::NewLine(); ImGui::NewLine();
-		ImGui::Text("--- 2D RENDERER STATS ---");
-		ImGui::Text("Draw Calls: %d", stats.DrawCalls);
-		ImGui::Text("Quads Drawn: %d", stats.QuadCount);
-		ImGui::Text("Max Quads per Draw Call: %d", Renderer2D::GetMaxQuads());
-
-		ImGui::NewLine();
-		ImGui::Text("Vertices: %d", stats.GetTotalVerticesCount());
-		ImGui::Text("Indices: %d", stats.GetTotalIndicesCount());
-		ImGui::Text("Tris: %d", stats.GetTotalTrianglesCount());
-
-		ImGui::End();
+		if (show_console_panel)
+		{
+			ImGui::Begin("Console");
+			ImGui::End();
+		}
 
 		// -- Viewport --
-		ImGui::Begin("Viewport");
-		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0.0f, 0.0f));
-
-		m_ViewportFocused = ImGui::IsWindowFocused();
-		m_ViewportHovered = ImGui::IsWindowHovered();
-		Application::Get().GetImGuiLayer()->SetBlockEvents(!m_ViewportFocused && !m_ViewportHovered);
-		
-		// Get the position where the next window begins (including Tab Bar)
-		ImVec2 viewport_offset = ImGui::GetWindowPos();
-		ImVec2 max_region = ImGui::GetWindowContentRegionMax();
-		ImVec2 min_region = ImGui::GetWindowContentRegionMin();
-		
-		// Set viewport limits
-		m_ViewportLimits[0] = glm::vec2(min_region.x + viewport_offset.x, min_region.y + viewport_offset.y);
-		m_ViewportLimits[1] = glm::vec2(max_region.x + viewport_offset.x, max_region.y + viewport_offset.y);
-
-		// Get viewport size & draw fbo texture
-		ImVec2 ViewportPanelSize = ImGui::GetContentRegionAvail();
-		m_ViewportSize = glm::vec2(ViewportPanelSize.x, ViewportPanelSize.y);
-		ImGui::Image(reinterpret_cast<void*>(m_Framebuffer->GetFBOTextureID()), ViewportPanelSize, ImVec2(0, 1), ImVec2(1, 0));		
-
-		// -- Guizmo --
-		Entity selected_entity = m_ScenePanel.GetSelectedEntity();
-		if (selected_entity && m_OperationGizmo != -1 && !Input::IsKeyPressed(KEY::LEFT_ALT))
+		if (show_viewport_panel)
 		{
-			ImGuizmo::SetOrthographic(false);
-			ImGuizmo::SetDrawlist();
-			ImGuizmo::SetRect(m_ViewportLimits[0].x, m_ViewportLimits[0].y, m_ViewportLimits[1].x - m_ViewportLimits[0].x, m_ViewportLimits[1].y - m_ViewportLimits[0].y);
+			ImGui::Begin("Viewport");
+			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0.0f, 0.0f));
 
-			// Camera
-			//Entity camera = m_CurrentScene->GetPrimaryCamera();			
-			//const glm::mat4& cam_proj = camera.GetComponent<CameraComponent>().Camera.GetProjection();
-			//glm::mat4 cam_view = glm::inverse(camera.GetComponent<TransformComponent>().GetTransform());
+			m_ViewportFocused = ImGui::IsWindowFocused();
+			m_ViewportHovered = ImGui::IsWindowHovered();
+			Application::Get().GetImGuiLayer()->SetBlockEvents(!m_ViewportFocused && !m_ViewportHovered);
 
-			const glm::mat4& cam_proj = m_EditorCamera.GetProjection();
-			glm::mat4 cam_view = m_EditorCamera.GetViewMatrix();
+			// Get the position where the next window begins (including Tab Bar)
+			ImVec2 viewport_offset = ImGui::GetWindowPos();
+			ImVec2 max_region = ImGui::GetWindowContentRegionMax();
+			ImVec2 min_region = ImGui::GetWindowContentRegionMin();
 
-			// Entity Transformation
-			TransformComponent& transform = selected_entity.GetComponent<TransformComponent>();
-			glm::mat4 tr_mat = transform.GetTransform();
+			// Set viewport limits
+			m_ViewportLimits[0] = glm::vec2(min_region.x + viewport_offset.x, min_region.y + viewport_offset.y);
+			m_ViewportLimits[1] = glm::vec2(max_region.x + viewport_offset.x, max_region.y + viewport_offset.y);
 
-			// Snapping
-			bool snap = Input::IsKeyPressed(KEY::LEFT_CONTROL) || Input::IsKeyPressed(KEY::RIGHT_CONTROL);
-			float snap_value = 0.5f;
-			if (m_OperationGizmo == ImGuizmo::OPERATION::ROTATE)
-				snap_value = 10.0f;
+			// Get viewport size & draw fbo texture
+			ImVec2 ViewportPanelSize = ImGui::GetContentRegionAvail();
+			m_ViewportSize = glm::vec2(ViewportPanelSize.x, ViewportPanelSize.y);
+			ImGui::Image(reinterpret_cast<void*>(m_Framebuffer->GetFBOTextureID()), ViewportPanelSize, ImVec2(0, 1), ImVec2(1, 0));
 
-			float snap_array[3] = { snap_value, snap_value, snap_value };
-
-			// Guizmo Manipulation
-			ImGuizmo::Manipulate(glm::value_ptr(cam_view), glm::value_ptr(cam_proj), (ImGuizmo::OPERATION)m_OperationGizmo, ImGuizmo::MODE::LOCAL, glm::value_ptr(tr_mat),
-				nullptr, snap ? snap_array : nullptr);
-
-			if (ImGuizmo::IsUsing())
+			// -- Guizmo --
+			Entity selected_entity = m_ScenePanel.GetSelectedEntity();
+			if (selected_entity && m_OperationGizmo != -1 && !Input::IsKeyPressed(KEY::LEFT_ALT))
 			{
-				glm::vec3 translation, rotation, scale;
-				Maths::DecomposeTransformation(tr_mat, translation, rotation, scale);
-				
+				ImGuizmo::SetOrthographic(false);
+				ImGuizmo::SetDrawlist();
+				ImGuizmo::SetRect(m_ViewportLimits[0].x, m_ViewportLimits[0].y, m_ViewportLimits[1].x - m_ViewportLimits[0].x, m_ViewportLimits[1].y - m_ViewportLimits[0].y);
 
-				transform.Translation = translation;
-				transform.Rotation += rotation - transform.Rotation;
-				transform.Scale = scale;
+				// Camera
+				//Entity camera = m_CurrentScene->GetPrimaryCamera();			
+				//const glm::mat4& cam_proj = camera.GetComponent<CameraComponent>().Camera.GetProjection();
+				//glm::mat4 cam_view = glm::inverse(camera.GetComponent<TransformComponent>().GetTransform());
+
+				const glm::mat4& cam_proj = m_EditorCamera.GetProjection();
+				glm::mat4 cam_view = m_EditorCamera.GetViewMatrix();
+
+				// Entity Transformation
+				TransformComponent& transform = selected_entity.GetComponent<TransformComponent>();
+				glm::mat4 tr_mat = transform.GetTransform();
+
+				// Snapping
+				bool snap = Input::IsKeyPressed(KEY::LEFT_CONTROL) || Input::IsKeyPressed(KEY::RIGHT_CONTROL);
+				float snap_value = 0.5f;
+				if (m_OperationGizmo == ImGuizmo::OPERATION::ROTATE)
+					snap_value = 10.0f;
+
+				float snap_array[3] = { snap_value, snap_value, snap_value };
+
+				// Guizmo Manipulation
+				ImGuizmo::Manipulate(glm::value_ptr(cam_view), glm::value_ptr(cam_proj), (ImGuizmo::OPERATION)m_OperationGizmo, ImGuizmo::MODE::LOCAL, glm::value_ptr(tr_mat),
+					nullptr, snap ? snap_array : nullptr);
+
+				if (ImGuizmo::IsUsing())
+				{
+					glm::vec3 translation, rotation, scale;
+					Maths::DecomposeTransformation(tr_mat, translation, rotation, scale);
+
+
+					transform.Translation = translation;
+					transform.Rotation += rotation - transform.Rotation;
+					transform.Scale = scale;
+				}
 			}
+
+			ImGui::PopStyleVar();
+			ImGui::End();
 		}
-
-
-		ImGui::PopStyleVar();
-		ImGui::End();
 	}
 
 

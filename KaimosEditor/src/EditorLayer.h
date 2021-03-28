@@ -3,6 +3,7 @@
 
 #include "Kaimos.h"
 #include "Panels/ScenePanel.h"
+#include "Panels/SettingsPanel.h"
 #include "Renderer/Cameras/EditorCamera.h"
 
 namespace Kaimos {
@@ -39,8 +40,8 @@ namespace Kaimos {
 
 		// TODO: TEMP
 		// Memory Stats UI
-		uint m_MemoryAllocations[90] = { 0 };
-		uint m_MemoryAllocationsIndex = 0;
+		//uint m_MemoryAllocations[90] = { 0 };
+		//uint m_MemoryAllocationsIndex = 0;
 
 		// Scene
 		Ref<Scene> m_CurrentScene = nullptr;
@@ -48,6 +49,7 @@ namespace Kaimos {
 		Entity m_CameraEntity = {};
 
 		ScenePanel m_ScenePanel = {};
+		SettingsPanel m_SettingsPanel = {};
 
 		EditorCamera m_EditorCamera = {};
 
