@@ -213,6 +213,7 @@ namespace Kaimos {
 		style.WindowMinSize.x = original_min_size;
 
 		// -- Upper Menu Tab Bar --
+		static bool show_uidemo = false;
 		if (ImGui::BeginMenuBar())
 		{
 			if (ImGui::BeginMenu("File"))
@@ -235,10 +236,23 @@ namespace Kaimos {
 				ImGui::EndMenu();
 			}
 
+			if (ImGui::BeginMenu("Window"))
+			{
+				if (ImGui::MenuItem("Show UI Demo"))
+					show_uidemo = !show_uidemo;
+
+				ImGui::EndMenu();
+			}
+
 			ImGui::EndMenuBar();
 		}
 		
 		ImGui::End();
+
+		// -- Demo Window --
+		if (show_uidemo)
+			ImGui::ShowDemoWindow();
+
 
 		// -- Scene Panel Rendering --
 		m_ScenePanel.OnUIRender();
@@ -254,7 +268,7 @@ namespace Kaimos {
 		ImGui::Text("Hovered Entity: %s", hovered_entity.c_str());
 
 		//ImGui::ColorEdit4("Squares Color", glm::value_ptr(m_Color));
-		ImGui::SliderFloat("Background Tiling", &m_BackgroundTiling, 1.0f, 100.0f, "%.2f");
+		//ImGui::SliderFloat("Background Tiling", &m_BackgroundTiling, 1.0f, 100.0f, "%.2f");
 
 		static bool camera_lock = false;
 		ImGui::Checkbox("Lock Camera Rotation", &camera_lock);

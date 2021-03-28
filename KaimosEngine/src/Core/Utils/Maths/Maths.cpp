@@ -6,6 +6,12 @@
 
 namespace Kaimos::Maths {
 
+	bool CompareFloats(float value_to_compare, float comparison)
+	{
+		return glm::epsilonEqual(value_to_compare, comparison, glm::epsilon<float>());
+	}
+
+
 	bool DecomposeTransformation(const glm::mat4& transform, glm::vec3& translation, glm::vec3& rotation, glm::vec3& scale)
 	{
 		// -- From glm::decompose() --

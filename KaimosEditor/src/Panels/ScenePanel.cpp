@@ -35,13 +35,18 @@ namespace Kaimos {
 	// ----------------------- Public Class Methods -------------------------------------------------------
 	void ScenePanel::OnUIRender()
 	{
+		// -- Scene Tab --
 		ImGui::Begin("Scene");
+		ImGui::TextColored({0.65f, 0.65f, 0.65f, 1.0f}, "%s", m_SceneContext->GetName().c_str());
 
 		// -- Entity Display --
 		m_SceneContext->m_Registry.each([&](auto entity_id)
 			{
 				Entity entity{ entity_id , m_SceneContext.get() };
+
+				ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(12.0f, 1.0f));
 				DrawEntityNode(entity);
+				ImGui::PopStyleVar();
 			});
 
 
@@ -73,7 +78,7 @@ namespace Kaimos {
 		ImGui::End();
 
 		// -- Properties Panel (Components Display) --
-		ImGui::Begin("Properties");
+		ImGui::Begin("Entity Properties");
 		if (m_SelectedEntity)
 			DrawComponents(m_SelectedEntity);
 
@@ -88,8 +93,9 @@ namespace Kaimos {
 		TagComponent& tag_comp = entity.GetComponent<TagComponent>();
 
 		// -- Open Tree --
+		ImGui::AlignTextToFramePadding();
 		ImGuiTreeNodeFlags flags = ((m_SelectedEntity == entity) ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_SpanAvailWidth;
-		bool opened = ImGui::TreeNodeEx((void*)(uint)entity, flags, tag_comp.Tag.c_str());
+		bool opened = ImGui::TreeNodeEx((void*)entity.GetID(), flags, tag_comp.Tag.c_str());
 
 		// -- Entity Selection --
 		if (ImGui::IsItemClicked())
@@ -111,12 +117,8 @@ namespace Kaimos {
 		// -- Entity Rename --
 		if (tag_comp.Rename)
 		{
-			char buffer[256];
-			memset(buffer, 0, sizeof(buffer));							// Set it all to 0
-			std::strncpy(buffer, tag_comp.Tag.c_str(), sizeof(buffer));	// Copy tag to buffer
-
-			if (ImGui::InputText("##Tag", buffer, sizeof(buffer)))
-				tag_comp.Tag = std::string(buffer);
+			// Input Text
+			KaimosUI::UIFunctionalities::DrawInputText("##Tag", tag_comp.Tag);
 			
 			// Auto focus Input Text
 			if (ImGui::IsItemHovered() || (ImGui::IsAnyWindowFocused() && !ImGui::IsAnyItemActive() && !ImGui::IsMouseClicked(0)))
@@ -161,17 +163,19 @@ namespace Kaimos {
 			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 4, 4 });
 
 			float line_height = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
-			ImGui::NewLine();
-			ImGui::Separator();
+			ImGui::NewLine(); ImGui::Separator();
 			
 			// -- Open Tree --
 			bool open = ImGui::TreeNodeEx((void*)typeid(T).hash_code(), flags, name.c_str());
 			ImGui::PopStyleVar();
 
 			// -- Add Button with Content Spacing + Open Settings Popup --
+			ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[1]);
 			ImGui::SameLine(content_region + 2.0f);
 			if (ImGui::Button("+", { line_height, line_height }))
 				ImGui::OpenPopup("ComponentSettings");
+
+			ImGui::PopFont();
 
 			// -- Component Settings Popup --
 			bool remove_component = false;
@@ -208,24 +212,14 @@ namespace Kaimos {
 		{
 			// - Activation -
 			if (entity.HasComponent<TransformComponent>())
-			{
-				TransformComponent& transf_comp = entity.GetComponent<TransformComponent>();
-				ImGui::Checkbox("##ent_active", &transf_comp.EntityActive);
-			}
+				ImGui::Checkbox("##EntActive", &entity.GetComponent<TransformComponent>().EntityActive);
 
 			// - Tag Modification -
-			std::string& tag = entity.GetComponent<TagComponent>().Tag;
-			char buffer[256];
-			memset(buffer, 0, sizeof(buffer));					// Set it all to 0
-			std::strncpy(buffer, tag.c_str(), sizeof(buffer));	// Copy tag to buffer
-			//strcpy_s(buffer, sizeof(buffer), tag.c_str());	// This is the same, but std::strncpy() is more like a C++ standard
-
 			ImGui::SameLine();
-			if (ImGui::InputText("##Tag", buffer, sizeof(buffer)))
-				tag = std::string(buffer);
+			KaimosUI::UIFunctionalities::DrawInputText("##Tag", entity.GetComponent<TagComponent>().Tag);
 		}
 
-		// -- Add Component Button --
+		// -- Add Component Button + Popup --
 		ImGui::SameLine();
 		ImGui::PushItemWidth(-1);
 
@@ -235,6 +229,7 @@ namespace Kaimos {
 		ImGui::Text("ID: %i", entity.GetID()); // ID Display
 		if (ImGui::BeginPopup("AddComponent"))
 		{
+			// Different Entities to Add (Camera, Sprite...)
 			if (ImGui::MenuItem("Camera"))
 			{
 				if (!m_SelectedEntity.HasComponent<CameraComponent>())
@@ -263,13 +258,17 @@ namespace Kaimos {
 			{
 				// - Transformation Control -
 				glm::vec3 xcol = { 0.8f, 0.1f, 0.15f }, ycol = { 0.2f, 0.7f, 0.2f }, zcol = { 0.1f, 0.25f, 0.8f };
-				UI::UIFunctionalities::DrawVec3UI("Position", component.Translation, xcol, ycol, zcol);
 
+				// Position
+				KaimosUI::UIFunctionalities::DrawVec3UI("Position", component.Translation, xcol, ycol, zcol);
+
+				// Rotation
 				glm::vec3 rot = glm::degrees(component.Rotation);
-				UI::UIFunctionalities::DrawVec3UI("Rotation", rot, xcol, ycol, zcol);
+				KaimosUI::UIFunctionalities::DrawVec3UI("Rotation", rot, xcol, ycol, zcol);
 				component.Rotation = glm::radians(rot);
 
-				UI::UIFunctionalities::DrawVec3UI("Scale", component.Scale, xcol, ycol, zcol, 1.0f);
+				// Scale
+				KaimosUI::UIFunctionalities::DrawVec3UI("Scale", component.Scale, xcol, ycol, zcol, 1.0f);
 			});
 
 		// -- Camera Component --
@@ -279,40 +278,30 @@ namespace Kaimos {
 
 				ImGui::Checkbox("Primary", &component.Primary);
 
-				const char* projection_options[] = { "Perspective", "Orthographic" };
-				const char* current_projection = projection_options[(int)camera.GetProjectionType()];
-				if (ImGui::BeginCombo("Projection", current_projection))
-				{
-					for (uint i = 0; i < 2; ++i)
-					{
-						bool selected = current_projection == projection_options[i];
-						if (ImGui::Selectable(projection_options[i], selected))
-						{
-							current_projection = projection_options[i];
-							camera.SetProjectionType((SceneCamera::PROJECTION_TYPE)i);
-						}
+				// Projection Type Dropdown
+				uint current_proj_type = (uint)camera.GetProjectionType();
+				const char* projection_options[] = { "Perspective", "Orthographic" };				
+				const char* current_projection = projection_options[current_proj_type];
 
-						if (selected)
-							ImGui::SetItemDefaultFocus();
-					}
+				KaimosUI::UIFunctionalities::DrawDropDown("Projection", projection_options, 2, current_projection, current_proj_type, ImGui::CalcItemWidth() / 4.0f);
+				camera.SetProjectionType((SceneCamera::PROJECTION_TYPE)current_proj_type);
 
-					ImGui::EndCombo();
-				}
-
-
+				// Camera Values UI
 				if (camera.GetProjectionType() == SceneCamera::PROJECTION_TYPE::PERSPECTIVE)
 				{
 					float persp_FOV = camera.GetPerspectiveFOV();
-					if (ImGui::DragFloat("FOV", &persp_FOV))
+					if (KaimosUI::UIFunctionalities::DrawInlineDragFloat("FOV", "###fov", &persp_FOV, 0.05f, ImGui::CalcItemWidth() / 4.0f, 0.0f, 180.0f, "%.1f"))
 						camera.SetPerspectiveFOV(persp_FOV);
 
-					float near_clip = camera.GetPerspectiveNearClip();
-					float far_clip = camera.GetPerspectiveFarClip();
+					float near_clip = camera.GetPerspectiveNearClip(), far_clip = camera.GetPerspectiveFarClip();
 
-					if (ImGui::DragFloat("Near Clip", &near_clip))
-						camera.SetPerspectiveClips(near_clip, far_clip);
-					if (ImGui::DragFloat("Far Clip", &far_clip))
-						camera.SetPerspectiveClips(near_clip, far_clip);
+					if (KaimosUI::UIFunctionalities::DrawInlineDragFloat("Near Clip", "###nclip", &near_clip, 0.01f, ImGui::CalcItemWidth() / 4.0f, 0.001f, far_clip - 0.1f, "%.3f", 1.5f))
+						if(near_clip < far_clip)
+							camera.SetPerspectiveClips(near_clip, far_clip);
+
+					if (KaimosUI::UIFunctionalities::DrawInlineDragFloat("Far Clip", "###fclip", &far_clip, 1.0f, ImGui::CalcItemWidth() / 4.0f, near_clip + 0.1f, INFINITY))
+						if(far_clip > near_clip)
+							camera.SetPerspectiveClips(near_clip, far_clip);
 				}
 
 				if (camera.GetProjectionType() == SceneCamera::PROJECTION_TYPE::ORTHOGRAPHIC)
@@ -320,25 +309,30 @@ namespace Kaimos {
 					ImGui::Checkbox("Fixed Aspect Ratio", &component.FixedAspectRatio);
 
 					float ortho_size = camera.GetOrthographicSize();
-					if (ImGui::DragFloat("Size", &ortho_size))
+					float near_clip = camera.GetOrthographicNearClip(), far_clip = camera.GetOrthographicFarClip();
+
+					if (KaimosUI::UIFunctionalities::DrawInlineDragFloat("Size", "###size", &ortho_size, 0.05f, ImGui::CalcItemWidth() / 4.0f, 0.0f, INFINITY, "%.1f"))
 						camera.SetOrthographicSize(ortho_size);
 
-					float near_clip = camera.GetOrthographicNearClip();
-					float far_clip = camera.GetOrthographicFarClip();
+					if (KaimosUI::UIFunctionalities::DrawInlineDragFloat("Near Clip", "###nclip2", &near_clip, 0.01f, ImGui::CalcItemWidth() / 4.0f, -INFINITY, far_clip - 0.1f, "%.3f", 1.5f))
+						if (near_clip < far_clip)
+							camera.SetOrthographicClips(near_clip, far_clip);
 
-					if (ImGui::DragFloat("Near Clip", &near_clip))
-						camera.SetOrthographicClips(near_clip, far_clip);
-					if (ImGui::DragFloat("Far Clip", &far_clip))
-						camera.SetOrthographicClips(near_clip, far_clip);
+
+					if (KaimosUI::UIFunctionalities::DrawInlineDragFloat("Far Clip", "###fclip2", &far_clip, 0.01f, ImGui::CalcItemWidth() / 4.0f, near_clip + 0.1f, INFINITY, "%.3f", 1.5f))
+						if (far_clip > near_clip)
+							camera.SetOrthographicClips(near_clip, far_clip);
 				}
 			});		
 
 		// -- Sprite Renderer Component --
 		DrawComponentUI<SpriteRendererComponent>("Sprite Renderer", entity, [](auto& component)
 			{
+				// Color Picker for Sprite Color
 				ImGuiColorEditFlags color_flags = ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreview | ImGuiColorEditFlags_NoInputs;
 				ImGui::ColorEdit4("Color", glm::value_ptr(component.Color), color_flags);
 
+				// Texture Button for Sprite Texture
 				const uint id = component.SpriteTexture == nullptr ? 0 : component.SpriteTexture->GetTextureID();
 				ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { 0.0f, 0.0f });
 
@@ -346,43 +340,27 @@ namespace Kaimos {
 				ImGui::Text("Texture");
 				ImGui::SameLine(ImGui::GetContentRegionAvail().x * 0.5f);
 
-				ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.25f, 0.25f, 0.25f, 1.0f));
-				ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.35f, 0.35f, 0.35f, 1.0f));
-				ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.25f, 0.25f, 0.25f, 1.0f));
-
-				if (ImGui::ImageButton((ImTextureID)id, { 80.0f, 80.0f }, { 0.0f, 1.0f }, { 1.0f, 0.0f }, 0, { 1.0f, 0.0f, 1.0f, 1.0f }))
+				if (KaimosUI::UIFunctionalities::DrawTexturedButton(id, glm::vec2(80.0f), glm::vec3(0.1f)))
 				{
 					std::string texture_file = FileDialogs::OpenFile("Texture (*.png)\0*.png\0");
 					if (!texture_file.empty())
 						component.SetTexture(texture_file);
 				}
 
-				ImGui::PopStyleColor(3);
+				KaimosUI::UIFunctionalities::PopButton(false);
 
+				// Remove Texture Button
 				ImGui::SameLine();
-				ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.2f, 0.2f, 0.2f, 1.0f });
-				ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.3f, 0.3f, 0.3f, 1.0f });
-				ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.2f, 0.2f, 0.2f, 1.0f });
-
-				if (ImGui::Button("x", { 20.0f, 80.0f }))
+				if (KaimosUI::UIFunctionalities::DrawColoredButton("X", { 20.0f, 80.0f }, glm::vec3(0.2f), true))
 					component.RemoveTexture();
-
-				ImGui::PopStyleColor(3);
+				
+				KaimosUI::UIFunctionalities::PopButton(true);				
 				ImGui::PopStyleVar();
 
+				// Tiling & UV Offset Drag Floats
 				ImGui::NewLine();
-				ImGui::Text("Tiling");
-				ImGui::SameLine(ImGui::GetContentRegionAvail().x * 0.5f - 1.0f);
-				ImGui::SetNextItemWidth(100.0f);
-				ImGui::DragFloat("##tiling_dragfloat", &component.TextureTiling, 0.1f, 0.0f, 0.0f, "%.2f");
-
-				ImGui::Text("UV Offset");
-				ImGui::SameLine(ImGui::GetContentRegionAvail().x * 0.5f - 1.0f);
-				ImGui::SetNextItemWidth(100.0f);
-				ImGui::DragFloat("##offsetx_dragfloat", &component.TextureUVOffset.x, 0.1f, 0.0f, 0.0f, "%.2f");
-				ImGui::SameLine();
-				ImGui::SetNextItemWidth(100.0f);
-				ImGui::DragFloat("##offsety_dragfloat", &component.TextureUVOffset.y, 0.1f, 0.0f, 0.0f, "%.2f");
+				KaimosUI::UIFunctionalities::DrawInlineDragFloat("Tiling", "##tiling", &component.TextureTiling, 0.1f, 100.0f, 0.0f, 0.0f, "%.2f");
+				KaimosUI::UIFunctionalities::DrawInlineDragFloat2("UV Offset", "##uv_offset", component.TextureUVOffset, 0.1f, 208.0f, 0.0f, 0.0f, "%.2f");
 			});
 	}
 }

@@ -7,7 +7,7 @@ struct ImVec2;
 struct ImVec4;
 struct ImFont;
 
-namespace Kaimos::UI {
+namespace Kaimos::KaimosUI {
 
 	// --- Conversors ---
 	static ImVec2 ConvertToImVec2(glm::vec2 v);
@@ -20,7 +20,36 @@ namespace Kaimos::UI {
 	public:
 		
 		// --- Public UI Methods ---
+		// Draw a Help Marker with a Text as popup
 		static void DrawHelpMarker(const std::string& help_text);
+
+		// - Drag Floats -
+		// Draw a Drag Float in the same line than 'text' - label is the "widget id"
+		static bool DrawInlineDragFloat(const char* text, const char* label, float* value, float speed = 1.0f, float width = 0.0f, float min = 0.0f, float max = 0.0f, const char* fmt = "%.3f", float pow = 1.0f);
+		
+		// Draw a Drag Float of 2 values in the same line than 'text' - label is the "widget id"
+		static bool DrawInlineDragFloat2(const char* text, const char* label, glm::vec2& value, float speed = 1.0f, float width = 0.0f, float min = 0.0f, float max = 0.0f, const char* fmt = "%.3f", float pow = 1.0f);
+
+		// - Buttons -
+		// Draw a button with a texture - requires texture id, button size and background color (when it has no texture or it has transparencies)
+		// This function requires to use PopButton() after calling it
+		static bool DrawTexturedButton(uint texture_id, const glm::vec2& size, const glm::vec3& bg_color);
+
+		// Draw a button with a color - requires the label to display, button size, color and a bool to draw the label with a black font
+		// This function requires to use PopButton() after calling it
+		static bool DrawColoredButton(const char* label, const glm::vec2& size, const glm::vec3& color, bool black_font);
+
+		// Pops Button ImGui values - black_font is for the cases in which black font is used (it needs to be popped too)
+		static void PopButton(bool black_font);
+
+		// - Text -
+		// Draw Input Text Widget (max string characters: 256)
+		static void DrawInputText(const char* label, std::string& value, float widget_width = 0.0f);
+
+		// - Others -
+		// Draw Dropdown: options = array of options (needs a size specification), selected_option = name of current selected opt. (needs its index in options[])
+		// the width is the width that the dropdown will occupy, if left to 0 will be the half of its imgui-calculated width
+		static void DrawDropDown(const char* label, const char* options[], uint options_size, const char* selected_option, uint& selected_index, float width = 0.0f);
 
 		// Draw controller of vec3 (ue4-like): name = label ("position"), value = ref to vec3, xyz colors = vec3 axis colors,
 		// reset value = reset on pressing axis button, labels = names for axis (xyz, rgb...), column width = width of controller elements
@@ -29,7 +58,13 @@ namespace Kaimos::UI {
 	private:
 
 		// --- Private UI Methods ---
-		static void SetButton(const glm::vec3& active_color, const glm::vec3& hover_color, ImFont* font);
+		static bool Button(const char* label, const ImVec2& size, const glm::vec3& color, ImFont* font);
+		static void PushButtonSettings(const glm::vec3& active_color, const glm::vec3& hover_color, ImFont* font = nullptr);
+		
+		static void SetItemWidth(float width);
+		static void SetTextCursorAndWidth(const char* text, float width);
+		
+		static void InlineDragFloat(const char* label, float* value, float speed);
 	};
 }
 

@@ -45,7 +45,7 @@ namespace Kaimos {
 		void SetPerspectiveCamera(float FOV, float near_clip, float far_clip);
 		
 		void SetPerspectiveFOV(float FOV)							{ m_PerspectiveFOV = FOV; RecalculateProjectionMatrix(); }
-		void SetPerspectiveClips(float near_plane, float farClip)	{ m_PerspectiveNearClip = near_plane; m_PerspectiveFarClip = farClip; RecalculateProjectionMatrix(); }
+		void SetPerspectiveClips(float near_plane, float far_clip)	{ m_PerspectiveNearClip = near_plane; m_PerspectiveFarClip = far_clip; RecalculateProjectionMatrix(); }
 
 	private:
 
