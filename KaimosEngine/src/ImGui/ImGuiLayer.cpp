@@ -232,9 +232,12 @@ namespace Kaimos {
 		colors[ImGuiCol_NavWindowingHighlight] = ImVec4(1.0f, 1.0f, 1.0f, 0.7f);
 		colors[ImGuiCol_NavWindowingDimBg] = ImVec4(0.8f, 0.8f, 0.8f, 0.20f);
 		colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.8f, 0.8f, 0.8f, 0.35f);
-		colors[ImGuiCol_DockingPreview] = colors[ImGuiCol_HeaderActive]; colors[ImGuiCol_DockingPreview].w *= 0.7f;
+
+		//colors[ImGuiCol_DockingPreview] = colors[ImGuiCol_HeaderActive]; colors[ImGuiCol_DockingPreview].w *= 0.7f;
+		colors[ImGuiCol_DockingPreview] = ImVec4(0.06f, 0.05f, 0.07f, 0.7f);
 		colors[ImGuiCol_DockingEmptyBg] = ImVec4(0.12f, 0.12f, 0.12f, 1.0f);
-		
+
+
 		// -- Tabs --
 		//colors[ImGuiCol_Tab] = ImVec4(0.392f, 0.369f, 0.376f, 0.5f);
 		colors[ImGuiCol_Tab] = ImVec4(0.44f, 0.42f, 0.42f, 0.5f);
