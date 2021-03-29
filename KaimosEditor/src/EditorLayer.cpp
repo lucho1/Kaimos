@@ -282,17 +282,8 @@ namespace Kaimos {
 			ImGui::End();
 		}
 
-		if (show_project_panel)
-		{
-			ImGui::Begin("Project");
-			ImGui::End();
-		}
+		m_ProjectPanel.OnUIRender(show_project_panel, show_console_panel);
 
-		if (show_console_panel)
-		{
-			ImGui::Begin("Console");
-			ImGui::End();
-		}
 
 		// -- Viewport --
 		if (show_viewport_panel)

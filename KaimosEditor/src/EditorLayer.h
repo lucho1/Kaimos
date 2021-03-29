@@ -4,6 +4,7 @@
 #include "Kaimos.h"
 #include "Panels/ScenePanel.h"
 #include "Panels/SettingsPanel.h"
+#include "Panels/ProjectPanel.h"
 #include "Renderer/Cameras/EditorCamera.h"
 
 namespace Kaimos {
@@ -50,6 +51,7 @@ namespace Kaimos {
 
 		ScenePanel m_ScenePanel = {};
 		SettingsPanel m_SettingsPanel = {};
+		ProjectPanel m_ProjectPanel = {};
 
 		EditorCamera m_EditorCamera = {};
 
