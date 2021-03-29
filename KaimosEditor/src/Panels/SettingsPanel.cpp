@@ -59,8 +59,6 @@ namespace Kaimos {
 
 	void SettingsPanel::DisplayMemoryMetrics()
 	{
-
-		
 		// -- Memory Metrics Gathering --
 		static bool stop = false;
 		ImGui::Checkbox("Stop", &stop);
@@ -85,7 +83,6 @@ namespace Kaimos {
 		ImGui::Text("Allocations: %i (%i MB)",						m_MemoryMetrics.GetAllocations(),			BTOMB(m_MemoryMetrics.GetAllocationsSize()));
 		ImGui::Text("Deallocations: %i (%i MB)",					m_MemoryMetrics.GetDeallocations(),			BTOMB(m_MemoryMetrics.GetDeallocationsSize()));
 		ImGui::Text("Current Memory Usage: %i Allocated (%i MB)",	m_MemoryMetrics.GetCurrentAllocations(),	BTOMB(m_MemoryMetrics.GetCurrentMemoryUsage()));
-
 	}
 
 

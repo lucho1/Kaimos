@@ -216,14 +216,14 @@ namespace Kaimos {
 
 			// - Tag Modification -
 			ImGui::SameLine();
-			KaimosUI::UIFunctionalities::DrawInputText("##Tag", entity.GetComponent<TagComponent>().Tag);
+			KaimosUI::UIFunctionalities::DrawInputText("##Tag", entity.GetComponent<TagComponent>().Tag, ImGui::GetContentRegionAvailWidth() / 1.5f);
 		}
 
 		// -- Add Component Button + Popup --
 		ImGui::SameLine();
 		ImGui::PushItemWidth(-1);
 
-		if (ImGui::Button("Add Component"))
+		if (ImGui::Button("Add Component", { ImGui::GetContentRegionAvail().x, ImGui::GetItemRectSize().y }))
 			ImGui::OpenPopup("AddComponent");
 
 		ImGui::Text("ID: %i", entity.GetID()); // ID Display
