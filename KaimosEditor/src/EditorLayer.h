@@ -5,6 +5,7 @@
 #include "Panels/ScenePanel.h"
 #include "Panels/SettingsPanel.h"
 #include "Panels/ProjectPanel.h"
+#include "Panels/ToolbarPanel.h"
 #include "Renderer/Cameras/EditorCamera.h"
 
 namespace Kaimos {
@@ -30,6 +31,7 @@ namespace Kaimos {
 		// --- Event Methods ---
 		bool OnKeyPressed(KeyPressedEvent& ev);
 		bool OnMouseButtonPressed(MouseButtonPressedEvent& ev);
+		bool OnKeyReleased(KeyReleasedEvent& ev);
 
 		// --- Private Editor Methods ---
 		void NewScene();
@@ -52,11 +54,12 @@ namespace Kaimos {
 		ScenePanel m_ScenePanel = {};
 		SettingsPanel m_SettingsPanel = {};
 		ProjectPanel m_ProjectPanel = {};
+		ToolbarPanel m_ToolbarPanel = {};
 
 		EditorCamera m_EditorCamera = {};
 
 		// Guizmo
-		int m_OperationGizmo = 0;
+		//int m_OperationGizmo = 0;
 		Entity m_HoveredEntity = {};
 
 		// Rendering

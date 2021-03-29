@@ -34,9 +34,9 @@ namespace Kaimos::KaimosUI {
 		static bool DrawInlineSlider(const char* text, const char* label, float* value, float width = 0.0f, float spacing = 2.0f, float max = 0.0f, float min = 0.0f, const char* fmt = "%.2f", float pow = 1.0f);
 
 		// - Buttons -
-		// Draw a button with a texture - requires texture id, button size and background color (when it has no texture or it has transparencies)
+		// Draw a button with a texture - requires a label (for id) texture id, button size and background color (when it has no texture or it has transparencies)
 		// This function requires to use PopButton() after calling it
-		static bool DrawTexturedButton(uint texture_id, const glm::vec2& size, const glm::vec3& bg_color);
+		static bool DrawTexturedButton(const char* label, uint texture_id, const glm::vec2& size, const glm::vec3& bg_color);
 
 		// Draw a button with a color - requires the label to display, button size, color and a bool to draw the label with a black font
 		// This function requires to use PopButton() after calling it

@@ -339,7 +339,7 @@ namespace Kaimos {
 				ImGui::Text("Texture");
 				ImGui::SameLine(ImGui::GetContentRegionAvail().x * 0.5f);
 
-				if (KaimosUI::UIFunctionalities::DrawTexturedButton(id, glm::vec2(80.0f), glm::vec3(0.1f)))
+				if (KaimosUI::UIFunctionalities::DrawTexturedButton("###sprite_texture_btn", id, glm::vec2(80.0f), glm::vec3(0.1f)))
 				{
 					std::string texture_file = FileDialogs::OpenFile("Texture (*.png)\0*.png\0");
 					if (!texture_file.empty())

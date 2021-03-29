@@ -40,11 +40,11 @@ namespace Kaimos::KaimosUI {
 
 
 	// --- Buttons ---
-	bool UIFunctionalities::DrawTexturedButton(uint texture_id, const glm::vec2& size, const glm::vec3& bg_color)
+	bool UIFunctionalities::DrawTexturedButton(const char* label, uint texture_id, const glm::vec2& size, const glm::vec3& bg_color)
 	{
 		PushButtonSettings(bg_color, bg_color + glm::vec3(0.1f), nullptr);
 		if (texture_id == 0)
-			ImGui::Button("###textured_btn", ConvertToImVec2(size));
+			return ImGui::Button(label, ConvertToImVec2(size));
 		else
 			return ImGui::ImageButton((ImTextureID)texture_id, ConvertToImVec2(size), { 0.0f, 1.0f }, { 1.0f, 0.0f }, 0, ConvertToImVec4(glm::vec4(bg_color, 1.0f)));
 	}

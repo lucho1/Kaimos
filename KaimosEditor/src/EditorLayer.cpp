@@ -204,6 +204,7 @@ namespace Kaimos {
 		float original_min_size = style.WindowMinSize.x;
 		style.WindowMinSize.x = 370.0f;
 
+
 		if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable)
 		{
 			ImGuiID dock_id = ImGui::GetID("MyDockspace");
@@ -214,6 +215,7 @@ namespace Kaimos {
 
 		
 		// -- Show Windows Booleans --
+		static bool show_toolbar = true;
 		static bool show_scene_panel = true;
 		static bool show_project_panel = true;
 		static bool show_console_panel = true;
@@ -248,6 +250,7 @@ namespace Kaimos {
 
 			if (ImGui::BeginMenu("Window"))
 			{
+				ImGui::MenuItem("Toolbar", nullptr, &show_toolbar);
 				ImGui::MenuItem("Scene Panel", nullptr, &show_scene_panel);
 				ImGui::MenuItem("Viewport", nullptr, &show_viewport_panel);
 				ImGui::MenuItem("Settings Panel", nullptr, &show_settings_panel);
@@ -268,6 +271,9 @@ namespace Kaimos {
 		// -- Demo Window --
 		if (show_uidemo)
 			ImGui::ShowDemoWindow();
+
+		// -- Toolbar --
+		m_ToolbarPanel.OnUIRender();
 
 		// -- Scene Panel Rendering --
 		if(show_scene_panel)
@@ -312,7 +318,7 @@ namespace Kaimos {
 
 			// -- Guizmo --
 			Entity selected_entity = m_ScenePanel.GetSelectedEntity();
-			if (selected_entity && m_OperationGizmo != -1 && !Input::IsKeyPressed(KEY::LEFT_ALT))
+			if (selected_entity && m_ToolbarPanel.m_SelectedOperation != -1 && !Input::IsKeyPressed(KEY::LEFT_ALT)) // TODO: Camera IsUsing on cam rework
 			{
 				ImGuizmo::SetOrthographic(false);
 				ImGuizmo::SetDrawlist();
@@ -322,7 +328,6 @@ namespace Kaimos {
 				//Entity camera = m_CurrentScene->GetPrimaryCamera();			
 				//const glm::mat4& cam_proj = camera.GetComponent<CameraComponent>().Camera.GetProjection();
 				//glm::mat4 cam_view = glm::inverse(camera.GetComponent<TransformComponent>().GetTransform());
-
 				const glm::mat4& cam_proj = m_EditorCamera.GetProjection();
 				glm::mat4 cam_view = m_EditorCamera.GetViewMatrix();
 
@@ -331,16 +336,17 @@ namespace Kaimos {
 				glm::mat4 tr_mat = transform.GetTransform();
 
 				// Snapping
-				bool snap = Input::IsKeyPressed(KEY::LEFT_CONTROL) || Input::IsKeyPressed(KEY::RIGHT_CONTROL);
+				bool snap = Input::IsKeyPressed(KEY::LEFT_CONTROL) || Input::IsKeyPressed(KEY::RIGHT_CONTROL) || m_ToolbarPanel.m_Snap;
 				float snap_value = 0.5f;
-				if (m_OperationGizmo == ImGuizmo::OPERATION::ROTATE)
+
+				if (m_ToolbarPanel.m_SelectedOperation == ImGuizmo::OPERATION::ROTATE)
 					snap_value = 10.0f;
 
 				float snap_array[3] = { snap_value, snap_value, snap_value };
 
 				// Guizmo Manipulation
-				ImGuizmo::Manipulate(glm::value_ptr(cam_view), glm::value_ptr(cam_proj), (ImGuizmo::OPERATION)m_OperationGizmo, ImGuizmo::MODE::LOCAL, glm::value_ptr(tr_mat),
-					nullptr, snap ? snap_array : nullptr);
+				ImGuizmo::Manipulate(glm::value_ptr(cam_view), glm::value_ptr(cam_proj), (ImGuizmo::OPERATION)m_ToolbarPanel.m_SelectedOperation, (ImGuizmo::MODE)m_ToolbarPanel.m_WorldMode,
+					glm::value_ptr(tr_mat),	nullptr, snap ? snap_array : nullptr);
 
 				if (ImGuizmo::IsUsing())
 				{
@@ -367,6 +373,7 @@ namespace Kaimos {
 
 		EventDispatcher dispatcher(ev);
 		dispatcher.Dispatch<KeyPressedEvent>(KS_BIND_EVENT_FN(EditorLayer::OnKeyPressed));
+		dispatcher.Dispatch<KeyReleasedEvent>(KS_BIND_EVENT_FN(EditorLayer::OnKeyReleased));
 		dispatcher.Dispatch<MouseButtonPressedEvent>(KS_BIND_EVENT_FN(EditorLayer::OnMouseButtonPressed));
 
 		// -- Event Example --
@@ -392,6 +399,17 @@ namespace Kaimos {
 		return false;
 	}
 
+	bool EditorLayer::OnKeyReleased(KeyReleasedEvent& ev)
+	{
+		if (ev.GetKeyCode() == KEY::LEFT_CONTROL && m_ToolbarPanel.m_ChangeSnap)
+		{
+			m_ToolbarPanel.m_Snap = false;
+			m_ToolbarPanel.m_ChangeSnap = false;
+		}
+
+		return false;
+	}
+
 	bool EditorLayer::OnKeyPressed(KeyPressedEvent& ev)
 	{
 		// -- Shortcuts --
@@ -412,17 +430,23 @@ namespace Kaimos {
 				else if (control_pressed) SaveScene();
 				break;
 			// Guizmo
+			case KEY::LEFT_CONTROL:
+				if (!m_ToolbarPanel.m_Snap) { m_ToolbarPanel.m_Snap = true; m_ToolbarPanel.m_ChangeSnap = true; }
+				break;
+			case KEY::SPACE:
+				if (!ImGuizmo::IsUsing()) m_ToolbarPanel.m_WorldMode = !m_ToolbarPanel.m_WorldMode;
+				break;
 			case KEY::Q:
-				if(!ImGuizmo::IsUsing()) m_OperationGizmo = -1;
+				if(!ImGuizmo::IsUsing()) m_ToolbarPanel.m_SelectedOperation = -1;
 				break;
 			case KEY::W:
-				if (!ImGuizmo::IsUsing()) m_OperationGizmo = ImGuizmo::OPERATION::TRANSLATE;
+				if (!ImGuizmo::IsUsing()) m_ToolbarPanel.m_SelectedOperation = ImGuizmo::OPERATION::TRANSLATE;
 				break;
 			case KEY::E:
-				if (!ImGuizmo::IsUsing()) m_OperationGizmo = ImGuizmo::OPERATION::ROTATE;
+				if (!ImGuizmo::IsUsing()) m_ToolbarPanel.m_SelectedOperation = ImGuizmo::OPERATION::ROTATE;
 				break;
 			case KEY::R:
-				if (!ImGuizmo::IsUsing()) m_OperationGizmo = ImGuizmo::OPERATION::SCALE;
+				if (!ImGuizmo::IsUsing()) m_ToolbarPanel.m_SelectedOperation = ImGuizmo::OPERATION::SCALE;
 				break;
 		}
 
