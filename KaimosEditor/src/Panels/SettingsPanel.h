@@ -13,7 +13,7 @@ namespace Kaimos {
 
 		// --- Public Class Methods ---
 		SettingsPanel() = default;
-		void OnUIRender(const Entity& hov_entity, EditorCamera& editor_camera);
+		void OnUIRender(const Entity& hov_entity, EditorCamera& editor_camera, bool& closing_settings, bool& closing_performance);
 
 	private:
 

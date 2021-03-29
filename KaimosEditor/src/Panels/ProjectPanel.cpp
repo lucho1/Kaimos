@@ -8,18 +8,18 @@ namespace Kaimos {
 	static ImGuiTextFilter filter;
 
 	// ----------------------- Public Class Methods -------------------------------------------------------
-	void Kaimos::ProjectPanel::OnUIRender(bool show_project_files, bool show_console)
+	void Kaimos::ProjectPanel::OnUIRender(bool& show_project_files, bool& show_console)
 	{
 		if (show_project_files)
 		{
-			ImGui::Begin("Project");
+			ImGui::Begin("Project", &show_project_files);
 			DisplayProjectFiles();
 			ImGui::End();
 		}
 
 		if (show_console)
 		{
-			ImGui::Begin("Console");
+			ImGui::Begin("Console", &show_console);
 			DisplayConsoleBar();
 
 			ImGui::Separator();
@@ -69,6 +69,11 @@ namespace Kaimos {
 		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(4.0f, 1.5f)); // Tighten spacing
 		if (m_Console.CopyToClipboard)
 			ImGui::LogToClipboard();
+
+		//static std::vector<Kaimos::LogData::KaimosLog> vec = Log::GetLogs();
+		//vec = Log::GetLogs();
+		
+		//static const MemoryMetrics& m = Application::Get().GetMemoryMetrics();
 
 		// - Message Filter & Color -
 		for (uint i = 0; i < m_Console.ConsoleMessages.size(); ++i)

@@ -219,6 +219,7 @@ namespace Kaimos {
 		static bool show_console_panel = true;
 		static bool show_files_panel = true;
 		static bool show_settings_panel = true;
+		static bool show_performance_panel = true;
 		static bool show_viewport_panel = true;
 		static bool show_uidemo = false;
 		
@@ -249,10 +250,11 @@ namespace Kaimos {
 			{
 				ImGui::MenuItem("Scene Panel", nullptr, &show_scene_panel);
 				ImGui::MenuItem("Viewport", nullptr, &show_viewport_panel);
-				ImGui::MenuItem("Settings & Performance", nullptr, &show_settings_panel);
+				ImGui::MenuItem("Settings Panel", nullptr, &show_settings_panel);
+				ImGui::MenuItem("Performance Panel", nullptr, &show_performance_panel);
 				ImGui::MenuItem("Project Panel", nullptr, &show_project_panel);
-				ImGui::MenuItem("Console", nullptr, &show_console_panel);
-				ImGui::MenuItem("Files", nullptr, &show_files_panel);
+				ImGui::MenuItem("Console Panel", nullptr, &show_console_panel);
+				ImGui::MenuItem("Files Panel", nullptr, &show_files_panel);
 				ImGui::MenuItem("UI Demo", nullptr, &show_uidemo);
 
 				ImGui::EndMenu();
@@ -269,16 +271,15 @@ namespace Kaimos {
 
 		// -- Scene Panel Rendering --
 		if(show_scene_panel)
-			m_ScenePanel.OnUIRender();
+			m_ScenePanel.OnUIRender(show_scene_panel);
 
 		// -- Settings Panel Rendering --
-		if(show_settings_panel)
-			m_SettingsPanel.OnUIRender(m_HoveredEntity, m_EditorCamera);
+		m_SettingsPanel.OnUIRender(m_HoveredEntity, m_EditorCamera, show_settings_panel, show_performance_panel);
 
 		// -- Project & Console Panels --
 		if (show_files_panel)
 		{
-			ImGui::Begin("Folders");
+			ImGui::Begin("Folders", &show_files_panel);
 			ImGui::End();
 		}
 
@@ -288,7 +289,7 @@ namespace Kaimos {
 		// -- Viewport --
 		if (show_viewport_panel)
 		{
-			ImGui::Begin("Viewport");
+			ImGui::Begin("Viewport", &show_viewport_panel);
 			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0.0f, 0.0f));
 
 			m_ViewportFocused = ImGui::IsWindowFocused();

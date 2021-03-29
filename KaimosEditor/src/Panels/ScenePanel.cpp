@@ -33,10 +33,10 @@ namespace Kaimos {
 
 
 	// ----------------------- Public Class Methods -------------------------------------------------------
-	void ScenePanel::OnUIRender()
+	void ScenePanel::OnUIRender(bool& closing_bool)
 	{
 		// -- Scene Tab --
-		ImGui::Begin("Scene");
+		ImGui::Begin("Scene", &closing_bool);
 		ImGui::TextColored({0.65f, 0.65f, 0.65f, 1.0f}, "%s", m_SceneContext->GetName().c_str());
 
 		// -- Entity Display --
@@ -78,7 +78,7 @@ namespace Kaimos {
 		ImGui::End();
 
 		// -- Properties Panel (Components Display) --
-		ImGui::Begin("Entity Properties");
+		ImGui::Begin("Entity Properties", &closing_bool);
 		if (m_SelectedEntity)
 			DrawComponents(m_SelectedEntity);
 

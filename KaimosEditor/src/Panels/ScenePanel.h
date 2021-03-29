@@ -13,7 +13,7 @@ namespace Kaimos {
 		ScenePanel() = default;
 		ScenePanel(const Ref<Scene>& context);
 		
-		void OnUIRender();
+		void OnUIRender(bool& closing_bool);
 
 		// --- Getters/Setters ---
 		void SetContext(const Ref<Scene>& context);

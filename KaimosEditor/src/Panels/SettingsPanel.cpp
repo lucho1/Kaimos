@@ -7,40 +7,46 @@
 namespace Kaimos {
 
 	// ----------------------- Public Class Methods -------------------------------------------------------
-	void SettingsPanel::OnUIRender(const Entity& hovered_entity, EditorCamera& editor_camera)
+	void SettingsPanel::OnUIRender(const Entity& hovered_entity, EditorCamera& editor_camera, bool& closing_settings, bool& closing_performance)
 	{
 		// -- World Settings --
-		ImGui::Begin("World Settings");
+		if (closing_settings)
+		{
+			ImGui::Begin("World Settings", &closing_settings);
 
-		// Show Hovered Entity
-		std::string entity_name = "None";
-		if (hovered_entity)
-			entity_name = hovered_entity.GetComponent<TagComponent>().Tag;
+			// Show Hovered Entity
+			std::string entity_name = "None";
+			if (hovered_entity)
+				entity_name = hovered_entity.GetComponent<TagComponent>().Tag;
 
-		ImGui::Text("Hovered Entity: %s", entity_name.c_str());
+			ImGui::Text("Hovered Entity: %s", entity_name.c_str());
 
-		// Lock Camera Rotation
-		static bool camera_lock = false;
-		ImGui::Checkbox("Lock Camera Rotation", &camera_lock);
-		editor_camera.LockRotation(camera_lock);
+			// Lock Camera Rotation
+			static bool camera_lock = false;
+			ImGui::Checkbox("Lock Camera Rotation", &camera_lock);
+			editor_camera.LockRotation(camera_lock);
 
-		ImGui::End();
+			ImGui::End();
+		}
 		
 
 		// -- Performance --
-		ImGui::Begin("Performance");
-		ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_SpanAvailWidth |ImGuiTreeNodeFlags_FramePadding;
-		// Memory
-		if (ImGui::CollapsingHeader("Memory", flags))
-			DisplayMemoryMetrics();
-		
-		// Rendering
-		ImGui::NewLine();
-		if (ImGui::CollapsingHeader("Rendering", flags))
-			DisplayRenderingMetrics();
+		if (closing_performance)
+		{
+			ImGui::Begin("Performance", &closing_performance);
+			ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_FramePadding;
+			// Memory
+			if (ImGui::CollapsingHeader("Memory", flags))
+				DisplayMemoryMetrics();
 
-		// -- End Panel --
-		ImGui::End();
+			// Rendering
+			ImGui::NewLine();
+			if (ImGui::CollapsingHeader("Rendering", flags))
+				DisplayRenderingMetrics();
+
+			// -- End Panel --
+			ImGui::End();
+		}
 	}
 
 

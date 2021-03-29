@@ -11,7 +11,7 @@ namespace Kaimos {
 
 		// --- Public Class Methods ---
 		ProjectPanel() = default;
-		void OnUIRender(bool show_project_files, bool show_console);
+		void OnUIRender(bool& show_project_files, bool& show_console);
 
 	private:
 
