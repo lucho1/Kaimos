@@ -1,10 +1,10 @@
 #include "kspch.h"
 #include "SettingsPanel.h"
+#include "ImGui/ImGuiUtils.h"
 
 #include <ImGui/imgui.h>
 
 namespace Kaimos {
-
 
 	// ----------------------- Public Class Methods -------------------------------------------------------
 	void SettingsPanel::OnUIRender(const Entity& hovered_entity, EditorCamera& editor_camera)
@@ -60,44 +60,97 @@ namespace Kaimos {
 	void SettingsPanel::DisplayMemoryMetrics()
 	{
 		// -- Memory Metrics Gathering --
-		static bool stop = false;
-		ImGui::Checkbox("Stop", &stop);
-		if (!stop)
-			SetMemoryMetrics();
-		
 		float float_mem_allocs[MEMORY_ALLOCATIONS_SAMPLES];
 		for (uint i = 0; i < MEMORY_ALLOCATIONS_SAMPLES; ++i)
-			float_mem_allocs[i] = (float)m_MemoryAllocations[i];
-
+			float_mem_allocs[i] = (float)m_MemoryAllocations[i];		
 		
-		// -- Average Mem. Allocs. to Display --
+
+		// -- Plots --
+		// Plots Text
+		ImGui::NewLine();
+		float font_size = ImGui::GetFontSize() * 6.0f; // 6 is half the characters of "Memory Usage"
+		ImGui::SameLine(ImGui::GetWindowSize().x / 2 - font_size + (font_size / 2));
+		ImGui::Text("Memory Usage");
+
+		// Avg. Allocs. to Display
 		char overlay[50];
 		sprintf(overlay, "Current Allocations: %i (%i MB)", m_MemoryMetrics.GetCurrentAllocations(), BTOMB(m_MemoryMetrics.GetCurrentMemoryUsage()));
 
-		// -- Plots --
-		ImGui::PlotLines("Memory Usage", float_mem_allocs, IM_ARRAYSIZE(float_mem_allocs), 0, overlay, 0.0f, 5000.0f, ImVec2(0.0f, 100.0f));
-		ImGui::PlotHistogram("Memory Usage Histogram", float_mem_allocs, IM_ARRAYSIZE(float_mem_allocs), 0, overlay, 0.0f, 5000.0f, ImVec2(0.0f, 100.0f));
+		// Plots
+		float plots_width = ImGui::GetContentRegionAvailWidth();
+		ImGui::PlotLines("###MemoryUsage", float_mem_allocs, IM_ARRAYSIZE(float_mem_allocs), 0, overlay, 0.0f, 5000.0f, ImVec2(plots_width, 100.0f));
+		ImGui::PlotHistogram("###MemoryUsageHistogram", float_mem_allocs, IM_ARRAYSIZE(float_mem_allocs), 0, overlay, 0.0f, 5000.0f, ImVec2(plots_width, 100.0f));
+
+
+		// -- Memory Metrics Gathering Stop --
+		static bool stop = false;
+		ImGui::Checkbox("Stop Metrics Count", &stop);
+		if (!stop)
+			SetMemoryMetrics();
+
 
 		// -- Printing --
+		float text_separation = ImGui::GetContentRegionAvailWidth() / 3.0f;
 		ImGui::NewLine();
-		ImGui::Text("Allocations: %i (%i MB)",						m_MemoryMetrics.GetAllocations(),			BTOMB(m_MemoryMetrics.GetAllocationsSize()));
-		ImGui::Text("Deallocations: %i (%i MB)",					m_MemoryMetrics.GetDeallocations(),			BTOMB(m_MemoryMetrics.GetDeallocationsSize()));
-		ImGui::Text("Current Memory Usage: %i Allocated (%i MB)",	m_MemoryMetrics.GetCurrentAllocations(),	BTOMB(m_MemoryMetrics.GetCurrentMemoryUsage()));
+
+		ImGui::Text("Allocations"); ImGui::SameLine(text_separation);
+		ImGui::Text("%i (%i MB)", m_MemoryMetrics.GetAllocations(), BTOMB(m_MemoryMetrics.GetAllocationsSize()));
+
+		ImGui::Text("Deallocations"); ImGui::SameLine(text_separation);
+		ImGui::Text("%i (%i MB)", m_MemoryMetrics.GetDeallocations(), BTOMB(m_MemoryMetrics.GetDeallocationsSize()));
+
+		ImGui::Text("Current Memory Usage"); ImGui::SameLine(text_separation);
+		ImGui::Text("%i (%i MB)", m_MemoryMetrics.GetCurrentAllocations(), BTOMB(m_MemoryMetrics.GetCurrentMemoryUsage()));
 	}
 
 
 	void SettingsPanel::DisplayRenderingMetrics()
 	{
 		auto stats = Renderer2D::GetStats();
+		float text_separation = ImGui::GetContentRegionAvailWidth() / 3.0f;
 
-		//ImGui::AlignTextToFramePadding();
-		ImGui::Text("Draw Calls: %d", stats.DrawCalls);
-		ImGui::Text("Quads Drawn: %d", stats.QuadCount);
-		ImGui::Text("Max Quads per Draw Call: %d", Renderer2D::GetMaxQuads());
+		// -- Draw Calls --
+		ImGui::Text("Draw Calls"); ImGui::SameLine(text_separation);
+		ImGui::Text("%i", stats.DrawCalls);
 
+		ImGui::Text("Max Quads x Draw Call"); ImGui::SameLine(text_separation);
+		ImGui::Text("%i", Renderer2D::GetMaxQuads());
+
+
+		// -- Geometry --
+		ImGui::NewLine(); ImGui::NewLine();
+
+		ImDrawList* draw_list = ImGui::GetWindowDrawList();
+		ImU32 icons_color = ImColor(1.0f, 0.7f, 0.0f);
+		float icons_size = 12.0f;
+		float icons_indent = icons_size + 25.0f;
+		
+		// Icons Positioning & Size
+		glm::vec2 position = KaimosUI::ConvertToVec2(ImGui::GetCursorScreenPos()) - glm::vec2(0.0f, 20.0f);
+		
+		// Quads
+		draw_list->AddRectFilled(KaimosUI::ConvertToImVec2(position), KaimosUI::ConvertToImVec2(position + glm::vec2(icons_size)), icons_color);
+		
+		ImGui::SameLine(icons_indent);
+		ImGui::Text("Quads Drawn"); ImGui::SameLine(text_separation);
+		ImGui::Text("%i", stats.QuadCount);
+		
+		// Triangles
 		ImGui::NewLine();
-		ImGui::Text("Vertices: %d", stats.GetTotalVerticesCount());
-		ImGui::Text("Indices: %d", stats.GetTotalIndicesCount());
-		ImGui::Text("Tris: %d", stats.GetTotalTrianglesCount());
+		position = KaimosUI::ConvertToVec2(ImGui::GetCursorScreenPos()) + glm::vec2(icons_size/2.0f, -20.0f);
+		draw_list->AddTriangleFilled(KaimosUI::ConvertToImVec2(position), KaimosUI::ConvertToImVec2(position + glm::vec2(-icons_size/2.0f, icons_size)), KaimosUI::ConvertToImVec2(position + glm::vec2(icons_size/2.0f, icons_size)), icons_color);
+				
+		ImGui::SameLine(icons_indent);
+		ImGui::Text("Triangles Drawn"); ImGui::SameLine(text_separation);
+		ImGui::Text("%i", stats.GetTotalTrianglesCount());
+
+		// Circle
+		ImGui::NewLine();
+		position = KaimosUI::ConvertToVec2(ImGui::GetCursorScreenPos()) + glm::vec2(icons_size/2.0f, -14.0f);
+		draw_list->AddCircleFilled(KaimosUI::ConvertToImVec2(position), 2.5f, icons_color);
+		
+		ImGui::SameLine(icons_indent);
+		ImGui::Text("Vertices Drawn"); ImGui::SameLine(text_separation);
+		ImGui::Text("%i	(%i Indices)", stats.GetTotalVerticesCount(), stats.GetTotalIndicesCount());
 	}
 }

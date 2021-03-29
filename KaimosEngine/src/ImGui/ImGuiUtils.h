@@ -10,10 +10,10 @@ struct ImFont;
 namespace Kaimos::KaimosUI {
 
 	// --- Conversors ---
-	static ImVec2 ConvertToImVec2(glm::vec2 v);
-	static ImVec4 ConvertToImVec4(glm::vec4 v);
-	static glm::vec2 ConvertToVec2(ImVec2 v);
-	static glm::vec4 ConvertToVec4(ImVec4 v);
+	ImVec2 ConvertToImVec2(glm::vec2 v);
+	ImVec4 ConvertToImVec4(glm::vec4 v);
+	glm::vec2 ConvertToVec2(ImVec2 v);
+	glm::vec4 ConvertToVec4(ImVec4 v);
 
 	class UIFunctionalities
 	{
@@ -23,12 +23,15 @@ namespace Kaimos::KaimosUI {
 		// Draw a Help Marker with a Text as popup
 		static void DrawHelpMarker(const std::string& help_text);
 
-		// - Drag Floats -
+		// - Drag Floats/Sliders -
 		// Draw a Drag Float in the same line than 'text' - label is the "widget id"
-		static bool DrawInlineDragFloat(const char* text, const char* label, float* value, float speed = 1.0f, float width = 0.0f, float min = 0.0f, float max = 0.0f, const char* fmt = "%.3f", float pow = 1.0f);
+		static bool DrawInlineDragFloat(const char* text, const char* label, float* value, float speed = 1.0f, float width = 0.0f, float spacing = 2.0f, float min = 0.0f, float max = 0.0f, const char* fmt = "%.2f", float pow = 1.0f);
 		
 		// Draw a Drag Float of 2 values in the same line than 'text' - label is the "widget id"
-		static bool DrawInlineDragFloat2(const char* text, const char* label, glm::vec2& value, float speed = 1.0f, float width = 0.0f, float min = 0.0f, float max = 0.0f, const char* fmt = "%.3f", float pow = 1.0f);
+		static bool DrawInlineDragFloat2(const char* text, const char* label, glm::vec2& value, float speed = 1.0f, float width = 0.0f, float spacing = 2.0f, float min = 0.0f, float max = 0.0f, const char* fmt = "%.2f", float pow = 1.0f);
+
+		// Draw a Slider in the same line than 'text' - label is the "widget_id"
+		static bool DrawInlineSlider(const char* text, const char* label, float* value, float width = 0.0f, float spacing = 2.0f, float max = 0.0f, float min = 0.0f, const char* fmt = "%.2f", float pow = 1.0f);
 
 		// - Buttons -
 		// Draw a button with a texture - requires texture id, button size and background color (when it has no texture or it has transparencies)
@@ -49,7 +52,7 @@ namespace Kaimos::KaimosUI {
 		// - Others -
 		// Draw Dropdown: options = array of options (needs a size specification), selected_option = name of current selected opt. (needs its index in options[])
 		// the width is the width that the dropdown will occupy, if left to 0 will be the half of its imgui-calculated width
-		static void DrawDropDown(const char* label, const char* options[], uint options_size, const char* selected_option, uint& selected_index, float width = 0.0f);
+		static void DrawDropDown(const char* label, const char* options[], uint options_size, const char* selected_option, uint& selected_index, float width = 0.0f, float spacing = 2.0f);
 
 		// Draw controller of vec3 (ue4-like): name = label ("position"), value = ref to vec3, xyz colors = vec3 axis colors,
 		// reset value = reset on pressing axis button, labels = names for axis (xyz, rgb...), column width = width of controller elements
@@ -62,7 +65,7 @@ namespace Kaimos::KaimosUI {
 		static void PushButtonSettings(const glm::vec3& active_color, const glm::vec3& hover_color, ImFont* font = nullptr);
 		
 		static void SetItemWidth(float width);
-		static void SetTextCursorAndWidth(const char* text, float width);
+		static void SetTextCursorAndWidth(const char* text, float width, float spacing);
 		
 		static void InlineDragFloat(const char* label, float* value, float speed);
 	};

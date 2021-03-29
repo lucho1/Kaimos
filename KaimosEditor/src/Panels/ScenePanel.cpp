@@ -275,7 +275,6 @@ namespace Kaimos {
 		DrawComponentUI<CameraComponent>("Camera", entity, [](auto& component)
 			{
 				SceneCamera& camera = component.Camera;
-
 				ImGui::Checkbox("Primary", &component.Primary);
 
 				// Projection Type Dropdown
@@ -290,16 +289,16 @@ namespace Kaimos {
 				if (camera.GetProjectionType() == SceneCamera::PROJECTION_TYPE::PERSPECTIVE)
 				{
 					float persp_FOV = camera.GetPerspectiveFOV();
-					if (KaimosUI::UIFunctionalities::DrawInlineDragFloat("FOV", "###fov", &persp_FOV, 0.05f, ImGui::CalcItemWidth() / 4.0f, 0.0f, 180.0f, "%.1f"))
+					if (KaimosUI::UIFunctionalities::DrawInlineDragFloat("FOV", "###fov", &persp_FOV, 0.05f, ImGui::CalcItemWidth() / 4.0f, 2.0f, 0.0f, 180.0f, "%.1f"))
 						camera.SetPerspectiveFOV(persp_FOV);
 
 					float near_clip = camera.GetPerspectiveNearClip(), far_clip = camera.GetPerspectiveFarClip();
 
-					if (KaimosUI::UIFunctionalities::DrawInlineDragFloat("Near Clip", "###nclip", &near_clip, 0.01f, ImGui::CalcItemWidth() / 4.0f, 0.001f, far_clip - 0.1f, "%.3f", 1.5f))
+					if (KaimosUI::UIFunctionalities::DrawInlineDragFloat("Near Clip", "###nclip", &near_clip, 0.01f, ImGui::CalcItemWidth() / 4.0f, 2.0f, 0.001f, far_clip - 0.1f, "%.3f", 1.5f))
 						if(near_clip < far_clip)
 							camera.SetPerspectiveClips(near_clip, far_clip);
 
-					if (KaimosUI::UIFunctionalities::DrawInlineDragFloat("Far Clip", "###fclip", &far_clip, 1.0f, ImGui::CalcItemWidth() / 4.0f, near_clip + 0.1f, INFINITY))
+					if (KaimosUI::UIFunctionalities::DrawInlineDragFloat("Far Clip", "###fclip", &far_clip, 1.0f, ImGui::CalcItemWidth() / 4.0f, 2.0f, near_clip + 0.1f, INFINITY))
 						if(far_clip > near_clip)
 							camera.SetPerspectiveClips(near_clip, far_clip);
 				}
@@ -311,15 +310,15 @@ namespace Kaimos {
 					float ortho_size = camera.GetOrthographicSize();
 					float near_clip = camera.GetOrthographicNearClip(), far_clip = camera.GetOrthographicFarClip();
 
-					if (KaimosUI::UIFunctionalities::DrawInlineDragFloat("Size", "###size", &ortho_size, 0.05f, ImGui::CalcItemWidth() / 4.0f, 0.0f, INFINITY, "%.1f"))
+					if (KaimosUI::UIFunctionalities::DrawInlineDragFloat("Size", "###size", &ortho_size, 0.05f, ImGui::CalcItemWidth() / 4.0f, 2.0f, 0.0f, INFINITY, "%.1f"))
 						camera.SetOrthographicSize(ortho_size);
 
-					if (KaimosUI::UIFunctionalities::DrawInlineDragFloat("Near Clip", "###nclip2", &near_clip, 0.01f, ImGui::CalcItemWidth() / 4.0f, -INFINITY, far_clip - 0.1f, "%.3f", 1.5f))
+					if (KaimosUI::UIFunctionalities::DrawInlineDragFloat("Near Clip", "###nclip2", &near_clip, 0.01f, ImGui::CalcItemWidth() / 4.0f, 2.0f, -INFINITY, far_clip - 0.1f, "%.3f", 1.5f))
 						if (near_clip < far_clip)
 							camera.SetOrthographicClips(near_clip, far_clip);
 
 
-					if (KaimosUI::UIFunctionalities::DrawInlineDragFloat("Far Clip", "###fclip2", &far_clip, 0.01f, ImGui::CalcItemWidth() / 4.0f, near_clip + 0.1f, INFINITY, "%.3f", 1.5f))
+					if (KaimosUI::UIFunctionalities::DrawInlineDragFloat("Far Clip", "###fclip2", &far_clip, 0.01f, ImGui::CalcItemWidth() / 4.0f, 2.0f, near_clip + 0.1f, INFINITY, "%.3f", 1.5f))
 						if (far_clip > near_clip)
 							camera.SetOrthographicClips(near_clip, far_clip);
 				}
@@ -359,8 +358,8 @@ namespace Kaimos {
 
 				// Tiling & UV Offset Drag Floats
 				ImGui::NewLine();
-				KaimosUI::UIFunctionalities::DrawInlineDragFloat("Tiling", "##tiling", &component.TextureTiling, 0.1f, 100.0f, 0.0f, 0.0f, "%.2f");
-				KaimosUI::UIFunctionalities::DrawInlineDragFloat2("UV Offset", "##uv_offset", component.TextureUVOffset, 0.1f, 208.0f, 0.0f, 0.0f, "%.2f");
+				KaimosUI::UIFunctionalities::DrawInlineDragFloat("Tiling", "##tiling", &component.TextureTiling, 0.1f, 100.0f);
+				KaimosUI::UIFunctionalities::DrawInlineDragFloat2("UV Offset", "##uv_offset", component.TextureUVOffset, 0.1f, 208.0f);
 			});
 	}
 }

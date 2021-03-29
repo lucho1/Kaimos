@@ -19,17 +19,23 @@ namespace Kaimos::KaimosUI {
 	
 
 	// ----------------------- Public UI Methods ----------------------------------------------------------
-	// --- Drag Floats ---
-	bool UIFunctionalities::DrawInlineDragFloat(const char* text, const char* label, float* value, float speed, float width, float min, float max, const char* fmt, float pow)
+	// --- Drag Floats/Sliders ---
+	bool UIFunctionalities::DrawInlineDragFloat(const char* text, const char* label, float* value, float speed, float width, float spacing, float min, float max, const char* fmt, float pow)
 	{
-		SetTextCursorAndWidth(text, width);
+		SetTextCursorAndWidth(text, width, spacing);
 		return ImGui::DragFloat(label, value, speed, min, max, fmt, pow);
 	}
 		
-	bool UIFunctionalities::DrawInlineDragFloat2(const char* text, const char* label, glm::vec2& value, float speed, float width, float min, float max, const char* fmt, float pow)
+	bool UIFunctionalities::DrawInlineDragFloat2(const char* text, const char* label, glm::vec2& value, float speed, float width, float spacing, float min, float max, const char* fmt, float pow)
 	{
-		SetTextCursorAndWidth(text, width);
+		SetTextCursorAndWidth(text, width, spacing);
 		return ImGui::DragFloat2(label, glm::value_ptr(value), speed, min, max, fmt, pow);
+	}
+
+	bool UIFunctionalities::DrawInlineSlider(const char* text, const char* label, float* value, float width, float spacing, float max, float min, const char* fmt, float pow)
+	{
+		SetTextCursorAndWidth(text, width, spacing);
+		return ImGui::SliderFloat(label, value, min, max, fmt, pow);
 	}
 
 
@@ -96,10 +102,10 @@ namespace Kaimos::KaimosUI {
 	}
 
 
-	void UIFunctionalities::DrawDropDown(const char* label, const char* options[], uint options_size, const char* selected_option, uint& selected_index, float width)
+	void UIFunctionalities::DrawDropDown(const char* label, const char* options[], uint options_size, const char* selected_option, uint& selected_index, float width, float spacing)
 	{
 		// - Set Combo Settings -
-		SetTextCursorAndWidth(label, width);		
+		SetTextCursorAndWidth(label, width, spacing);
 		std::string widget_label = "###" + std::string(label);
 
 		if (ImGui::BeginCombo(widget_label.c_str(), selected_option))
@@ -213,14 +219,14 @@ namespace Kaimos::KaimosUI {
 			ImGui::SetNextItemWidth(width);
 	}
 
-	void UIFunctionalities::SetTextCursorAndWidth(const char* text, float width)
+	void UIFunctionalities::SetTextCursorAndWidth(const char* text, float width, float spacing)
 	{
 		// - Set Cursor & text -
 		ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 10.0f);
 		ImGui::Text(text);
 
 		// - Same Line width + Cursor Offset -
-		ImGui::SameLine(ImGui::GetContentRegionAvail().x * 0.5f - 1.0f);
+		ImGui::SameLine(ImGui::GetContentRegionAvail().x / spacing - 1.0f);
 		ImGui::SetCursorPosY(ImGui::GetCursorPosY() - 6.0f);
 
 		// - Set Width -
