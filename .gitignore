@@ -16,3 +16,4 @@ bin-int/
 **/ResultOutputFiles/
 *.log
 *.json
+*.psd
