@@ -7,7 +7,7 @@
 namespace Kaimos {
 
 	// ----------------------- Public Class Methods -------------------------------------------------------
-	void SettingsPanel::OnUIRender(const Entity& hovered_entity, EditorCamera& editor_camera, bool& closing_settings, bool& closing_performance)
+	void SettingsPanel::OnUIRender(const Entity& hovered_entity, CameraController& editor_camera_controller, bool& closing_settings, bool& closing_performance)
 	{
 		// -- World Settings --
 		if (closing_settings)
@@ -24,7 +24,46 @@ namespace Kaimos {
 			// Lock Camera Rotation
 			static bool camera_lock = false;
 			ImGui::Checkbox("Lock Camera Rotation", &camera_lock);
-			editor_camera.LockRotation(camera_lock);
+			editor_camera_controller.LockRotation(camera_lock);
+
+
+			glm::vec3 vec = editor_camera_controller.GetForwardVector();
+			ImGui::Text("Fw Vec: (%.2f, %.2f, %.2f)", vec.x, vec.y, vec.z);
+
+			vec = editor_camera_controller.GetRightVector();
+			ImGui::Text("Rt Vec: (%.2f, %.2f, %.2f)", vec.x, vec.y, vec.z);
+
+			vec = editor_camera_controller.GetUpVector();
+			ImGui::Text("Up Vec: (%.2f, %.2f, %.2f)", vec.x, vec.y, vec.z);
+
+			vec = editor_camera_controller.m_FocalPoint;
+			ImGui::Text("Focal: (%.2f, %.2f, %.2f)", vec.x, vec.y, vec.z);
+
+			vec = editor_camera_controller.m_Position;
+			ImGui::Text("Pos: (%.2f, %.2f, %.2f)", vec.x, vec.y, vec.z);
+			ImGui::Text("Zoom: %.2f", editor_camera_controller.m_ZoomLevel);
+
+			glm::vec2 v = editor_camera_controller.m_InitialMousePosition;
+			ImGui::Text("IMousePos: (%.2f, %.2f)", v.x, v.y);
+
+			v = { editor_camera_controller.m_Pitch, editor_camera_controller.m_Yaw };
+			ImGui::Text("Rot: (%.2f, %.2f)", v.x, v.y);
+
+			
+			KaimosUI::UIFunctionalities::DrawInlineDragFloat("Zoom", "###edcam_zoom", &editor_camera_controller.m_ZoomLevel);
+			KaimosUI::UIFunctionalities::DrawInlineDragFloat("PosX", "###edcam_posx", &editor_camera_controller.m_Position.x);
+			KaimosUI::UIFunctionalities::DrawInlineDragFloat("PosY", "###edcam_posy", &editor_camera_controller.m_Position.y);
+			KaimosUI::UIFunctionalities::DrawInlineDragFloat("PosZ", "###edcam_posz", &editor_camera_controller.m_Position.z);
+
+			
+
+			glm::vec3 position = editor_camera_controller.GetPosition();
+			if (ImGui::DragFloat3("Position", &position[0], 0.05f))
+				editor_camera_controller.SetPosition(position);
+			
+			glm::vec2 rot = { editor_camera_controller.m_Pitch, editor_camera_controller.m_Yaw };
+			if(KaimosUI::UIFunctionalities::DrawInlineDragFloat2("Orientation", "###edcam_rot", rot, 0.05f))
+				editor_camera_controller.SetOrientation(rot.x, rot.y);
 
 			ImGui::End();
 		}

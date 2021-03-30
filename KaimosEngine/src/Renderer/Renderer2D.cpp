@@ -133,6 +133,7 @@ namespace Kaimos {
 		s_Data->ColoredTextureShader->Unbind();
 	}
 
+
 	void Renderer2D::Shutdown()
 	{
 		KS_PROFILE_FUNCTION();
@@ -146,46 +147,31 @@ namespace Kaimos {
 
 	
 	// ----------------------- Public Renderer Methods ----------------------------------------------------
-	void Renderer2D::BeginScene(const OrthographicCamera& camera)
+	void Renderer2D::BeginScene(const CameraComponent& camera_component, const TransformComponent& transform_component)
 	{
 		KS_PROFILE_FUNCTION();
-
-		s_Data->QuadVArray->Bind();
-		s_Data->ColoredTextureShader->Bind();
-		s_Data->ColoredTextureShader->SetUMat4("u_ViewProjection", camera.GetViewProjectionMatrix());
-		StartBatch();
-	}
-
-
-	void Renderer2D::BeginScene(const EditorCamera& camera)
-	{
-		KS_PROFILE_FUNCTION();
-
-		s_Data->QuadVArray->Bind();
-		s_Data->ColoredTextureShader->Bind();
-		s_Data->ColoredTextureShader->SetUMat4("u_ViewProjection", camera.GetViewProjection());
-		StartBatch();
-	}
-
-
-	void Renderer2D::BeginScene(const Camera& camera, const glm::mat4& camera_transform)
-	{
-		KS_PROFILE_FUNCTION();
-		glm::mat4 view_proj = camera.GetProjection() * glm::inverse(camera_transform);
+		glm::mat4 view_proj = camera_component.Camera.GetProjection() * glm::inverse(transform_component.GetTransform());
 
 		s_Data->QuadVArray->Bind();
 		s_Data->ColoredTextureShader->Bind();
 		s_Data->ColoredTextureShader->SetUMat4("u_ViewProjection", view_proj);
 		StartBatch();
 	}
-
+	
+	void Renderer2D::BeginScene(const Camera& camera)
+	{
+		KS_PROFILE_FUNCTION();
+		s_Data->QuadVArray->Bind();
+		s_Data->ColoredTextureShader->Bind();
+		s_Data->ColoredTextureShader->SetUMat4("u_ViewProjection", camera.GetViewProjection());
+		StartBatch();
+	}
 
 	void Renderer2D::EndScene()
 	{
 		KS_PROFILE_FUNCTION();
 		Flush();
 	}
-
 
 	void Renderer2D::Flush()
 	{
@@ -213,22 +199,20 @@ namespace Kaimos {
 
 	
 	// ----------------------- Private Renderer Methods ---------------------------------------------------
-	void Renderer2D::NextBatch()
-	{
-		KS_PROFILE_FUNCTION();
-		Flush();
-		StartBatch();
-	}
-
-
 	void Renderer2D::StartBatch()
 	{
 		KS_PROFILE_FUNCTION();
 		s_Data->QuadIndicesDrawCount = 0;
 		s_Data->TextureSlotIndex = 1;
 		s_Data->QuadVBufferPtr = s_Data->QuadVBufferBase;
+	}		
+	
+	void Renderer2D::NextBatch()
+	{
+		KS_PROFILE_FUNCTION();
+		Flush();
+		StartBatch();
 	}
-		
 
 	void Renderer2D::SetupVertexArray(const glm::mat4& transform, const glm::vec4& color, int entity_id, float texture_index, float texture_tiling, glm::vec2 texture_uvoffset)
 	{

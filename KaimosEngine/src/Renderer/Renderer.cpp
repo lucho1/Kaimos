@@ -26,9 +26,9 @@ namespace Kaimos {
 
 	// ----------------------- Public Renderer Methods -------------------------------------------------------
 	// Takes all scene parameters & makes sure shaders we use get the right uniforms
-	void Renderer::BeginScene(const OrthographicCamera& camera)
+	void Renderer::BeginScene(const Camera& camera)
 	{
-		s_SceneData->ViewProjectionMatrix = camera.GetViewProjectionMatrix();
+		s_SceneData->ViewProjectionMatrix = camera.GetViewProjection();
 	}
 
 	void Renderer::EndScene()

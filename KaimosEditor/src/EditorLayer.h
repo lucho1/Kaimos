@@ -6,7 +6,7 @@
 #include "Panels/SettingsPanel.h"
 #include "Panels/ProjectPanel.h"
 #include "Panels/ToolbarPanel.h"
-#include "Renderer/Cameras/EditorCamera.h"
+#include "Renderer/Cameras/CameraController.h"
 
 namespace Kaimos {
 
@@ -42,11 +42,8 @@ namespace Kaimos {
 	private:
 
 		// TODO: TEMP
-		// Memory Stats UI
-		//uint m_MemoryAllocations[90] = { 0 };
-		//uint m_MemoryAllocationsIndex = 0;
-
 		// Scene
+		CameraController m_EditorCamera;
 		Ref<Scene> m_CurrentScene = nullptr;
 		Entity m_Entity = {};
 		Entity m_CameraEntity = {};
@@ -58,14 +55,13 @@ namespace Kaimos {
 
 		Ref<Texture2D> m_IconsArray[7] = { 0 };
 
-		EditorCamera m_EditorCamera = {};
+
 
 		// Guizmo
 		//int m_OperationGizmo = 0;
 		Entity m_HoveredEntity = {};
 
 		// Rendering
-		OrtographicCameraController m_CameraController;
 		Ref<VertexArray> m_VArray = nullptr;
 		
 		Ref<Framebuffer> m_Framebuffer = nullptr;

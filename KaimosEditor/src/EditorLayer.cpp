@@ -15,7 +15,7 @@
 namespace Kaimos {
 
 	// ----------------------- Public Class Methods -------------------------------------------------------
-	EditorLayer::EditorLayer() : Layer("EditorLayer"), m_CameraController(1280.0f / 720.0f, true), m_EditorCamera(45.0f, 1.778f, 0.1f, 10000.0f)
+	EditorLayer::EditorLayer() : Layer("EditorLayer")
 	{
 	}
 
@@ -44,46 +44,6 @@ namespace Kaimos {
 		m_Framebuffer = Framebuffer::Create(fboSettings);
 
 		m_CurrentScene = CreateRef<Scene>();
-
-		/*
-		m_Entity = m_CurrentScene->CreateEntity("Square");
-		m_Entity.AddComponent<SpriteRendererComponent>(glm::vec4(0.8f, 0.4f, 0.5f, 1.0f));
-		
-		m_CameraEntity = m_CurrentScene->CreateEntity("Camera");
-		m_CameraEntity.AddComponent<CameraComponent>();
-		
-
-		// ---
-		class CameraController : public ScriptableEntity
-		{
-		public:
-			void OnDestroy() {}
-			
-			void OnCreate()
-			{
-				glm::vec3& translation = GetComponent<TransformComponent>().Translation;
-				//translation.x = rand() % 10 - 5.0f;
-			}
-
-			void OnUpdate(Timestep dt)
-			{
-				glm::vec3& translation = GetComponent<TransformComponent>().Translation;
-				float speed = 10.0f;
-
-				if (Input::IsKeyPressed(Key::A))
-					translation.x -= speed * dt;
-				if (Input::IsKeyPressed(Key::D))
-					translation.x += speed * dt;
-				if (Input::IsKeyPressed(Key::W))
-					translation.y += speed * dt;
-				if (Input::IsKeyPressed(Key::S))
-					translation.y -= speed * dt;
-			}
-		};
-
-		m_CameraEntity.AddComponent<NativeScriptComponent>().Bind<CameraController>();
-		*/
-
 		m_ScenePanel.SetContext(m_CurrentScene);
 		SceneSerializer m_Serializer(m_CurrentScene);
 		m_Serializer.Deserialize("assets/scenes/CubeScene.kaimos");
@@ -106,18 +66,14 @@ namespace Kaimos {
 			(settings.Width != (uint)m_ViewportSize.x || settings.Height != (uint)m_ViewportSize.y))
 		{
 			m_Framebuffer->Resize((uint)m_ViewportSize.x, (uint)m_ViewportSize.y);
-			m_CameraController.SetAspectRatio(m_ViewportSize.x, m_ViewportSize.y);
 
 			m_CurrentScene->SetViewportSize((uint)m_ViewportSize.x, (uint)m_ViewportSize.y);
-			m_EditorCamera.SetViewportSize(m_ViewportSize.x, m_ViewportSize.y);
+			//m_EditorCamera.SetViewportSize(m_ViewportSize.x, m_ViewportSize.y); // TODO: There  must be a way to make the camera know the viewport size
 		}
 
 		// -- Camera Update --
 		if (m_ViewportFocused)
-		{
-			m_CameraController.OnUpdate(dt);
 			m_EditorCamera.OnUpdate(dt);
-		}
 
 		// -- Render --
 		Renderer2D::ResetStats();
@@ -129,12 +85,8 @@ namespace Kaimos {
 		// Clear EntityID FBO texture (RED_INTEGER), make it -1 so that we can mouse pick (and the empty areas are -1)
 		m_Framebuffer->ClearFBOTexture(1, -1);
 
-		// Scene
-		//Renderer2D::BeginScene(m_CameraController.GetCamera());
-		//Renderer2D::DrawQuad(glm::vec3(0.0f, 0.0f, -0.1f), glm::vec2(10.0f), m_CheckerTexture, m_BackgroundTiling, glm::vec4(1.0f));
-
 		// -- Scene Update --
-		m_CurrentScene->OnUpdateEditor(dt, m_EditorCamera);
+		m_CurrentScene->OnUpdateEditor(dt, m_EditorCamera.GetCamera());
 
 		// -- Mouse Picking --
 		// Get Mouse position with respect to the viewport boundaries
@@ -151,31 +103,7 @@ namespace Kaimos {
 			int pixel_read = m_Framebuffer->GetPixelFromFBO(1, (int)mouse_pos.x, (int)mouse_pos.y);
 			m_HoveredEntity = pixel_read == -1 ? Entity() : Entity(pixel_read, m_CurrentScene.get());
 		}
-
-		/*Renderer2D::DrawQuad(glm::vec2(1.5f, -2.5f), glm::vec2(0.5f, 0.75f), { 0.3f, 0.2f, 0.8f, 1.0f });
-		Renderer2D::DrawQuad(glm::vec2(0.5f, -0.5f), glm::vec2(0.5f, 0.75f), { 0.8f, 0.2f, 0.3f, 1.0f });
-		Renderer2D::DrawQuad(glm::vec2(-2.0f, -1.5f), glm::vec2(0.5f, 0.75f), m_Color);
-
-		Renderer2D::DrawRotatedQuad(glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec2(1.0f), 45.0f, m_LogoTexture, 1.0f, glm::vec4(1.0f));
-
-		static float rotation = 0.0f;
-		rotation += dt * 50.0f;
-		Renderer2D::DrawRotatedQuad(glm::vec3(-3.0f, 0.0f, 0.1f), glm::vec2(0.8f), rotation, { 0.2f, 0.8f, 0.3f, 1.0f });
-
-		Renderer2D::EndScene();
-
-		Renderer2D::BeginScene(m_CameraController.GetCamera());
-
-		for (float y = -5.0f; y < 5.0f; y += 0.475f)
-		{
-			for (float x = -5.0f; x < 5.0f; x += 0.475f)
-			{
-				glm::vec4 color = { (x + 0.5f) / 10.0f, 0.4f, (y + 5.0f) / 10.0f, 0.75f };
-				Renderer2D::DrawQuad({ x, y }, { 0.45f, 0.45f }, color);
-			}
-		}*/
-
-		//Renderer2D::EndScene();
+		
 		m_Framebuffer->Unbind();
 	}
 
@@ -333,11 +261,8 @@ namespace Kaimos {
 				ImGuizmo::SetRect(m_ViewportLimits[0].x, m_ViewportLimits[0].y, m_ViewportLimits[1].x - m_ViewportLimits[0].x, m_ViewportLimits[1].y - m_ViewportLimits[0].y);
 
 				// Camera
-				//Entity camera = m_CurrentScene->GetPrimaryCamera();			
-				//const glm::mat4& cam_proj = camera.GetComponent<CameraComponent>().Camera.GetProjection();
-				//glm::mat4 cam_view = glm::inverse(camera.GetComponent<TransformComponent>().GetTransform());
-				const glm::mat4& cam_proj = m_EditorCamera.GetProjection();
-				glm::mat4 cam_view = m_EditorCamera.GetViewMatrix();
+				const glm::mat4& cam_proj = m_EditorCamera.GetCamera().GetProjection();
+				glm::mat4 cam_view = m_EditorCamera.GetCamera().GetView();
 
 				// Entity Transformation
 				TransformComponent& transform = selected_entity.GetComponent<TransformComponent>();
@@ -376,24 +301,12 @@ namespace Kaimos {
 
 	void EditorLayer::OnEvent(Event& ev)
 	{
-		m_CameraController.OnEvent(ev);
 		m_EditorCamera.OnEvent(ev);
 
 		EventDispatcher dispatcher(ev);
 		dispatcher.Dispatch<KeyPressedEvent>(KS_BIND_EVENT_FN(EditorLayer::OnKeyPressed));
 		dispatcher.Dispatch<KeyReleasedEvent>(KS_BIND_EVENT_FN(EditorLayer::OnKeyReleased));
 		dispatcher.Dispatch<MouseButtonPressedEvent>(KS_BIND_EVENT_FN(EditorLayer::OnMouseButtonPressed));
-
-		// -- Event Example --
-		//KS_EDITOR_TRACE("LayerTest Event: {0}", ev);
-		//if (ev.GetEventType() == EVENT_TYPE::KEY_PRESSED)
-		//{
-		//	KeyPressedEvent& e = (KeyPressedEvent&)ev;
-		//	KS_EDITOR_TRACE("{0}", (char)e.GetKeyCode());
-		//}
-
-		//EventDispatcher dispatcher(ev);
-		//dispatcher.Dispatch<KeyPressedEvent>(KS_BIND_EVENT_FN(LayerTest::OnKeyPressedEvent)); // For a "OnKeyPressedEvent()" function
 	}
 
 

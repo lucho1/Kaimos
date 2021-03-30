@@ -28,8 +28,7 @@ namespace Kaimos {
 
 
 	// ----------------------- Public Scene Methods -------------------------------------------------------
-	// TODO: Remake this in the Camera Rework
-	void Scene::OnUpdateEditor(Timestep dt, EditorCamera& camera)
+	void Scene::OnUpdateEditor(Timestep dt, const Camera& camera)
 	{
 		KS_PROFILE_FUNCTION();
 
@@ -67,9 +66,6 @@ namespace Kaimos {
 
 
 		// -- Render --
-		Camera* main_cam = nullptr;
-		glm::mat4 cam_transform;
-
 		auto view = m_Registry.view<TransformComponent, CameraComponent>();
 		for (auto ent : view)
 		{
@@ -77,24 +73,17 @@ namespace Kaimos {
 
 			if (camera.Primary)
 			{
-				main_cam = &camera.Camera;
-				cam_transform = transform.GetTransform();
+				Renderer2D::BeginScene(camera, transform);
+				auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
+				for (auto ent : group)
+				{
+					auto& [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(ent);
+					Renderer2D::DrawSprite(transform.GetTransform(), sprite, (int)ent);
+				}
+
+				Renderer2D::EndScene();
 				break;
 			}
-		}
-
-		if (main_cam)
-		{
-			Renderer2D::BeginScene(*main_cam, cam_transform);
-
-			auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
-			for (auto ent : group)
-			{
-				auto& [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(ent);
-				Renderer2D::DrawSprite(transform.GetTransform(), sprite, (int)ent);
-			}
-
-			Renderer2D::EndScene();
 		}
 	}
 

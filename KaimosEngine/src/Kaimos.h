@@ -30,8 +30,8 @@
 #include "Renderer/Resources/Framebuffer.h"
 #include "Renderer/Resources/Texture.h"
 
-#include "Renderer/Cameras/OrthographicCamera.h"
-#include "Renderer/Cameras/OrtographicCameraController.h"
+#include "Renderer/Cameras/Camera.h"
+#include "Renderer/Cameras/CameraController.h"
 
 // --- Entry Point ---
 // Entry point must be inicluded only where the EntryPoint (main) is actually

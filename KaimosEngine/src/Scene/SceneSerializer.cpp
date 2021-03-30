@@ -159,20 +159,16 @@ namespace Kaimos {
 			output << YAML::BeginMap;
 			
 			CameraComponent& cam_comp = entity.GetComponent<CameraComponent>();
-			SceneCamera& camera = cam_comp.Camera;
+			Camera& camera = cam_comp.Camera;
 			output << YAML::Key << "Camera" << YAML::Value;
 
 			// -- Begin Cam Map --
 			output << YAML::BeginMap;
-			output << YAML::Key << "ProjectionType" << YAML::Value << (int)camera.GetProjectionType();
-			
-			output << YAML::Key << "FOV" << YAML::Value << (int)camera.GetPerspectiveFOV();
-			output << YAML::Key << "PerspFarClip" << YAML::Value << camera.GetPerspectiveFarClip();
-			output << YAML::Key << "PerspNearClip" << YAML::Value <<camera.GetPerspectiveNearClip();
-
-			output << YAML::Key << "OrthoSize" << YAML::Value << camera.GetOrthographicSize();
-			output << YAML::Key << "OrthoFarClip" << YAML::Value << camera.GetOrthographicFarClip();
-			output << YAML::Key << "OrthoNearClip" << YAML::Value << camera.GetOrthographicNearClip();
+			output << YAML::Key << "ProjectionType" << YAML::Value << (int)camera.GetProjectionType();			
+			output << YAML::Key << "FOV" << YAML::Value << (int)camera.GetFOV();
+			output << YAML::Key << "PerspFarClip" << YAML::Value << camera.GetFarClip(); //TODO: Change this name
+			output << YAML::Key << "PerspNearClip" << YAML::Value <<camera.GetNearClip();
+			output << YAML::Key << "OrthoSize" << YAML::Value << camera.GetSize();
 			output << YAML::EndMap;
 			// -- End Cam Map --
 
@@ -289,12 +285,15 @@ namespace Kaimos {
 					CameraComponent& cam_comp = deserialized_entity.AddComponent<CameraComponent>();
 					YAML::Node& camera_node = cameracomp_node["Camera"];
 
-					cam_comp.Camera.SetProjectionType((SceneCamera::PROJECTION_TYPE) camera_node["ProjectionType"].as<int>());
-					cam_comp.Camera.SetPerspectiveFOV(camera_node["FOV"].as<float>());
-					cam_comp.Camera.SetPerspectiveClips(camera_node["PerspNearClip"].as<float>(), camera_node["PerspFarClip"].as<float>());
+					if (camera_node["ProjectionType"].as<int>() == (int)Kaimos::CAMERA_PROJECTION::ORTHOGRAPHIC)
+						cam_comp.Camera.SetOrthographicCamera();
+					else
+						cam_comp.Camera.SetPerspectiveCamera();
 
-					cam_comp.Camera.SetOrthographicSize(camera_node["OrthoSize"].as<float>());
-					cam_comp.Camera.SetOrthographicClips(camera_node["OrthoNearClip"].as<float>(), camera_node["OrthoFarClip"].as<float>());
+					cam_comp.Camera.SetFOV(camera_node["FOV"].as<float>());
+					cam_comp.Camera.SetNearClip(camera_node["PerspNearClip"].as<float>());
+					cam_comp.Camera.SetFarClip(camera_node["PerspFarClip"].as<float>());
+					cam_comp.Camera.SetSize(camera_node["OrthoSize"].as<float>());
 
 					cam_comp.Primary = cameracomp_node["PrimaryCamera"].as<bool>();
 					cam_comp.FixedAspectRatio = cameracomp_node["FixedAR"].as<bool>();

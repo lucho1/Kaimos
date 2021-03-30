@@ -2,7 +2,7 @@
 #define _SCENE_H_
 
 #include "Core/Utils/Time/Timestep.h"
-#include "Renderer/Cameras/EditorCamera.h"
+#include "Renderer/Cameras/Camera.h"
 
 #include <entt.hpp>
 
@@ -23,7 +23,7 @@ namespace Kaimos {
 		~Scene() = default;
 
 		// --- Public Scene Methods ---
-		void OnUpdateEditor(Timestep dt, EditorCamera& camera);
+		void OnUpdateEditor(Timestep dt, const Camera& camera);
 		void OnUpdateRuntime(Timestep dt);
 		void SetViewportSize(uint width, uint height);
 

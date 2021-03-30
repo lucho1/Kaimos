@@ -1,9 +1,7 @@
 #ifndef _RENDERER_2D_
 #define _RENDERER_2D_
 
-#include "Cameras/OrthographicCamera.h" // TODO: Reduce this on camera rework
 #include "Cameras/Camera.h"
-#include "Cameras/EditorCamera.h"
 
 #include "Resources/Texture.h"
 #include "Scene/ECS/Components.h"
@@ -39,9 +37,8 @@ namespace Kaimos {
 		static void Shutdown();
 
 		// --- Public Renderer Methods ---
-		static void BeginScene(const OrthographicCamera& camera); // TODO: Remove this - Upon Camera Rework
-		static void BeginScene(const EditorCamera& camera);
-		static void BeginScene(const Camera& camera, const glm::mat4& camera_transform);
+		static void BeginScene(const CameraComponent& camera_component, const TransformComponent& transform_component);
+		static void BeginScene(const Camera& camera);
 		static void EndScene();
 		static void Flush();
 

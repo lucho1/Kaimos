@@ -2,7 +2,7 @@
 #define _COMPONENTS_H_
 
 #include "Renderer/Resources/Texture.h"
-#include "Scene/SceneCamera.h"
+#include "Renderer/Cameras/Camera.h"
 #include "ScriptableEntity.h"
 
 #include <glm/glm.hpp>
@@ -80,7 +80,7 @@ namespace Kaimos {
 
 	struct CameraComponent
 	{
-		Kaimos::SceneCamera Camera = {};
+		Kaimos::Camera Camera = {};
 		bool Primary = true; // TODO: Move it to scene on Camera Rework!
 		bool FixedAspectRatio = false;
 

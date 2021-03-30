@@ -3,11 +3,11 @@
 
 #include "Foundations/RenderCommand.h"
 #include "Renderer/Resources/Shader.h"
-#include "Renderer/Cameras/OrthographicCamera.h"
+#include "Renderer/Cameras/Camera.h"
 
 namespace Kaimos {
 
-	class Renderer
+	class Renderer // TODO: I should review what does this does and see how it is used, because is very similar to Renderer2D
 	{
 	public:
 
@@ -16,7 +16,7 @@ namespace Kaimos {
 		static void Shutdown();
 
 		// --- Public Renderer Methods ---
-		static void BeginScene(const OrthographicCamera& camera);
+		static void BeginScene(const Camera& camera);
 		static void EndScene();
 
 		static void Submit(const Ref<Shader>& shader, const Ref<VertexArray>& vertex_array, const glm::mat4& transformation = glm::mat4(1.0f));
