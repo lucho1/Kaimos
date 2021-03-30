@@ -29,6 +29,14 @@ namespace Kaimos {
 		m_CheckerTexture = Texture2D::Create("assets/textures/Checkerboard.png");
 		m_LogoTexture = Texture2D::Create("assets/textures/ChernoLogo.png");
 
+		m_IconsArray[0] = Texture2D::Create("../KaimosEngine/res/icons/selection_icon.png");
+		m_IconsArray[1] = Texture2D::Create("../KaimosEngine/res/icons/transform_icon.png");
+		m_IconsArray[2] = Texture2D::Create("../KaimosEngine/res/icons/rotation_icon.png");
+		m_IconsArray[3] = Texture2D::Create("../KaimosEngine/res/icons/scale_icon.png");
+		m_IconsArray[4] = Texture2D::Create("../KaimosEngine/res/icons/snap_icon3.png");
+		m_IconsArray[5] = Texture2D::Create("../KaimosEngine/res/icons/local_trs_icon.png");
+		m_IconsArray[6] = Texture2D::Create("../KaimosEngine/res/icons/world_trs_icon.png");
+
 		FramebufferSettings fboSettings;
 		fboSettings.FBOAttachments = { TEXTURE_FORMAT::RGBA8, TEXTURE_FORMAT::RED_INTEGER, TEXTURE_FORMAT::DEPTH};
 		fboSettings.Width = 1280;
@@ -273,7 +281,7 @@ namespace Kaimos {
 			ImGui::ShowDemoWindow();
 
 		// -- Toolbar --
-		m_ToolbarPanel.OnUIRender();
+		m_ToolbarPanel.OnUIRender(m_IconsArray);
 
 		// -- Scene Panel Rendering --
 		if(show_scene_panel)

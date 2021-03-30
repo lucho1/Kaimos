@@ -12,7 +12,7 @@ namespace Kaimos {
 
 		// --- Public Class Methods ---
 		ToolbarPanel() = default;
-		void OnUIRender();
+		void OnUIRender(Ref<Texture2D> icons_array[7]);
 
 	private:
 
