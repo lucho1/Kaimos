@@ -15,6 +15,12 @@ namespace Kaimos {
 		m_Camera.CalculateViewMatrix(m_Position, GetOrientation());
 	}
 
+	CameraController::CameraController(Camera& camera) : m_Camera(camera)
+	{
+		m_Camera.CalculateProjectionMatrix();
+		m_Camera.CalculateViewMatrix(m_Position, GetOrientation());
+	}
+
 	void CameraController::OnUpdate(Timestep dt)
 	{
 		if (Input::IsKeyPressed(KEY::LEFT_ALT))

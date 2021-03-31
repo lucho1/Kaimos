@@ -19,6 +19,7 @@ namespace Kaimos {
 
 		// --- Public Class/Event Methods ---
 		CameraController();
+		CameraController(Camera& camera);
 		~CameraController() = default;
 
 		void OnUpdate(Timestep dt);

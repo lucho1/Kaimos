@@ -21,7 +21,7 @@ namespace Kaimos {
 	}
 
 	// ----------------------- Public Camera Methods ------------------------------------------------------
-	void Kaimos::Camera::SetViewport(uint width, uint height)
+	void Camera::SetViewport(uint width, uint height)
 	{
 		if (height == 0)
 		{
@@ -62,7 +62,7 @@ namespace Kaimos {
 		m_View = glm::inverse(transform);
 	}
 
-	void Kaimos::Camera::CalculateProjectionMatrix()
+	void Camera::CalculateProjectionMatrix()
 	{
 		if (m_ProjectionType == CAMERA_PROJECTION::PERSPECTIVE)
 			m_Projection = glm::perspective(glm::radians(m_FOV), m_AR, m_NearClip, m_FarClip);
