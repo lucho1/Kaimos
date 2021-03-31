@@ -12,11 +12,9 @@ Entities:
       Camera:
         ProjectionType: 0
         FOV: 45
-        PerspFarClip: 10000
-        PerspNearClip: 0.00999999978
+        FarClip: 9915
+        NearClip: 0.36500001
         OrthoSize: 10
-        OrthoFarClip: 1
-        OrthoNearClip: -1
       PrimaryCamera: true
       FixedAR: false
   - Entity: 70065788
