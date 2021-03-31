@@ -315,6 +315,12 @@ namespace Kaimos {
 						camera.SetSize(ortho_size);
 				}
 
+				glm::vec2 resolution = camera.GetViewportSize();
+				if (KaimosUI::UIFunctionalities::DrawInlineDragFloat2("Width & Height", "###camresolutionwh", resolution, 1.0f, ImGui::CalcItemWidth() / 4.0f, 2.0f, 120.0f, 4096.0f, "%.0f"))
+					camera.SetViewport((uint)resolution.x, (uint)resolution.y);
+
+				ImGui::SameLine(); ImGui::Text("(AR: %.2f)", camera.GetAspectRato());
+
 
 				//TODO: This should keep the values of both types of cameras
 				float near_clip = camera.GetNearPlane(), far_clip = camera.GetFarPlane();

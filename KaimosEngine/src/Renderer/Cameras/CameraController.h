@@ -42,8 +42,8 @@ namespace Kaimos {
 	public:
 
 		// --- Camera Transform Setters ---
-		//inline void SetOrientation(float x_angle, float y_angle);
-		//inline void SetPosition(const glm::vec3& position)			{ m_Position = position; RecalculateView(); }
+		inline void SetOrientation(float x_angle, float y_angle);
+		inline void SetPosition(const glm::vec3& position);
 
 		// --- Camera Parameters Setters ---
 		inline void SetZoomLevel(float zoom_level)					{ m_ZoomLevel = zoom_level; }

@@ -2,6 +2,7 @@
 #include "ToolbarPanel.h"
 
 #include "ImGui/ImGuiUtils.h"
+#include "Renderer/Cameras/CameraController.cpp"
 
 #include <ImGui/imgui.h>
 #include <imgui/imgui_internal.h>
@@ -84,10 +85,10 @@ namespace Kaimos {
 		if(DrawToolbarButton("EdCamSettings", btn_texture_id, btn_color))
 			ImGui::OpenPopup("Editor Camera Settings");
 		
-		ImGui::SetNextWindowSize({400.0f, 380.0f});
+		ImGui::SetNextWindowSize({400.0f, 480.0f});
 		if (ImGui::BeginPopup("Editor Camera Settings"))
 		{
-			// Lock Camera Rotation
+			// -- Lock Camera Rotation --
 			static bool camera_lock = false;
 			ImGui::Checkbox("Lock Camera Rotation", &camera_lock);
 			editor_camera.LockRotation(camera_lock);
@@ -120,6 +121,21 @@ namespace Kaimos {
 			ImGui::Text("Camera Viewport");
 			ImGui::SameLine(ImGui::GetContentRegionAvail().x / 2.0f - 1.0f);
 			ImGui::Text("%ix%i (AR: %.2f)", view_size.x, view_size.y, editor_camera.m_Camera.GetAspectRato());
+
+
+			// -- Pos & Rot --
+			ImGui::NewLine(); ImGui::NewLine(); ImGui::NewLine();
+
+			glm::vec2 rot = { editor_camera.m_Pitch, editor_camera.m_Yaw };
+			ImGui::Text("Camera Rotation (Pitch & Yaw)"); ImGui::SameLine(ImGui::GetContentRegionAvail().x / 2.0f - 1.0f);
+			if (ImGui::DragFloat2("###edcamrotation", &rot[0], 0.01f))
+				editor_camera.SetOrientation(rot.x, rot.y);
+
+			glm::vec3 pos = editor_camera.m_Position;
+			ImGui::Text("Camera Position"); ImGui::SameLine(ImGui::GetContentRegionAvail().x / 2.0f - 1.0f);
+			if (ImGui::DragFloat3("###edcampos", &pos[0], 0.05f))
+				editor_camera.SetPosition(pos);
+
 
 			// -- End Menu --
 			ImGui::EndPopup();

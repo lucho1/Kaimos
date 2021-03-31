@@ -52,19 +52,24 @@ namespace Kaimos {
 
 
 
-	// ----------------------- Camera Getters/Setters -----------------------------------------------------
-	//void CameraController::SetOrientation(float x_angle, float y_angle)
-	//{
-	//	if (!m_LockRotation)
-	//	{
-	//		m_Pitch = x_angle;
-	//		m_Yaw = y_angle;
-	//		RecalculateView();
-	//	}
-	//}
+	// ----------------------- Camera Getters/Setters -----------------------------------------------------	
+	inline void CameraController::SetOrientation(float x_angle, float y_angle)
+	{
+		if (!m_LockRotation)
+		{
+			m_Pitch = x_angle;
+			m_Yaw = y_angle;
+			RecalculateView();
+		}
+	}
 
+	inline void CameraController::SetPosition(const glm::vec3& position)
+	{
+		m_Position = position;
+		m_FocalPoint = m_Position + GetForwardVector() * m_ZoomLevel;
+		RecalculateView();
+	}
 
-	
 	// ----------------------- Private Event Methods ------------------------------------------------------
 	bool CameraController::OnMouseScrolled(MouseScrolledEvent& ev)
 	{

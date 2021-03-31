@@ -55,8 +55,6 @@ namespace Kaimos {
 
 		Ref<Texture2D> m_IconsArray[8] = { 0 };
 
-
-
 		// Guizmo
 		//int m_OperationGizmo = 0;
 		Entity m_HoveredEntity = {};

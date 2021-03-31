@@ -235,13 +235,6 @@ namespace Kaimos {
 			ImGui::Begin("Viewport", &show_viewport_panel);
 			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0.0f, 0.0f));
 
-			//ImGui::GetCursorScreenPos().x;
-			//ImGui::GetWindowPos().x;
-			//ImGui::GetCursorPosX();
-			//ImGui::GetWindowContentRegionWidth();
-
-			//viewport_endpos = ImGui::GetCursorScreenPos().x + ImGui::GetWindowContentRegionWidth();
-
 			m_ViewportFocused = ImGui::IsWindowFocused();
 			m_ViewportHovered = ImGui::IsWindowHovered();
 			Application::Get().GetImGuiLayer()->SetBlockEvents(!m_ViewportFocused && !m_ViewportHovered);
