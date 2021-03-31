@@ -31,7 +31,7 @@ namespace Kaimos::KaimosUI {
 		static bool DrawInlineDragFloat2(const char* text, const char* label, glm::vec2& value, float speed = 1.0f, float width = 0.0f, float spacing = 2.0f, float min = 0.0f, float max = 0.0f, const char* fmt = "%.2f", float pow = 1.0f);
 
 		// Draw a Slider in the same line than 'text' - label is the "widget_id"
-		static bool DrawInlineSlider(const char* text, const char* label, float* value, float width = 0.0f, float spacing = 2.0f, float max = 0.0f, float min = 0.0f, const char* fmt = "%.2f", float pow = 1.0f);
+		static bool DrawInlineSlider(const char* text, const char* label, float* value, float width = 0.0f, float spacing = 2.0f, float max = 10.0f, float min = 0.0f, const char* fmt = "%.2f", float pow = 1.0f);
 
 		// - Buttons -
 		// Draw a button with a texture - requires a label (for id) texture id, button size and background color (when it has no texture or it has transparencies)

@@ -94,8 +94,8 @@ namespace Kaimos {
 	{
 		// -- Pan Speed on X and Y --
 		glm::ivec2 viewport = m_Camera.GetViewportSize();
-		float x = std::min((float)viewport.x / 1000.0f, m_MaxPanSpeed);
-		float y = std::min((float)viewport.y / 1000.0f, m_MaxPanSpeed);
+		float x = std::min((float)viewport.x / 1000.0f, m_PanSpeed);
+		float y = std::min((float)viewport.y / 1000.0f, m_PanSpeed);
 
 		// This is a quadratic function: X squared - X * constant
 		float dx = 0.0366f * (x * x) - 0.1778f * x + 0.3021f;

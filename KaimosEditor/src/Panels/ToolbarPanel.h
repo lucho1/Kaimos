@@ -12,12 +12,13 @@ namespace Kaimos {
 
 		// --- Public Class Methods ---
 		ToolbarPanel() = default;
-		void OnUIRender(Ref<Texture2D> icons_array[7]);
+		void OnUIRender(Ref<Texture2D> icons_array[7], CameraController& editor_camera);
 
 	private:
 
-		// --- Private Scene Methods ---
+		// --- Private Toolbar Methods ---
 		bool DrawToolbarButton(const char* label, uint texture_id, const glm::vec4& color);
+		void DrawCameraSettings(CameraController& editor_camera);
 
 	private:
 

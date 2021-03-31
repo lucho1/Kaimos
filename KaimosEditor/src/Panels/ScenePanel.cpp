@@ -302,7 +302,7 @@ namespace Kaimos {
 				if (camera.GetProjectionType() == Kaimos::CAMERA_PROJECTION::PERSPECTIVE)
 				{
 					float FOV = camera.GetFOV();
-					if (KaimosUI::UIFunctionalities::DrawInlineDragFloat("FOV", "###fov", &FOV, 0.05f, ImGui::CalcItemWidth() / 4.0f, 2.0f, 0.0f, 180.0f, "%.1f"))
+					if (KaimosUI::UIFunctionalities::DrawInlineDragFloat("FOV", "###fov", &FOV, 0.05f, ImGui::CalcItemWidth() / 4.0f, 2.0f, 15.0f, 180.0f, "%.1f"))
 						camera.SetFOV(FOV);
 				}
 
@@ -311,7 +311,7 @@ namespace Kaimos {
 				{
 					min_clip = -INFINITY; far_clip_speed = 0.01f;
 					float ortho_size = camera.GetSize();
-					if (KaimosUI::UIFunctionalities::DrawInlineDragFloat("Size", "###size", &ortho_size, 0.05f, ImGui::CalcItemWidth() / 4.0f, 2.0f, 0.0f, INFINITY, "%.1f"))
+					if (KaimosUI::UIFunctionalities::DrawInlineDragFloat("Size", "###size", &ortho_size, 0.05f, ImGui::CalcItemWidth() / 4.0f, 2.0f, 1.0f, INFINITY, "%.1f"))
 						camera.SetSize(ortho_size);
 				}
 

@@ -14,7 +14,7 @@ namespace Kaimos {
 
 	class CameraController
 	{
-		friend class SettingsPanel;
+		friend class ToolbarPanel;
 	public:
 
 		// --- Public Class/Event Methods ---
@@ -50,7 +50,6 @@ namespace Kaimos {
 		inline void SetMoveSpeed(float speed)						{ m_MoveSpeed = speed; }
 		inline void SetRotationSpeed(float speed)					{ m_RotationSpeed = speed; }
 		inline void SetSpeedMultiplier(float multiplier)			{ m_SpeedMultiplier = multiplier; }
-		inline void SetMaxPanSpeed(float speed)						{ m_MaxPanSpeed = speed; }
 		inline void SetMaxZoomSpeed(float speed)					{ m_MaxZoomSpeed = speed; }
 
 		inline void LockRotation(bool lock)							{ m_LockRotation = lock; }
@@ -86,8 +85,8 @@ namespace Kaimos {
 		glm::vec2 m_InitialMousePosition = glm::vec2(0.0f);
 
 		// --- Camera Parameters ---
-		float m_ZoomLevel = 10.0f, m_MoveSpeed = 1.0f, m_RotationSpeed = 0.8f, m_PanSpeed = 5.0f;
-		float m_SpeedMultiplier = 1.0f, m_MaxPanSpeed = 2.4f, m_MaxZoomSpeed = 100.0f;
+		float m_ZoomLevel = 10.0f, m_MoveSpeed = 1.0f, m_RotationSpeed = 0.8f, m_PanSpeed = 2.4f;
+		float m_SpeedMultiplier = 1.0f, m_MaxZoomSpeed = 100.0f;
 
 		bool m_LockRotation = false;
 	};
