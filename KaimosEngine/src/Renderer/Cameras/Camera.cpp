@@ -14,7 +14,7 @@ namespace Kaimos {
 		CalculateViewMatrix(glm::vec3(0.0f, 0.0f, 2.0f), glm::identity<glm::quat>());
 	}
 
-	Camera::Camera(float FOV, float ar, float nclip, float fclip) : m_FOV(FOV), m_AR(ar), m_NearClip(nclip), m_FarClip(fclip)
+	Camera::Camera(float FOV, float ar, float nclip, float fclip) : m_FOV(FOV), m_AR(ar), m_NearClip(nclip), m_FarClip(fclip), m_ProjectionPlanes(nclip, fclip)
 	{
 		CalculateProjectionMatrix();
 		CalculateViewMatrix(glm::vec3(0.0f, 0.0f, 2.0f), glm::identity<glm::quat>());
@@ -65,9 +65,13 @@ namespace Kaimos {
 	void Camera::CalculateProjectionMatrix()
 	{
 		if (m_ProjectionType == CAMERA_PROJECTION::PERSPECTIVE)
+		{
+			m_ProjectionPlanes = { m_NearClip, m_FarClip };
 			m_Projection = glm::perspective(glm::radians(m_FOV), m_AR, m_NearClip, m_FarClip);
+		}
 		else
 		{
+			m_OrthoPlanes = { m_NearClip, m_FarClip };
 			float horizontal = m_OrthographicSize * m_AR * 0.5f;
 			float vertical = m_OrthographicSize * 0.5f;
 			m_Projection = glm::ortho(-horizontal, horizontal, -vertical, vertical, m_NearClip, m_FarClip);

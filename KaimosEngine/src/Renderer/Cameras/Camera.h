@@ -27,8 +27,8 @@ namespace Kaimos {
 		// --- Getters ---
 		// Only for cameras with Orthographic Perspective
 		inline float GetSize()							const { return m_OrthographicSize; }
-		inline float GetNearClip()						const { return m_NearClip; }
-		inline float GetFarClip()						const { return m_FarClip; }
+		inline float GetNearPlane()						const { return m_NearClip; }
+		inline float GetFarPlane()						const { return m_FarClip; }
 		inline float GetFOV()							const { return m_FOV; }
 		inline float GetAspectRato()					const { return m_AR; }
 		inline glm::ivec2 GetViewportSize()				const { return m_ViewportSize; }
@@ -38,14 +38,16 @@ namespace Kaimos {
 		inline const glm::mat4& GetView()				const { return m_View; }
 		inline const glm::mat4& GetProjection()			const { return m_Projection; }
 		inline CAMERA_PROJECTION GetProjectionType()	const { return m_ProjectionType; }
+		
+		inline glm::vec2 GetStoredPlanes(CAMERA_PROJECTION planes_type) const { return planes_type == CAMERA_PROJECTION::PERSPECTIVE ? m_ProjectionPlanes : m_OrthoPlanes; }
 
 	public:
 
 		// --- Setters ---
 		void SetViewport(uint width, uint height);
 		inline void SetFOV(float FOV)							{ m_FOV = FOV;			CalculateProjectionMatrix(); }
-		inline void SetNearClip(float nclip)					{ m_NearClip = nclip;	CalculateProjectionMatrix(); }
-		inline void SetFarClip(float fclip)						{ m_FarClip = fclip;	CalculateProjectionMatrix(); }
+		inline void SetNearPlane(float nclip)					{ m_NearClip = nclip;	CalculateProjectionMatrix(); }
+		inline void SetFarPlane(float fclip)					{ m_FarClip = fclip;	CalculateProjectionMatrix(); }
 
 		// Only for cameras with Orthographic Perspective
 		inline void SetSize(float size)							{ m_OrthographicSize = size; CalculateProjectionMatrix(); }
@@ -66,6 +68,10 @@ namespace Kaimos {
 		float m_OrthographicSize = 10.0f;
 
 		glm::ivec2 m_ViewportSize = glm::ivec2(1280, 720);
+		
+		// Planes storage for projection type swapping
+		glm::vec2 m_ProjectionPlanes = glm::vec2(0.1f, 10000.0f);
+		glm::vec2 m_OrthoPlanes = glm::vec2(-1.0f, 1.0f);
 	};
 }
 

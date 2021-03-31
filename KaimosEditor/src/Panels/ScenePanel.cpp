@@ -253,6 +253,7 @@ namespace Kaimos {
 			ImGui::EndPopup();
 		}
 
+
 		// -- Transform Component --
 		DrawComponentUI<TransformComponent>("Transform", entity, [](auto& component)
 			{
@@ -271,23 +272,31 @@ namespace Kaimos {
 				KaimosUI::UIFunctionalities::DrawVec3UI("Scale", component.Scale, xcol, ycol, zcol, 1.0f);
 			});
 
+
 		// -- Camera Component --
 		DrawComponentUI<CameraComponent>("Camera", entity, [](auto& component) // TODO: Clean this
 			{
+				// Common Parameters
 				Camera& camera = component.Camera;
-				ImGui::Checkbox("Primary", &component.Primary);
+				ImGui::Checkbox("Primary", &component.Primary); // TODO: Camera Rework, Primary camera should be handled in scene
+				ImGui::Checkbox("Fixed Aspect Ratio", &component.FixedAspectRatio);
+
 
 				// Projection Type Dropdown
 				uint current_proj_type = (uint)camera.GetProjectionType();
 				const char* projection_options[] = { "Perspective", "Orthographic" };				
 				const char* current_projection = projection_options[current_proj_type];
 
-				KaimosUI::UIFunctionalities::DrawDropDown("Projection", projection_options, 2, current_projection, current_proj_type, ImGui::CalcItemWidth() / 4.0f);
+				if (KaimosUI::UIFunctionalities::DrawDropDown("Projection", projection_options, 2, current_projection, current_proj_type, ImGui::CalcItemWidth() / 4.0f))
+				{
+					// Set Projection Values
+					glm::vec2 stored_planes = camera.GetStoredPlanes((CAMERA_PROJECTION)current_proj_type);
+					if (current_proj_type == (uint)Kaimos::CAMERA_PROJECTION::PERSPECTIVE)
+						camera.SetPerspectiveParameters(camera.GetFOV(), stored_planes.x, stored_planes.y);
+					else
+						camera.SetOrthographicParameters(camera.GetSize(), stored_planes.x, stored_planes.y);
+				}			
 				
-				if (current_proj_type == (uint)Kaimos::CAMERA_PROJECTION::PERSPECTIVE)
-					camera.SetPerspectiveParameters(camera.GetFOV(), camera.GetNearClip(), camera.GetFarClip());
-				else
-					camera.SetOrthographicParameters(camera.GetSize(), camera.GetNearClip(), camera.GetFarClip());
 
 				// Camera Values UI
 				if (camera.GetProjectionType() == Kaimos::CAMERA_PROJECTION::PERSPECTIVE)
@@ -295,37 +304,29 @@ namespace Kaimos {
 					float FOV = camera.GetFOV();
 					if (KaimosUI::UIFunctionalities::DrawInlineDragFloat("FOV", "###fov", &FOV, 0.05f, ImGui::CalcItemWidth() / 4.0f, 2.0f, 0.0f, 180.0f, "%.1f"))
 						camera.SetFOV(FOV);
-
-					float near_clip = camera.GetNearClip(), far_clip = camera.GetFarClip();
-					if (KaimosUI::UIFunctionalities::DrawInlineDragFloat("Near Clip", "###nclip", &near_clip, 0.01f, ImGui::CalcItemWidth() / 4.0f, 2.0f, 0.001f, far_clip - 0.1f, "%.3f", 1.5f))
-						if(near_clip < far_clip)
-							camera.SetNearClip(near_clip);
-
-					if (KaimosUI::UIFunctionalities::DrawInlineDragFloat("Far Clip", "###fclip", &far_clip, 1.0f, ImGui::CalcItemWidth() / 4.0f, 2.0f, near_clip + 0.1f, INFINITY))
-						if(far_clip > near_clip)
-							camera.SetFarClip(far_clip);
 				}
 
+				float min_clip = 0.001f, far_clip_speed = 1.0f;
 				if (camera.GetProjectionType() == Kaimos::CAMERA_PROJECTION::ORTHOGRAPHIC)
 				{
-					ImGui::Checkbox("Fixed Aspect Ratio", &component.FixedAspectRatio);
-
+					min_clip = -INFINITY; far_clip_speed = 0.01f;
 					float ortho_size = camera.GetSize();
-					float near_clip = camera.GetNearClip(), far_clip = camera.GetFarClip(); //TODO: This should keep the values of both types of cameras
-
 					if (KaimosUI::UIFunctionalities::DrawInlineDragFloat("Size", "###size", &ortho_size, 0.05f, ImGui::CalcItemWidth() / 4.0f, 2.0f, 0.0f, INFINITY, "%.1f"))
 						camera.SetSize(ortho_size);
-
-					if (KaimosUI::UIFunctionalities::DrawInlineDragFloat("Near Clip", "###nclip2", &near_clip, 0.01f, ImGui::CalcItemWidth() / 4.0f, 2.0f, -INFINITY, far_clip - 0.1f, "%.3f", 1.5f))
-						if (near_clip < far_clip)
-							camera.SetNearClip(near_clip);
-
-
-					if (KaimosUI::UIFunctionalities::DrawInlineDragFloat("Far Clip", "###fclip2", &far_clip, 0.01f, ImGui::CalcItemWidth() / 4.0f, 2.0f, near_clip + 0.1f, INFINITY, "%.3f", 1.5f))
-						if (far_clip > near_clip)
-							camera.SetFarClip(far_clip);
 				}
-			});		
+
+
+				//TODO: This should keep the values of both types of cameras
+				float near_clip = camera.GetNearPlane(), far_clip = camera.GetFarPlane();
+				if (KaimosUI::UIFunctionalities::DrawInlineDragFloat("Near Clip", "###nclip", &near_clip, 0.01f, ImGui::CalcItemWidth() / 4.0f, 2.0f, min_clip, far_clip - 0.1f, "%.3f", 1.5f))
+					if (near_clip < far_clip)
+						camera.SetNearPlane(near_clip);
+
+				if (KaimosUI::UIFunctionalities::DrawInlineDragFloat("Far Clip", "###fclip", &far_clip, far_clip_speed, ImGui::CalcItemWidth() / 4.0f, 2.0f, near_clip + 0.1f, INFINITY), "%.3f", 1.5f)
+					if (far_clip > near_clip)
+						camera.SetFarPlane(far_clip);
+			});
+
 
 		// -- Sprite Renderer Component --
 		DrawComponentUI<SpriteRendererComponent>("Sprite Renderer", entity, [](auto& component)

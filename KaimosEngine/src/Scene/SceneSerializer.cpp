@@ -166,8 +166,8 @@ namespace Kaimos {
 			output << YAML::BeginMap;
 			output << YAML::Key << "ProjectionType" << YAML::Value << (int)camera.GetProjectionType();			
 			output << YAML::Key << "FOV" << YAML::Value << (int)camera.GetFOV();
-			output << YAML::Key << "FarClip" << YAML::Value << camera.GetFarClip();
-			output << YAML::Key << "NearClip" << YAML::Value <<camera.GetNearClip();
+			output << YAML::Key << "FarClip" << YAML::Value << camera.GetFarPlane();
+			output << YAML::Key << "NearClip" << YAML::Value <<camera.GetNearPlane();
 			output << YAML::Key << "OrthoSize" << YAML::Value << camera.GetSize();
 			output << YAML::EndMap;
 			// -- End Cam Map --
@@ -291,8 +291,8 @@ namespace Kaimos {
 						cam_comp.Camera.SetPerspectiveParameters();
 
 					cam_comp.Camera.SetFOV(camera_node["FOV"].as<float>());
-					cam_comp.Camera.SetNearClip(camera_node["NearClip"].as<float>());
-					cam_comp.Camera.SetFarClip(camera_node["FarClip"].as<float>());
+					cam_comp.Camera.SetNearPlane(camera_node["NearClip"].as<float>());
+					cam_comp.Camera.SetFarPlane(camera_node["FarClip"].as<float>());
 					cam_comp.Camera.SetSize(camera_node["OrthoSize"].as<float>());
 
 					cam_comp.Primary = cameracomp_node["PrimaryCamera"].as<bool>();
