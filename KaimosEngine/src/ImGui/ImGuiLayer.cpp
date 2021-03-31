@@ -167,10 +167,14 @@ namespace Kaimos {
 		colors[ImGuiCol_ScrollbarBg] = ImVec4(0.1f, 0.09f, 0.12f, 1.0f);
 		colors[ImGuiCol_ScrollbarGrab] = ImVec4(0.8f, 0.8f, 0.83f, 0.31f);
 		colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(0.56f, 0.56f, 0.58f, 1.0f);
-		colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(0.06f, 0.05f, 0.07f, 1.0f);
-		colors[ImGuiCol_CheckMark] = ImVec4(0.8f, 0.8f, 0.83f, 0.31f);
-		colors[ImGuiCol_SliderGrab] = ImVec4(0.8f, 0.8f, 0.83f, 0.31f);
-		colors[ImGuiCol_SliderGrabActive] = ImVec4(0.06f, 0.05f, 0.07f, 1.0f);
+		colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(0.1f, 0.4f, 0.75f, 1.0f);
+		//colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(0.06f, 0.05f, 0.07f, 1.0f);
+		//colors[ImGuiCol_CheckMark] = ImVec4(0.8f, 0.8f, 0.83f, 0.31f);
+		colors[ImGuiCol_CheckMark] = ImVec4(0.96f, 0.96f, 0.97f, 0.47f);
+		colors[ImGuiCol_SliderGrab] = ImVec4(0.1f, 0.4f, 0.75f, 1.0f);
+		colors[ImGuiCol_SliderGrabActive] = ImVec4(0.1f, 0.4f, 0.75f, 1.0f);
+		//colors[ImGuiCol_SliderGrab] = ImVec4(0.8f, 0.8f, 0.83f, 0.31f);
+		//colors[ImGuiCol_SliderGrabActive] = ImVec4(0.06f, 0.05f, 0.07f, 1.0f);
 		//colors[ImGuiCol_Column] = ImVec4(0.56f, 0.56f, 0.58f, 1.0f);
 		//colors[ImGuiCol_ColumnHovered] = ImVec4(0.24f, 0.23f, 0.29f, 1.0f);
 		//colors[ImGuiCol_ColumnActive] = ImVec4(0.56f, 0.56f, 0.58f, 1.0f);
@@ -210,7 +214,8 @@ namespace Kaimos {
 		colors[ImGuiCol_ButtonActive] = ImVec4(0.56f, 0.56f, 0.58f, 1.0f);
 
 		// -- Frames --
-		colors[ImGuiCol_FrameBg] = ImVec4(0.1f, 0.09f, 0.12f, 1.0f);
+		//colors[ImGuiCol_FrameBg] = ImVec4(0.1f, 0.09f, 0.12f, 1.0f);
+		colors[ImGuiCol_FrameBg] = ImVec4(0.144f, 0.136f, 0.16f, 1.0f);
 		colors[ImGuiCol_FrameBgHovered] = ImVec4(0.24f, 0.23f, 0.29f, 1.0f);
 		colors[ImGuiCol_FrameBgActive] = ImVec4(0.56f, 0.56f, 0.58f, 1.0f);
 
