@@ -34,3 +34,4 @@ Toolbar Icons
    · World by Lorenzo Baldini from the Noun Project
    · Magnet by Ralf Schmitzer from the Noun Project
    · Grid by Andrea Severgnini from the Noun Project
+   · Camera by Hakim Fadhlullah from the Noun Project

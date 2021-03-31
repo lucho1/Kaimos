@@ -53,7 +53,7 @@ namespace Kaimos {
 		ProjectPanel m_ProjectPanel = {};
 		ToolbarPanel m_ToolbarPanel = {};
 
-		Ref<Texture2D> m_IconsArray[7] = { 0 };
+		Ref<Texture2D> m_IconsArray[8] = { 0 };
 
 
 

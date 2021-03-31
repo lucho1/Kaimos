@@ -36,6 +36,7 @@ namespace Kaimos {
 		m_IconsArray[4] = Texture2D::Create("../KaimosEngine/res/icons/snap_icon3.png");
 		m_IconsArray[5] = Texture2D::Create("../KaimosEngine/res/icons/local_trs_icon.png");
 		m_IconsArray[6] = Texture2D::Create("../KaimosEngine/res/icons/world_trs_icon.png");
+		m_IconsArray[7] = Texture2D::Create("../KaimosEngine/res/icons/camera_icon.png");
 
 		FramebufferSettings fboSettings;
 		fboSettings.FBOAttachments = { TEXTURE_FORMAT::RGBA8, TEXTURE_FORMAT::RED_INTEGER, TEXTURE_FORMAT::DEPTH};
