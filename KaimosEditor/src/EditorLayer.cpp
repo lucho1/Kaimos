@@ -139,7 +139,6 @@ namespace Kaimos {
 		float original_min_size = style.WindowMinSize.x;
 		style.WindowMinSize.x = 370.0f;
 
-
 		if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable)
 		{
 			ImGuiID dock_id = ImGui::GetID("MyDockspace");
