@@ -21,7 +21,7 @@ namespace Kaimos {
 	}
 
 	// ----------------------- Public Camera Methods ------------------------------------------------------
-	void Kaimos::Camera::SetAspectRatio(uint width, uint height)
+	void Kaimos::Camera::SetViewport(uint width, uint height)
 	{
 		if (height == 0)
 		{
@@ -29,7 +29,9 @@ namespace Kaimos {
 			return;
 		}
 
+		m_ViewportSize = glm::ivec2(width, height);
 		m_AR = (float)width/(float)height;
+
 		CalculateProjectionMatrix();
 	}
 

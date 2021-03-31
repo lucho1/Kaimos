@@ -36,20 +36,21 @@ namespace Kaimos {
 		
 		// --- Camera Getters/Setters ---
 		inline const Camera& GetCamera()	const { return m_Camera; }
-		inline void SetCameraViewport(uint width, uint height) { m_Camera.SetAspectRatio(width, height); }
+		inline void SetCameraViewport(uint width, uint height) { m_Camera.SetViewport(width, height); }
 		
 	public:
 
 		// --- Camera Transform Setters ---
-		inline void SetPosition(const glm::vec3& position)			{ m_Position = position; m_Camera.CalculateViewMatrix(m_Position, GetOrientation()); }
-		inline void SetOrientation(float x_angle, float y_angle)	{ m_Pitch = x_angle; m_Yaw = y_angle; m_Camera.CalculateViewMatrix(m_Position, GetOrientation()); }
-
+		//inline void SetOrientation(float x_angle, float y_angle);
+		//inline void SetPosition(const glm::vec3& position)			{ m_Position = position; RecalculateView(); }
 
 		// --- Camera Parameters Setters ---
 		inline void SetZoomLevel(float zoom_level)					{ m_ZoomLevel = zoom_level; }
 		inline void SetMoveSpeed(float speed)						{ m_MoveSpeed = speed; }
 		inline void SetRotationSpeed(float speed)					{ m_RotationSpeed = speed; }
 		inline void SetSpeedMultiplier(float multiplier)			{ m_SpeedMultiplier = multiplier; }
+		inline void SetMaxPanSpeed(float speed)						{ m_MaxPanSpeed = speed; }
+		inline void SetMaxZoomSpeed(float speed)					{ m_MaxZoomSpeed = speed; }
 
 		inline void LockRotation(bool lock)							{ m_LockRotation = lock; }
 		inline bool IsRotationLocked()								const { return m_LockRotation; }
@@ -65,8 +66,11 @@ namespace Kaimos {
 		// TODO: More events - like middle button, right button...
 
 		// --- Private Camera Methods ---
-		void CameraRotation(const glm::vec2& rotation);
-		void CameraPanning(const glm::vec2& panning);
+		void RotateCamera(const glm::vec2& rotation);
+		void PanCamera(const glm::vec2& panning);
+		void ZoomCamera(float zoom);
+
+		void RecalculateView();
 
 	private:
 
@@ -82,7 +86,7 @@ namespace Kaimos {
 
 		// --- Camera Parameters ---
 		float m_ZoomLevel = 10.0f, m_MoveSpeed = 1.0f, m_RotationSpeed = 0.8f, m_PanSpeed = 5.0f;
-		float m_SpeedMultiplier = 1.0f;
+		float m_SpeedMultiplier = 1.0f, m_MaxPanSpeed = 2.4f, m_MaxZoomSpeed = 100.0f;
 
 		bool m_LockRotation = false;
 	};

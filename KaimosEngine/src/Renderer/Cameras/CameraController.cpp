@@ -24,17 +24,14 @@ namespace Kaimos {
 			m_InitialMousePosition = mouse_pos;
 
 			if (Input::IsMouseButtonPressed(MOUSE::BUTTON_MIDDLE))
-				CameraPanning(delta);
-			if (Input::IsMouseButtonPressed(MOUSE::BUTTON_LEFT))
-				CameraRotation(delta);
-			//if (Input::IsMouseButtonPressed(MOUSE::BUTTON_RIGHT))
-			//	MouseZoom(delta.y);
+				PanCamera(delta);
+			if (Input::IsMouseButtonPressed(MOUSE::BUTTON_LEFT) && !m_LockRotation)
+				RotateCamera(delta);
+			if (Input::IsMouseButtonPressed(MOUSE::BUTTON_RIGHT))
+				ZoomCamera(delta.y);
 		}
 
-		//UpdateViewMatrix()
-		//if(m_LockRotation) // TODO: If locked, rotation !changed
-		m_Position = m_FocalPoint - GetForwardVector() * m_ZoomLevel; //CalculatePosition();
-		m_Camera.CalculateViewMatrix(m_Position, GetOrientation());
+		RecalculateView();
 	}
 
 	void CameraController::OnEvent(Event& ev)
@@ -46,65 +43,81 @@ namespace Kaimos {
 	}
 
 
+
+	// ----------------------- Camera Getters/Setters -----------------------------------------------------
+	//void CameraController::SetOrientation(float x_angle, float y_angle)
+	//{
+	//	if (!m_LockRotation)
+	//	{
+	//		m_Pitch = x_angle;
+	//		m_Yaw = y_angle;
+	//		RecalculateView();
+	//	}
+	//}
+
+
 	
 	// ----------------------- Private Event Methods ------------------------------------------------------
 	bool CameraController::OnMouseScrolled(MouseScrolledEvent& ev)
 	{
 		KS_PROFILE_FUNCTION();
-		
-		float zoom = ev.GetYOffset() * 0.1f;
-
-		// MouseZoom()
-		float d = std::max(m_ZoomLevel * 0.2f, 0.0f);
-		float speed = std::min(d * d, 100.0f); //TODO: Max Zoom Speed (100.0f)
-		m_ZoomLevel -= zoom * speed;
-
-		if (m_ZoomLevel < 1.0f) // TODO: Min Zoom Level (1.0f)
-		{
-			m_FocalPoint += GetForwardVector();
-			m_ZoomLevel = 1.0f;
-		}
-
-		// UpdateMatrix()
-		//if(m_LockRotation) // TODO: If locked, rotation !changed
-		m_Position = m_FocalPoint - GetForwardVector() * m_ZoomLevel; //CalculatePosition();
-		m_Camera.CalculateViewMatrix(m_Position, GetOrientation());
-
+		ZoomCamera(ev.GetYOffset() * 0.1f);
 		return false;
 	}
 
 	bool CameraController::OnWindowResized(WindowResizeEvent& ev)
 	{
 		KS_PROFILE_FUNCTION();
-		m_Camera.SetAspectRato((float)ev.GetWidth() / (float)ev.GetHeight());
+		m_Camera.SetViewport(ev.GetWidth(), ev.GetHeight());
 		return false;
 	}
 
 	
 
 	// ----------------------- Private Camera Methods -----------------------------------------------------
-	void CameraController::CameraRotation(const glm::vec2& rotation)
+	void CameraController::RotateCamera(const glm::vec2& rotation)
 	{
 		float yaw = GetUpVector().y < 0.0f ? -1.0f : 1.0f;
-
 		m_Yaw += yaw * rotation.x * m_RotationSpeed;
 		m_Pitch += rotation.y * m_RotationSpeed;
 	}
 
-	void CameraController::CameraPanning(const glm::vec2& panning)
+	void CameraController::PanCamera(const glm::vec2& panning)
 	{
-		// PanSpeed()
-		// This works with a quadratic function for dx and dy: x squared - x * constant
-		float x = std::min(1280.0f / 1000.0f, 2.4f); // TODO: Max PanSpeed (2.4f) & some way to get the viewport width & height (1280.0f & 720.0f)
-		float dx = 0.0366f * (x * x) - 0.1778f * x + 0.3021f;
+		// -- Pan Speed on X and Y --
+		glm::ivec2 viewport = m_Camera.GetViewportSize();
+		float x = std::min((float)viewport.x / 1000.0f, m_MaxPanSpeed);
+		float y = std::min((float)viewport.y / 1000.0f, m_MaxPanSpeed);
 
-		float y = std::min(720.0f / 1000.0f, 2.4f);
+		// This is a quadratic function: X squared - X * constant
+		float dx = 0.0366f * (x * x) - 0.1778f * x + 0.3021f;
 		float dy = 0.0366f * (y * y) - 0.1778f * y + 0.3021f;
 
+		// -- Pan --
+		m_FocalPoint += -GetRightVector() * panning.x * dx * m_ZoomLevel;
+		m_FocalPoint += GetUpVector() * panning.y * dy * m_ZoomLevel;
+	}
 
-		// Pan()
-		glm::vec2 speed = { dx, dy };
-		m_FocalPoint += -GetRightVector() * panning.x * speed.x * m_ZoomLevel;
-		m_FocalPoint += GetUpVector() * panning.y * speed.y * m_ZoomLevel;
+	void CameraController::ZoomCamera(float zoom)
+	{
+		// -- Zoom Speed --
+		float d = std::max(m_ZoomLevel * 0.2f, 0.0f);
+		m_ZoomLevel -= zoom * std::min(d * d, m_MaxZoomSpeed);
+
+		// -- Zoom Cap --
+		if (m_ZoomLevel < 1.2f)
+		{
+			m_FocalPoint += GetForwardVector();
+			m_ZoomLevel = 1.2f;
+		}
+
+		// -- View Recalc --
+		RecalculateView();
+	}
+
+	void CameraController::RecalculateView()
+	{
+		m_Position = m_FocalPoint - GetForwardVector() * m_ZoomLevel;
+		m_Camera.CalculateViewMatrix(m_Position, GetOrientation());
 	}
 }

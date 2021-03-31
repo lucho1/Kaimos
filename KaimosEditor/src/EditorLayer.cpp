@@ -66,9 +66,7 @@ namespace Kaimos {
 			(settings.Width != (uint)m_ViewportSize.x || settings.Height != (uint)m_ViewportSize.y))
 		{
 			m_Framebuffer->Resize((uint)m_ViewportSize.x, (uint)m_ViewportSize.y);
-
 			m_CurrentScene->SetViewportSize((uint)m_ViewportSize.x, (uint)m_ViewportSize.y);
-			//m_EditorCamera.SetViewportSize(m_ViewportSize.x, m_ViewportSize.y); // TODO: There  must be a way to make the camera know the viewport size
 			m_EditorCamera.SetCameraViewport(m_ViewportSize.x, m_ViewportSize.y);
 		}
 

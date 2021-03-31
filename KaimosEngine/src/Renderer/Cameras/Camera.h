@@ -31,6 +31,7 @@ namespace Kaimos {
 		inline float GetFarClip()						const { return m_FarClip; }
 		inline float GetFOV()							const { return m_FOV; }
 		inline float GetAspectRato()					const { return m_AR; }
+		inline glm::ivec2 GetViewportSize()				const { return m_ViewportSize; }
 
 		
 		inline glm::mat4 GetViewProjection()			const { return m_Projection * m_View; }		// PxV since OGL is column-major, though in DX should be VxP (careful! TODO!)
@@ -41,8 +42,7 @@ namespace Kaimos {
 	public:
 
 		// --- Setters ---
-		void SetAspectRatio(uint width, uint height);
-		inline void SetAspectRato(float aspect_ratio)			{ m_AR = aspect_ratio;	CalculateProjectionMatrix(); }
+		void SetViewport(uint width, uint height);
 		inline void SetFOV(float FOV)							{ m_FOV = FOV;			CalculateProjectionMatrix(); }
 		inline void SetNearClip(float nclip)					{ m_NearClip = nclip;	CalculateProjectionMatrix(); }
 		inline void SetFarClip(float fclip)						{ m_FarClip = fclip;	CalculateProjectionMatrix(); }
@@ -63,7 +63,9 @@ namespace Kaimos {
 		glm::mat4 m_View = glm::mat4(1.0f);
 
 		float m_AR = 1.778f, m_FOV = 45.0f, m_NearClip = 0.1f, m_FarClip = 10000.0f;
-		float m_OrthographicSize = 10.0f;		
+		float m_OrthographicSize = 10.0f;
+
+		glm::ivec2 m_ViewportSize = glm::ivec2(1280, 720);
 	};
 }
 
