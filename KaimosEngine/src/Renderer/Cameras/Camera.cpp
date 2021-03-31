@@ -21,7 +21,7 @@ namespace Kaimos {
 	}
 
 	// ----------------------- Public Camera Methods ------------------------------------------------------
-	void Kaimos::Camera::SetViewportSize(uint width, uint height)
+	void Kaimos::Camera::SetAspectRatio(uint width, uint height)
 	{
 		if (height == 0)
 		{
@@ -33,7 +33,7 @@ namespace Kaimos {
 		CalculateProjectionMatrix();
 	}
 
-	void Camera::SetOrthographicCamera(float ortho_size, float nclip, float fclip)
+	void Camera::SetOrthographicParameters(float ortho_size, float nclip, float fclip)
 	{
 		m_ProjectionType = CAMERA_PROJECTION::ORTHOGRAPHIC;
 		m_OrthographicSize = ortho_size;
@@ -42,7 +42,7 @@ namespace Kaimos {
 		CalculateProjectionMatrix();
 	}
 
-	void Camera::SetPerspectiveCamera(float FOV, float nclip, float fclip)
+	void Camera::SetPerspectiveParameters(float FOV, float nclip, float fclip)
 	{
 		m_ProjectionType = CAMERA_PROJECTION::PERSPECTIVE;
 		m_FOV = FOV;
@@ -58,7 +58,6 @@ namespace Kaimos {
 	{
 		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * glm::toMat4(orientation);
 		m_View = glm::inverse(transform);
-
 	}
 
 	void Kaimos::Camera::CalculateProjectionMatrix()

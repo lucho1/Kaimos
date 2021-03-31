@@ -98,7 +98,7 @@ namespace Kaimos {
 		{
 			auto& camComp = view.get<CameraComponent>(entity);
 			if (!camComp.FixedAspectRatio)
-				camComp.Camera.SetViewportSize(width, height);
+				camComp.Camera.SetAspectRatio(width, height);
 		}
 	}
 
@@ -157,7 +157,7 @@ namespace Kaimos {
 	template<>
 	void Scene::OnComponentAdded<CameraComponent>(Entity entity, CameraComponent& component) const
 	{
-		component.Camera.SetViewportSize(m_ViewportWidth, m_ViewportHeight);
+		component.Camera.SetAspectRatio(m_ViewportWidth, m_ViewportHeight);
 	}
 
 	template<>

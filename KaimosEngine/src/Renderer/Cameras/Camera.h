@@ -18,9 +18,9 @@ namespace Kaimos {
 		virtual ~Camera() = default;
 
 		// --- Public Camera Methods ---
-		void SetViewportSize(uint width, uint height);
-		void SetOrthographicCamera(float ortho_size = 10.0f, float nclip = -1.0f, float fclip = 1.0f);
-		void SetPerspectiveCamera(float FOV = 45.0f, float nclip = 0.1f, float fclip = 10000.0f);
+		// Sets the camera's Viewport
+		void SetOrthographicParameters(float ortho_size = 10.0f, float nclip = -1.0f, float fclip = 1.0f);
+		void SetPerspectiveParameters(float FOV = 45.0f, float nclip = 0.1f, float fclip = 10000.0f);
 
 	public:
 
@@ -41,6 +41,7 @@ namespace Kaimos {
 	public:
 
 		// --- Setters ---
+		void SetAspectRatio(uint width, uint height);
 		inline void SetAspectRato(float aspect_ratio)			{ m_AR = aspect_ratio;	CalculateProjectionMatrix(); }
 		inline void SetFOV(float FOV)							{ m_FOV = FOV;			CalculateProjectionMatrix(); }
 		inline void SetNearClip(float nclip)					{ m_NearClip = nclip;	CalculateProjectionMatrix(); }

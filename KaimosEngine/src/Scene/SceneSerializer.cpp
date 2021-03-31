@@ -286,9 +286,9 @@ namespace Kaimos {
 					YAML::Node& camera_node = cameracomp_node["Camera"];
 
 					if (camera_node["ProjectionType"].as<int>() == (int)Kaimos::CAMERA_PROJECTION::ORTHOGRAPHIC)
-						cam_comp.Camera.SetOrthographicCamera();
+						cam_comp.Camera.SetOrthographicParameters();
 					else
-						cam_comp.Camera.SetPerspectiveCamera();
+						cam_comp.Camera.SetPerspectiveParameters();
 
 					cam_comp.Camera.SetFOV(camera_node["FOV"].as<float>());
 					cam_comp.Camera.SetNearClip(camera_node["PerspNearClip"].as<float>());

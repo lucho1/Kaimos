@@ -285,9 +285,9 @@ namespace Kaimos {
 				KaimosUI::UIFunctionalities::DrawDropDown("Projection", projection_options, 2, current_projection, current_proj_type, ImGui::CalcItemWidth() / 4.0f);
 				
 				if (current_proj_type == (uint)Kaimos::CAMERA_PROJECTION::PERSPECTIVE)
-					camera.SetPerspectiveCamera(camera.GetFOV(), camera.GetNearClip(), camera.GetFarClip());
+					camera.SetPerspectiveParameters(camera.GetFOV(), camera.GetNearClip(), camera.GetFarClip());
 				else
-					camera.SetOrthographicCamera(camera.GetSize(), camera.GetNearClip(), camera.GetFarClip());
+					camera.SetOrthographicParameters(camera.GetSize(), camera.GetNearClip(), camera.GetFarClip());
 
 				// Camera Values UI
 				if (camera.GetProjectionType() == Kaimos::CAMERA_PROJECTION::PERSPECTIVE)
