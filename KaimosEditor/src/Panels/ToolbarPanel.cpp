@@ -10,7 +10,7 @@ namespace Kaimos {
 
 
 	// ----------------------- Public Class Methods -------------------------------------------------------
-	void Kaimos::ToolbarPanel::OnUIRender(Ref<Texture2D> icons_array[8], CameraController& editor_camera)
+	void Kaimos::ToolbarPanel::OnUIRender(Ref<Texture2D> icons_array[8], CameraController& editor_camera, float viewport_endpos)
 	{
 		// -- Window Flags --
 		ImGuiWindowFlags flags = ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoCollapse
@@ -60,7 +60,7 @@ namespace Kaimos {
 			m_WorldMode = true;
 
 		// -- Editor Camera Settings --
-		ImGui::SameLine(500.0f);
+		ImGui::SameLine(viewport_endpos);
 		DrawCameraSettings(editor_camera, btn_color, icons_array[7]->GetTextureID());
 
 		// -- Window Pops --
@@ -80,7 +80,7 @@ namespace Kaimos {
 
 	void ToolbarPanel::DrawCameraSettings(CameraController& editor_camera, const glm::vec4& btn_color, uint btn_texture_id)
 	{
-		static bool button_opened = false;
+
 		if(DrawToolbarButton("EdCamSettings", btn_texture_id, btn_color))
 			ImGui::OpenPopup("Editor Camera Settings");
 		

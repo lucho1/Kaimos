@@ -12,7 +12,7 @@ namespace Kaimos {
 
 		// --- Public Class Methods ---
 		ToolbarPanel() = default;
-		void OnUIRender(Ref<Texture2D> icons_array[8], CameraController& editor_camera);
+		void OnUIRender(Ref<Texture2D> icons_array[8], CameraController& editor_camera, float viewport_endpos);
 
 	private:
 

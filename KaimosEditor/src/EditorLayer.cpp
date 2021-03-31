@@ -207,7 +207,10 @@ namespace Kaimos {
 			ImGui::ShowDemoWindow();
 
 		// -- Toolbar --
-		m_ToolbarPanel.OnUIRender(m_IconsArray, m_EditorCamera);
+		static float viewport_endpos = 500.0f;
+		float left_boundary = std::max(500.0f, viewport_endpos - 100.0f);
+		float right_boundary = std::min(left_boundary, 1500.0f);
+		m_ToolbarPanel.OnUIRender(m_IconsArray, m_EditorCamera, right_boundary);
 
 		// -- Scene Panel Rendering --
 		if(show_scene_panel)
@@ -232,6 +235,13 @@ namespace Kaimos {
 			ImGui::Begin("Viewport", &show_viewport_panel);
 			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0.0f, 0.0f));
 
+			//ImGui::GetCursorScreenPos().x;
+			//ImGui::GetWindowPos().x;
+			//ImGui::GetCursorPosX();
+			//ImGui::GetWindowContentRegionWidth();
+
+			//viewport_endpos = ImGui::GetCursorScreenPos().x + ImGui::GetWindowContentRegionWidth();
+
 			m_ViewportFocused = ImGui::IsWindowFocused();
 			m_ViewportHovered = ImGui::IsWindowHovered();
 			Application::Get().GetImGuiLayer()->SetBlockEvents(!m_ViewportFocused && !m_ViewportHovered);
@@ -240,10 +250,12 @@ namespace Kaimos {
 			ImVec2 viewport_offset = ImGui::GetWindowPos();
 			ImVec2 max_region = ImGui::GetWindowContentRegionMax();
 			ImVec2 min_region = ImGui::GetWindowContentRegionMin();
+			viewport_endpos = max_region.x + ImGui::GetContentRegionAvail().x/2.0f;
 
 			// Set viewport limits
 			m_ViewportLimits[0] = glm::vec2(min_region.x + viewport_offset.x, min_region.y + viewport_offset.y);
 			m_ViewportLimits[1] = glm::vec2(max_region.x + viewport_offset.x, max_region.y + viewport_offset.y);
+
 
 			// Get viewport size & draw fbo texture
 			ImVec2 ViewportPanelSize = ImGui::GetContentRegionAvail();
