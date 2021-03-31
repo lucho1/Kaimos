@@ -22,7 +22,7 @@ namespace Kaimos {
 		CameraController(Camera& camera);
 		~CameraController() = default;
 
-		void OnUpdate(Timestep dt);
+		void OnUpdate(Timestep dt, bool viewport_focused);
 		void OnEvent(Event& ev);
 
 	public:

@@ -71,8 +71,7 @@ namespace Kaimos {
 		}
 
 		// -- Camera Update --
-		if (m_ViewportFocused)
-			m_EditorCamera.OnUpdate(dt);
+		m_EditorCamera.OnUpdate(dt, m_ViewportFocused);
 
 		// -- Render --
 		Renderer2D::ResetStats();

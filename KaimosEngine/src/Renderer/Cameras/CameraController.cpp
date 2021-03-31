@@ -21,22 +21,24 @@ namespace Kaimos {
 		m_Camera.CalculateViewMatrix(m_Position, GetOrientation());
 	}
 
-	void CameraController::OnUpdate(Timestep dt)
+	void CameraController::OnUpdate(Timestep dt, bool viewport_focused)
 	{
-		if (Input::IsKeyPressed(KEY::LEFT_ALT))
+		const glm::vec2& mouse_pos = Input::GetMousePos();
+		if (viewport_focused)
 		{
-			const glm::vec2& mouse_pos = Input::GetMousePos();
-			glm::vec2 delta = (mouse_pos - m_InitialMousePosition) * 0.003f;
-			m_InitialMousePosition = mouse_pos;
-
-			if (Input::IsMouseButtonPressed(MOUSE::BUTTON_MIDDLE))
-				PanCamera(delta);
-			if (Input::IsMouseButtonPressed(MOUSE::BUTTON_LEFT) && !m_LockRotation)
-				RotateCamera(delta);
-			if (Input::IsMouseButtonPressed(MOUSE::BUTTON_RIGHT))
-				ZoomCamera(delta.y);
+			if (Input::IsKeyPressed(KEY::LEFT_ALT))
+			{
+				glm::vec2 delta = (mouse_pos - m_InitialMousePosition) * 0.003f;
+				if (Input::IsMouseButtonPressed(MOUSE::BUTTON_MIDDLE))
+					PanCamera(delta);
+				if (Input::IsMouseButtonPressed(MOUSE::BUTTON_LEFT) && !m_LockRotation)
+					RotateCamera(delta);
+				if (Input::IsMouseButtonPressed(MOUSE::BUTTON_RIGHT))
+					ZoomCamera(delta.y);
+			}
 		}
 
+		m_InitialMousePosition = mouse_pos;
 		RecalculateView();
 	}
 
