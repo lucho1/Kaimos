@@ -61,18 +61,22 @@ namespace Kaimos {
 					RotateCamera(delta);
 
 					// -- FPS Movement --
+					float speed = m_MoveSpeed;
+					if (Input::IsKeyPressed(KEY::LEFT_SHIFT))
+						speed *= m_SpeedMultiplier;
+
 					if (Input::IsKeyPressed(KEY::W))
-						int a = 0;
-					if (Input::IsKeyPressed(KEY::A))
-						int a = 0;
+						m_Position += GetForwardVector() * (speed * dt * 12.0f);
 					if (Input::IsKeyPressed(KEY::S))
-						int a = 0;
+						m_Position -= GetForwardVector() * (speed * dt * 12.0f);
+					if (Input::IsKeyPressed(KEY::A))
+						m_Position -= GetRightVector() * (speed * dt * 10.0f);
 					if (Input::IsKeyPressed(KEY::D))
-						int a = 0;
+						m_Position += GetRightVector() * (speed * dt * 10.0f);
 					if (Input::IsKeyPressed(KEY::Q))
-						int a = 0;
+						m_Position -= glm::vec3(0.0f, 1.0f, 0.0f) * (speed * dt * 10.0f);
 					if (Input::IsKeyPressed(KEY::E))
-						int a = 0;
+						m_Position += glm::vec3(0.0f, 1.0f, 0.0f) * (speed * dt * 10.0f);
 				}
 			}
 		}
