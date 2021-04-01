@@ -111,7 +111,7 @@ namespace Kaimos {
 
 
 	// ----------------------- Camera Getters/Setters -----------------------------------------------------	
-	inline void CameraController::SetOrientation(float x_angle, float y_angle)
+	void CameraController::SetOrientation(float x_angle, float y_angle)
 	{
 		if (!m_LockRotation)
 		{
@@ -122,7 +122,7 @@ namespace Kaimos {
 		}
 	}
 
-	inline void CameraController::SetPosition(const glm::vec3& position)
+	void CameraController::SetPosition(const glm::vec3& position)
 	{
 		m_Position = position;
 		m_FocalPoint = m_Position + GetForwardVector() * m_ZoomLevel;

@@ -13,18 +13,18 @@ namespace Kaimos {
 
 		// --- Keyboard Methods ---
 		static bool IsKeyPressed(const KEY_CODE key);
-		inline static bool IsKeyDown(const KEY_CODE key);
-		inline static bool IsKeyUp(const KEY_CODE key);
+		static bool IsKeyDown(const KEY_CODE key);
+		static bool IsKeyUp(const KEY_CODE key);
 
 		// --- Mouse Methods ---
 		static bool IsMouseButtonPressed(const MOUSE_CODE button);
-		inline static bool IsMouseButtonDown(const MOUSE_CODE button);
-		inline static bool IsMouseButtonUp(const MOUSE_CODE button);
+		static bool IsMouseButtonDown(const MOUSE_CODE button);
+		static bool IsMouseButtonUp(const MOUSE_CODE button);
 
 		// --- Mouse Getters ---
 		static glm::vec2 GetMousePos();
-		inline static float GetMouseX();
-		inline static float GetMouseY();
+		static float GetMouseX();
+		static float GetMouseY();
 		
 		// --- Public Class Methods ---
 		static KEY_CODE GetCrossKeyboardKey(const KEY_CODE key);
@@ -32,8 +32,8 @@ namespace Kaimos {
 	protected:
 
 		// --- Protected Class Methods ---
-		inline static bool GetKey(const KEY_CODE key);
-		inline static bool GetMouseButton(const MOUSE_CODE button);
+		static bool GetKey(const KEY_CODE key);
+		static bool GetMouseButton(const MOUSE_CODE button);
 
 	private:
 		

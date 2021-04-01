@@ -23,12 +23,12 @@ namespace Kaimos {
 		return state == GLFW_PRESS || state == GLFW_REPEAT;
 	}
 
-	inline bool Input::IsKeyDown(const KEY_CODE key)
+	bool Input::IsKeyDown(const KEY_CODE key)
 	{
 		return GetKey(key) && !s_KeyMap[key];
 	}
 	
-	inline bool Input::IsKeyUp(const KEY_CODE key)
+	bool Input::IsKeyUp(const KEY_CODE key)
 	{
 		return !GetKey(key) && s_KeyMap[key];
 	}
@@ -44,12 +44,12 @@ namespace Kaimos {
 		return state == GLFW_PRESS;
 	}
 
-	inline bool Input::IsMouseButtonDown(const MOUSE_CODE button)
+	bool Input::IsMouseButtonDown(const MOUSE_CODE button)
 	{
 		return GetMouseButton(button) && !s_MouseMap[button];
 	}
 
-	inline bool Input::IsMouseButtonUp(const MOUSE_CODE button)
+	bool Input::IsMouseButtonUp(const MOUSE_CODE button)
 	{
 		return !GetMouseButton(button) && s_MouseMap[button];
 	}
@@ -65,12 +65,12 @@ namespace Kaimos {
 		return { (float)x, (float)y };
 	}
 
-	inline float Input::GetMouseX()
+	float Input::GetMouseX()
 	{
 		return GetMousePos().x;
 	}
 
-	inline float Input::GetMouseY()
+	float Input::GetMouseY()
 	{
 		return GetMousePos().y;
 	}
@@ -102,12 +102,12 @@ namespace Kaimos {
 
 
 	// ----------------------- Protected Class Methods ----------------------------------------------------
-	inline bool Input::GetKey(const KEY_CODE key)
+	bool Input::GetKey(const KEY_CODE key)
 	{
 		return GLFW_PRESS == glfwGetKey(static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow()), static_cast<int32_t>(key));
 	}
 
-	inline bool Input::GetMouseButton(const MOUSE_CODE button)
+	bool Input::GetMouseButton(const MOUSE_CODE button)
 	{
 		return GLFW_PRESS == glfwGetMouseButton(static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow()), static_cast<int32_t>(button));
 	}
