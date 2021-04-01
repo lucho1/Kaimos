@@ -65,7 +65,8 @@ namespace Kaimos {
 
 		// --- Private Camera Methods ---
 		void AdvanceCamera(const glm::vec2& movement);
-		void RotateCamera(const glm::vec2& movement);
+		void CalculateRotation(const glm::vec2 rotation);
+		void RotateCamera(const glm::vec2& rotation);
 		void OrbitCamera(const glm::vec2& rotation);
 		void PanCamera(const glm::vec2& panning);
 		void ZoomCamera(float zoom);

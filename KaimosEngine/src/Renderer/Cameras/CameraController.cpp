@@ -23,15 +23,21 @@ namespace Kaimos {
 
 	void CameraController::OnUpdate(Timestep dt, bool viewport_focused)
 	{
-		//bool recalculate_matrix = false;
 		const glm::vec2& mouse_pos = Input::GetMousePos();
-
 		if (viewport_focused)
 		{
+			// -- Focus --
+			if (Input::IsKeyPressed(KEY::F))
+				int a = 0;
+
+			// -- Mouse Calc --
 			glm::vec2 delta = (mouse_pos - m_InitialMousePosition) * 0.003f;
+
+			// -- Mid Mouse Button --
 			if (Input::IsMouseButtonPressed(MOUSE::BUTTON_MIDDLE))
 				PanCamera(delta);
 
+			// -- Left & Right Mouse Buttons --
 			if (Input::IsMouseButtonPressed(MOUSE::BUTTON_LEFT) && Input::IsMouseButtonPressed(MOUSE::BUTTON_RIGHT))
 			{
 				if(Input::IsKeyPressed(KEY::LEFT_ALT))
@@ -51,15 +57,27 @@ namespace Kaimos {
 				if (Input::IsKeyPressed(KEY::LEFT_ALT))
 					ZoomCamera(delta.y);
 				else
+				{
 					RotateCamera(delta);
-			}
 
+					// -- FPS Movement --
+					if (Input::IsKeyPressed(KEY::W))
+						int a = 0;
+					if (Input::IsKeyPressed(KEY::A))
+						int a = 0;
+					if (Input::IsKeyPressed(KEY::S))
+						int a = 0;
+					if (Input::IsKeyPressed(KEY::D))
+						int a = 0;
+					if (Input::IsKeyPressed(KEY::Q))
+						int a = 0;
+					if (Input::IsKeyPressed(KEY::E))
+						int a = 0;
+				}
+			}
 		}
 
-
 		m_InitialMousePosition = mouse_pos;
-		//if(recalculate_matrix)
-		RecalculateView();
 	}
 
 	void CameraController::OnEvent(Event& ev)
@@ -79,6 +97,7 @@ namespace Kaimos {
 		{
 			m_Pitch = x_angle;
 			m_Yaw = y_angle;
+			m_FocalPoint = m_Position + GetForwardVector() * m_ZoomLevel;
 			RecalculateView();
 		}
 	}
@@ -112,31 +131,56 @@ namespace Kaimos {
 	// ----------------------- Private Camera Methods -----------------------------------------------------
 	void CameraController::AdvanceCamera(const glm::vec2& movement)
 	{
+		// -- Rotation --
 		if (!m_LockRotation)
 		{
 			float yaw = GetUpVector().y < 0.0f ? -1.0f : 1.0f;
-			m_Yaw += yaw * movement.x * m_RotationSpeed;
-		}
-		
-		m_Position += -GetForwardVector() * movement.y;
+			m_Yaw += yaw * movement.x * m_RotationSpeed * 1.5f;
+		}		
+
+		// -- Movement Calc. --
+		glm::vec3 fw = -GetForwardVector();
+		glm::vec3 up = -GetUpVector();
+		glm::vec3 dir = glm::vec3(fw.x, 0.0f, fw.z);
+
+		// Cap movement if fw vec is too slope
+		if (glm::dot(-GetForwardVector(), { 0.0f, 1.0f, 0.0f }) > 0.99f)
+			dir = glm::vec3(up.x, 0.0f, up.z);
+
+		// -- Move --
+		m_Position += dir * movement.y * m_MoveSpeed * m_ZoomLevel * 1.2f;
 		m_FocalPoint = m_Position + GetForwardVector() * m_ZoomLevel;
 		RecalculateView();
 	}
 
-	void CameraController::RotateCamera(const glm::vec2& movement)
+	void CameraController::CalculateRotation(const glm::vec2 rotation)
 	{
-		OrbitCamera(movement);
-		if(!m_LockRotation)
+		float yaw = GetUpVector().y < 0.0f ? -1.0f : 1.0f;
+		m_Yaw += yaw * rotation.x * m_RotationSpeed;
+		m_Pitch += rotation.y * m_RotationSpeed;
+
+		if (m_Pitch > 1.56f)
+			m_Pitch = 1.56f;
+		if (m_Pitch < -1.56f)
+			m_Pitch = -1.56f;
+	}
+
+	void CameraController::RotateCamera(const glm::vec2& rotation)
+	{
+		if (!m_LockRotation)
+		{
+			CalculateRotation(rotation);
 			m_FocalPoint = m_Position + GetForwardVector() * m_ZoomLevel;
+			RecalculateView();
+		}
 	}
 
 	void CameraController::OrbitCamera(const glm::vec2& rotation)
 	{
 		if (!m_LockRotation)
 		{
-			float yaw = GetUpVector().y < 0.0f ? -1.0f : 1.0f;
-			m_Yaw += yaw * rotation.x * m_RotationSpeed;
-			m_Pitch += rotation.y * m_RotationSpeed;
+			CalculateRotation(rotation);
+			RecalculateView();
 		}
 	}
 
@@ -154,12 +198,13 @@ namespace Kaimos {
 		// -- Pan --
 		m_FocalPoint += -GetRightVector() * panning.x * dx * m_ZoomLevel;
 		m_FocalPoint += GetUpVector() * panning.y * dy * m_ZoomLevel;
+		RecalculateView();
 	}
 
 	void CameraController::ZoomCamera(float zoom)
 	{
 		// -- Zoom Speed --
-		float d = std::max(m_ZoomLevel * 0.2f, 0.0f);
+		float d = std::max(m_ZoomLevel * 0.35f, 0.0f);
 		m_ZoomLevel -= zoom * std::min(d * d, m_MaxZoomSpeed);
 
 		// -- Zoom Cap --
