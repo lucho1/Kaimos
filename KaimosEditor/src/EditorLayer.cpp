@@ -260,6 +260,31 @@ namespace Kaimos {
 			m_ViewportSize = glm::vec2(ViewportPanelSize.x, ViewportPanelSize.y);
 			ImGui::Image(reinterpret_cast<void*>(m_Framebuffer->GetFBOTextureID()), ViewportPanelSize, ImVec2(0, 1), ImVec2(1, 0));
 
+			// -- Camera Speed Multiplier Modification --
+			if (m_MultiSpeedPanelAlpha > 0.0f)
+			{
+				m_MultiSpeedPanelAlpha -= 0.015f;
+
+				static ImVec2 popup_size = ImVec2(938.0f, 422.0f);
+				ImVec2 size = ImGui::GetWindowSize();
+				float posX = ImGui::GetWindowPos().x + ImGui::GetWindowContentRegionMin().x - popup_size.x/2.0f - 10.0f;
+				float posY = ImGui::GetWindowPos().y + ImGui::GetWindowContentRegionMin().y - popup_size.y/2.0f - 25.0f;
+
+				ImGui::SetNextWindowPos({ posX + size.x/2.0f, posY + size.y/2.0f });
+				ImGui::SetNextWindowBgAlpha(m_MultiSpeedPanelAlpha);
+
+				if (ImGui::Begin("Example: Simple overlay", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav))
+				{
+					popup_size = ImGui::GetWindowSize();
+					ImGui::SetWindowFontScale(2);
+
+					float speed_multiplier = m_EditorCamera.GetSpeedMultiplier();
+					ImGui::Text("x%.2f", speed_multiplier);
+				}
+				ImGui::End();
+			}
+
+
 			// -- Guizmo --
 			Entity selected_entity = m_ScenePanel.GetSelectedEntity();
 			if (selected_entity && m_ToolbarPanel.m_SelectedOperation != -1)
@@ -319,6 +344,7 @@ namespace Kaimos {
 		dispatcher.Dispatch<KeyPressedEvent>(KS_BIND_EVENT_FN(EditorLayer::OnKeyPressed));
 		dispatcher.Dispatch<KeyReleasedEvent>(KS_BIND_EVENT_FN(EditorLayer::OnKeyReleased));
 		dispatcher.Dispatch<MouseButtonPressedEvent>(KS_BIND_EVENT_FN(EditorLayer::OnMouseButtonPressed));
+		dispatcher.Dispatch<MouseScrolledEvent>(KS_BIND_EVENT_FN(EditorLayer::OnMouseScrolled));
 	}
 
 
@@ -338,6 +364,23 @@ namespace Kaimos {
 		{
 			m_ToolbarPanel.m_Snap = false;
 			m_ToolbarPanel.m_ChangeSnap = false;
+		}
+
+		return false;
+	}
+
+	bool EditorLayer::OnMouseScrolled(MouseScrolledEvent& ev)
+	{
+		if (Input::IsMouseButtonPressed(MOUSE::BUTTON_RIGHT))
+		{
+			float current_multiplier = m_EditorCamera.GetSpeedMultiplier();
+			float new_speed = current_multiplier + ev.GetYOffset() * current_multiplier / 8.0f;
+			m_EditorCamera.SetSpeedMultiplier(new_speed);
+
+			if (new_speed > 18.2f)
+				m_EditorCamera.SetSpeedMultiplier(20.0f);
+
+			m_MultiSpeedPanelAlpha = 0.75f;
 		}
 
 		return false;

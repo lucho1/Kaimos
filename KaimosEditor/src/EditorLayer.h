@@ -32,6 +32,7 @@ namespace Kaimos {
 		bool OnKeyPressed(KeyPressedEvent& ev);
 		bool OnMouseButtonPressed(MouseButtonPressedEvent& ev);
 		bool OnKeyReleased(KeyReleasedEvent& ev);
+		bool OnMouseScrolled(MouseScrolledEvent& ev);
 
 		// --- Private Editor Methods ---
 		void NewScene();
@@ -58,6 +59,7 @@ namespace Kaimos {
 		// Guizmo
 		//int m_OperationGizmo = 0;
 		Entity m_HoveredEntity = {};
+		float m_MultiSpeedPanelAlpha = false;
 
 		// Rendering
 		Ref<VertexArray> m_VArray = nullptr;

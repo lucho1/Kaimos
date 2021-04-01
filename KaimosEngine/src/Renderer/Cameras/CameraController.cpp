@@ -77,9 +77,9 @@ namespace Kaimos {
 					RotateCamera(delta);
 
 					// -- FPS Movement --
-					float speed = m_MoveSpeed;
+					float speed = m_MoveSpeed * m_SpeedMultiplier;
 					if (Input::IsKeyPressed(KEY::LEFT_SHIFT))
-						speed *= m_SpeedMultiplier;
+						speed *= 2.0f;
 
 					if (Input::IsKeyPressed(KEY::W))
 						SetPosition(m_Position + GetForwardVector() * (speed * dt * 12.0f));

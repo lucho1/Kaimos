@@ -27,6 +27,9 @@ namespace Kaimos {
 
 	public:
 
+		// --- Camera Parameters Getters ---
+		inline float GetSpeedMultiplier()	const { return m_SpeedMultiplier; }
+
 		// --- Camera Transform Getters ---
 		inline glm::vec3 GetPosition()		const { return m_Position; }
 		inline glm::quat GetOrientation()	const { return glm::quat(glm::vec3(-m_Pitch, -m_Yaw, 0.0f)); }
@@ -49,7 +52,7 @@ namespace Kaimos {
 		inline void SetZoomLevel(float zoom_level)					{ m_ZoomLevel = zoom_level; }
 		inline void SetMoveSpeed(float speed)						{ m_MoveSpeed = speed; }
 		inline void SetRotationSpeed(float speed)					{ m_RotationSpeed = speed; }
-		inline void SetSpeedMultiplier(float multiplier)			{ m_SpeedMultiplier = multiplier; }
+		inline void SetSpeedMultiplier(float multiplier)			{ if(multiplier > 0.05f && multiplier <= 20.0f ) m_SpeedMultiplier = multiplier; }
 		inline void SetMaxZoomSpeed(float speed)					{ m_MaxZoomSpeed = speed; }
 
 		inline void UsingGuizmo(bool using_guizmo)					{ m_UsingGuizmo = using_guizmo; }
