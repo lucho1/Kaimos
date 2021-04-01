@@ -2,7 +2,6 @@
 #include "ToolbarPanel.h"
 
 #include "ImGui/ImGuiUtils.h"
-#include "Renderer/Cameras/CameraController.cpp"
 
 #include <ImGui/imgui.h>
 #include <imgui/imgui_internal.h>
@@ -81,7 +80,6 @@ namespace Kaimos {
 
 	void ToolbarPanel::DrawCameraSettings(CameraController& editor_camera, const glm::vec4& btn_color, uint btn_texture_id)
 	{
-
 		if(DrawToolbarButton("EdCamSettings", btn_texture_id, btn_color))
 			ImGui::OpenPopup("Editor Camera Settings");
 		
