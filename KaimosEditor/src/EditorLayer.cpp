@@ -72,7 +72,12 @@ namespace Kaimos {
 		}
 
 		// -- Camera Update --
-		m_EditorCamera.OnUpdate(dt, m_ViewportFocused);
+		glm::vec3 focus_pos = glm::vec3(0.0f, 5.0f, 9.0f);
+		Entity selected_entity = m_ScenePanel.GetSelectedEntity();
+		if (selected_entity)
+			focus_pos = selected_entity.GetComponent<TransformComponent>().Translation;
+
+		m_EditorCamera.OnUpdate(dt, m_ViewportFocused, focus_pos);
 
 		// -- Render --
 		Renderer2D::ResetStats();
@@ -269,7 +274,7 @@ namespace Kaimos {
 				TransformComponent& transform = selected_entity.GetComponent<TransformComponent>();
 				glm::mat4 tr_mat = transform.GetTransform();
 
-				if (!m_EditorCamera.IsBeingUsed())
+				if (!m_EditorCamera.IsUsingLMB())
 				{
 					// Camera
 					const glm::mat4& cam_proj = m_EditorCamera.GetCamera().GetProjection();
@@ -341,7 +346,7 @@ namespace Kaimos {
 	bool EditorLayer::OnKeyPressed(KeyPressedEvent& ev)
 	{
 		// -- Shortcuts --
-		if (ev.GetRepeatCount() > 0)
+		if (ev.GetRepeatCount() > 0 || m_EditorCamera.IsCameraMoving())
 			return false;
 
 		bool control_pressed = Input::IsKeyPressed(KEY::LEFT_CONTROL) || Input::IsKeyPressed(KEY::RIGHT_CONTROL);

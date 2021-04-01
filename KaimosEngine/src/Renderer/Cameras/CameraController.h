@@ -22,7 +22,7 @@ namespace Kaimos {
 		CameraController(Camera& camera);
 		~CameraController() = default;
 
-		void OnUpdate(Timestep dt, bool viewport_focused);
+		void OnUpdate(Timestep dt, bool viewport_focused, const glm::vec3& focus_pos);
 		void OnEvent(Event& ev);
 
 	public:
@@ -55,7 +55,10 @@ namespace Kaimos {
 		inline void UsingGuizmo(bool using_guizmo)					{ m_UsingGuizmo = using_guizmo; }
 		inline void LockRotation(bool lock)							{ m_LockRotation = lock; }
 		inline bool IsRotationLocked()								const { return m_LockRotation; }
-		inline bool IsBeingUsed()									const { return m_UsingCamera; }
+		
+		// Using Left Mouse Button (LMB)
+		inline bool IsUsingLMB()									const { return m_IsBlockingLBtn; }
+		inline bool IsCameraMoving()								const { return m_IsMoving; }
 
 	private:
 
@@ -93,7 +96,8 @@ namespace Kaimos {
 
 		bool m_LockRotation = false;
 		bool m_UsingGuizmo = false;
-		bool m_UsingCamera = false;
+		bool m_IsBlockingLBtn = false;
+		bool m_IsMoving = false;
 	};
 }
 

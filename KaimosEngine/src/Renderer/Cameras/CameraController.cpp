@@ -21,15 +21,19 @@ namespace Kaimos {
 		m_Camera.CalculateProjectionMatrix();
 	}
 
-	void CameraController::OnUpdate(Timestep dt, bool viewport_focused)
+	void CameraController::OnUpdate(Timestep dt, bool viewport_focused, const glm::vec3& focus_pos)
 	{
-		m_UsingCamera = false;
+		m_IsBlockingLBtn = m_IsMoving = false;
 		const glm::vec2& mouse_pos = Input::GetMousePos();
 		if (viewport_focused)
 		{
 			// -- Focus --
 			if (Input::IsKeyPressed(KEY::F))
-				int a = 0;
+			{
+				//glm::vec3(0.0f, 5.0f, 9.0f)
+				SetPosition(focus_pos - GetForwardVector() * m_ZoomLevel);
+				SetOrientation(0.5f, 0.0f);
+			}
 
 			if (m_UsingGuizmo)
 			{
@@ -47,6 +51,7 @@ namespace Kaimos {
 			// -- Left & Right Mouse Buttons --
 			if (Input::IsMouseButtonPressed(MOUSE::BUTTON_LEFT) && Input::IsMouseButtonPressed(MOUSE::BUTTON_RIGHT))
 			{
+				m_IsMoving = true;
 				if(Input::IsKeyPressed(KEY::LEFT_ALT))
 					ZoomCamera(delta.y);
 				else if(!m_UsingGuizmo)
@@ -54,7 +59,8 @@ namespace Kaimos {
 			}
 			else if (Input::IsMouseButtonPressed(MOUSE::BUTTON_LEFT))
 			{
-				m_UsingCamera = true;
+				m_IsMoving = true;
+				m_IsBlockingLBtn = true;
 				if (Input::IsKeyPressed(KEY::LEFT_ALT))
 					OrbitCamera(delta);
 				else
@@ -63,6 +69,7 @@ namespace Kaimos {
 
 			if (Input::IsMouseButtonPressed(MOUSE::BUTTON_RIGHT))
 			{
+				m_IsMoving = true;
 				if (Input::IsKeyPressed(KEY::LEFT_ALT))
 					ZoomCamera(delta.y);
 				else
@@ -128,7 +135,10 @@ namespace Kaimos {
 	bool CameraController::OnMouseScrolled(MouseScrolledEvent& ev)
 	{
 		KS_PROFILE_FUNCTION();
-		ZoomCamera(ev.GetYOffset() * 0.1f);
+
+		if(!Input::IsMouseButtonPressed(MOUSE::BUTTON_RIGHT))
+			ZoomCamera(ev.GetYOffset() * 0.1f);
+
 		return false;
 	}
 
@@ -221,11 +231,13 @@ namespace Kaimos {
 		m_ZoomLevel -= zoom * std::min(d * d, m_MaxZoomSpeed);
 
 		// -- Zoom Cap --
-		if (m_ZoomLevel < 1.2f)
+		if (m_ZoomLevel <= 1.75f)
 		{
-			m_FocalPoint += GetForwardVector();
-			m_ZoomLevel = 1.2f;
+			//m_FocalPoint += GetForwardVector();
+			m_ZoomLevel = 1.75f;
 		}
+		if (m_ZoomLevel >= 75.0f)
+			m_ZoomLevel = 75.0f;
 
 		// -- View Recalc --
 		RecalculateView();
