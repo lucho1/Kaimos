@@ -38,6 +38,11 @@ namespace Kaimos {
 		// -- Scene Tab --
 		ImGui::Begin("Scene", &closing_bool);
 		ImGui::TextColored({0.65f, 0.65f, 0.65f, 1.0f}, "%s", m_SceneContext->GetName().c_str());
+		ImGui::SameLine();
+		if(m_SceneContext->GetPrimaryCamera())
+			ImGui::Text("Current camera: %i", m_SceneContext->GetPrimaryCamera().GetID());
+		else
+			ImGui::Text("Current camera: NULL");
 
 		// -- Entity Display --
 		m_SceneContext->m_Registry.each([&](auto entity_id)
@@ -274,11 +279,21 @@ namespace Kaimos {
 
 
 		// -- Camera Component --
-		DrawComponentUI<CameraComponent>("Camera", entity, [](auto& component)
+		DrawComponentUI<CameraComponent>("Camera", entity, [&](auto& component)
 			{
-				// Common Parameters
 				Camera& camera = component.Camera;
-				ImGui::Checkbox("Primary", &component.Primary); // TODO: Camera Rework, Primary camera should be handled in scene
+				
+				// Common Parameters
+				bool primary = component.Primary;
+				if (ImGui::Checkbox("Primary", &primary))
+				{
+					if (primary)
+						m_SceneContext->SetPrimaryCamera(entity);
+					else
+						m_SceneContext->UnsetPrimaryCamera();
+				}
+
+
 				ImGui::Checkbox("Fixed Aspect Ratio", &component.FixedAspectRatio);
 
 

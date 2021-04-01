@@ -34,7 +34,9 @@ namespace Kaimos {
 	public:
 
 		// --- Getters/Setters ---
-		Entity GetPrimaryCamera(); //TODO: Handle this with cameras rework!
+		Entity GetPrimaryCamera();
+		void SetPrimaryCamera(Entity new_camera_entity);
+		void UnsetPrimaryCamera();
 
 		const inline std::string GetName()				const { return m_Name; }
 		const inline std::string GetPath()				const { return m_Path; }

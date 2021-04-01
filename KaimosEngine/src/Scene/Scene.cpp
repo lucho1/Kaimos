@@ -10,6 +10,7 @@
 
 namespace Kaimos {
 
+	static Entity m_PrimaryCamera = {};
 	// entt::entity entity = registry.create();						-- To create entities in the registry
 	// registry.clear();											-- To clear the registry (remove all in it)
 
@@ -46,7 +47,7 @@ namespace Kaimos {
 		Renderer2D::EndScene();
 	}
 
-	// TODO: Remake this in the Camera Rework
+
 	void Scene::OnUpdateRuntime(Timestep dt)
 	{
 		KS_PROFILE_FUNCTION();
@@ -66,25 +67,21 @@ namespace Kaimos {
 
 
 		// -- Render --
-		auto view = m_Registry.view<TransformComponent, CameraComponent>();
-		for (auto ent : view)
+		if (m_PrimaryCamera)
 		{
-			auto& [transform, camera] = view.get<TransformComponent, CameraComponent>(ent);
-
-			if (camera.Primary)
+			Renderer2D::BeginScene(m_PrimaryCamera.GetComponent<CameraComponent>(), m_PrimaryCamera.GetComponent<TransformComponent>());
+			auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
+			for (auto ent : group)
 			{
-				Renderer2D::BeginScene(camera, transform);
-				auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
-				for (auto ent : group)
-				{
-					auto& [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(ent);
+				auto& [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(ent);
+				if (transform.EntityActive)
 					Renderer2D::DrawSprite(transform.GetTransform(), sprite, (int)ent);
-				}
-
-				Renderer2D::EndScene();
-				break;
 			}
+
+			Renderer2D::EndScene();
 		}
+		else
+			KS_ENGINE_WARN("No Primary Camera Setted!");		
 	}
 
 	void Scene::SetViewportSize(uint width, uint height)
@@ -124,15 +121,33 @@ namespace Kaimos {
 
 	Entity Scene::GetPrimaryCamera()
 	{
-		auto view = m_Registry.view<CameraComponent>();
-		for (auto entity : view)
-		{
-			const auto& camera = view.get<CameraComponent>(entity);
-			if (camera.Primary)
-				return Entity{ entity, this };
-		}
+		if(m_PrimaryCamera && m_PrimaryCamera.GetComponent<TransformComponent>().EntityActive)
+			return m_PrimaryCamera;
 
 		return {};
+	}
+
+	void Scene::SetPrimaryCamera(Entity new_camera_entity)
+	{
+		if (!new_camera_entity || !new_camera_entity.HasComponent<CameraComponent>())
+			return;
+
+		if (m_PrimaryCamera && new_camera_entity == m_PrimaryCamera)
+			return;
+
+		if (m_PrimaryCamera)
+			m_PrimaryCamera.GetComponent<CameraComponent>().Primary = false;
+
+		new_camera_entity.GetComponent<CameraComponent>().Primary = true;
+		m_PrimaryCamera = new_camera_entity;
+	}
+
+	void Scene::UnsetPrimaryCamera()
+	{
+		if (m_PrimaryCamera)
+			m_PrimaryCamera.GetComponent<CameraComponent>().Primary = false;
+
+		m_PrimaryCamera = {};
 	}
 
 	

@@ -15,7 +15,7 @@ Entities:
         FarClip: 9915
         NearClip: 0.36500001
         OrthoSize: 10
-      PrimaryCamera: true
+      PrimaryCamera: false
       FixedAR: false
   - Entity: 70065788
     TagComponent:

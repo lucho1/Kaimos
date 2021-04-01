@@ -85,7 +85,7 @@ namespace Kaimos {
 	struct CameraComponent
 	{
 		Kaimos::Camera Camera = {};
-		bool Primary = true; // TODO: Move it to scene on Camera Rework!
+		bool Primary = false;
 		bool FixedAspectRatio = false;
 
 		CameraComponent() = default;
