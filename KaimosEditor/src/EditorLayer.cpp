@@ -374,12 +374,8 @@ namespace Kaimos {
 		if (Input::IsMouseButtonPressed(MOUSE::BUTTON_RIGHT))
 		{
 			float current_multiplier = m_EditorCamera.GetSpeedMultiplier();
-			float new_speed = current_multiplier + ev.GetYOffset() * current_multiplier / 8.0f;
-			m_EditorCamera.SetSpeedMultiplier(new_speed);
-
-			if (new_speed > 18.2f)
-				m_EditorCamera.SetSpeedMultiplier(20.0f);
-
+			float scroll_pow = ev.GetYOffset() * current_multiplier / 8.0f;
+			m_EditorCamera.SetSpeedMultiplier(current_multiplier + scroll_pow);
 			m_MultiSpeedPanelAlpha = 0.75f;
 		}
 

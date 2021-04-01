@@ -52,7 +52,7 @@ namespace Kaimos {
 		inline void SetZoomLevel(float zoom_level)					{ m_ZoomLevel = zoom_level; }
 		inline void SetMoveSpeed(float speed)						{ m_MoveSpeed = speed; }
 		inline void SetRotationSpeed(float speed)					{ m_RotationSpeed = speed; }
-		inline void SetSpeedMultiplier(float multiplier)			{ if(multiplier > 0.05f && multiplier <= 20.0f ) m_SpeedMultiplier = multiplier; }
+		inline void SetSpeedMultiplier(float multiplier)			{ m_SpeedMultiplier = multiplier; m_SpeedMultiplier = std::clamp(m_SpeedMultiplier, 0.05f, 20.0f); }
 		inline void SetMaxZoomSpeed(float speed)					{ m_MaxZoomSpeed = speed; }
 
 		inline void UsingGuizmo(bool using_guizmo)					{ m_UsingGuizmo = using_guizmo; }

@@ -30,7 +30,6 @@ namespace Kaimos {
 			// -- Focus --
 			if (Input::IsKeyPressed(KEY::F))
 			{
-				//glm::vec3(0.0f, 5.0f, 9.0f)
 				SetPosition(focus_pos - GetForwardVector() * m_ZoomLevel);
 				SetOrientation(0.5f, 0.0f);
 			}
@@ -41,7 +40,7 @@ namespace Kaimos {
 				return;
 			}
 
-			// -- Mouse Calc --
+			// -- Mouse Movement Calc --
 			glm::vec2 delta = (mouse_pos - m_InitialMousePosition) * 0.003f;
 
 			// -- Mid Mouse Button --
@@ -136,8 +135,8 @@ namespace Kaimos {
 	{
 		KS_PROFILE_FUNCTION();
 
-		if(!Input::IsMouseButtonPressed(MOUSE::BUTTON_RIGHT))
-			ZoomCamera(ev.GetYOffset() * 0.1f);
+		if (!Input::IsMouseButtonPressed(MOUSE::BUTTON_RIGHT))
+			ZoomCamera(ev.GetYOffset()*0.1f);
 
 		return false;
 	}
@@ -181,11 +180,7 @@ namespace Kaimos {
 		float yaw = GetUpVector().y < 0.0f ? -1.0f : 1.0f;
 		m_Yaw += yaw * rotation.x * m_RotationSpeed;
 		m_Pitch += rotation.y * m_RotationSpeed;
-
-		if (m_Pitch > 1.56f)
-			m_Pitch = 1.56f;
-		if (m_Pitch < -1.56f)
-			m_Pitch = -1.56f;
+		m_Pitch = std::clamp(m_Pitch, -1.56f, 1.56f);
 	}
 
 	void CameraController::RotateCamera(const glm::vec2& rotation)
@@ -226,18 +221,10 @@ namespace Kaimos {
 
 	void CameraController::ZoomCamera(float zoom)
 	{
-		// -- Zoom Speed --
+		// -- Zoom Calc --
 		float d = std::max(m_ZoomLevel * 0.35f, 0.0f);
 		m_ZoomLevel -= zoom * std::min(d * d, m_MaxZoomSpeed);
-
-		// -- Zoom Cap --
-		if (m_ZoomLevel <= 1.75f)
-		{
-			//m_FocalPoint += GetForwardVector();
-			m_ZoomLevel = 1.75f;
-		}
-		if (m_ZoomLevel >= 75.0f)
-			m_ZoomLevel = 75.0f;
+		m_ZoomLevel = std::clamp(m_ZoomLevel, 1.75f, 75.0f);
 
 		// -- View Recalc --
 		RecalculateView();
