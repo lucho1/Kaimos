@@ -274,7 +274,7 @@ namespace Kaimos {
 
 
 		// -- Camera Component --
-		DrawComponentUI<CameraComponent>("Camera", entity, [](auto& component) // TODO: Clean this
+		DrawComponentUI<CameraComponent>("Camera", entity, [](auto& component)
 			{
 				// Common Parameters
 				Camera& camera = component.Camera;
@@ -321,8 +321,6 @@ namespace Kaimos {
 
 				ImGui::SameLine(); ImGui::Text("(AR: %.2f)", camera.GetAspectRato());
 
-
-				//TODO: This should keep the values of both types of cameras
 				float near_clip = camera.GetNearPlane(), far_clip = camera.GetFarPlane();
 				if (KaimosUI::UIFunctionalities::DrawInlineDragFloat("Near Clip", "###nclip", &near_clip, 0.01f, ImGui::CalcItemWidth() / 4.0f, 2.0f, min_clip, far_clip - 0.1f, "%.3f", 1.5f))
 					if (near_clip < far_clip)

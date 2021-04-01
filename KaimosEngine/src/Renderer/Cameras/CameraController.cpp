@@ -11,34 +11,54 @@ namespace Kaimos {
 	// ----------------------- Public Class/Event Methods -------------------------------------------------
 	CameraController::CameraController()
 	{
+		RecalculateView();
 		m_Camera.CalculateProjectionMatrix();
-		m_Camera.CalculateViewMatrix(m_Position, GetOrientation());
 	}
 
 	CameraController::CameraController(Camera& camera) : m_Camera(camera)
 	{
+		RecalculateView();
 		m_Camera.CalculateProjectionMatrix();
-		m_Camera.CalculateViewMatrix(m_Position, GetOrientation());
 	}
 
 	void CameraController::OnUpdate(Timestep dt, bool viewport_focused)
 	{
+		//bool recalculate_matrix = false;
 		const glm::vec2& mouse_pos = Input::GetMousePos();
+
 		if (viewport_focused)
 		{
-			if (Input::IsKeyPressed(KEY::LEFT_ALT))
+			glm::vec2 delta = (mouse_pos - m_InitialMousePosition) * 0.003f;
+			if (Input::IsMouseButtonPressed(MOUSE::BUTTON_MIDDLE))
+				PanCamera(delta);
+
+			if (Input::IsMouseButtonPressed(MOUSE::BUTTON_LEFT) && Input::IsMouseButtonPressed(MOUSE::BUTTON_RIGHT))
 			{
-				glm::vec2 delta = (mouse_pos - m_InitialMousePosition) * 0.003f;
-				if (Input::IsMouseButtonPressed(MOUSE::BUTTON_MIDDLE))
-					PanCamera(delta);
-				if (Input::IsMouseButtonPressed(MOUSE::BUTTON_LEFT) && !m_LockRotation)
-					RotateCamera(delta);
-				if (Input::IsMouseButtonPressed(MOUSE::BUTTON_RIGHT))
+				if(Input::IsKeyPressed(KEY::LEFT_ALT))
 					ZoomCamera(delta.y);
+				else
+					PanCamera(-delta);
 			}
+			else if (Input::IsMouseButtonPressed(MOUSE::BUTTON_LEFT))
+			{
+				if (Input::IsKeyPressed(KEY::LEFT_ALT))
+					OrbitCamera(delta);
+				else
+					AdvanceCamera(delta);
+			}
+			else if (Input::IsMouseButtonPressed(MOUSE::BUTTON_RIGHT))
+			{
+				if (Input::IsKeyPressed(KEY::LEFT_ALT))
+					ZoomCamera(delta.y);
+				else
+					RotateCamera(delta);
+			}
+
 		}
 
+
 		m_InitialMousePosition = mouse_pos;
+		//if(recalculate_matrix)
 		RecalculateView();
 	}
 
@@ -70,6 +90,8 @@ namespace Kaimos {
 		RecalculateView();
 	}
 
+
+
 	// ----------------------- Private Event Methods ------------------------------------------------------
 	bool CameraController::OnMouseScrolled(MouseScrolledEvent& ev)
 	{
@@ -88,11 +110,34 @@ namespace Kaimos {
 	
 
 	// ----------------------- Private Camera Methods -----------------------------------------------------
-	void CameraController::RotateCamera(const glm::vec2& rotation)
+	void CameraController::AdvanceCamera(const glm::vec2& movement)
 	{
-		float yaw = GetUpVector().y < 0.0f ? -1.0f : 1.0f;
-		m_Yaw += yaw * rotation.x * m_RotationSpeed;
-		m_Pitch += rotation.y * m_RotationSpeed;
+		if (!m_LockRotation)
+		{
+			float yaw = GetUpVector().y < 0.0f ? -1.0f : 1.0f;
+			m_Yaw += yaw * movement.x * m_RotationSpeed;
+		}
+		
+		m_Position += -GetForwardVector() * movement.y;
+		m_FocalPoint = m_Position + GetForwardVector() * m_ZoomLevel;
+		RecalculateView();
+	}
+
+	void CameraController::RotateCamera(const glm::vec2& movement)
+	{
+		OrbitCamera(movement);
+		if(!m_LockRotation)
+			m_FocalPoint = m_Position + GetForwardVector() * m_ZoomLevel;
+	}
+
+	void CameraController::OrbitCamera(const glm::vec2& rotation)
+	{
+		if (!m_LockRotation)
+		{
+			float yaw = GetUpVector().y < 0.0f ? -1.0f : 1.0f;
+			m_Yaw += yaw * rotation.x * m_RotationSpeed;
+			m_Pitch += rotation.y * m_RotationSpeed;
+		}
 	}
 
 	void CameraController::PanCamera(const glm::vec2& panning)

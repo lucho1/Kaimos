@@ -63,10 +63,10 @@ namespace Kaimos {
 		// Resize changes Aspect Ratio
 		bool OnWindowResized(WindowResizeEvent& ev);
 
-		// TODO: More events - like middle button, right button...
-
 		// --- Private Camera Methods ---
-		void RotateCamera(const glm::vec2& rotation);
+		void AdvanceCamera(const glm::vec2& movement);
+		void RotateCamera(const glm::vec2& movement);
+		void OrbitCamera(const glm::vec2& rotation);
 		void PanCamera(const glm::vec2& panning);
 		void ZoomCamera(float zoom);
 
