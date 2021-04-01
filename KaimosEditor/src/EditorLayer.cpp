@@ -257,38 +257,42 @@ namespace Kaimos {
 
 			// -- Guizmo --
 			Entity selected_entity = m_ScenePanel.GetSelectedEntity();
-			if (selected_entity && m_ToolbarPanel.m_SelectedOperation != -1 && !Input::IsKeyPressed(KEY::LEFT_ALT)) // TODO: Camera IsUsing on cam rework
+			if (selected_entity && m_ToolbarPanel.m_SelectedOperation != -1)
 			{
+				// Set Guizmo
+				m_EditorCamera.UsingGuizmo(ImGuizmo::IsOver());
 				ImGuizmo::SetOrthographic(false);
 				ImGuizmo::SetDrawlist();
 				ImGuizmo::SetRect(m_ViewportLimits[0].x, m_ViewportLimits[0].y, m_ViewportLimits[1].x - m_ViewportLimits[0].x, m_ViewportLimits[1].y - m_ViewportLimits[0].y);
-
-				// Camera
-				const glm::mat4& cam_proj = m_EditorCamera.GetCamera().GetProjection();
-				glm::mat4 cam_view = m_EditorCamera.GetCamera().GetView();
 
 				// Entity Transformation
 				TransformComponent& transform = selected_entity.GetComponent<TransformComponent>();
 				glm::mat4 tr_mat = transform.GetTransform();
 
-				// Snapping
-				bool snap = Input::IsKeyPressed(KEY::LEFT_CONTROL) || Input::IsKeyPressed(KEY::RIGHT_CONTROL) || m_ToolbarPanel.m_Snap;
-				float snap_value = 0.5f;
+				if (!m_EditorCamera.IsBeingUsed())
+				{
+					// Camera
+					const glm::mat4& cam_proj = m_EditorCamera.GetCamera().GetProjection();
+					glm::mat4 cam_view = m_EditorCamera.GetCamera().GetView();
 
-				if (m_ToolbarPanel.m_SelectedOperation == ImGuizmo::OPERATION::ROTATE)
-					snap_value = 10.0f;
+					// Snapping
+					bool snap = Input::IsKeyPressed(KEY::LEFT_CONTROL) || Input::IsKeyPressed(KEY::RIGHT_CONTROL) || m_ToolbarPanel.m_Snap;
+					float snap_value = 0.5f;
 
-				float snap_array[3] = { snap_value, snap_value, snap_value };
+					if (m_ToolbarPanel.m_SelectedOperation == ImGuizmo::OPERATION::ROTATE)
+						snap_value = 10.0f;
 
-				// Guizmo Manipulation
-				ImGuizmo::Manipulate(glm::value_ptr(cam_view), glm::value_ptr(cam_proj), (ImGuizmo::OPERATION)m_ToolbarPanel.m_SelectedOperation, (ImGuizmo::MODE)m_ToolbarPanel.m_WorldMode,
-					glm::value_ptr(tr_mat),	nullptr, snap ? snap_array : nullptr);
+					float snap_array[3] = { snap_value, snap_value, snap_value };
 
+					// Guizmo Manipulation
+					ImGuizmo::Manipulate(glm::value_ptr(cam_view), glm::value_ptr(cam_proj), (ImGuizmo::OPERATION)m_ToolbarPanel.m_SelectedOperation, (ImGuizmo::MODE)m_ToolbarPanel.m_WorldMode,
+						glm::value_ptr(tr_mat), nullptr, snap ? snap_array : nullptr);
+				}
+				
 				if (ImGuizmo::IsUsing())
 				{
 					glm::vec3 translation, rotation, scale;
 					Maths::DecomposeTransformation(tr_mat, translation, rotation, scale);
-
 
 					transform.Translation = translation;
 					transform.Rotation += rotation - transform.Rotation;

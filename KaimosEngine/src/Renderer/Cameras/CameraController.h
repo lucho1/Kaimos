@@ -52,8 +52,10 @@ namespace Kaimos {
 		inline void SetSpeedMultiplier(float multiplier)			{ m_SpeedMultiplier = multiplier; }
 		inline void SetMaxZoomSpeed(float speed)					{ m_MaxZoomSpeed = speed; }
 
+		inline void UsingGuizmo(bool using_guizmo)					{ m_UsingGuizmo = using_guizmo; }
 		inline void LockRotation(bool lock)							{ m_LockRotation = lock; }
 		inline bool IsRotationLocked()								const { return m_LockRotation; }
+		inline bool IsBeingUsed()									const { return m_UsingCamera; }
 
 	private:
 
@@ -90,6 +92,8 @@ namespace Kaimos {
 		float m_SpeedMultiplier = 1.0f, m_MaxZoomSpeed = 100.0f;
 
 		bool m_LockRotation = false;
+		bool m_UsingGuizmo = false;
+		bool m_UsingCamera = false;
 	};
 }
 

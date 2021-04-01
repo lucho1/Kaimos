@@ -23,12 +23,19 @@ namespace Kaimos {
 
 	void CameraController::OnUpdate(Timestep dt, bool viewport_focused)
 	{
+		m_UsingCamera = false;
 		const glm::vec2& mouse_pos = Input::GetMousePos();
 		if (viewport_focused)
 		{
 			// -- Focus --
 			if (Input::IsKeyPressed(KEY::F))
 				int a = 0;
+
+			if (m_UsingGuizmo)
+			{
+				m_InitialMousePosition = mouse_pos;
+				return;
+			}
 
 			// -- Mouse Calc --
 			glm::vec2 delta = (mouse_pos - m_InitialMousePosition) * 0.003f;
@@ -42,17 +49,19 @@ namespace Kaimos {
 			{
 				if(Input::IsKeyPressed(KEY::LEFT_ALT))
 					ZoomCamera(delta.y);
-				else
+				else if(!m_UsingGuizmo)
 					PanCamera(-delta);
 			}
 			else if (Input::IsMouseButtonPressed(MOUSE::BUTTON_LEFT))
 			{
+				m_UsingCamera = true;
 				if (Input::IsKeyPressed(KEY::LEFT_ALT))
 					OrbitCamera(delta);
 				else
 					AdvanceCamera(delta);
 			}
-			else if (Input::IsMouseButtonPressed(MOUSE::BUTTON_RIGHT))
+
+			if (Input::IsMouseButtonPressed(MOUSE::BUTTON_RIGHT))
 			{
 				if (Input::IsKeyPressed(KEY::LEFT_ALT))
 					ZoomCamera(delta.y);
@@ -66,17 +75,17 @@ namespace Kaimos {
 						speed *= m_SpeedMultiplier;
 
 					if (Input::IsKeyPressed(KEY::W))
-						m_Position += GetForwardVector() * (speed * dt * 12.0f);
+						SetPosition(m_Position + GetForwardVector() * (speed * dt * 12.0f));
 					if (Input::IsKeyPressed(KEY::S))
-						m_Position -= GetForwardVector() * (speed * dt * 12.0f);
+						SetPosition(m_Position - GetForwardVector() * (speed * dt * 12.0f));
 					if (Input::IsKeyPressed(KEY::A))
-						m_Position -= GetRightVector() * (speed * dt * 10.0f);
+						SetPosition(m_Position - GetRightVector() * (speed * dt * 10.0f));
 					if (Input::IsKeyPressed(KEY::D))
-						m_Position += GetRightVector() * (speed * dt * 10.0f);
+						SetPosition(m_Position + GetRightVector() * (speed * dt * 10.0f));
 					if (Input::IsKeyPressed(KEY::Q))
-						m_Position -= glm::vec3(0.0f, 1.0f, 0.0f) * (speed * dt * 10.0f);
+						SetPosition(m_Position - glm::vec3(0.0f, 1.0f, 0.0f) * (speed * dt * 10.0f));
 					if (Input::IsKeyPressed(KEY::E))
-						m_Position += glm::vec3(0.0f, 1.0f, 0.0f) * (speed * dt * 10.0f);
+						SetPosition(m_Position + glm::vec3(0.0f, 1.0f, 0.0f) * (speed * dt * 10.0f));
 				}
 			}
 		}
