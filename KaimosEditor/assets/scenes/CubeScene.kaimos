@@ -11,11 +11,12 @@ Entities:
     CameraComponent:
       Camera:
         ProjectionType: 0
+        ViewSize: [1280, 720]
         FOV: 45
         FarClip: 9915
         NearClip: 0.36500001
         OrthoSize: 10
-      PrimaryCamera: false
+      PrimaryCamera: true
       FixedAR: false
   - Entity: 70065788
     TagComponent:

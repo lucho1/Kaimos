@@ -46,8 +46,6 @@ namespace Kaimos {
 		// Scene
 		CameraController m_EditorCamera;
 		Ref<Scene> m_CurrentScene = nullptr;
-		Entity m_Entity = {};
-		Entity m_CameraEntity = {};
 
 		ScenePanel m_ScenePanel = {};
 		SettingsPanel m_SettingsPanel = {};
@@ -65,6 +63,9 @@ namespace Kaimos {
 		Ref<VertexArray> m_VArray = nullptr;
 		
 		Ref<Framebuffer> m_Framebuffer = nullptr;
+		Ref<Framebuffer> m_PrimaryCameraFramebuffer = nullptr;
+		glm::ivec2 m_DefaultViewportResolution = glm::ivec2(1280, 720); // Default res 1280x720 (TODO: Make this a thing of the system itself, not hardcoded)
+
 		Ref<Shader> m_Shader = nullptr;
 		Ref<Texture2D> m_CheckerTexture = nullptr;
 		Ref<Texture2D> m_LogoTexture = nullptr;

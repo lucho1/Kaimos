@@ -27,15 +27,10 @@ namespace Kaimos {
 	//																-- If "group" is iterated, we could code "auto&[c1, c2] = group.get<Comp1, Comp2>(ent)" (c1, c2 being variables)
 
 
-
-	// ----------------------- Public Scene Methods -------------------------------------------------------
-	void Scene::OnUpdateEditor(Timestep dt, const Camera& camera)
+	
+	// ----------------------- Public/Private Scene Methods -----------------------------------------------
+	void Scene::RenderScene()
 	{
-		KS_PROFILE_FUNCTION();
-
-		// -- Render --
-		Renderer2D::BeginScene(camera);
-
 		auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
 		for (auto ent : group)
 		{
@@ -43,7 +38,16 @@ namespace Kaimos {
 			if (transform.EntityActive)
 				Renderer2D::DrawSprite(transform.GetTransform(), sprite, (int)ent);
 		}
+	}
 
+
+	void Scene::OnUpdateEditor(Timestep dt, const Camera& camera)
+	{
+		KS_PROFILE_FUNCTION();
+
+		// -- Render --
+		Renderer2D::BeginScene(camera);
+		RenderScene();
 		Renderer2D::EndScene();
 	}
 
@@ -53,7 +57,7 @@ namespace Kaimos {
 		KS_PROFILE_FUNCTION();
 
 		// -- Scripts (should be in Scene::OnScenePlay() or similar, upon pressing engine's play button) --
-		m_Registry.view<NativeScriptComponent>().each([=](auto entity, auto& component) // Lambda that will be called for each of the NativeScriptComponent
+		/*m_Registry.view<NativeScriptComponent>().each([=](auto entity, auto& component) // Lambda that will be called for each of the NativeScriptComponent
 			{
 				if (!component.EntityInstance)
 				{
@@ -63,25 +67,23 @@ namespace Kaimos {
 				}
 
 				component.EntityInstance->OnUpdate(dt);
-			});
+			});*/
 
 
 		// -- Render --
+		static bool primary_camera_warn = false;
 		if (m_PrimaryCamera)
 		{
 			Renderer2D::BeginScene(m_PrimaryCamera.GetComponent<CameraComponent>(), m_PrimaryCamera.GetComponent<TransformComponent>());
-			auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
-			for (auto ent : group)
-			{
-				auto& [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(ent);
-				if (transform.EntityActive)
-					Renderer2D::DrawSprite(transform.GetTransform(), sprite, (int)ent);
-			}
-
+			RenderScene();
 			Renderer2D::EndScene();
+			primary_camera_warn = false;
 		}
-		else
-			KS_ENGINE_WARN("No Primary Camera Setted!");		
+		else if(!primary_camera_warn)
+		{
+			primary_camera_warn = true;
+			KS_ENGINE_WARN("No Primary Camera Setted!");
+		}
 	}
 
 	void Scene::SetViewportSize(uint width, uint height)
@@ -90,13 +92,13 @@ namespace Kaimos {
 		m_ViewportHeight = height;
 
 		// -- Resize Cameras with non-fixed AR --
-		auto view = m_Registry.view<CameraComponent>();
-		for (auto entity : view)
-		{
-			auto& camComp = view.get<CameraComponent>(entity);
-			if (!camComp.FixedAspectRatio)
-				camComp.Camera.SetViewport(width, height);
-		}
+		//auto view = m_Registry.view<CameraComponent>();
+		//for (auto entity : view)
+		//{
+		//	auto& camComp = view.get<CameraComponent>(entity);
+		//	if (!camComp.FixedAspectRatio)
+		//		camComp.Camera.SetViewport(width, height);
+		//}
 	}
 
 
@@ -172,7 +174,7 @@ namespace Kaimos {
 	template<>
 	void Scene::OnComponentAdded<CameraComponent>(Entity entity, CameraComponent& component) const
 	{
-		component.Camera.SetViewport(m_ViewportWidth, m_ViewportHeight);
+		component.Camera.SetViewport(component.Camera.GetViewportSize().x, component.Camera.GetViewportSize().y);
 	}
 
 	template<>

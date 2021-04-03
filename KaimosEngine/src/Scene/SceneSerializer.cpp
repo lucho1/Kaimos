@@ -164,7 +164,9 @@ namespace Kaimos {
 
 			// -- Begin Cam Map --
 			output << YAML::BeginMap;
-			output << YAML::Key << "ProjectionType" << YAML::Value << (int)camera.GetProjectionType();			
+			output << YAML::Key << "ProjectionType" << YAML::Value << (int)camera.GetProjectionType();
+
+			output << YAML::Key << "ViewSize" << YAML::Value << camera.GetViewportSize();
 			output << YAML::Key << "FOV" << YAML::Value << (int)camera.GetFOV();
 			output << YAML::Key << "FarClip" << YAML::Value << camera.GetFarPlane();
 			output << YAML::Key << "NearClip" << YAML::Value <<camera.GetNearPlane();
@@ -290,6 +292,9 @@ namespace Kaimos {
 					else
 						cam_comp.Camera.SetPerspectiveParameters();
 
+					glm::vec2 cam_view_size = camera_node["ViewSize"].as<glm::vec2>();
+					cam_comp.Camera.SetViewport(cam_view_size.x, cam_view_size.y);
+
 					cam_comp.Camera.SetFOV(camera_node["FOV"].as<float>());
 					cam_comp.Camera.SetNearPlane(camera_node["NearClip"].as<float>());
 					cam_comp.Camera.SetFarPlane(camera_node["FarClip"].as<float>());
@@ -297,6 +302,9 @@ namespace Kaimos {
 
 					cam_comp.Primary = cameracomp_node["PrimaryCamera"].as<bool>();
 					cam_comp.FixedAspectRatio = cameracomp_node["FixedAR"].as<bool>();
+
+					if(cam_comp.Primary)
+						m_Scene->SetPrimaryCamera(deserialized_entity);
 				}
 
 				YAML::Node sprite_node = entity["SpriteRendererComponent"];

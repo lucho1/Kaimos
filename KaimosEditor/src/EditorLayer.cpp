@@ -38,11 +38,17 @@ namespace Kaimos {
 		m_IconsArray[6] = Texture2D::Create("../KaimosEngine/res/icons/world_trs_icon.png");
 		m_IconsArray[7] = Texture2D::Create("../KaimosEngine/res/icons/camera_icon.png");
 
-		FramebufferSettings fboSettings;
-		fboSettings.FBOAttachments = { TEXTURE_FORMAT::RGBA8, TEXTURE_FORMAT::RED_INTEGER, TEXTURE_FORMAT::DEPTH};
-		fboSettings.Width = 1280;
-		fboSettings.Height = 720;
-		m_Framebuffer = Framebuffer::Create(fboSettings);
+		FramebufferSettings fbo_settings;
+		fbo_settings.FBOAttachments = { TEXTURE_FORMAT::RGBA8, TEXTURE_FORMAT::RED_INTEGER, TEXTURE_FORMAT::DEPTH};
+		fbo_settings.Width = m_DefaultViewportResolution.x;
+		fbo_settings.Height = m_DefaultViewportResolution.y;
+		m_Framebuffer = Framebuffer::Create(fbo_settings);
+
+		FramebufferSettings primcam_fbo_settings;
+		primcam_fbo_settings.FBOAttachments = { TEXTURE_FORMAT::RGBA8, TEXTURE_FORMAT::DEPTH };		
+		primcam_fbo_settings.Width = m_DefaultViewportResolution.x;
+		primcam_fbo_settings.Height = m_DefaultViewportResolution.y;
+		m_PrimaryCameraFramebuffer = Framebuffer::Create(primcam_fbo_settings);
 
 		m_CurrentScene = CreateRef<Scene>();
 		m_ScenePanel.SetContext(m_CurrentScene);
@@ -109,6 +115,13 @@ namespace Kaimos {
 		}
 		
 		m_Framebuffer->Unbind();
+
+		// -- Primary Camera Rendering --
+		m_PrimaryCameraFramebuffer->Bind();
+		RenderCommand::SetClearColor(glm::vec4(0.08f, 0.08f, 0.08f, 1.0f));
+		RenderCommand::Clear();
+		m_CurrentScene->OnUpdateRuntime(dt);
+		m_PrimaryCameraFramebuffer->Unbind();
 	}
 
 
@@ -260,20 +273,74 @@ namespace Kaimos {
 			m_ViewportSize = glm::vec2(ViewportPanelSize.x, ViewportPanelSize.y);
 			ImGui::Image(reinterpret_cast<void*>(m_Framebuffer->GetFBOTextureID()), ViewportPanelSize, ImVec2(0, 1), ImVec2(1, 0));
 
+
+
+			// -- Primary Camera Mini-Screen --
+			// Mini-Screen Size
+			glm::ivec2 reduced_default_res = m_DefaultViewportResolution / 8;
+			ImVec2 camera_img_size = ImVec2((float)reduced_default_res.x, (float)reduced_default_res.y);
+
+			// Mini-Screen Pos
+			float mini_posX = ImGui::GetWindowPos().x + ImGui::GetWindowContentRegionMin().x - camera_img_size.x * 1.45f;
+			float mini_posY = ImGui::GetWindowPos().y + ImGui::GetWindowContentRegionMin().y - camera_img_size.y * 2.0f;
+			static glm::vec2 size_increase = glm::vec2(0.0f);
+			
+			glm::vec2 mini_screen_pos = { mini_posX + ImGui::GetWindowSize().x, mini_posY + ImGui::GetWindowSize().y };
+			mini_screen_pos -= size_increase;
+			ImGui::SetNextWindowPos({ mini_screen_pos.x, mini_screen_pos.y });
+
+			// Mini-Screen
+			// --- TODO: Add Options: !Show, Show Only on Cam. Selection, Show always + "NoCamera" Texture ---
+			ImGuiWindowFlags w_camdisp_flags = ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
+			ImGui::Begin("Primary Camera Display", nullptr, w_camdisp_flags);			
+			
+			// Draw Primary Camera onto Mini-Screen & Modify its size according to it
+			if (Entity camera = m_CurrentScene->GetPrimaryCamera())
+			{
+				// Min/Max mini-screen resolutions (TODO: Make this a thing of the system itself, not hardcoded)
+				int max_x = 2048 / 8, max_y = 1280 / 8, min_x = 780 / 8, min_y = 460 / 8;
+				glm::ivec2 cam_view_size = camera.GetComponent<CameraComponent>().Camera.GetViewportSize() / 8;
+
+				cam_view_size.x = std::clamp(cam_view_size.x, min_x, max_x);
+				cam_view_size.y = std::clamp(cam_view_size.y, min_y, max_y);
+				size_increase = cam_view_size - reduced_default_res;
+				
+				// Set Pos, Size & Draw Camera
+				camera_img_size = ImVec2((float)cam_view_size.x, (float)cam_view_size.y);
+				ImGui::SetWindowSize({ camera_img_size.x + 30.0f, camera_img_size.y + 29.0f });
+				ImGui::Image(reinterpret_cast<void*>(m_PrimaryCameraFramebuffer->GetFBOTextureID()), camera_img_size, ImVec2(0, 1), ImVec2(1, 0));
+			}
+			else
+			{
+				// Set size increase to 0 + If not primary camera, set window size back to normal
+				size_increase = glm::vec2(0.0f);
+				ImGui::SetWindowSize({ camera_img_size.x + 30.0f, camera_img_size.y + 29.0f });
+
+				// Print a warning text in the middle
+				std::string no_text_str = "No Primary Camera Selected!";
+				float text_size_x = ImGui::CalcTextSize(no_text_str.c_str()).x;
+				ImGui::SameLine(ImGui::GetWindowSize().x/2.0f - text_size_x/2.0f);
+				ImGui::TextColored({0.8f, 0.8f, 0.2f, 1.0f}, no_text_str.c_str());
+			}
+
+			ImGui::End();
+
+
+
 			// -- Camera Speed Multiplier Modification --
 			if (m_MultiSpeedPanelAlpha > 0.0f)
 			{
 				m_MultiSpeedPanelAlpha -= 0.015f;
 
 				static ImVec2 popup_size = ImVec2(938.0f, 422.0f);
-				ImVec2 size = ImGui::GetWindowSize();
+				ImVec2 win_size = ImGui::GetWindowSize();
 				float posX = ImGui::GetWindowPos().x + ImGui::GetWindowContentRegionMin().x - popup_size.x/2.0f - 10.0f;
 				float posY = ImGui::GetWindowPos().y + ImGui::GetWindowContentRegionMin().y - popup_size.y/2.0f - 25.0f;
 
-				ImGui::SetNextWindowPos({ posX + size.x/2.0f, posY + size.y/2.0f });
+				ImGui::SetNextWindowPos({ posX + win_size.x/2.0f, posY + win_size.y/2.0f });
 				ImGui::SetNextWindowBgAlpha(m_MultiSpeedPanelAlpha);
 
-				if (ImGui::Begin("Example: Simple overlay", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav))
+				if (ImGui::Begin("Speed Multiplicator Overlay", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav))
 				{
 					popup_size = ImGui::GetWindowSize();
 					ImGui::SetWindowFontScale(2);
@@ -283,6 +350,7 @@ namespace Kaimos {
 				}
 				ImGui::End();
 			}
+
 
 
 			// -- Guizmo --

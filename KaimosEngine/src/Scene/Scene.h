@@ -45,6 +45,9 @@ namespace Kaimos {
 
 	private:
 
+		// --- Private Scene Methods ---
+		void RenderScene();
+
 		// --- Private Entities Methods ---
 		template<typename T>
 		void OnComponentAdded(Entity entity, T& component) const;
