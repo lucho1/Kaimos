@@ -69,6 +69,8 @@ namespace Kaimos {
 		Ref<VertexArray> m_VArray = nullptr;
 		
 		Ref<Framebuffer> m_Framebuffer = nullptr;
+		Ref<Framebuffer> m_GameFramebuffer = nullptr;
+		bool m_RenderGamePanel = true, m_RenderViewport = true;
 		Ref<Framebuffer> m_PrimaryCameraFramebuffer = nullptr;
 		glm::ivec2 m_DefaultViewportResolution = glm::ivec2(1280, 720); // Default res 1280x720 (TODO: Make this a thing of the system itself, not hardcoded)
 

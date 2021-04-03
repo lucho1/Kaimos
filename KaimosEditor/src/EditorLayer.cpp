@@ -48,6 +48,8 @@ namespace Kaimos {
 		primcam_fbo_settings.FBOAttachments = { TEXTURE_FORMAT::RGBA8, TEXTURE_FORMAT::DEPTH };		
 		primcam_fbo_settings.Width = m_DefaultViewportResolution.x;
 		primcam_fbo_settings.Height = m_DefaultViewportResolution.y;
+		
+		m_GameFramebuffer = Framebuffer::Create(fbo_settings);
 		m_PrimaryCameraFramebuffer = Framebuffer::Create(primcam_fbo_settings);
 
 		m_CurrentScene = CreateRef<Scene>();
@@ -116,8 +118,20 @@ namespace Kaimos {
 		
 		m_Framebuffer->Unbind();
 
+		// -- Game Rendering (Primary Camera) --
+		if (m_RenderGamePanel)
+		{
+			// -- Render --
+			Renderer2D::ResetStats();
+			m_GameFramebuffer->Bind();
+			RenderCommand::SetClearColor(glm::vec4(0.15f, 0.15f, 0.15f, 1.0f));
+			RenderCommand::Clear();
+			m_CurrentScene->OnUpdateRuntime(dt);
+			m_GameFramebuffer->Unbind();
+		}
+
 		// -- Primary/Selected Camera Rendering --
-		if (m_SettingsPanel.ShowCameraMiniScreen)
+		if (m_SettingsPanel.ShowCameraMiniScreen && m_RenderViewport)
 		{
 			Entity camera = {};
 			if (m_SettingsPanel.ShowCameraWhenSelected)
@@ -131,6 +145,7 @@ namespace Kaimos {
 
 			if (camera)
 			{
+				Renderer2D::ResetStats();
 				m_PrimaryCameraFramebuffer->Bind();
 				RenderCommand::SetClearColor(glm::vec4(0.08f, 0.08f, 0.08f, 1.0f));
 				RenderCommand::Clear();
@@ -191,6 +206,7 @@ namespace Kaimos {
 		static bool show_settings_panel = true;
 		static bool show_performance_panel = true;
 		static bool show_viewport_panel = true;
+		static bool show_game_panel = true;
 		static bool show_uidemo = false;
 		
 		// -- Upper Menu Tab Bar --
@@ -221,6 +237,7 @@ namespace Kaimos {
 				ImGui::MenuItem("Toolbar", nullptr, &show_toolbar);
 				ImGui::MenuItem("Scene Panel", nullptr, &show_scene_panel);
 				ImGui::MenuItem("Viewport", nullptr, &show_viewport_panel);
+				ImGui::MenuItem("Game Panel", nullptr, &show_game_panel);
 				ImGui::MenuItem("Settings Panel", nullptr, &show_settings_panel);
 				ImGui::MenuItem("Performance Panel", nullptr, &show_performance_panel);
 				ImGui::MenuItem("Project Panel", nullptr, &show_project_panel);
@@ -266,7 +283,7 @@ namespace Kaimos {
 		// -- Viewport --
 		if (show_viewport_panel)
 		{
-			ImGui::Begin("Viewport", &show_viewport_panel);
+			ImGui::Begin("Viewport", &show_viewport_panel, ImGuiWindowFlags_NoScrollbar);
 			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0.0f, 0.0f));
 
 			m_ViewportFocused = ImGui::IsWindowFocused();
@@ -285,14 +302,18 @@ namespace Kaimos {
 
 
 			// Get viewport size & draw fbo texture
-			ImVec2 ViewportPanelSize = ImGui::GetContentRegionAvail();
-			m_ViewportSize = glm::vec2(ViewportPanelSize.x, ViewportPanelSize.y);
-			ImGui::Image(reinterpret_cast<void*>(m_Framebuffer->GetFBOTextureID()), ViewportPanelSize, ImVec2(0, 1), ImVec2(1, 0));
-
-
+			ImVec2 viewportpanel_size = ImGui::GetContentRegionAvail();
+			m_ViewportSize = glm::vec2(viewportpanel_size.x, viewportpanel_size.y);
+			ImGui::Image(reinterpret_cast<void*>(m_Framebuffer->GetFBOTextureID()), viewportpanel_size, ImVec2(0, 1), ImVec2(1, 0));
 
 			// -- Primary Camera Mini-Screen --
-			ShowPrimaryCameraDisplay();
+			if (ImGui::IsItemVisible())
+			{
+				m_RenderViewport = true;
+				ShowPrimaryCameraDisplay();
+			}
+			else
+				m_RenderViewport = false;
 
 
 			// -- Camera Speed Multiplier Modification --
@@ -305,6 +326,22 @@ namespace Kaimos {
 			ImGui::PopStyleVar();
 			ImGui::End();
 		}
+
+		if (show_game_panel)
+		{
+			m_RenderGamePanel = true;
+			ImGui::Begin("Game", &show_game_panel, ImGuiWindowFlags_NoScrollbar);
+			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0.0f, 0.0f));
+			ImGui::Image(reinterpret_cast<void*>(m_GameFramebuffer->GetFBOTextureID()), ImGui::GetContentRegionAvail(), ImVec2(0, 1), ImVec2(1, 0));
+
+			if (!ImGui::IsItemVisible())
+				m_RenderGamePanel = false;
+
+			ImGui::PopStyleVar();
+			ImGui::End();
+		}
+		else
+			m_RenderGamePanel = false;
 	}
 
 
