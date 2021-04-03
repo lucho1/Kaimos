@@ -86,6 +86,17 @@ namespace Kaimos {
 		}
 	}
 
+	void Scene::RenderFromCamera(Timestep dt, const Entity& camera_entity)
+	{
+		// -- Render --
+		if (camera_entity && camera_entity.HasComponent<CameraComponent>())
+		{
+			Renderer2D::BeginScene(camera_entity.GetComponent<CameraComponent>(), camera_entity.GetComponent<TransformComponent>());
+			RenderScene();
+			Renderer2D::EndScene();
+		}
+	}
+
 	void Scene::SetViewportSize(uint width, uint height)
 	{
 		m_ViewportWidth = width;

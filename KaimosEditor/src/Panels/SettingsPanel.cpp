@@ -20,6 +20,25 @@ namespace Kaimos {
 				entity_name = hovered_entity.GetComponent<TagComponent>().Tag;
 
 			ImGui::Text("Hovered Entity: %s", entity_name.c_str());
+
+			// Camera Display Options
+			ImGui::NewLine(); ImGui::Separator();
+			static uint current_option_type = 0;
+			const char* camera_viewport_display_options[] = { "Always Show", "Show Only on Camera Selected", "Never Show" };
+			const char* current_option = camera_viewport_display_options[current_option_type];
+
+			ImGui::Text("Primary Camera Mini-Screen Viewport");
+			if (KaimosUI::UIFunctionalities::DrawDropDown("Display Options", camera_viewport_display_options, 3, current_option, current_option_type, ImGui::CalcItemWidth() / 2.0f))
+			{
+				switch (current_option_type)
+				{
+					case 0:		ShowCameraMiniScreen = true; ShowCameraWhenSelected = false;	break;
+					case 1:		ShowCameraMiniScreen = true; ShowCameraWhenSelected = true;		break;
+					case 2:		ShowCameraMiniScreen = false; ShowCameraWhenSelected = false;	break;
+					default:	ShowCameraMiniScreen = true; ShowCameraWhenSelected = false;	break;
+				}
+			}
+
 			ImGui::End();
 		}
 		

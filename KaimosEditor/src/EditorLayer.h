@@ -28,6 +28,11 @@ namespace Kaimos {
 
 	private:
 
+		// --- Private Editor UI Methods ---
+		void ShowPrimaryCameraDisplay();
+		void ShowCameraSpeedMultiplier();
+		void ShowGuizmo();
+
 		// --- Event Methods ---
 		bool OnKeyPressed(KeyPressedEvent& ev);
 		bool OnMouseButtonPressed(MouseButtonPressedEvent& ev);
@@ -39,6 +44,7 @@ namespace Kaimos {
 		void OpenScene();
 		void SaveScene();
 		void SaveSceneAs();
+
 
 	private:
 

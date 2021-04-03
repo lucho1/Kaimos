@@ -22,6 +22,11 @@ namespace Kaimos {
 		void DisplayMemoryMetrics();
 		void DisplayRenderingMetrics();
 
+	public:
+
+		bool ShowCameraMiniScreen = true;
+		bool ShowCameraWhenSelected = false;
+
 	private:
 
 		uint m_MemoryAllocations[MEMORY_ALLOCATIONS_SAMPLES] = { 0 };

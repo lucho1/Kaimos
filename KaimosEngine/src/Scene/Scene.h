@@ -25,6 +25,7 @@ namespace Kaimos {
 		// --- Public Scene Methods ---
 		void OnUpdateEditor(Timestep dt, const Camera& camera);
 		void OnUpdateRuntime(Timestep dt);
+		void RenderFromCamera(Timestep dt, const Entity& camera_entity);
 		void SetViewportSize(uint width, uint height);
 
 		// --- Public Entities Methods ---
