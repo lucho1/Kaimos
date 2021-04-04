@@ -24,7 +24,7 @@ namespace Kaimos {
 			// Camera Display Options
 			ImGui::NewLine(); ImGui::Separator();
 			static uint current_option_type = 0;
-			const char* camera_viewport_display_options[] = { "Always Show", "Show Only on Camera Selected", "Never Show" };
+			const char* camera_viewport_display_options[] = { "Always Show Primary Camera", "Show Only on Camera Selected", "Never Show" };
 			const char* current_option = camera_viewport_display_options[current_option_type];
 
 			ImGui::Text("Primary Camera Mini-Screen Viewport");
