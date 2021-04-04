@@ -306,6 +306,7 @@ namespace Kaimos {
 			m_ViewportSize = glm::vec2(viewportpanel_size.x, viewportpanel_size.y);
 			ImGui::Image(reinterpret_cast<void*>(m_Framebuffer->GetFBOTextureID()), viewportpanel_size, ImVec2(0, 1), ImVec2(1, 0));
 
+
 			// -- Primary Camera Mini-Screen --
 			if (ImGui::IsItemVisible())
 			{
@@ -319,7 +320,6 @@ namespace Kaimos {
 			// -- Camera Speed Multiplier Modification --
 			ShowCameraSpeedMultiplier();
 
-
 			// -- Guizmo --
 			ShowGuizmo();
 
@@ -330,9 +330,25 @@ namespace Kaimos {
 		if (show_game_panel)
 		{
 			m_RenderGamePanel = true;
-			ImGui::Begin("Game", &show_game_panel, ImGuiWindowFlags_NoScrollbar);
+			ImGui::Begin("Game", &show_game_panel, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
 			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0.0f, 0.0f));
-			ImGui::Image(reinterpret_cast<void*>(m_GameFramebuffer->GetFBOTextureID()), ImGui::GetContentRegionAvail(), ImVec2(0, 1), ImVec2(1, 0));
+
+			Entity camera = m_CurrentScene->GetPrimaryCamera();
+			if (camera)
+			{
+				ImVec2 viewport_size = ImGui::GetWindowSize();				
+				glm::vec2 cam_size = camera.GetComponent<CameraComponent>().Camera.GetViewportSize();
+
+				float scale_x = 1.0f, scale_y = 1.0f;
+				if (viewport_size.x <= cam_size.x)
+					scale_x = viewport_size.x / cam_size.x;
+				
+				if (viewport_size.y <= cam_size.y)
+					scale_y = viewport_size.y / cam_size.y;
+
+				glm::vec2 size = cam_size * std::min(scale_x, scale_y * 0.9f);
+				ImGui::Image(reinterpret_cast<void*>(m_GameFramebuffer->GetFBOTextureID()), { size.x, size.y }, ImVec2(0, 1), ImVec2(1, 0));
+			}
 
 			if (!ImGui::IsItemVisible())
 				m_RenderGamePanel = false;
