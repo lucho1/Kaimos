@@ -70,8 +70,8 @@ namespace Kaimos {
 		if (m_Console.CopyToClipboard)
 			ImGui::LogToClipboard();
 
-		//static std::vector<Kaimos::LogData::KaimosLog> vec = Log::GetLogs();
-		//vec = Log::GetLogs();
+		std::vector<Kaimos::LogData::KaimosLog> vec = Log::GetLogs();
+		//Log::GetLogs();
 		
 		//static const MemoryMetrics& m = Application::Get().GetMemoryMetrics();
 

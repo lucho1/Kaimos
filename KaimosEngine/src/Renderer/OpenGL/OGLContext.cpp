@@ -28,7 +28,7 @@ namespace Kaimos {
 		int v_maj, v_min;
 		glGetIntegerv(GL_MAJOR_VERSION, &v_maj);
 		glGetIntegerv(GL_MINOR_VERSION, &v_min);
-		KS_ENGINE_ASSERT(v_maj == 4 && v_min <= 6, "Wrong OpenGL version!");
+		KS_ENGINE_ASSERT((v_maj == 4 && v_min <= 6), "Wrong OpenGL version!");
 	}
 
 
