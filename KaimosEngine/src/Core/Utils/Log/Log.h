@@ -11,44 +11,14 @@
 
 namespace Kaimos {
 
-	namespace LogData {
-
-		enum class LOG_TYPES { NO_LOG = 0, TRACE_LOG, INFO_LOG, WARN_LOG, ERROR_LOG };
-		struct KaimosLog
-		{
-			KaimosLog(const char* log, LOG_TYPES type) : Log(log), LogType(type) {}
-			const char* Log = "";
-			LOG_TYPES LogType = LOG_TYPES::NO_LOG;
-		};
-
-		static std::vector<KaimosLog> m_Logs; // Logs
-		static void AddLog(LogData::LOG_TYPES type, const char* log)
-		{
-			KaimosLog klog("AAA", type);
-			m_Logs.push_back(klog);
-		}
-	}
-
 	class Log
 	{
 	public:
 
 		static void Init();
 
-		inline static Ref<spdlog::logger>& GetEngineLogger()			{ return s_EngineLogger; }
-		inline static Ref<spdlog::logger>& GetEditorLogger()			{ return s_EditorLogger; }
-		
-		inline static const std::vector<LogData::KaimosLog>& GetLogs()	{
-			return LogData::m_Logs;
-		}
-
-		static void AddLog(LogData::LOG_TYPES type, const char* log)
-		{
-			//std::string str(log);
-			LogData::AddLog(type, log);
-			//LogData::KaimosLog klog("EXAMPLE", type);
-			//LogData::m_Logs.push_back(klog);
-		}
+		inline static Ref<spdlog::logger>& GetEngineLogger() { return s_EngineLogger; }
+		inline static Ref<spdlog::logger>& GetEditorLogger() { return s_EditorLogger; }
 
 	private:
 
@@ -80,19 +50,8 @@ inline Ostream& operator<<(Ostream& ostream, const glm::qua<T, Q>& quat)
 
 
 
-// --- __VA_ARGS__ Conversion to const char* ---
-template<typename FormatString, typename... Args>
-inline const char* StringFromArgs(const FormatString& fmt, const Args &... args)
-{
-	char arg_string[1024];
-	fmt::format_to(arg_string, fmt, args...);
-	return arg_string;
-}
-
-
-
 // --- Engine/Core Logging Macros ---
-#define KS_ENGINE_TRACE(...)	::Kaimos::Log::GetEngineLogger()->trace(__VA_ARGS__);	Kaimos::LogData::AddLog(Kaimos::LogData::LOG_TYPES::TRACE_LOG, StringFromArgs(__VA_ARGS__))
+#define KS_ENGINE_TRACE(...)	::Kaimos::Log::GetEngineLogger()->trace(__VA_ARGS__)
 #define KS_ENGINE_INFO(...)		::Kaimos::Log::GetEngineLogger()->info(__VA_ARGS__)
 #define KS_ENGINE_WARN(...)		::Kaimos::Log::GetEngineLogger()->warn(__VA_ARGS__)
 #define KS_ENGINE_ERROR(...)	::Kaimos::Log::GetEngineLogger()->error(__VA_ARGS__)
