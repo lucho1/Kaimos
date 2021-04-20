@@ -126,11 +126,13 @@ namespace Kaimos {
 				//file.close();							// Actually not needed, ifstream closes itself due to RAII
 				return ret;
 			}
-			else
+			else { // Sorry for this {, it's needed because of the next define call
 				KS_ENGINE_ERROR("Couldn't read Shader file at path '{0}'", filepath);
+			}
 		}
-		else
+		else {
 			KS_ENGINE_ERROR("Couldn't open Shader file at path '{0}'", filepath);
+		}
 
 		return ret;
 	}

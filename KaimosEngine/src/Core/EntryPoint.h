@@ -36,7 +36,7 @@
 		// -- Initialization --
 		Kaimos::Log::Init();
 		KS_ENGINE_INFO("--- Kaimos Engine Started ---");
-		KS_ENGINE_INFO("	Initialized Logger");
+		KS_ENGINE_INFO("Initialized Logger");
 
 		// -- Application Creation --
 		KS_PROFILE_BEGIN_SESSION(SESSION_NAME("Startup"), SESSION_FILENAME("Startup.json"));

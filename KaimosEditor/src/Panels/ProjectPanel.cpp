@@ -70,9 +70,8 @@ namespace Kaimos {
 		if (m_Console.CopyToClipboard)
 			ImGui::LogToClipboard();
 
-		std::vector<Kaimos::Log::KaimosLog> vec = Log::GetLogs();
-
 		// - Message Filter & Color -
+		std::vector<Kaimos::Log::KaimosLog> vec = Log::GetLogs();
 		for (uint i = 0; i < vec.size(); ++i)
 		{
 			std::string message = vec[i].Log;
@@ -88,6 +87,7 @@ namespace Kaimos {
 			}
 			
 			// - Message Print -
+			message += "\n\n";
 			ImGui::TextUnformatted(message.c_str());
 			ImGui::PopStyleColor();
 		}

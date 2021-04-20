@@ -72,7 +72,7 @@ namespace Kaimos {
 				TextureFilepath = filepath;
 			}
 			else
-				KS_ENGINE_WARN("Couldn't Load Texture from '{0}'", filepath.c_str());
+				KS_EDITOR_WARN("Couldn't Load Texture from '{0}'", filepath.c_str());
 		}
 
 		SpriteRendererComponent() = default;

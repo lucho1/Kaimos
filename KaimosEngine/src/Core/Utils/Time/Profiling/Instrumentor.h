@@ -85,7 +85,9 @@ namespace Kaimos {
 			{
 				// Edge case: BeginSession() might be before Log::Init()
 				if (Log::GetEngineLogger())
+				{
 					KS_ENGINE_ERROR("Instrumentor could not open results file '{0}'.", filepath);
+				}
 			}
 		}
 

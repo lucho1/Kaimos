@@ -81,7 +81,7 @@ namespace Kaimos {
 		m_Data.Width = props.Width;
 		m_Data.Height = props.Height;
 		m_Data.Title = props.Title;
-		KS_ENGINE_INFO("Creating Window {0} with measure {1}x{2}px", props.Title, props.Width, props.Height);
+		KS_ENGINE_INFO("Creating Window {0} with resolution {1}x{2}px", props.Title, props.Width, props.Height);
 
 		// -- GLFW Initialization --
 		if (s_WindowCount == 0)

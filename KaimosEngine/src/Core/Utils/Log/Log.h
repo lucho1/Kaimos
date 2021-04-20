@@ -78,17 +78,17 @@ inline std::string StringFromArgs(const FormatString& fmt, const Args &... args)
 
 // --- Engine/Core Logging Macros ---
 #define KS_ENGINE_CONSOLE_WARN(...) ::Kaimos::Log::GetEngineLogger()->warn(__VA_ARGS__)
-#define KS_ENGINE_TRACE(...)	::Kaimos::Log::GetEngineLogger()->trace(__VA_ARGS__);	 Kaimos::Log::AddLog(Kaimos::Log::LOG_TYPES::TRACE_LOG, StringFromArgs(__VA_ARGS__))
-#define KS_ENGINE_INFO(...)		::Kaimos::Log::GetEngineLogger()->info(__VA_ARGS__);	 Kaimos::Log::AddLog(Kaimos::Log::LOG_TYPES::INFO_LOG, StringFromArgs(__VA_ARGS__))
-#define KS_ENGINE_WARN(...)		::Kaimos::Log::GetEngineLogger()->warn(__VA_ARGS__);	 Kaimos::Log::AddLog(Kaimos::Log::LOG_TYPES::WARN_LOG, StringFromArgs(__VA_ARGS__))
-#define KS_ENGINE_ERROR(...)	::Kaimos::Log::GetEngineLogger()->error(__VA_ARGS__);	 Kaimos::Log::AddLog(Kaimos::Log::LOG_TYPES::ERROR_LOG, StringFromArgs(__VA_ARGS__))
-#define KS_ENGINE_CRITICAL(...)	::Kaimos::Log::GetEngineLogger()->critical(__VA_ARGS__); Kaimos::Log::AddLog(Kaimos::Log::LOG_TYPES::ERROR_LOG, StringFromArgs(__VA_ARGS__))
+#define KS_ENGINE_TRACE(...)	::Kaimos::Log::GetEngineLogger()->trace(__VA_ARGS__);	 Kaimos::Log::AddLog(Kaimos::Log::LOG_TYPES::TRACE_LOG, StringFromArgs(__VA_ARGS__))	// ------ DON'T USE AFTER AN IF OR EQUIVALENT WITHOUT {} ------
+#define KS_ENGINE_INFO(...)		::Kaimos::Log::GetEngineLogger()->info(__VA_ARGS__);	 Kaimos::Log::AddLog(Kaimos::Log::LOG_TYPES::INFO_LOG, StringFromArgs(__VA_ARGS__))		// ------ DON'T USE AFTER AN IF OR EQUIVALENT WITHOUT {} ------
+#define KS_ENGINE_WARN(...)		::Kaimos::Log::GetEngineLogger()->warn(__VA_ARGS__);	 Kaimos::Log::AddLog(Kaimos::Log::LOG_TYPES::WARN_LOG, StringFromArgs(__VA_ARGS__))		// ------ DON'T USE AFTER AN IF OR EQUIVALENT WITHOUT {} ------
+#define KS_ENGINE_ERROR(...)	::Kaimos::Log::GetEngineLogger()->error(__VA_ARGS__);	 Kaimos::Log::AddLog(Kaimos::Log::LOG_TYPES::ERROR_LOG, StringFromArgs(__VA_ARGS__))	// ------ DON'T USE AFTER AN IF OR EQUIVALENT WITHOUT {} ------
+#define KS_ENGINE_CRITICAL(...)	::Kaimos::Log::GetEngineLogger()->critical(__VA_ARGS__); Kaimos::Log::AddLog(Kaimos::Log::LOG_TYPES::ERROR_LOG, StringFromArgs(__VA_ARGS__))	// ------ DON'T USE AFTER AN IF OR EQUIVALENT WITHOUT {} ------
 
 // --- Editor/Client Logging Macros ---
-#define KS_EDITOR_TRACE(...)	::Kaimos::Log::GetEditorLogger()->trace(__VA_ARGS__);	 Kaimos::Log::AddLog(Kaimos::Log::LOG_TYPES::TRACE_LOG, StringFromArgs(__VA_ARGS__))
-#define KS_EDITOR_INFO(...)		::Kaimos::Log::GetEditorLogger()->info(__VA_ARGS__);	 Kaimos::Log::AddLog(Kaimos::Log::LOG_TYPES::INFO_LOG, StringFromArgs(__VA_ARGS__))
-#define KS_EDITOR_WARN(...)		::Kaimos::Log::GetEditorLogger()->warn(__VA_ARGS__);	 Kaimos::Log::AddLog(Kaimos::Log::LOG_TYPES::WARN_LOG, StringFromArgs(__VA_ARGS__))
-#define KS_EDITOR_ERROR(...)	::Kaimos::Log::GetEditorLogger()->error(__VA_ARGS__);	 Kaimos::Log::AddLog(Kaimos::Log::LOG_TYPES::ERROR_LOG, StringFromArgs(__VA_ARGS__))
-#define KS_EDITOR_CRITICAL(...)	::Kaimos::Log::GetEditorLogger()->critical(__VA_ARGS__); Kaimos::Log::AddLog(Kaimos::Log::LOG_TYPES::ERROR_LOG, StringFromArgs(__VA_ARGS__))
+#define KS_EDITOR_TRACE(...)	Kaimos::Log::AddLog(Kaimos::Log::LOG_TYPES::TRACE_LOG, StringFromArgs(__VA_ARGS__))
+#define KS_EDITOR_INFO(...)		Kaimos::Log::AddLog(Kaimos::Log::LOG_TYPES::INFO_LOG, StringFromArgs(__VA_ARGS__))
+#define KS_EDITOR_WARN(...)		Kaimos::Log::AddLog(Kaimos::Log::LOG_TYPES::WARN_LOG, StringFromArgs(__VA_ARGS__))
+#define KS_EDITOR_ERROR(...)	Kaimos::Log::AddLog(Kaimos::Log::LOG_TYPES::ERROR_LOG, StringFromArgs(__VA_ARGS__))
+#define KS_EDITOR_CRITICAL(...)	Kaimos::Log::AddLog(Kaimos::Log::LOG_TYPES::ERROR_LOG, StringFromArgs(__VA_ARGS__))
 
 #endif //_LOG_H_

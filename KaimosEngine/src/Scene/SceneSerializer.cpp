@@ -267,7 +267,7 @@ namespace Kaimos {
 				if (tag_component)
 					name = tag_component["Tag"].as<std::string>();
 
-				KS_ENGINE_TRACE("Deserialized Entity with ID = {0} and name = '{1}'", entity_id, name.c_str());
+				KS_ENGINE_TRACE("Deserialized Entity '{0}' (ID: {1})", name.c_str(), entity_id);
 				Entity deserialized_entity = m_Scene->CreateEntity(name, entity_id);
 
 				YAML::Node transform_node = entity["TransformComponent"];

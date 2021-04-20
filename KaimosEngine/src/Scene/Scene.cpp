@@ -82,7 +82,7 @@ namespace Kaimos {
 		else if(!primary_camera_warn)
 		{
 			primary_camera_warn = true;
-			KS_ENGINE_WARN("No Primary Camera Setted!");
+			KS_EDITOR_WARN("No Primary Camera Setted!");
 		}
 	}
 
