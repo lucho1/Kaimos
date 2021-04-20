@@ -84,7 +84,7 @@ namespace Kaimos {
 		KS_PROFILE_FUNCTION();
 		if (width == 0 || height == 0 || width > s_MaxFBOSize || height > s_MaxFBOSize)
 		{
-			KS_ENGINE_WARN("Warning: Tried to resize FBO to {0}x{1}, aborting operation", width, height);
+			KS_ENGINE_CONSOLE_WARN("Warning: Tried to resize FBO to {0}x{1}, aborting operation", width, height);
 			return;
 		}
 
@@ -160,7 +160,7 @@ namespace Kaimos {
 		KS_ENGINE_ASSERT(fbo_status, "Framebuffer Incompleted!");
 
 		if (!fbo_status)
-			KS_ENGINE_ERROR("Framebuffer Incompleted");
+			KS_ENGINE_CONSOLE_WARN("Framebuffer Incompleted");
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}

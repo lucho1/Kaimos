@@ -37,7 +37,7 @@ namespace Kaimos {
 
 		// - Clear Button -
 		if (ImGui::Button("Clear", buttons_size))
-			m_Console.ClearLog();
+			Log::ClearLogs();
 
 		// - Copy Button -
 		ImGui::SameLine();
@@ -70,35 +70,26 @@ namespace Kaimos {
 		if (m_Console.CopyToClipboard)
 			ImGui::LogToClipboard();
 
-		//static std::vector<Kaimos::LogData::KaimosLog> vec = Log::GetLogs();
-		//vec = Log::GetLogs();
-		
-		//static const MemoryMetrics& m = Application::Get().GetMemoryMetrics();
+		std::vector<Kaimos::Log::KaimosLog> vec = Log::GetLogs();
 
 		// - Message Filter & Color -
-		for (uint i = 0; i < m_Console.ConsoleMessages.size(); ++i)
+		for (uint i = 0; i < vec.size(); ++i)
 		{
-			const char* message = m_Console.ConsoleMessages[i];
-			if (!filter.PassFilter(message))
+			std::string message = vec[i].Log;
+			if (!filter.PassFilter(message.c_str()))
 				continue;
 
-			bool pop_color = false;
-
-			if (strstr(message, "[ERROR]"))
+			switch (vec[i].LogType)
 			{
-				ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.4f, 0.4f, 1.0f));
-				pop_color = true;
-			}
-			else if (strncmp(message, "# ", 2) == 0)
-			{
-				ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.8f, 0.6f, 1.0f));
-				pop_color = true;
+				case Log::LOG_TYPES::INFO_LOG:	ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.4f, 0.9f, 0.4f, 1.0f)); break;
+				case Log::LOG_TYPES::WARN_LOG:	ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.9f, 0.9f, 0.4f, 1.0f)); break;
+				case Log::LOG_TYPES::ERROR_LOG:	ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.3f, 0.3f, 1.0f)); break;
+				default: ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.8f, 0.8f, 0.8f, 1.0f)); break;
 			}
 			
 			// - Message Print -
-			ImGui::TextUnformatted(message);
-			if (pop_color)
-				ImGui::PopStyleColor();
+			ImGui::TextUnformatted(message.c_str());
+			ImGui::PopStyleColor();
 		}
 
 		// - Copy to Clipboard -
