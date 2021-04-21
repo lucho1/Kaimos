@@ -56,6 +56,10 @@ namespace Kaimos {
 		m_ScenePanel.SetContext(m_CurrentScene);
 		SceneSerializer m_Serializer(m_CurrentScene);
 		m_Serializer.Deserialize("assets/scenes/CubeScene.kaimos");
+
+		// -- Save Editor Settings (ini files) --
+		ImGui::LoadIniSettingsFromDisk("imgui.ini");
+		m_KMEPanel.LoadIniEditorSettings();
 	}
 
 
@@ -612,6 +616,9 @@ namespace Kaimos {
 		m_CurrentScene = CreateRef<Scene>();
 		m_CurrentScene->SetViewportSize((uint)m_ViewportSize.x, (uint)m_ViewportSize.y);
 		m_ScenePanel.SetContext(m_CurrentScene);
+
+		ImGui::LoadIniSettingsFromDisk("imgui.ini");
+		m_KMEPanel.LoadIniEditorSettings();
 	}
 
 	void EditorLayer::SaveScene()
@@ -623,6 +630,10 @@ namespace Kaimos {
 			m_Serializer.Serialize("assets/scenes/" + m_CurrentScene->GetName() + ".kaimos");
 		else
 			m_Serializer.Serialize(m_CurrentScene->GetPath());
+
+		// -- Save Editor Settings (ini files) --
+		ImGui::SaveIniSettingsToDisk("imgui.ini");
+		m_KMEPanel.SaveIniEditorSettings();
 	}
 
 	void EditorLayer::SaveSceneAs()
@@ -647,6 +658,10 @@ namespace Kaimos {
 			// -- Save --
 			SceneSerializer m_Serializer(m_CurrentScene);
 			m_Serializer.Serialize(filepath);
+
+			// -- Save Editor Settings (ini files) --
+			ImGui::SaveIniSettingsToDisk("imgui.ini");
+			m_KMEPanel.SaveIniEditorSettings();
 		}
 	}
 

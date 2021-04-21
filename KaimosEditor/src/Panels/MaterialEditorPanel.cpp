@@ -70,4 +70,14 @@ namespace Kaimos {
 
 		ImGui::End();
 	}
+
+	void MaterialEditorPanel::LoadIniEditorSettings() const
+	{
+		ImNodes::LoadCurrentEditorStateFromIniFile("imnode.ini");
+	}
+
+	void MaterialEditorPanel::SaveIniEditorSettings() const
+	{
+		ImNodes::SaveCurrentEditorStateToIniFile("imnode.ini");
+	}
 }

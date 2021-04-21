@@ -13,6 +13,9 @@ namespace Kaimos {
 		MaterialEditorPanel() = default;
 		void OnUIRender();
 
+		void LoadIniEditorSettings() const;
+		void SaveIniEditorSettings() const;
+
 	private:
 
 		// --- Private Scene Methods ---
