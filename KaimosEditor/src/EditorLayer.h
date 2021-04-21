@@ -41,7 +41,7 @@ namespace Kaimos {
 		bool OnMouseScrolled(MouseScrolledEvent& ev);
 
 		// --- Private Editor Methods ---
-		void NewScene();
+		void NewScene(bool set_viewport = true);
 		void OpenScene();
 		void SaveScene();
 		void SaveSceneAs();

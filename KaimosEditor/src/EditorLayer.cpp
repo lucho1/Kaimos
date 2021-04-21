@@ -52,14 +52,10 @@ namespace Kaimos {
 		m_GameFramebuffer = Framebuffer::Create(fbo_settings);
 		m_PrimaryCameraFramebuffer = Framebuffer::Create(primcam_fbo_settings);
 
-		m_CurrentScene = CreateRef<Scene>();
-		m_ScenePanel.SetContext(m_CurrentScene);
+		// -- Create & Load Scene --
+		NewScene(false);
 		SceneSerializer m_Serializer(m_CurrentScene);
 		m_Serializer.Deserialize("assets/scenes/CubeScene.kaimos");
-
-		// -- Save Editor Settings (ini files) --
-		ImGui::LoadIniSettingsFromDisk("imgui.ini");
-		m_KMEPanel.LoadIniEditorSettings();
 	}
 
 
@@ -611,11 +607,12 @@ namespace Kaimos {
 
 	
 	// ----------------------- Private Editor Methods -----------------------------------------------------
-	void EditorLayer::NewScene()
+	void EditorLayer::NewScene(bool set_viewport)
 	{
 		m_CurrentScene = CreateRef<Scene>();
-		m_CurrentScene->SetViewportSize((uint)m_ViewportSize.x, (uint)m_ViewportSize.y);
-		m_ScenePanel.SetContext(m_CurrentScene);
+		m_ScenePanel.SetContext(m_CurrentScene);		
+		if(set_viewport)
+			m_CurrentScene->SetViewportSize((uint)m_ViewportSize.x, (uint)m_ViewportSize.y);
 
 		ImGui::LoadIniSettingsFromDisk("imgui.ini");
 		m_KMEPanel.LoadIniEditorSettings();
