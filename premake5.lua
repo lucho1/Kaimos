@@ -32,13 +32,13 @@ workspace "Kaimos"
     IncludeDir["stb_image"] = "%{wks.location}/KaimosEngine/vendor/stb_image"
     IncludeDir["entt"]      = "%{wks.location}/KaimosEngine/vendor/entt/include"
     IncludeDir["yaml"]      = "%{wks.location}/KaimosEngine/vendor/yaml/include"
-    IncludeDir["ImGuizmo"]      = "%{wks.location}/KaimosEngine/vendor/ImGuizmo"
+    IncludeDir["ImGuizmo"]  = "%{wks.location}/KaimosEngine/vendor/ImGuizmo"
+    IncludeDir["ImNodes"]   = "%{wks.location}/KaimosEngine/vendor/ImNodes"
 
     -- How To Add a Library: --
     -- Just include it here, on top, as a new IncludeDir, 
-    -- then add it down there in includedirs (under defines{})
-    -- and finally add it in links if needed (aside anything)
-    -- needed, such as dlls)
+    -- then add it down there (or in its vendor file) in includedirs (under defines{})
+    -- and finally add it in links if needed (aside anything needed, such as dlls)
     ---------------------------
 
     group "Dependencies"

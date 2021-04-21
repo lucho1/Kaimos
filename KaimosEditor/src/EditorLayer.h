@@ -6,6 +6,7 @@
 #include "Panels/SettingsPanel.h"
 #include "Panels/ProjectPanel.h"
 #include "Panels/ToolbarPanel.h"
+#include "Panels/MaterialEditorPanel.h"
 #include "Renderer/Cameras/CameraController.h"
 
 namespace Kaimos {
@@ -57,6 +58,7 @@ namespace Kaimos {
 		SettingsPanel m_SettingsPanel = {};
 		ProjectPanel m_ProjectPanel = {};
 		ToolbarPanel m_ToolbarPanel = {};
+		MaterialEditorPanel m_KMEPanel = {}; // Kaimos Material Editor
 
 		Ref<Texture2D> m_IconsArray[8] = { 0 };
 

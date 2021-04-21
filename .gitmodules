@@ -22,3 +22,7 @@
 	path = KaimosEngine/vendor/ImGuizmo
 	url = ../../lucho1/ImGuizmo.git
 	branch = master
+[submodule "KaimosEngine/vendor/ImNodes"]
+	path = KaimosEngine/vendor/ImNodes
+	url = ../../lucho1/imnodes.git
+	branch = master

@@ -207,6 +207,7 @@ namespace Kaimos {
 		static bool show_performance_panel = true;
 		static bool show_viewport_panel = true;
 		static bool show_game_panel = true;
+		static bool show_materialeditor_panel = true;
 		static bool show_uidemo = false;
 		
 		// -- Upper Menu Tab Bar --
@@ -238,6 +239,7 @@ namespace Kaimos {
 				ImGui::MenuItem("Scene Panel", nullptr, &show_scene_panel);
 				ImGui::MenuItem("Viewport", nullptr, &show_viewport_panel);
 				ImGui::MenuItem("Game Panel", nullptr, &show_game_panel);
+				ImGui::MenuItem("Material Editor", nullptr, &show_materialeditor_panel);
 				ImGui::MenuItem("Settings Panel", nullptr, &show_settings_panel);
 				ImGui::MenuItem("Performance Panel", nullptr, &show_performance_panel);
 				ImGui::MenuItem("Project Panel", nullptr, &show_project_panel);
@@ -279,6 +281,9 @@ namespace Kaimos {
 
 		m_ProjectPanel.OnUIRender(show_project_panel, show_console_panel);
 
+		// -- Material Editor Panel --
+		if (show_materialeditor_panel)
+			m_KMEPanel.OnUIRender();
 
 		// -- Viewport --
 		if (show_viewport_panel)
@@ -331,9 +336,7 @@ namespace Kaimos {
 		{
 			m_RenderGamePanel = true;
 			ImGui::Begin("Game", &show_game_panel, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
-			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0.0f, 0.0f));
-
-			
+			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0.0f, 0.0f));			
 
 			Entity camera = m_CurrentScene->GetPrimaryCamera();
 			if (camera)

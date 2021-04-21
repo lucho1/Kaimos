@@ -7,6 +7,7 @@
 #include <examples/imgui_impl_glfw.h>
 #include <examples/imgui_impl_opengl3.h>
 #include <ImGuizmo.h>
+#include <imnodes.h>
 
 #include <GLFW/glfw3.h>
 
@@ -45,12 +46,16 @@ namespace Kaimos {
 		GLFWwindow* window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
 		ImGui_ImplGlfw_InitForOpenGL(window, true);
 		ImGui_ImplOpenGL3_Init("#version 460");
+
+		// -- Initialize ImNodes Library --
+		ImNodes::CreateContext();		
 	}
 
 
 	void ImGuiLayer::OnDetach()
 	{
 		KS_PROFILE_FUNCTION();
+		ImNodes::DestroyContext();
 		ImGui_ImplOpenGL3_Shutdown();
 		ImGui_ImplGlfw_Shutdown();
 		ImGui::DestroyContext();

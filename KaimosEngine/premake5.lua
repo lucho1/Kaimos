@@ -23,7 +23,9 @@ project "KaimosEngine"
         "vendor/stb_image/**.cpp",
         "vendor/stb_image/**.h",
         "vendor/ImGuizmo/ImGuizmo.h",
-        "vendor/ImGuizmo/ImGuizmo.cpp"
+        "vendor/ImGuizmo/ImGuizmo.cpp",
+        "vendor/ImNodes/imnodes.h",
+        "vendor/ImNodes/imnodes.cpp"
     }
 
     -- Definitions for the project (global ones)
@@ -45,7 +47,8 @@ project "KaimosEngine"
         "%{IncludeDir.stb_image}",
         "%{IncludeDir.entt}",
         "%{IncludeDir.yaml}",
-        "%{IncludeDir.ImGuizmo}"
+        "%{IncludeDir.ImGuizmo}",
+        "%{IncludeDir.ImNodes}"
     }
 
     -- Kaimos Engine Project Links --
@@ -61,6 +64,8 @@ project "KaimosEngine"
     -- Custom Filter specifically for **any** .cpp files of ImGuizmo and its subdirectories --
     filter "files:vendor/ImGuizmo/**.cpp"
         flags {"NoPCH"} -- Basically, a flag to state that, for the filter, no PCH on it --
+    filter "files:vendor/ImNodes/**.cpp"
+        flags {"NoPCH"}
 
     -- Systems --
     filter "system:windows"
