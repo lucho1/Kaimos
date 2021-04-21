@@ -54,11 +54,11 @@ namespace Kaimos {
 		CameraController m_EditorCamera;
 		Ref<Scene> m_CurrentScene = nullptr;
 
-		ScenePanel m_ScenePanel = {};
 		SettingsPanel m_SettingsPanel = {};
 		ProjectPanel m_ProjectPanel = {};
 		ToolbarPanel m_ToolbarPanel = {};
 		MaterialEditorPanel m_KMEPanel = {}; // Kaimos Material Editor
+		ScenePanel m_ScenePanel;
 
 		Ref<Texture2D> m_IconsArray[8] = { 0 };
 

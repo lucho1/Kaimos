@@ -51,6 +51,8 @@ namespace Kaimos {
 
 	struct SpriteRendererComponent
 	{
+		bool InMaterialEditor = false;
+
 		glm::vec4 Color = glm::vec4(1.0f);
 		Ref<Texture2D> SpriteTexture = nullptr;
 		std::string TextureFilepath = "";

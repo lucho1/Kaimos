@@ -2,6 +2,7 @@
 #define _SCENEPANEL_H_
 
 #include "Kaimos.h"
+#include "MaterialEditorPanel.h"
 
 namespace Kaimos {
 
@@ -11,7 +12,7 @@ namespace Kaimos {
 
 		// --- Public Class Methods ---
 		ScenePanel() = default;
-		ScenePanel(const Ref<Scene>& context);
+		ScenePanel(const Ref<Scene>& context, MaterialEditorPanel* material_editor_panel);
 		
 		void OnUIRender(bool& closing_bool);
 
@@ -27,8 +28,12 @@ namespace Kaimos {
 		void DrawEntityNode(Entity entity);
 		void DrawComponents(Entity& entity);
 
+		template<typename T, typename UIFunction>
+		void DrawComponentUI(const std::string& name, Entity entity, UIFunction function);
+
 	private:
 
+		MaterialEditorPanel* m_KMEPanel = nullptr;
 		Ref<Scene> m_SceneContext = nullptr;
 		Entity m_SelectedEntity = {};
 	};

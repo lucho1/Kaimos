@@ -16,8 +16,10 @@
 namespace Kaimos {
 
 	// ----------------------- Public Class Methods -------------------------------------------------------
-	ScenePanel::ScenePanel(const Ref<Scene>& context)
+	ScenePanel::ScenePanel(const Ref<Scene>& context, MaterialEditorPanel* material_editor_panel)
 	{
+		m_SelectedEntity = {};
+		m_KMEPanel = material_editor_panel;
 		SetContext(context);
 	}
 	
@@ -141,6 +143,13 @@ namespace Kaimos {
 		// -- Delete Entity --
 		if (entity_deleted)
 		{
+			if (entity.HasComponent<SpriteRendererComponent>())
+			{
+				SpriteRendererComponent& comp = entity.GetComponent<SpriteRendererComponent>();
+				if (comp.InMaterialEditor)
+					m_KMEPanel->UnsetMaterialToModify();
+			}
+
 			if (m_SelectedEntity == entity)
 				m_SelectedEntity = {};
 
@@ -151,7 +160,7 @@ namespace Kaimos {
 
 	// ----- TODO: WTF? -- This requires of an entities/components rework
 	template<typename T, typename UIFunction>
-	static void DrawComponentUI(const std::string& name, Entity entity, UIFunction function)
+	void ScenePanel::DrawComponentUI(const std::string& name, Entity entity, UIFunction function)
 	{
 		if (entity.HasComponent<T>())
 		{
@@ -204,7 +213,15 @@ namespace Kaimos {
 
 			// -- Remove Component --
 			if (remove_component)
+			{
+				if (std::is_same<T, SpriteRendererComponent>::value)
+				{
+					if (entity.GetComponent<SpriteRendererComponent>().InMaterialEditor)
+						m_KMEPanel->UnsetMaterialToModify();
+				}
+
 				entity.RemoveComponent<T>();
+			}
 		}
 	}
 
@@ -348,7 +365,7 @@ namespace Kaimos {
 
 
 		// -- Sprite Renderer Component --
-		DrawComponentUI<SpriteRendererComponent>("Sprite Renderer", entity, [](auto& component)
+		DrawComponentUI<SpriteRendererComponent>("Sprite Renderer", entity, [&](auto& component)
 			{
 				// Color Picker for Sprite Color
 				ImGuiColorEditFlags color_flags = ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreview | ImGuiColorEditFlags_NoInputs;
@@ -383,6 +400,13 @@ namespace Kaimos {
 				ImGui::NewLine();
 				KaimosUI::UIFunctionalities::DrawInlineDragFloat("Tiling", "##tiling", &component.TextureTiling, 0.1f, 100.0f);
 				KaimosUI::UIFunctionalities::DrawInlineDragFloat2("UV Offset", "##uv_offset", component.TextureUVOffset, 0.1f, 208.0f);
+
+				// Open in Material Editor Button
+				float btn_width = 196.0f;
+				ImGui::NewLine(); ImGui::NewLine();
+				ImGui::SameLine(ImGui::GetWindowContentRegionWidth() * 0.5f - btn_width * 0.5f);
+				if (ImGui::Button("Open in Material Editor", ImVec2(btn_width, 25.0f)))
+					m_KMEPanel->SetMaterialToModify(&component);
 			});
 	}
 }

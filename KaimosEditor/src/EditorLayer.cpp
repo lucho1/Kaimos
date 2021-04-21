@@ -56,6 +56,7 @@ namespace Kaimos {
 		NewScene(false);
 		SceneSerializer m_Serializer(m_CurrentScene);
 		m_Serializer.Deserialize("assets/scenes/CubeScene.kaimos");
+		m_ScenePanel = ScenePanel(m_CurrentScene, &m_KMEPanel);
 	}
 
 
@@ -285,6 +286,42 @@ namespace Kaimos {
 		if (show_materialeditor_panel)
 			m_KMEPanel.OnUIRender();
 
+		if (show_game_panel)
+		{
+			m_RenderGamePanel = true;
+			ImGui::Begin("Game", &show_game_panel, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0.0f, 0.0f));
+
+			Entity camera = m_CurrentScene->GetPrimaryCamera();
+			if (camera)
+			{
+				glm::vec2 viewport_size = { ImGui::GetWindowWidth(), ImGui::GetWindowHeight() };
+				ImVec2 content_region = ImGui::GetContentRegionAvail();
+				glm::vec2 cam_size = camera.GetComponent<CameraComponent>().Camera.GetViewportSize();
+
+				float scale_x = 1.0f, scale_y = 1.0f;
+				if (viewport_size.x <= cam_size.x)
+					scale_x = viewport_size.x / cam_size.x;
+
+				if (viewport_size.y <= cam_size.y)
+					scale_y = viewport_size.y / cam_size.y;
+
+				glm::vec2 size = cam_size * std::min(scale_x, scale_y * 0.9f);
+				glm::vec2 pos_diff = (glm::vec2(content_region.x, content_region.y) - size) / 2.0f;
+
+				ImGui::SetWindowPos({ ImGui::GetWindowPos().x + pos_diff.x, ImGui::GetWindowPos().y + pos_diff.y });
+				ImGui::Image(reinterpret_cast<void*>(m_GameFramebuffer->GetFBOTextureID()), { size.x, size.y }, ImVec2(0, 1), ImVec2(1, 0));
+			}
+
+			if (!ImGui::IsItemVisible())
+				m_RenderGamePanel = false;
+
+			ImGui::PopStyleVar();
+			ImGui::End();
+		}
+		else
+			m_RenderGamePanel = false;
+
 		// -- Viewport --
 		if (show_viewport_panel)
 		{
@@ -321,7 +358,6 @@ namespace Kaimos {
 			else
 				m_RenderViewport = false;
 
-
 			// -- Camera Speed Multiplier Modification --
 			ShowCameraSpeedMultiplier();
 
@@ -332,41 +368,7 @@ namespace Kaimos {
 			ImGui::End();
 		}
 
-		if (show_game_panel)
-		{
-			m_RenderGamePanel = true;
-			ImGui::Begin("Game", &show_game_panel, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
-			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0.0f, 0.0f));			
-
-			Entity camera = m_CurrentScene->GetPrimaryCamera();
-			if (camera)
-			{
-				glm::vec2 viewport_size = { ImGui::GetWindowWidth(), ImGui::GetWindowHeight() };
-				ImVec2 content_region = ImGui::GetContentRegionAvail();
-				glm::vec2 cam_size = camera.GetComponent<CameraComponent>().Camera.GetViewportSize();
-
-				float scale_x = 1.0f, scale_y = 1.0f;
-				if (viewport_size.x <= cam_size.x)
-					scale_x = viewport_size.x / cam_size.x;
-				
-				if (viewport_size.y <= cam_size.y)
-					scale_y = viewport_size.y / cam_size.y;
-
-				glm::vec2 size = cam_size * std::min(scale_x, scale_y * 0.9f);				
-				glm::vec2 pos_diff = (glm::vec2(content_region.x, content_region.y) - size) / 2.0f;
-				
-				ImGui::SetWindowPos({ ImGui::GetWindowPos().x + pos_diff.x, ImGui::GetWindowPos().y + pos_diff.y });
-				ImGui::Image(reinterpret_cast<void*>(m_GameFramebuffer->GetFBOTextureID()), { size.x, size.y }, ImVec2(0, 1), ImVec2(1, 0));
-			}
-
-			if (!ImGui::IsItemVisible())
-				m_RenderGamePanel = false;
-
-			ImGui::PopStyleVar();
-			ImGui::End();
-		}
-		else
-			m_RenderGamePanel = false;
+		
 	}
 
 

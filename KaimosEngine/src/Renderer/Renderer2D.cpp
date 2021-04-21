@@ -203,7 +203,7 @@ namespace Kaimos {
 	{
 		KS_PROFILE_FUNCTION();
 		s_Data->QuadIndicesDrawCount = 0;
-		s_Data->TextureSlotIndex = 1;
+		s_Data->TextureSlotIndex = 1; // 0 is white texture
 		s_Data->QuadVBufferPtr = s_Data->QuadVBufferBase;
 	}		
 	

@@ -2,6 +2,7 @@
 #define _MATERIALEDITORPANEL_H_
 
 #include "Kaimos.h"
+#include "Scene/ECS/Components.h"
 
 namespace Kaimos {
 
@@ -16,14 +17,17 @@ namespace Kaimos {
 		void LoadIniEditorSettings() const;
 		void SaveIniEditorSettings() const;
 
-	private:
+	public:
 
 		// --- Private Scene Methods ---
+		void UnsetMaterialToModify() const;
+		void SetMaterialToModify(SpriteRendererComponent* sprite_component) const;
+
 
 	private:
 
 		// --- Variables ---
-
+		mutable SpriteRendererComponent* m_MaterialToModify = nullptr;
 	};
 }
 
