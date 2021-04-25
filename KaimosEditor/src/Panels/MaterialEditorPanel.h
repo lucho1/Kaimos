@@ -3,6 +3,7 @@
 
 #include "Kaimos.h"
 #include "Scene/ECS/Components.h"
+#include "../MaterialEditor/MaterialNode.h"
 
 namespace Kaimos {
 
@@ -19,14 +20,17 @@ namespace Kaimos {
 
 	public:
 
-		// --- Private Scene Methods ---
+		// --- Public Material Methods ---
 		void UnsetMaterialToModify() const;
 		void SetMaterialToModify(SpriteRendererComponent* sprite_component) const;
+		void CreateNode();
 
+		MaterialNodePin* FindNodePin(uint pin_id);
 
 	private:
 
 		// --- Variables ---
+		std::vector<Ref<MaterialNode>> m_Nodes;
 		mutable SpriteRendererComponent* m_MaterialToModify = nullptr;
 	};
 }

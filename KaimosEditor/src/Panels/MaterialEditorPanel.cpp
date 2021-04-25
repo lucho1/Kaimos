@@ -1,12 +1,17 @@
 #include "kspch.h"
 #include "MaterialEditorPanel.h"
 
+#include "Core/Utils/Maths/RandomGenerator.h"
+
 #include <ImGui/imgui.h>
 #include <ImNodes/imnodes.h>
 #include <glm/gtc/type_ptr.hpp>
 
+
 namespace Kaimos {
 
+	
+	// ----------------------- Public Class Methods -------------------------------------------------------
 	void MaterialEditorPanel::OnUIRender()
 	{
 		ImGui::Begin("Kaimos Material Editor");
@@ -73,58 +78,112 @@ namespace Kaimos {
 		ImNodes::EndNode();
 
 
-		// -------- EXAMPLE OF LINKING --------
-		//ImNodes::BeginNode();
-		//ImNodes::BeginInputAttribute(3);
-		//ImGui::Text("Input Pin (%.1f, %.1f)", 5.0f, 4.0f);
-		//ImNodes::EndInputAttribute();
-		//
-		//
-		//ImNodes::BeginOutputAttribute(4);
-		//ImGui::Indent(40.0f);
-		//ImGui::Text("Output Pin");
-		//ImNodes::EndOutputAttribute();
-		//
-		//ImNodes::EndNode();
-		//
-		//ImNodes::BeginNode(2);
-		//
-		//ImNodes::BeginInputAttribute(1);
-		//ImGui::Text("Input Pin");
-		//ImNodes::EndInputAttribute();
-		//
-		//ImNodes::BeginOutputAttribute(2);
-		//ImGui::Text("Output Pin");
-		//ImNodes::EndOutputAttribute();
-		//
-		//ImNodes::EndNode();
-		//
-		//static std::vector<std::pair<int, int>> links;
-		//for (int i = 0; i < links.size(); ++i)
-		//	ImNodes::Link(i, links[i].first, links[i].second);
+		// ------ NODES --------------------------------------------------------
+		// -- Create Node with V Key --
+		if (Input::IsKeyDown(KEY::V))
+			CreateNode();
 
+		// -- Draw Nodes & its Pins --
+		for (Ref<MaterialNode>& node : m_Nodes)
+		{
+			ImNodes::BeginNode(node->GetID());
+
+			ImNodes::BeginOutputAttribute(node->GetOutputPin()->ID);
+			ImGui::Indent(40.0f);
+			ImGui::Text(node->GetOutputPin()->Name.c_str());
+			ImNodes::EndOutputAttribute();
+
+			for (Ref<MaterialNodePin> pin : *node->GetInputPins())
+			{
+				ImNodes::BeginInputAttribute(pin->ID);
+				ImGui::Text(pin->Name.c_str());
+				ImNodes::EndInputAttribute();
+			}
+
+			ImNodes::EndNode();
+		}
+
+		// -- Draw Links between Node Pins --
+		for (Ref<MaterialNode>& node : m_Nodes)
+		{
+			for (Ref<MaterialNodePin> pin : *node->GetInputPins())
+				if (pin->OutputPinLinked)
+					ImNodes::Link(pin->ID, pin->ID, pin->OutputPinLinked->ID);
+		}
+
+		// -- End Material Node Editor --
 		ImNodes::EndNodeEditor();
+		
+		// -- Create Links between Node Pins --
+		int start, end;
+		if (ImNodes::IsLinkCreated(&start, &end))
+		{
+			MaterialNodePin* out_pin = FindNodePin(start);	// Output pin (start)
+			MaterialNodePin* in_pin = FindNodePin(end);		// Input pin (end)
 
-		//int start = 4, end = 1;
-		//if (ImNodes::IsLinkCreated(&start, &end))
-		//{
-		//	links.push_back({ 4, 1 });
-		//}
+			if (in_pin && out_pin)
+			{
+				// Check if the node of the input pin is connected to the node of the output pin
+				bool connect = true;
+				MaterialNodePin* inpin_nodeoutput = in_pin->OwnerNode->GetOutputPin();
+				if (inpin_nodeoutput)
+				{
+					for (Ref<MaterialNodePin> outnode_inpin : *out_pin->OwnerNode->GetInputPins())
+						if (outnode_inpin->OutputPinLinked && outnode_inpin->OutputPinLinked->ID == inpin_nodeoutput->ID)
+							connect = false;
+				}
+
+				if(connect)
+					in_pin->OutputPinLinked = out_pin;
+			}
+		}
 
 
 		// -- End Editor --
 		ImGui::End();
 	}
 
+
 	void MaterialEditorPanel::LoadIniEditorSettings() const
 	{
 		UnsetMaterialToModify();
 		ImNodes::LoadCurrentEditorStateFromIniFile("imnode.ini");
 	}
+	
 
 	void MaterialEditorPanel::SaveIniEditorSettings() const
 	{
 		ImNodes::SaveCurrentEditorStateToIniFile("imnode.ini");
+	}
+
+
+
+	// ----------------------- Public Material Methods ----------------------------------------------------
+	void MaterialEditorPanel::CreateNode()
+	{
+		uint id = (uint)Kaimos::Random::GetRandomInt();
+		Ref<MaterialNode> mat_node = CreateRef<MaterialNode>(id, "Node_" + std::to_string(id));
+
+		mat_node->AddPin(false);
+		mat_node->AddPin(true);
+		mat_node->AddPin(true);
+
+		m_Nodes.push_back(mat_node);
+	}
+
+	MaterialNodePin* MaterialEditorPanel::FindNodePin(uint pin_id)
+	{
+		for (Ref<MaterialNode>& node : m_Nodes)
+		{
+			if (node->GetOutputPin()->ID == pin_id)
+				return node->GetOutputPin();
+
+			int index = node->FindInputPinIndex(pin_id);
+			if (index != -1)
+				return node->GetInputPinAt(index);
+		}
+
+		return nullptr;
 	}
 
 	void MaterialEditorPanel::UnsetMaterialToModify() const
