@@ -78,10 +78,16 @@ namespace Kaimos {
 		ImNodes::EndNode();
 
 
-		// ------ NODES --------------------------------------------------------
-		// -- Create Node with V Key --
-		if (Input::IsKeyDown(KEY::V))
-			CreateNode();
+		// ----------- NODES ------------------------------------------------------------------
+		// -- Create Node Key --
+		if (ImGui::BeginPopupContextWindow(0, 1, false))
+		{
+			if (ImGui::MenuItem("Create Node"))
+				CreateNode();
+
+			ImGui::EndPopup();
+		}
+
 
 		// -- Draw Nodes & its Pins --
 		for (Ref<MaterialNode>& node : m_Nodes)
@@ -108,11 +114,12 @@ namespace Kaimos {
 		{
 			for (Ref<MaterialNodePin> pin : *node->GetInputPins())
 				if (pin->OutputPinLinked)
-					ImNodes::Link(pin->ID, pin->ID, pin->OutputPinLinked->ID);
+					ImNodes::Link(pin->ID, pin->ID, pin->OutputPinLinked->ID); // Links have the same ID than its input pin
 		}
+		
 
 		// -- End Material Node Editor --
-		ImNodes::EndNodeEditor();
+		ImNodes::EndNodeEditor();		
 		
 		// -- Create Links between Node Pins --
 		int start, end;
@@ -138,6 +145,14 @@ namespace Kaimos {
 			}
 		}
 
+		// -- Check for Links Destroys --
+		int destroyed_id;
+		if (ImNodes::IsLinkDestroyed(&destroyed_id))
+		{
+			MaterialNodePin* in_pin = FindNodePin(destroyed_id);
+			if (in_pin)
+				in_pin->OutputPinLinked = nullptr;
+		}
 
 		// -- End Editor --
 		ImGui::End();

@@ -48,13 +48,17 @@ namespace Kaimos {
 		ImGui_ImplOpenGL3_Init("#version 460");
 
 		// -- Initialize ImNodes Library --
-		ImNodes::CreateContext();		
+		ImNodes::CreateContext();
+		ImNodes::GetIO().EmulateThreeButtonMouse.Modifier = &ImGui::GetIO().KeyAlt;
+		ImNodes::GetIO().LinkDetachWithModifierClick.Modifier = &ImGui::GetIO().KeyAlt;
+		ImNodes::PushAttributeFlag(ImNodesAttributeFlags_EnableLinkDetachWithDragClick);
 	}
 
 
 	void ImGuiLayer::OnDetach()
 	{
 		KS_PROFILE_FUNCTION();
+		ImNodes::PopAttributeFlag();
 		ImNodes::DestroyContext();
 		ImGui_ImplOpenGL3_Shutdown();
 		ImGui_ImplGlfw_Shutdown();
