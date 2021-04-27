@@ -16,7 +16,7 @@ namespace Kaimos {
 
 		uint ID = 0;
 		MaterialNode* OwnerNode = nullptr;
-		//std::vector<MaterialNodePin*> InputPinsLinked;
+		std::vector<MaterialNodePin*> InputPinsLinked;
 		MaterialNodePin* OutputPinLinked = nullptr;
 
 		std::string Name = "UnnamedPin";
@@ -30,11 +30,18 @@ namespace Kaimos {
 		MaterialNode(uint id, const std::string& name) : m_ID(id), m_Name(name) {}
 		~MaterialNode()
 		{
-			for (Ref<MaterialNodePin> pin : m_NodeInputPins)
+			for (Ref<MaterialNodePin>& pin : m_NodeInputPins)
 				pin.reset();
 
-			m_NodeInputPins.clear();
+			for (auto& pin : m_NodeOutputPin->InputPinsLinked)
+			{
+				pin->OutputPinLinked = nullptr;
+				pin = nullptr;
+			}
+
+			m_NodeOutputPin->InputPinsLinked.clear();
 			m_NodeOutputPin.reset();
+			m_NodeInputPins.clear();
 		}
 
 		void AddPin(bool input)

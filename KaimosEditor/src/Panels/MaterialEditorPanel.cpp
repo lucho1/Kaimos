@@ -84,10 +84,9 @@ namespace Kaimos {
 		{
 			if (ImGui::MenuItem("Create Node"))
 				CreateNode();
-
+		
 			ImGui::EndPopup();
 		}
-
 
 		// -- Draw Nodes & its Pins --
 		for (Ref<MaterialNode>& node : m_Nodes)
@@ -113,13 +112,14 @@ namespace Kaimos {
 		for (Ref<MaterialNode>& node : m_Nodes)
 		{
 			for (Ref<MaterialNodePin> pin : *node->GetInputPins())
+			{
 				if (pin->OutputPinLinked)
 					ImNodes::Link(pin->ID, pin->ID, pin->OutputPinLinked->ID); // Links have the same ID than its input pin
-		}
-		
+			}
+		}		
 
 		// -- End Material Node Editor --
-		ImNodes::EndNodeEditor();		
+		ImNodes::EndNodeEditor();
 		
 		// -- Create Links between Node Pins --
 		int start, end;
@@ -140,18 +140,49 @@ namespace Kaimos {
 							connect = false;
 				}
 
-				if(connect)
+				if (connect)
+				{
 					in_pin->OutputPinLinked = out_pin;
+					out_pin->InputPinsLinked.push_back(in_pin);
+				}
 			}
 		}
 
-		// -- Check for Links Destroys --
+		// -- Check for Links & Nodes Destroys --
 		int destroyed_id;
-		if (ImNodes::IsLinkDestroyed(&destroyed_id))
+		if (ImNodes::IsLinkDestroyed(&destroyed_id))										// If any link is dragged to an empty space
+			DeleteLink((uint)destroyed_id);
+
+		int item_hovered;
+		if (ImGui::GetIO().MouseDoubleClicked[2] && ImNodes::IsLinkHovered(&item_hovered))	// If a link is right-clicked twice
+			DeleteLink((uint)item_hovered);
+		
+		if (ImGui::GetIO().MouseDoubleClicked[2] && ImNodes::IsNodeHovered(&item_hovered))	// If a node is right-clicked twice
+			DeleteNode((uint)item_hovered);
+
+		if (Input::IsKeyDown(KEY::DEL))														// If there is a nodes/link selection and SUPR or DEL is pressed
 		{
-			MaterialNodePin* in_pin = FindNodePin(destroyed_id);
-			if (in_pin)
-				in_pin->OutputPinLinked = nullptr;
+			int selected_links = ImNodes::NumSelectedLinks();
+			if (selected_links > 0)
+			{
+				int* del_links = new int[selected_links];
+				ImNodes::GetSelectedLinks(del_links);
+				for (uint i = 0; i < selected_links; ++i)
+					DeleteLink((uint)del_links[i]);
+
+				delete[] del_links;
+			}
+
+			const int selected_nodes = ImNodes::NumSelectedNodes();
+			if (selected_nodes > 0)
+			{
+				int* del_nodes = new int[selected_nodes];
+				ImNodes::GetSelectedNodes(del_nodes);
+				for (uint i = 0; i < selected_nodes; ++i)
+					DeleteNode((uint)del_nodes[i]);
+
+				delete[] del_nodes;
+			}
 		}
 
 		// -- End Editor --
@@ -172,8 +203,8 @@ namespace Kaimos {
 	}
 
 
-
-	// ----------------------- Public Material Methods ----------------------------------------------------
+	
+	// ----------------------- Private Material Editor Methods --------------------------------------------
 	void MaterialEditorPanel::CreateNode()
 	{
 		uint id = (uint)Kaimos::Random::GetRandomInt();
@@ -184,6 +215,29 @@ namespace Kaimos {
 		mat_node->AddPin(true);
 
 		m_Nodes.push_back(mat_node);
+	}
+
+	void MaterialEditorPanel::DeleteNode(uint node_id)
+	{
+		std::vector<Ref<MaterialNode>>::const_iterator it = m_Nodes.begin();
+		for (; it != m_Nodes.end(); ++it)
+		{
+			if ((*it)->GetID() == node_id)
+			{
+				m_Nodes.erase(it);
+				return;
+			}
+		}
+	}
+
+	void MaterialEditorPanel::DeleteLink(uint pin_id)
+	{
+		MaterialNodePin* in_pin = FindNodePin(pin_id);
+		if (in_pin)
+		{
+			in_pin->OutputPinLinked->InputPinsLinked.erase(std::find(in_pin->OutputPinLinked->InputPinsLinked.begin(), in_pin->OutputPinLinked->InputPinsLinked.end(), in_pin));
+			in_pin->OutputPinLinked = nullptr;
+		}
 	}
 
 	MaterialNodePin* MaterialEditorPanel::FindNodePin(uint pin_id)
@@ -201,6 +255,20 @@ namespace Kaimos {
 		return nullptr;
 	}
 
+	MaterialNode* MaterialEditorPanel::FindNode(uint node_id)
+	{
+		for (Ref<MaterialNode>& node : m_Nodes)
+		{
+			if (node->GetID() == node_id)
+				return node.get();
+		}
+
+		return nullptr;
+	}
+
+
+
+	// ----------------------- Public Material Methods ----------------------------------------------------
 	void MaterialEditorPanel::UnsetMaterialToModify() const
 	{
 		if (m_MaterialToModify)

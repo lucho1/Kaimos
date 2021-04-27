@@ -13,6 +13,14 @@ namespace Kaimos {
 
 		// --- Public Class Methods ---
 		MaterialEditorPanel() = default;
+		~MaterialEditorPanel()
+		{
+			for (Ref<MaterialNode>& matnode_ref : m_Nodes)
+				matnode_ref.reset();
+
+			m_Nodes.clear();
+		}
+
 		void OnUIRender();
 
 		void LoadIniEditorSettings() const;
@@ -23,9 +31,15 @@ namespace Kaimos {
 		// --- Public Material Methods ---
 		void UnsetMaterialToModify() const;
 		void SetMaterialToModify(SpriteRendererComponent* sprite_component) const;
-		void CreateNode();
 
+	private:
+
+		// --- Private Material Editor Methods ---
+		void CreateNode();
+		void DeleteNode(uint node_id);
+		void DeleteLink(uint pin_id);
 		MaterialNodePin* FindNodePin(uint pin_id);
+		MaterialNode* FindNode(uint node_id);
 
 	private:
 
