@@ -20,8 +20,8 @@ namespace Kaimos {
 
 	void MaterialEditorPanel::CleanUp()
 	{
-		for (Ref<MaterialNode>& matnode_ref : m_Nodes)
-			matnode_ref.reset();
+		for (Ref<MaterialNode>& node : m_Nodes)
+			node.reset();
 
 		m_Nodes.clear();
 		m_MainMatNode.reset();
@@ -179,15 +179,15 @@ namespace Kaimos {
 		m_Nodes.push_back(mat_node);
 	}
 
-	void MaterialEditorPanel::DeleteNode(uint node_id)
+	void MaterialEditorPanel::DeleteNode(uint nodeID)
 	{
-		if (node_id == m_MainMatNode->GetID())
+		if (nodeID == m_MainMatNode->GetID())
 			return;
 
 		std::vector<Ref<MaterialNode>>::const_iterator it = m_Nodes.begin();
 		for (; it != m_Nodes.end(); ++it)
 		{
-			if ((*it)->GetID() == node_id)
+			if ((*it)->GetID() == nodeID)
 			{
 				m_Nodes.erase(it);
 				return;
@@ -195,16 +195,11 @@ namespace Kaimos {
 		}
 	}
 
-	void MaterialEditorPanel::DeleteLink(uint pin_id)
+	void MaterialEditorPanel::DeleteLink(uint pinID)
 	{
-		MaterialNodePin* in_pin = FindNodePin(pin_id);
+		MaterialNodePin* in_pin = FindNodePin(pinID);
 		if (in_pin)
-		{
-			in_pin->OutputPinLinked->InputPinsLinked.erase(std::find(in_pin->OutputPinLinked->InputPinsLinked.begin(), in_pin->OutputPinLinked->InputPinsLinked.end(), in_pin));
-			in_pin->OutputPinLinked = nullptr;
-
-			//m_MainMatNode->m_MaterialToModify->TextureTiling = in_pin->Value = in_pin->DefaultValue;
-		}
+			in_pin->DeleteLink();
 	}
 
 	void MaterialEditorPanel::DeleteSelection(int selected_links, int selected_nodes)
@@ -230,27 +225,27 @@ namespace Kaimos {
 		}
 	}
 
-	MaterialNodePin* MaterialEditorPanel::FindNodePin(uint pin_id)
+	MaterialNode* MaterialEditorPanel::FindNode(uint nodeID)
 	{
 		for (Ref<MaterialNode>& node : m_Nodes)
 		{
-			if (node->GetID() != m_MainMatNode->GetID() && node->GetOutputPin()->ID == pin_id)
-				return node->GetOutputPin();
-
-			int index = node->FindInputPinIndex(pin_id);
-			if (index != -1)
-				return node->GetInputPinAt(index);
+			if (node->GetID() == nodeID)
+				return node.get();
 		}
 
 		return nullptr;
 	}
 
-	MaterialNode* MaterialEditorPanel::FindNode(uint node_id)
+	MaterialNodePin* MaterialEditorPanel::FindNodePin(uint pinID)
 	{
 		for (Ref<MaterialNode>& node : m_Nodes)
 		{
-			if (node->GetID() == node_id)
-				return node.get();
+			if (node->GetID() != m_MainMatNode->GetID() && node->GetOutputPin()->ID == pinID)
+				return node->GetOutputPin();
+
+			MaterialNodePin* input_pin = node->FindInputPin(pinID);
+			if (input_pin)
+				return input_pin;
 		}
 
 		return nullptr;

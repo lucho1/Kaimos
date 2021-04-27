@@ -24,7 +24,7 @@ namespace Kaimos {
 		void AddPin(bool input, float default_value = 1.0f);
 		void AddPin(bool input, Ref<MaterialNodePin>& pin);
 
-		int FindInputPinIndex(uint pin_id);
+		MaterialNodePin* FindInputPin(uint pinID);
 
 	public:
 
@@ -33,7 +33,6 @@ namespace Kaimos {
 		const std::string& GetName()	const { return m_Name; }
 
 		MaterialNodePin* GetOutputPin()							const { return m_NodeOutputPin.get(); }
-		MaterialNodePin* GetInputPinAt(uint index)				const { return m_NodeInputPins[index].get(); }
 		const std::vector<Ref<MaterialNodePin>>* GetInputPins()	const { return &m_NodeInputPins; }
 
 	protected:
@@ -45,6 +44,8 @@ namespace Kaimos {
 		std::vector<Ref<MaterialNodePin>> m_NodeInputPins;
 		Ref<MaterialNodePin> m_NodeOutputPin = nullptr;
 	};
+
+
 
 
 
@@ -71,7 +72,19 @@ namespace Kaimos {
 
 	struct MaterialNodePin
 	{
-		MaterialNodePin(MaterialNode* owner, uint id, const std::string& name, float default_value = 1.0f) : OwnerNode(owner), ID(id), Name(name), DefaultValue(default_value) {}
+		MaterialNodePin(MaterialNode* owner, uint id, const std::string& name, float default_value = 1.0f)
+			: OwnerNode(owner), ID(id), Name(name), DefaultValue(default_value) {}
+
+		void DeleteLink()
+		{
+			if (OutputPinLinked)
+			{
+				OutputPinLinked->InputPinsLinked.erase(std::find(OutputPinLinked->InputPinsLinked.begin(), OutputPinLinked->InputPinsLinked.end(), this));
+				OutputPinLinked = nullptr;
+
+				//m_MainMatNode->m_MaterialToModify->TextureTiling = in_pin->Value = in_pin->DefaultValue;
+			}
+		}
 
 		void LinkPin(MaterialNodePin* output_pin)
 		{
@@ -86,23 +99,26 @@ namespace Kaimos {
 							return;
 				}
 
-				// Check if this pin has an output, then erase this pin from the output's inputs list (TODO: All this kind of stuff should be in functions in their classes)
+				// Check if this pin has an output, then erase this pin from the output's inputs list
 				if (OutputPinLinked)
-				{
-					std::vector<MaterialNodePin*>::const_iterator otherpin_it = OutputPinLinked->InputPinsLinked.begin();
-					for (; otherpin_it != OutputPinLinked->InputPinsLinked.end(); ++otherpin_it)
-					{
-						if ((*otherpin_it)->ID == ID)
-						{
-							OutputPinLinked->InputPinsLinked.erase(otherpin_it);
-							break;
-						}
-					}
-				}
+					OutputPinLinked->DeleteInputPin(ID);
 
 				// Connect output pin to this pin and pushback this pin into the output's inputs list
 				OutputPinLinked = output_pin;
 				output_pin->InputPinsLinked.push_back(this);
+			}
+		}
+
+		void DeleteInputPin(uint input_pinID)
+		{
+			std::vector<MaterialNodePin*>::const_iterator it = InputPinsLinked.begin();
+			for (; it != InputPinsLinked.end(); ++it)
+			{
+				if ((*it)->ID == input_pinID)
+				{
+					InputPinsLinked.erase(it);
+					break;
+				}
 			}
 		}
 

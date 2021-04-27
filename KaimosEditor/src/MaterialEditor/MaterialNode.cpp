@@ -49,6 +49,7 @@ namespace Kaimos {
 			ImNodes::EndInputAttribute();
 		}
 
+		// -- End Node Drawing --
 		ImNodes::EndNode();
 
 		// -- Draw Links --
@@ -80,13 +81,13 @@ namespace Kaimos {
 	}
 
 
-	int MaterialNode::FindInputPinIndex(uint pin_id)
+	MaterialNodePin* MaterialNode::FindInputPin(uint pinID)
 	{
 		for (uint i = 0; i < m_NodeInputPins.size(); ++i)
-			if (m_NodeInputPins[i]->ID == pin_id)
-				return i;
+			if (m_NodeInputPins[i]->ID == pinID)
+				return m_NodeInputPins[i].get();
 
-		return -1;
+		return nullptr;
 	}
 
 

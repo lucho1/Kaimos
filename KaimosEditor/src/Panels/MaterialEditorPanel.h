@@ -32,20 +32,18 @@ namespace Kaimos {
 
 		// --- Private Material Editor Methods ---
 		void CreateNode();
-		void DeleteNode(uint node_id);
-		void DeleteLink(uint pin_id);
+		void DeleteNode(uint nodeID);
+		void DeleteLink(uint pinID);
 		void DeleteSelection(int selected_links, int selected_nodes);
 
-		MaterialNodePin* FindNodePin(uint pin_id);
-		MaterialNode* FindNode(uint node_id);
+		MaterialNode* FindNode(uint nodeID);
+		MaterialNodePin* FindNodePin(uint pinID);
 
 	private:
 
 		// --- Variables ---
 		Ref<MainMaterialNode> m_MainMatNode = nullptr;
-
 		std::vector<Ref<MaterialNode>> m_Nodes;
-		//mutable SpriteRendererComponent* m_MaterialToModify = nullptr;
 	};
 }
 
