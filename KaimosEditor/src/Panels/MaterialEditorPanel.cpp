@@ -9,13 +9,29 @@
 
 
 namespace Kaimos {
-
+	
 	
 	// ----------------------- Public Class Methods -------------------------------------------------------
+	void MaterialEditorPanel::Start()
+	{
+		m_MainMatNode = CreateRef<MainMaterialNode>();
+		m_Nodes.push_back(m_MainMatNode);
+	}
+
+	void MaterialEditorPanel::CleanUp()
+	{
+		for (Ref<MaterialNode>& matnode_ref : m_Nodes)
+			matnode_ref.reset();
+
+		m_Nodes.clear();
+		m_MainMatNode.reset();
+	}	
+	
+
 	void MaterialEditorPanel::OnUIRender()
 	{
 		ImGui::Begin("Kaimos Material Editor");
-		if (!m_MaterialToModify)
+		if (!m_MainMatNode->m_MaterialToModify)
 		{
 			ImGui::End();
 			return;
@@ -27,6 +43,8 @@ namespace Kaimos {
 		bool set_draggable = true;
 		float indent = 5.0f, width = 30.0f;
 
+		
+		// ----------- CENTRAL HARDCODED NODE -------------------------------------------------
 		// -- Central Node Beginning --
 		ImNodes::BeginNode(1);
 		ImNodes::BeginNodeTitleBar();
@@ -37,28 +55,28 @@ namespace Kaimos {
 		ImGui::Text("Color");
 		ImGuiColorEditFlags color_flags = ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreview | ImGuiColorEditFlags_NoInputs;
 		ImGui::SameLine();
-		ImGui::ColorEdit4("##spcompcolor", glm::value_ptr(m_MaterialToModify->Color), color_flags);
+		ImGui::ColorEdit4("##spcompcolor", glm::value_ptr(m_MainMatNode->m_MaterialToModify->Color), color_flags);
 
 		if (ImGui::IsItemHovered() || ImGui::IsItemFocused() || ImGui::IsItemActive() || ImGui::IsItemEdited() || ImGui::IsItemClicked())
 			set_draggable = false;
 
 		// -- Texture Node --
-		if (m_MaterialToModify->SpriteTexture)
+		if (m_MainMatNode->m_MaterialToModify->SpriteTexture)
 		{
-			std::string tex_path = m_MaterialToModify->TextureFilepath;
+			std::string tex_path = m_MainMatNode->m_MaterialToModify->TextureFilepath;
 			std::string tex_name = tex_path.substr(tex_path.find_last_of("/\\" + 1, tex_path.size() - 1));
 
 			ImGui::Text("Texture");
 			ImGui::Indent(indent);
-			ImGui::Text("Texture %i: '%s'", m_MaterialToModify->SpriteTexture->GetTextureID(), tex_name.c_str());
+			ImGui::Text("Texture %i: '%s'", m_MainMatNode->m_MaterialToModify->SpriteTexture->GetTextureID(), tex_name.c_str());
 			ImGui::SameLine();
-			ImGui::Text("(%ix%i)", m_MaterialToModify->SpriteTexture->GetWidth(), m_MaterialToModify->SpriteTexture->GetHeight());
+			ImGui::Text("(%ix%i)", m_MainMatNode->m_MaterialToModify->SpriteTexture->GetWidth(), m_MainMatNode->m_MaterialToModify->SpriteTexture->GetHeight());
 		}
 
 		// -- Texture Tiling Node --
 		ImGui::Text("Texture Tiling");
 		ImGui::SameLine(); ImGui::SetNextItemWidth(width);
-		ImGui::DragFloat("##spcomptextiling", &m_MaterialToModify->TextureTiling, 0.2f);
+		ImGui::DragFloat("##spcomptextiling", &m_MainMatNode->m_MaterialToModify->TextureTiling, 0.2f);
 
 		if (ImGui::IsItemHovered() || ImGui::IsItemFocused() || ImGui::IsItemActive() || ImGui::IsItemEdited() || ImGui::IsItemClicked())
 			set_draggable = false;
@@ -67,7 +85,7 @@ namespace Kaimos {
 		// -- Texture UV Offset Node --
 		ImGui::Text("Texture Offset");
 		ImGui::SameLine(); ImGui::SetNextItemWidth(width * 2.0f);
-		ImGui::DragFloat2("##spcomptexoffx", glm::value_ptr(m_MaterialToModify->TextureUVOffset), 0.2f);
+		ImGui::DragFloat2("##spcomptexoffx", glm::value_ptr(m_MainMatNode->m_MaterialToModify->TextureUVOffset), 0.2f);
 
 		if (ImGui::IsItemHovered() || ImGui::IsItemFocused() || ImGui::IsItemActive() || ImGui::IsItemEdited() || ImGui::IsItemClicked())
 			set_draggable = false;
@@ -78,7 +96,7 @@ namespace Kaimos {
 
 
 		// ----------- NODES ------------------------------------------------------------------
-		// -- Create Node Key --
+		// -- Right-Click Popup --
 		if (ImGui::BeginPopupContextWindow(0, 1, false))
 		{
 			if (ImGui::MenuItem("Create Node"))
@@ -87,58 +105,12 @@ namespace Kaimos {
 			ImGui::EndPopup();
 		}
 
-		// -- Draw Central (Material) Node --
-		ImNodes::BeginNode(m_CentralNode->GetID());
+		if(Input::IsKeyDown(KEY::V))
+			CreateNode();
 
-		ImNodes::BeginInputAttribute(m_TextureTilingPin->ID); // Texture Tiling Input
-		ImGui::Text(m_TextureTilingPin->Name.c_str());
-		ImNodes::EndInputAttribute();
-
-		if (m_TextureTilingPin->OutputPinLinked)
-		{
-			m_MaterialToModify->TextureTiling = m_TextureTilingPin->OutputPinLinked->Value;
-		}
-		else
-		{
-			ImGui::SameLine(); ImGui::SetNextItemWidth(width);
-			if(ImGui::DragFloat("##spcomptextiling", &m_TextureTilingPin->Value, 0.2f))
-				m_MaterialToModify->TextureTiling = m_TextureTilingPin->Value;
-		}
-
-		ImNodes::EndNode();
-
-		// -- Draw Nodes & its Pins --
+		// -- Draw Nodes, Pins & Links --
 		for (Ref<MaterialNode>& node : m_Nodes)
-		{
-			if (node->GetID() == m_CentralNode->GetID())
-				continue;
-
-			ImNodes::BeginNode(node->GetID());
-
-			ImNodes::BeginOutputAttribute(node->GetOutputPin()->ID);
-			ImGui::Indent(40.0f);
-			ImGui::Text(node->GetOutputPin()->Name.c_str());
-			ImNodes::EndOutputAttribute();
-
-			for (Ref<MaterialNodePin> pin : *node->GetInputPins())
-			{
-				ImNodes::BeginInputAttribute(pin->ID);
-				ImGui::Text(pin->Name.c_str());
-				ImNodes::EndInputAttribute();
-			}
-
-			ImNodes::EndNode();
-		}
-
-		// -- Draw Links between Node Pins --
-		for (Ref<MaterialNode>& node : m_Nodes)
-		{
-			for (Ref<MaterialNodePin> pin : *node->GetInputPins())
-			{
-				if (pin->OutputPinLinked)
-					ImNodes::Link(pin->ID, pin->ID, pin->OutputPinLinked->ID); // Links have the same ID than its input pin
-			}
-		}		
+			node->DrawNodeUI();
 
 		// -- End Material Node Editor --
 		ImNodes::EndNodeEditor();
@@ -147,66 +119,33 @@ namespace Kaimos {
 		int start, end;
 		if (ImNodes::IsLinkCreated(&start, &end))
 		{
-			MaterialNodePin* out_pin = FindNodePin(start);	// Output pin (start)
-			MaterialNodePin* in_pin = FindNodePin(end);		// Input pin (end)
-
-			if (in_pin && out_pin)
-			{
-				// Check if the node of the input pin is connected to the node of the output pin
-				bool connect = true;
-				MaterialNodePin* inpin_nodeoutput = in_pin->OwnerNode->GetOutputPin();
-				if (inpin_nodeoutput)
-				{
-					for (Ref<MaterialNodePin> outnode_inpin : *out_pin->OwnerNode->GetInputPins())
-						if (outnode_inpin->OutputPinLinked && outnode_inpin->OutputPinLinked->ID == inpin_nodeoutput->ID)
-							connect = false;
-				}
-
-				if (connect)
-				{
-					in_pin->OutputPinLinked = out_pin;
-					out_pin->InputPinsLinked.push_back(in_pin);
-
-					m_TextureTilingPin->DefaultValue = m_TextureTilingPin->Value;
-				}
-			}
+			// Input pin is always end while Output pin is always start
+			MaterialNodePin* in_pin = FindNodePin(end);
+			if (in_pin)
+				in_pin->LinkPin(FindNodePin(start));
 		}
 
 		// -- Check for Links & Nodes Destroys --
+		// Link dragged to empty space
 		int destroyed_id;
-		if (ImNodes::IsLinkDestroyed(&destroyed_id))										// If any link is dragged to an empty space
+		if (ImNodes::IsLinkDestroyed(&destroyed_id))
 			DeleteLink((uint)destroyed_id);
 
+		// Link is double right-clicked
 		int item_hovered;
-		if (ImGui::GetIO().MouseDoubleClicked[2] && ImNodes::IsLinkHovered(&item_hovered))	// If a link is right-clicked twice
+		if (ImGui::GetIO().MouseDoubleClicked[2] && ImNodes::IsLinkHovered(&item_hovered))
 			DeleteLink((uint)item_hovered);
 		
-		if (ImGui::GetIO().MouseDoubleClicked[2] && ImNodes::IsNodeHovered(&item_hovered))	// If a node is right-clicked twice
+		// Node is double right-clicked
+		if (ImGui::GetIO().MouseDoubleClicked[2] && ImNodes::IsNodeHovered(&item_hovered))
 			DeleteNode((uint)item_hovered);
 
-		if (Input::IsKeyDown(KEY::DEL))														// If there is a nodes/link selection and SUPR or DEL is pressed
+		// SUPR/DEL pressed + nodes/link selection
+		if (Input::IsKeyDown(KEY::DEL))
 		{
-			int selected_links = ImNodes::NumSelectedLinks();
-			if (selected_links > 0)
-			{
-				int* del_links = new int[selected_links];
-				ImNodes::GetSelectedLinks(del_links);
-				for (uint i = 0; i < selected_links; ++i)
-					DeleteLink((uint)del_links[i]);
-
-				delete[] del_links;
-			}
-
-			const int selected_nodes = ImNodes::NumSelectedNodes();
-			if (selected_nodes > 0)
-			{
-				int* del_nodes = new int[selected_nodes];
-				ImNodes::GetSelectedNodes(del_nodes);
-				for (uint i = 0; i < selected_nodes; ++i)
-					DeleteNode((uint)del_nodes[i]);
-
-				delete[] del_nodes;
-			}
+			int selected_links = ImNodes::NumSelectedLinks(), selected_nodes = ImNodes::NumSelectedNodes();
+			if (selected_links > 0 || selected_nodes > 0)
+				DeleteSelection(selected_links, selected_nodes);
 		}
 
 		// -- End Editor --
@@ -218,8 +157,7 @@ namespace Kaimos {
 	{
 		UnsetMaterialToModify();
 		ImNodes::LoadCurrentEditorStateFromIniFile("imnode.ini");
-	}
-	
+	}	
 
 	void MaterialEditorPanel::SaveIniEditorSettings() const
 	{
@@ -243,7 +181,7 @@ namespace Kaimos {
 
 	void MaterialEditorPanel::DeleteNode(uint node_id)
 	{
-		if (node_id == m_CentralNode->GetID())
+		if (node_id == m_MainMatNode->GetID())
 			return;
 
 		std::vector<Ref<MaterialNode>>::const_iterator it = m_Nodes.begin();
@@ -265,7 +203,30 @@ namespace Kaimos {
 			in_pin->OutputPinLinked->InputPinsLinked.erase(std::find(in_pin->OutputPinLinked->InputPinsLinked.begin(), in_pin->OutputPinLinked->InputPinsLinked.end(), in_pin));
 			in_pin->OutputPinLinked = nullptr;
 
-			m_MaterialToModify->TextureTiling = in_pin->Value = in_pin->DefaultValue;
+			//m_MainMatNode->m_MaterialToModify->TextureTiling = in_pin->Value = in_pin->DefaultValue;
+		}
+	}
+
+	void MaterialEditorPanel::DeleteSelection(int selected_links, int selected_nodes)
+	{
+		if (selected_links > 0)
+		{
+			int* del_links = new int[selected_links];
+			ImNodes::GetSelectedLinks(del_links);
+			for (uint i = 0; i < selected_links; ++i)
+				DeleteLink((uint)del_links[i]);
+
+			delete[] del_links;
+		}
+		
+		if (selected_nodes > 0)
+		{
+			int* del_nodes = new int[selected_nodes];
+			ImNodes::GetSelectedNodes(del_nodes);
+			for (uint i = 0; i < selected_nodes; ++i)
+				DeleteNode((uint)del_nodes[i]);
+
+			delete[] del_nodes;
 		}
 	}
 
@@ -273,7 +234,7 @@ namespace Kaimos {
 	{
 		for (Ref<MaterialNode>& node : m_Nodes)
 		{
-			if (node->GetID() != m_CentralNode->GetID() && node->GetOutputPin()->ID == pin_id)
+			if (node->GetID() != m_MainMatNode->GetID() && node->GetOutputPin()->ID == pin_id)
 				return node->GetOutputPin();
 
 			int index = node->FindInputPinIndex(pin_id);
@@ -297,26 +258,31 @@ namespace Kaimos {
 
 
 
-	// ----------------------- Public Material Methods ----------------------------------------------------
+	// ----------------------- Public Material Editor Methods ---------------------------------------------
 	void MaterialEditorPanel::UnsetMaterialToModify() const
 	{
-		if (m_MaterialToModify)
-			m_MaterialToModify->InMaterialEditor = false;
+		if (!m_MainMatNode)
+			return;
 
-		m_MaterialToModify = nullptr;
+		if (m_MainMatNode->m_MaterialToModify)
+			m_MainMatNode->m_MaterialToModify->InMaterialEditor = false;
 
-		if(m_TextureTilingPin)
-			m_TextureTilingPin->DefaultValue = m_TextureTilingPin->Value = 1.0f;
+
+		m_MainMatNode->m_TextureTilingPin->DefaultValue = m_MainMatNode->m_TextureTilingPin->Value = 1.0f;
+		m_MainMatNode->m_MaterialToModify = nullptr;
 	}
 
 	void MaterialEditorPanel::SetMaterialToModify(SpriteRendererComponent* sprite_component) const
 	{
-		if(m_MaterialToModify)
-			m_MaterialToModify->InMaterialEditor = false;
+		if (!m_MainMatNode)
+			return;
 
-		m_MaterialToModify = sprite_component;
-		m_MaterialToModify->InMaterialEditor = true;
+		if(m_MainMatNode->m_MaterialToModify)
+			m_MainMatNode->m_MaterialToModify->InMaterialEditor = false;
 
-		m_TextureTilingPin->DefaultValue = m_TextureTilingPin->Value = m_MaterialToModify->TextureTiling;
+		m_MainMatNode->m_MaterialToModify = sprite_component;
+		m_MainMatNode->m_MaterialToModify->InMaterialEditor = true;
+
+		m_MainMatNode->m_TextureTilingPin->DefaultValue = m_MainMatNode->m_TextureTilingPin->Value = m_MainMatNode->m_MaterialToModify->TextureTiling;
 	}
 }

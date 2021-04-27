@@ -1,19 +1,112 @@
 #ifndef _MATERIALNODE_H_
 #define _MATERIALNODE_H_
 
-
-//#include "Kaimos.h"
 #include "Core/Core.h"
 #include "Core/Utils/Maths/RandomGenerator.h"
+#include "Scene/ECS/Components.h"
 
 
 namespace Kaimos {
 
-	class MaterialNode;
+	class MaterialNodePin;
+
+	class MaterialNode
+	{
+	public:
+
+		// --- Public Class Methods ---
+		MaterialNode(uint id, const std::string& name) : m_ID(id), m_Name(name) {}
+		~MaterialNode();
+
+		virtual void DrawNodeUI();
+
+		// --- Public Material Node Methods ---
+		void AddPin(bool input, float default_value = 1.0f);
+		void AddPin(bool input, Ref<MaterialNodePin>& pin);
+
+		int FindInputPinIndex(uint pin_id);
+
+	public:
+
+		// --- Getters ---
+		uint GetID()					const { return m_ID; }
+		const std::string& GetName()	const { return m_Name; }
+
+		MaterialNodePin* GetOutputPin()							const { return m_NodeOutputPin.get(); }
+		MaterialNodePin* GetInputPinAt(uint index)				const { return m_NodeInputPins[index].get(); }
+		const std::vector<Ref<MaterialNodePin>>* GetInputPins()	const { return &m_NodeInputPins; }
+
+	protected:
+
+		// --- Variables ---
+		uint m_ID = 0;
+		std::string m_Name = "unnamed";
+
+		std::vector<Ref<MaterialNodePin>> m_NodeInputPins;
+		Ref<MaterialNodePin> m_NodeOutputPin = nullptr;
+	};
+
+
+
+	class MainMaterialNode : public MaterialNode
+	{
+		friend class MaterialEditorPanel;
+	public:
+
+		MainMaterialNode();
+		~MainMaterialNode();
+		virtual void DrawNodeUI() override;
+
+	protected:
+
+		mutable SpriteRendererComponent* m_MaterialToModify = nullptr;
+
+	private:
+
+		Ref<MaterialNodePin> m_TextureTilingPin = nullptr;
+	};
+
+
+
+
 	struct MaterialNodePin
 	{
 		MaterialNodePin(MaterialNode* owner, uint id, const std::string& name, float default_value = 1.0f) : OwnerNode(owner), ID(id), Name(name), DefaultValue(default_value) {}
 
+		void LinkPin(MaterialNodePin* output_pin)
+		{
+			if (output_pin)
+			{
+				// Check if this pin's node is connected to the node of the output_pin
+				MaterialNodePin* node_output = OwnerNode->GetOutputPin();
+				if (node_output)
+				{
+					for (Ref<MaterialNodePin> othernode_input : *output_pin->OwnerNode->GetInputPins())
+						if (othernode_input->OutputPinLinked && othernode_input->OutputPinLinked->ID == node_output->ID)
+							return;
+				}
+
+				// Check if this pin has an output, then erase this pin from the output's inputs list (TODO: All this kind of stuff should be in functions in their classes)
+				if (OutputPinLinked)
+				{
+					std::vector<MaterialNodePin*>::const_iterator otherpin_it = OutputPinLinked->InputPinsLinked.begin();
+					for (; otherpin_it != OutputPinLinked->InputPinsLinked.end(); ++otherpin_it)
+					{
+						if ((*otherpin_it)->ID == ID)
+						{
+							OutputPinLinked->InputPinsLinked.erase(otherpin_it);
+							break;
+						}
+					}
+				}
+
+				// Connect output pin to this pin and pushback this pin into the output's inputs list
+				OutputPinLinked = output_pin;
+				output_pin->InputPinsLinked.push_back(this);
+			}
+		}
+
+		// --- Variables ---
 		uint ID = 0;
 		MaterialNode* OwnerNode = nullptr;
 		std::vector<MaterialNodePin*> InputPinsLinked;
@@ -23,76 +116,6 @@ namespace Kaimos {
 
 		float Value = 10.0f;
 		float DefaultValue = 1.0f;
-	};
-
-
-	class MaterialNode
-	{
-	public:
-
-		MaterialNode(uint id, const std::string& name) : m_ID(id), m_Name(name) {}
-		~MaterialNode()
-		{
-			for (Ref<MaterialNodePin>& pin : m_NodeInputPins)
-				pin.reset();
-
-			if (m_NodeOutputPin)
-			{
-				for (auto& pin : m_NodeOutputPin->InputPinsLinked)
-				{
-					pin->Value = pin->DefaultValue;
-					pin->OutputPinLinked = nullptr;
-					pin = nullptr;
-				}
-
-				m_NodeOutputPin->InputPinsLinked.clear();
-			}
-
-			m_NodeOutputPin.reset();
-			m_NodeInputPins.clear();
-		}
-
-		void AddPin(bool input, float default_value = 1.0f)
-		{
-			if (input)
-				m_NodeInputPins.push_back(CreateRef<MaterialNodePin>(this, Kaimos::Random::GetRandomInt(), "InputP", default_value));
-			else if(!m_NodeOutputPin)
-				m_NodeOutputPin = CreateRef<MaterialNodePin>(this, Kaimos::Random::GetRandomInt(), "OutputP");
-		}
-
-		void AddPin(bool input, Ref<MaterialNodePin>& pin)
-		{
-			if (input)
-				m_NodeInputPins.push_back(pin);
-			else if (!m_NodeOutputPin)
-				m_NodeOutputPin = pin;
-		}
-
-		int FindInputPinIndex(uint pin_id)
-		{
-			for (uint i = 0; i < m_NodeInputPins.size(); ++i)
-				if (m_NodeInputPins[i]->ID == pin_id)
-					return i;
-
-			return -1;
-		}
-
-	public:
-
-		uint GetID()					const { return m_ID; }
-		const std::string& GetName()	const { return m_Name; }
-
-		MaterialNodePin* GetOutputPin()							const { return m_NodeOutputPin.get(); }
-		MaterialNodePin* GetInputPinAt(uint index)				const { return m_NodeInputPins[index].get(); }
-		const std::vector<Ref<MaterialNodePin>>* GetInputPins()	const { return &m_NodeInputPins; }
-
-	private:
-
-		uint m_ID = 0;
-		std::string m_Name = "unnamed";
-
-		std::vector<Ref<MaterialNodePin>> m_NodeInputPins;
-		Ref<MaterialNodePin> m_NodeOutputPin = nullptr;
 	};
 }
 
