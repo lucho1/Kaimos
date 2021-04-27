@@ -55,7 +55,6 @@ namespace Kaimos {
 			ImGui::Text("(%ix%i)", m_MaterialToModify->SpriteTexture->GetWidth(), m_MaterialToModify->SpriteTexture->GetHeight());
 		}
 
-
 		// -- Texture Tiling Node --
 		ImGui::Text("Texture Tiling");
 		ImGui::SameLine(); ImGui::SetNextItemWidth(width);
@@ -88,9 +87,32 @@ namespace Kaimos {
 			ImGui::EndPopup();
 		}
 
+		// -- Draw Central (Material) Node --
+		ImNodes::BeginNode(m_CentralNode->GetID());
+
+		ImNodes::BeginInputAttribute(m_TextureTilingPin->ID); // Texture Tiling Input
+		ImGui::Text(m_TextureTilingPin->Name.c_str());
+		ImNodes::EndInputAttribute();
+
+		if (m_TextureTilingPin->OutputPinLinked)
+		{
+			m_MaterialToModify->TextureTiling = m_TextureTilingPin->OutputPinLinked->Value;
+		}
+		else
+		{
+			ImGui::SameLine(); ImGui::SetNextItemWidth(width);
+			if(ImGui::DragFloat("##spcomptextiling", &m_TextureTilingPin->Value, 0.2f))
+				m_MaterialToModify->TextureTiling = m_TextureTilingPin->Value;
+		}
+
+		ImNodes::EndNode();
+
 		// -- Draw Nodes & its Pins --
 		for (Ref<MaterialNode>& node : m_Nodes)
 		{
+			if (node->GetID() == m_CentralNode->GetID())
+				continue;
+
 			ImNodes::BeginNode(node->GetID());
 
 			ImNodes::BeginOutputAttribute(node->GetOutputPin()->ID);
@@ -144,6 +166,8 @@ namespace Kaimos {
 				{
 					in_pin->OutputPinLinked = out_pin;
 					out_pin->InputPinsLinked.push_back(in_pin);
+
+					m_TextureTilingPin->DefaultValue = m_TextureTilingPin->Value;
 				}
 			}
 		}
@@ -219,6 +243,9 @@ namespace Kaimos {
 
 	void MaterialEditorPanel::DeleteNode(uint node_id)
 	{
+		if (node_id == m_CentralNode->GetID())
+			return;
+
 		std::vector<Ref<MaterialNode>>::const_iterator it = m_Nodes.begin();
 		for (; it != m_Nodes.end(); ++it)
 		{
@@ -237,6 +264,8 @@ namespace Kaimos {
 		{
 			in_pin->OutputPinLinked->InputPinsLinked.erase(std::find(in_pin->OutputPinLinked->InputPinsLinked.begin(), in_pin->OutputPinLinked->InputPinsLinked.end(), in_pin));
 			in_pin->OutputPinLinked = nullptr;
+
+			m_MaterialToModify->TextureTiling = in_pin->Value = in_pin->DefaultValue;
 		}
 	}
 
@@ -244,7 +273,7 @@ namespace Kaimos {
 	{
 		for (Ref<MaterialNode>& node : m_Nodes)
 		{
-			if (node->GetOutputPin()->ID == pin_id)
+			if (node->GetID() != m_CentralNode->GetID() && node->GetOutputPin()->ID == pin_id)
 				return node->GetOutputPin();
 
 			int index = node->FindInputPinIndex(pin_id);
@@ -275,6 +304,9 @@ namespace Kaimos {
 			m_MaterialToModify->InMaterialEditor = false;
 
 		m_MaterialToModify = nullptr;
+
+		if(m_TextureTilingPin)
+			m_TextureTilingPin->DefaultValue = m_TextureTilingPin->Value = 1.0f;
 	}
 
 	void MaterialEditorPanel::SetMaterialToModify(SpriteRendererComponent* sprite_component) const
@@ -284,5 +316,7 @@ namespace Kaimos {
 
 		m_MaterialToModify = sprite_component;
 		m_MaterialToModify->InMaterialEditor = true;
+
+		m_TextureTilingPin->DefaultValue = m_TextureTilingPin->Value = m_MaterialToModify->TextureTiling;
 	}
 }

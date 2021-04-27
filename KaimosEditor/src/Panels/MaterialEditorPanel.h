@@ -13,12 +13,25 @@ namespace Kaimos {
 
 		// --- Public Class Methods ---
 		MaterialEditorPanel() = default;
-		~MaterialEditorPanel()
+		~MaterialEditorPanel() { CleanUp(); }
+
+		void CleanUp()
 		{
 			for (Ref<MaterialNode>& matnode_ref : m_Nodes)
 				matnode_ref.reset();
 
 			m_Nodes.clear();
+			m_TextureTilingPin.reset();
+			m_CentralNode.reset();
+		}
+
+		void Start()
+		{
+			m_CentralNode = CreateRef<MaterialNode>((uint)Kaimos::Random::GetRandomInt(), "MaterialNode");
+			m_TextureTilingPin = CreateRef<MaterialNodePin>(m_CentralNode.get(), Kaimos::Random::GetRandomInt(), "Texture Tiling");
+
+			m_CentralNode->AddPin(true, m_TextureTilingPin);
+			m_Nodes.push_back(m_CentralNode);
 		}
 
 		void OnUIRender();
@@ -44,6 +57,9 @@ namespace Kaimos {
 	private:
 
 		// --- Variables ---
+		Ref<MaterialNode> m_CentralNode = nullptr;
+		Ref<MaterialNodePin> m_TextureTilingPin = nullptr;
+
 		std::vector<Ref<MaterialNode>> m_Nodes;
 		mutable SpriteRendererComponent* m_MaterialToModify = nullptr;
 	};

@@ -57,12 +57,14 @@ namespace Kaimos {
 		SceneSerializer m_Serializer(m_CurrentScene);
 		m_Serializer.Deserialize("assets/scenes/CubeScene.kaimos");
 		m_ScenePanel = ScenePanel(m_CurrentScene, &m_KMEPanel);
+		m_KMEPanel.Start();
 	}
 
 
 	void EditorLayer::OnDetach()
 	{
 		KS_PROFILE_FUNCTION();
+		m_KMEPanel.CleanUp();
 	}
 
 

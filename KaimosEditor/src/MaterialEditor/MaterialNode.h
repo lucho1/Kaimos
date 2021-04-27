@@ -12,7 +12,7 @@ namespace Kaimos {
 	class MaterialNode;
 	struct MaterialNodePin
 	{
-		MaterialNodePin(MaterialNode* owner, uint id, const std::string& name) : OwnerNode(owner), ID(id), Name(name) {}
+		MaterialNodePin(MaterialNode* owner, uint id, const std::string& name, float default_value = 1.0f) : OwnerNode(owner), ID(id), Name(name), DefaultValue(default_value) {}
 
 		uint ID = 0;
 		MaterialNode* OwnerNode = nullptr;
@@ -20,6 +20,9 @@ namespace Kaimos {
 		MaterialNodePin* OutputPinLinked = nullptr;
 
 		std::string Name = "UnnamedPin";
+
+		float Value = 10.0f;
+		float DefaultValue = 1.0f;
 	};
 
 
@@ -33,23 +36,36 @@ namespace Kaimos {
 			for (Ref<MaterialNodePin>& pin : m_NodeInputPins)
 				pin.reset();
 
-			for (auto& pin : m_NodeOutputPin->InputPinsLinked)
+			if (m_NodeOutputPin)
 			{
-				pin->OutputPinLinked = nullptr;
-				pin = nullptr;
+				for (auto& pin : m_NodeOutputPin->InputPinsLinked)
+				{
+					pin->Value = pin->DefaultValue;
+					pin->OutputPinLinked = nullptr;
+					pin = nullptr;
+				}
+
+				m_NodeOutputPin->InputPinsLinked.clear();
 			}
 
-			m_NodeOutputPin->InputPinsLinked.clear();
 			m_NodeOutputPin.reset();
 			m_NodeInputPins.clear();
 		}
 
-		void AddPin(bool input)
+		void AddPin(bool input, float default_value = 1.0f)
 		{
 			if (input)
-				m_NodeInputPins.push_back(CreateRef<MaterialNodePin>(this, Kaimos::Random::GetRandomInt(), "InputP"));
+				m_NodeInputPins.push_back(CreateRef<MaterialNodePin>(this, Kaimos::Random::GetRandomInt(), "InputP", default_value));
 			else if(!m_NodeOutputPin)
 				m_NodeOutputPin = CreateRef<MaterialNodePin>(this, Kaimos::Random::GetRandomInt(), "OutputP");
+		}
+
+		void AddPin(bool input, Ref<MaterialNodePin>& pin)
+		{
+			if (input)
+				m_NodeInputPins.push_back(pin);
+			else if (!m_NodeOutputPin)
+				m_NodeOutputPin = pin;
 		}
 
 		int FindInputPinIndex(uint pin_id)
