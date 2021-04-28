@@ -98,16 +98,29 @@ namespace Kaimos::MaterialEditor {
 
 		// ----------- NODES ------------------------------------------------------------------
 		// -- Right-Click Popup --
+		if (Input::IsKeyDown(KEY::V))
+			CreateNode();
+
 		if (ImGui::BeginPopupContextWindow(0, 1, false))
 		{
-			if (ImGui::MenuItem("Create Node"))
+			if (ImGui::MenuItem("Float Dummy Node"))
 				CreateNode();
+
+			if (ImGui::MenuItem("Texture Coordinates Node"))
+				CreateNode(ConstantNodeType::TCOORDS);
+
+			if (ImGui::MenuItem("Delta Time Node"))
+				CreateNode(ConstantNodeType::DELTATIME);
+
+			if (ImGui::MenuItem("Sum Node"))
+				CreateNode(OperationNodeType::ADDITION, PinDataType::FLOAT);
+
+			if (ImGui::MenuItem("Multiplication Node"))
+				CreateNode(OperationNodeType::MULTIPLICATION, PinDataType::FLOAT);
 		
 			ImGui::EndPopup();
 		}
-
-		if(Input::IsKeyDown(KEY::V))
-			CreateNode();
+		
 
 		// -- Draw Nodes, Pins & Links --
 		for (Ref<MaterialNode>& node : m_Nodes)
@@ -165,21 +178,32 @@ namespace Kaimos::MaterialEditor {
 		ImNodes::SaveCurrentEditorStateToIniFile("imnode.ini");
 	}
 
-
+		
 	
-	// ----------------------- Private Material Editor Methods --------------------------------------------
+	// ----------------------- Node Creation Methods ------------------------------------------------------
 	void MaterialEditorPanel::CreateNode()
 	{
 		uint id = (uint)Kaimos::Random::GetRandomInt();
-		Ref<MaterialNode> mat_node = CreateRef<MaterialNode>(id, "Node_" + std::to_string(id));
-
-		mat_node->AddPin(false);
-		mat_node->AddPin(true);
-		mat_node->AddPin(true);
-
+		Ref<MaterialNode> mat_node = CreateRef<MaterialNode>(id, "DummyNode_" + std::to_string(id), MaterialNodeType::FLOAT_DUMMY);
+		mat_node->AddPin(false, PinDataType::FLOAT, "Float Output", 5.0f);
 		m_Nodes.push_back(mat_node);
 	}
 
+	void MaterialEditorPanel::CreateNode(ConstantNodeType constant_type)
+	{
+		ConstantMaterialNode* cnode = new ConstantMaterialNode(constant_type);
+		m_Nodes.push_back(CreateRef<MaterialNode>((MaterialNode*)cnode));
+	}
+
+	void MaterialEditorPanel::CreateNode(OperationNodeType operation_type, PinDataType operation_data_type)
+	{
+		OperationMaterialNode* onode = new OperationMaterialNode(operation_type, operation_data_type);
+		m_Nodes.push_back(CreateRef<MaterialNode>((MaterialNode*)onode));
+	}
+
+
+
+	// ----------------------- Private Material Editor Methods --------------------------------------------
 	void MaterialEditorPanel::DeleteNode(uint nodeID)
 	{
 		if (nodeID == m_MainMatNode->GetID())

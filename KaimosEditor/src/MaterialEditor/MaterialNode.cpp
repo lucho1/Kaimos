@@ -54,12 +54,21 @@ namespace Kaimos::MaterialEditor {
 
 
 	// ----------------------- Public Material Node Methods -----------------------------------------------
-	void MaterialNode::AddPin(bool input, float default_value)
+	MaterialNodePin* MaterialNode::FindInputPin(uint pinID)
+	{
+		for (uint i = 0; i < m_NodeInputPins.size(); ++i)
+			if (m_NodeInputPins[i]->GetID() == pinID)
+				return m_NodeInputPins[i].get();
+
+		return nullptr;
+	}
+
+	void MaterialNode::AddPin(bool input, PinDataType pin_type, const std::string& name, float default_value)
 	{
 		if (input)
-			m_NodeInputPins.push_back(CreateRef<MaterialNodePin>(this, (uint)Kaimos::Random::GetRandomInt(), PinDataType::FLOAT, "InputP", default_value));
+			m_NodeInputPins.push_back(CreateRef<MaterialNodePin>(this, (uint)Kaimos::Random::GetRandomInt(), pin_type, name, default_value));
 		else if (!m_NodeOutputPin)
-			m_NodeOutputPin = CreateRef<MaterialNodePin>(this, (uint)Kaimos::Random::GetRandomInt(), PinDataType::FLOAT, "OutputP", 0.0f);
+			m_NodeOutputPin = CreateRef<MaterialNodePin>(this, (uint)Kaimos::Random::GetRandomInt(), pin_type, name, default_value);
 	}
 
 	void MaterialNode::AddPin(bool input, Ref<MaterialNodePin>& pin)
@@ -70,21 +79,11 @@ namespace Kaimos::MaterialEditor {
 			m_NodeOutputPin = pin;
 	}
 
-	MaterialNodePin* MaterialNode::FindInputPin(uint pinID)
-	{
-		for (uint i = 0; i < m_NodeInputPins.size(); ++i)
-			if (m_NodeInputPins[i]->GetID() == pinID)
-				return m_NodeInputPins[i].get();
-
-		return nullptr;
-	}
-
-
 
 
 	// ---------------------------- MAIN MAT NODE ---------------------------------------------------------
 	// ----------------------- Public Class Methods -------------------------------------------------------
-	MainMaterialNode::MainMaterialNode() : MaterialNode((uint)Kaimos::Random::GetRandomInt(), "Main Node")
+	MainMaterialNode::MainMaterialNode() : MaterialNode((uint)Kaimos::Random::GetRandomInt(), "Main Node", MaterialNodeType::MAIN)
 	{
 		m_TextureTilingPin = CreateRef<MaterialNodePin>(this, (uint)Kaimos::Random::GetRandomInt(), PinDataType::FLOAT, "Texture Tiling", 1.0f);
 		m_TextureOffsetPinX = CreateRef<MaterialNodePin>(this, (uint)Kaimos::Random::GetRandomInt(), PinDataType::VEC2, "Texture Offset X", 0.0f);
@@ -109,7 +108,7 @@ namespace Kaimos::MaterialEditor {
 		ImNodes::BeginNode(m_ID);
 
 		ImNodes::BeginNodeTitleBar();
-		ImGui::Text("Main Node");
+		ImGui::Text(m_Name.c_str());
 		ImNodes::EndNodeTitleBar();
 
 		// -- Draw Input Pins --
@@ -157,5 +156,49 @@ namespace Kaimos::MaterialEditor {
 		m_TextureTilingPin->ResetToDefault();
 		m_TextureOffsetPinX->ResetToDefault();
 		m_TextureOffsetPinY->ResetToDefault();
+	}
+
+
+
+	// ---------------------------- OTHER NODES -----------------------------------------------------------
+	// ----------------------- Public Class Methods -------------------------------------------------------
+	ConstantMaterialNode::ConstantMaterialNode(ConstantNodeType constant_type)
+		: MaterialNode((uint)Kaimos::Random::GetRandomInt(), "Constant Node", MaterialNodeType::CONSTANT)
+	{
+		m_ConstantType = constant_type;
+		switch (m_ConstantType)
+		{
+			case ConstantNodeType::TCOORDS:
+			{
+				m_Name = "Texture Coordinates Node";
+				AddPin(false, PinDataType::VEC2, "TCoords");
+				break;
+			}
+			
+			case ConstantNodeType::DELTATIME:
+			{
+				m_Name = "Delta Time";
+				AddPin(false, PinDataType::FLOAT, "Time");
+				break;
+			}
+
+			default: KS_ENGINE_ASSERT(false, "Attempted to create a non-supported Constant Node");
+		}
+	}
+
+	OperationMaterialNode::OperationMaterialNode(OperationNodeType operation_type, PinDataType operation_data_type)
+		: MaterialNode((uint)Kaimos::Random::GetRandomInt(), "Operation Node", MaterialNodeType::OPERATION)
+	{
+		m_OperationType = operation_type;
+		switch (m_OperationType)
+		{
+			case OperationNodeType::ADDITION:		m_Name = "Sum Node";		break;
+			case OperationNodeType::MULTIPLICATION:	m_Name = "Multiply Node";	break;
+			default:								KS_ENGINE_ASSERT(false, "Attempted to create a non-supported Operation Node");
+		}
+
+		AddPin(true, operation_data_type, "Value 1");
+		AddPin(true, operation_data_type, "Value 2");
+		AddPin(false, operation_data_type, "Out");
 	}
 }

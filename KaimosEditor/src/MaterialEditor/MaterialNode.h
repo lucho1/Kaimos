@@ -8,7 +8,9 @@
 
 namespace Kaimos::MaterialEditor {
 
+	enum class MaterialNodeType { NONE, MAIN, FLOAT_DUMMY, OPERATION, CONSTANT };
 	class MaterialNodePin;
+	enum class PinDataType;
 
 
 	// ---- Base Material Node ----
@@ -17,17 +19,16 @@ namespace Kaimos::MaterialEditor {
 	public:
 
 		// --- Public Class Methods ---
-		MaterialNode(uint id, const std::string& name) : m_ID(id), m_Name(name) {}
+		MaterialNode(uint id, const std::string& name, MaterialNodeType type) : m_ID(id), m_Name(name), m_Type(type) {}
 		~MaterialNode();
 
 		virtual void DrawNodeUI();
 
 
 		// --- Public Material Node Methods ---
-		void AddPin(bool input, float default_value = 1.0f);
-		void AddPin(bool input, Ref<MaterialNodePin>& pin);
-
 		MaterialNodePin* FindInputPin(uint pinID);
+		void AddPin(bool input, PinDataType pin_type, const std::string& name, float default_value = 1.0f);
+		void AddPin(bool input, Ref<MaterialNodePin>& pin);
 
 	public:
 
@@ -43,6 +44,8 @@ namespace Kaimos::MaterialEditor {
 		// --- Variables ---
 		uint m_ID = 0;
 		std::string m_Name = "unnamed";
+
+		MaterialNodeType m_Type = MaterialNodeType::NONE;
 
 		std::vector<Ref<MaterialNodePin>> m_NodeInputPins;
 		Ref<MaterialNodePin> m_NodeOutputPin = nullptr;
@@ -70,11 +73,47 @@ namespace Kaimos::MaterialEditor {
 			
 	private:
 
-		// --- Protected Variables ---
+		// --- Variables ---
 		mutable SpriteRendererComponent* m_AttachedMaterial = nullptr;
 		Ref<MaterialNodePin> m_TextureTilingPin = nullptr;
 		Ref<MaterialNodePin> m_TextureOffsetPinX = nullptr;
 		Ref<MaterialNodePin> m_TextureOffsetPinY = nullptr;
+	};
+
+
+
+	// ---- Constant Node ----
+	enum class ConstantNodeType { NONE, TCOORDS, DELTATIME };
+
+	class ConstantMaterialNode : public MaterialNode
+	{
+	public:
+
+		// --- Public Class Methods ---
+		ConstantMaterialNode(ConstantNodeType constant_type);
+
+	private:
+
+		// --- Variables ---
+		ConstantNodeType m_ConstantType = ConstantNodeType::NONE;
+	};
+
+
+
+	// ---- Operation Node ----
+	enum class OperationNodeType { NONE, ADDITION, MULTIPLICATION };
+
+	class OperationMaterialNode : public MaterialNode
+	{
+	public:
+
+		// --- Public Class Methods ---
+		OperationMaterialNode(OperationNodeType operation_type, PinDataType operation_data_type);
+
+	private:
+
+		// --- Variables ---
+		OperationNodeType m_OperationType = OperationNodeType::NONE;
 	};
 }
 

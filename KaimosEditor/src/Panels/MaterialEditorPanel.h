@@ -30,8 +30,12 @@ namespace Kaimos::MaterialEditor {
 
 	private:
 
-		// --- Private Material Editor Methods ---
+		// --- Node Creation Methods ---
 		void CreateNode();
+		void CreateNode(ConstantNodeType constant_type);
+		void CreateNode(OperationNodeType operation_type, PinDataType operation_data_type);
+
+		// --- Private Material Editor Methods ---
 		void DeleteNode(uint nodeID);
 		void DeleteLink(uint pinID);
 		void DeleteSelection(int selected_links, int selected_nodes);
