@@ -6,14 +6,17 @@
 
 namespace Kaimos::MaterialEditor {
 
+	// ---- Pin Data Type ----
+	enum class PinDataType { NONE, FLOAT, INT, VEC2, VEC4 };
 
+	// ---- Node Pin Class ----
 	class MaterialNodePin
 	{
 	public:
 
 		// --- Public Class Methods ---
-		MaterialNodePin(MaterialNode* owner, uint id, const std::string& name, float default_value)
-			: m_OwnerNode(owner), m_ID(id), m_Name(name), m_DefaultValue(default_value) {}
+		MaterialNodePin(MaterialNode* owner, uint id, PinDataType type, const std::string& name, float default_value)
+			: m_OwnerNode(owner), m_ID(id), m_Type(type), m_Name(name), m_DefaultValue(default_value) {}
 
 		~MaterialNodePin();
 
@@ -38,6 +41,7 @@ namespace Kaimos::MaterialEditor {
 		// --- Variables ---
 		uint m_ID = 0;
 		std::string m_Name = "UnnamedPin";
+		PinDataType m_Type = PinDataType::NONE;
 		float m_Value = 10.0f, m_DefaultValue = 1.0f;
 		
 		MaterialNode* m_OwnerNode = nullptr;

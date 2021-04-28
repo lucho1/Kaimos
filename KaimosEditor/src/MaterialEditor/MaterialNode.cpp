@@ -57,9 +57,9 @@ namespace Kaimos::MaterialEditor {
 	void MaterialNode::AddPin(bool input, float default_value)
 	{
 		if (input)
-			m_NodeInputPins.push_back(CreateRef<MaterialNodePin>(this, (uint)Kaimos::Random::GetRandomInt(), "InputP", default_value));
+			m_NodeInputPins.push_back(CreateRef<MaterialNodePin>(this, (uint)Kaimos::Random::GetRandomInt(), PinDataType::FLOAT, "InputP", default_value));
 		else if (!m_NodeOutputPin)
-			m_NodeOutputPin = CreateRef<MaterialNodePin>(this, (uint)Kaimos::Random::GetRandomInt(), "OutputP", 0.0f);
+			m_NodeOutputPin = CreateRef<MaterialNodePin>(this, (uint)Kaimos::Random::GetRandomInt(), PinDataType::FLOAT, "OutputP", 0.0f);
 	}
 
 	void MaterialNode::AddPin(bool input, Ref<MaterialNodePin>& pin)
@@ -86,9 +86,9 @@ namespace Kaimos::MaterialEditor {
 	// ----------------------- Public Class Methods -------------------------------------------------------
 	MainMaterialNode::MainMaterialNode() : MaterialNode((uint)Kaimos::Random::GetRandomInt(), "Main Node")
 	{
-		m_TextureTilingPin = CreateRef<MaterialNodePin>(this, (uint)Kaimos::Random::GetRandomInt(), "Texture Tiling", 1.0f);
-		m_TextureOffsetPinX = CreateRef<MaterialNodePin>(this, (uint)Kaimos::Random::GetRandomInt(), "Texture Offset X", 0.0f);		
-		m_TextureOffsetPinY = CreateRef<MaterialNodePin>(this, (uint)Kaimos::Random::GetRandomInt(), "Texture Offset Y", 0.0f);
+		m_TextureTilingPin = CreateRef<MaterialNodePin>(this, (uint)Kaimos::Random::GetRandomInt(), PinDataType::FLOAT, "Texture Tiling", 1.0f);
+		m_TextureOffsetPinX = CreateRef<MaterialNodePin>(this, (uint)Kaimos::Random::GetRandomInt(), PinDataType::VEC2, "Texture Offset X", 0.0f);
+		m_TextureOffsetPinY = CreateRef<MaterialNodePin>(this, (uint)Kaimos::Random::GetRandomInt(), PinDataType::VEC2, "Texture Offset Y", 0.0f);
 
 		AddPin(true, m_TextureTilingPin);
 		AddPin(true, m_TextureOffsetPinX);

@@ -53,7 +53,7 @@ namespace Kaimos::MaterialEditor {
 	// ----------------------- Public Node Pin Methods ----------------------------------------------------
 	void MaterialNodePin::LinkPin(MaterialNodePin* output_pin)
 	{
-		if (output_pin)
+		if (output_pin && output_pin->m_Type == m_Type)
 		{
 			// Check if this pin's node is connected to the node of the output_pin
 			MaterialNodePin* node_output = m_OwnerNode->GetOutputPin();
