@@ -10,6 +10,8 @@ namespace Kaimos {
 
 	class MaterialNodePin;
 
+
+	// ---- Base Material Node ----
 	class MaterialNode
 	{
 	public:
@@ -20,6 +22,7 @@ namespace Kaimos {
 
 		virtual void DrawNodeUI();
 
+
 		// --- Public Material Node Methods ---
 		void AddPin(bool input, float default_value = 1.0f);
 		void AddPin(bool input, Ref<MaterialNodePin>& pin);
@@ -29,11 +32,11 @@ namespace Kaimos {
 	public:
 
 		// --- Getters ---
-		uint GetID()					const { return m_ID; }
-		const std::string& GetName()	const { return m_Name; }
+		uint GetID()												const { return m_ID; }
+		const std::string& GetName()								const { return m_Name; }
 
-		MaterialNodePin* GetOutputPin()							const { return m_NodeOutputPin.get(); }
-		const std::vector<Ref<MaterialNodePin>>* GetInputPins()	const { return &m_NodeInputPins; }
+		MaterialNodePin* GetOutputPin()								const { return m_NodeOutputPin.get(); }
+		const std::vector<Ref<MaterialNodePin>>* GetInputPins()		const { return &m_NodeInputPins; }
 
 	protected:
 
@@ -47,91 +50,31 @@ namespace Kaimos {
 
 
 
-
-
+	// ---- Main Material Node ----
 	class MainMaterialNode : public MaterialNode
 	{
-		friend class MaterialEditorPanel;
 	public:
 
+		// --- Public Class Methods ---
 		MainMaterialNode();
 		~MainMaterialNode();
+
 		virtual void DrawNodeUI() override;
 
-	protected:
 
-		mutable SpriteRendererComponent* m_MaterialToModify = nullptr;
+		// --- Public Main Material Node Methods ---
+		void DettachMaterial();
+		void AttachMaterial(SpriteRendererComponent* sprite_component);
 
+		bool HasMaterialAttached() const { return m_AttachedMaterial != nullptr; }
+			
 	private:
 
+		// --- Protected Variables ---
+		mutable SpriteRendererComponent* m_AttachedMaterial = nullptr;
 		Ref<MaterialNodePin> m_TextureTilingPin = nullptr;
-	};
-
-
-
-
-	struct MaterialNodePin
-	{
-		MaterialNodePin(MaterialNode* owner, uint id, const std::string& name, float default_value = 1.0f)
-			: OwnerNode(owner), ID(id), Name(name), DefaultValue(default_value) {}
-
-		void DeleteLink()
-		{
-			if (OutputPinLinked)
-			{
-				OutputPinLinked->InputPinsLinked.erase(std::find(OutputPinLinked->InputPinsLinked.begin(), OutputPinLinked->InputPinsLinked.end(), this));
-				OutputPinLinked = nullptr;
-
-				//m_MainMatNode->m_MaterialToModify->TextureTiling = in_pin->Value = in_pin->DefaultValue;
-			}
-		}
-
-		void LinkPin(MaterialNodePin* output_pin)
-		{
-			if (output_pin)
-			{
-				// Check if this pin's node is connected to the node of the output_pin
-				MaterialNodePin* node_output = OwnerNode->GetOutputPin();
-				if (node_output)
-				{
-					for (Ref<MaterialNodePin> othernode_input : *output_pin->OwnerNode->GetInputPins())
-						if (othernode_input->OutputPinLinked && othernode_input->OutputPinLinked->ID == node_output->ID)
-							return;
-				}
-
-				// Check if this pin has an output, then erase this pin from the output's inputs list
-				if (OutputPinLinked)
-					OutputPinLinked->DeleteInputPin(ID);
-
-				// Connect output pin to this pin and pushback this pin into the output's inputs list
-				OutputPinLinked = output_pin;
-				output_pin->InputPinsLinked.push_back(this);
-			}
-		}
-
-		void DeleteInputPin(uint input_pinID)
-		{
-			std::vector<MaterialNodePin*>::const_iterator it = InputPinsLinked.begin();
-			for (; it != InputPinsLinked.end(); ++it)
-			{
-				if ((*it)->ID == input_pinID)
-				{
-					InputPinsLinked.erase(it);
-					break;
-				}
-			}
-		}
-
-		// --- Variables ---
-		uint ID = 0;
-		MaterialNode* OwnerNode = nullptr;
-		std::vector<MaterialNodePin*> InputPinsLinked;
-		MaterialNodePin* OutputPinLinked = nullptr;
-
-		std::string Name = "UnnamedPin";
-
-		float Value = 10.0f;
-		float DefaultValue = 1.0f;
+		Ref<MaterialNodePin> m_TextureOffsetPinX = nullptr;
+		Ref<MaterialNodePin> m_TextureOffsetPinY = nullptr;
 	};
 }
 

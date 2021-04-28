@@ -2,10 +2,11 @@
 #include "MaterialEditorPanel.h"
 
 #include "Core/Utils/Maths/RandomGenerator.h"
+#include "../MaterialEditor/MaterialNodePin.h"
 
 #include <ImGui/imgui.h>
 #include <ImNodes/imnodes.h>
-#include <glm/gtc/type_ptr.hpp>
+//#include <glm/gtc/type_ptr.hpp>
 
 
 namespace Kaimos {
@@ -31,7 +32,7 @@ namespace Kaimos {
 	void MaterialEditorPanel::OnUIRender()
 	{
 		ImGui::Begin("Kaimos Material Editor");
-		if (!m_MainMatNode->m_MaterialToModify)
+		if (!m_MainMatNode->HasMaterialAttached())
 		{
 			ImGui::End();
 			return;
@@ -46,53 +47,53 @@ namespace Kaimos {
 		
 		// ----------- CENTRAL HARDCODED NODE -------------------------------------------------
 		// -- Central Node Beginning --
-		ImNodes::BeginNode(1);
-		ImNodes::BeginNodeTitleBar();
-		ImGui::Text("Central");
-		ImNodes::EndNodeTitleBar();
-
-		// -- Color Node --
-		ImGui::Text("Color");
-		ImGuiColorEditFlags color_flags = ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreview | ImGuiColorEditFlags_NoInputs;
-		ImGui::SameLine();
-		ImGui::ColorEdit4("##spcompcolor", glm::value_ptr(m_MainMatNode->m_MaterialToModify->Color), color_flags);
-
-		if (ImGui::IsItemHovered() || ImGui::IsItemFocused() || ImGui::IsItemActive() || ImGui::IsItemEdited() || ImGui::IsItemClicked())
-			set_draggable = false;
-
-		// -- Texture Node --
-		if (m_MainMatNode->m_MaterialToModify->SpriteTexture)
-		{
-			std::string tex_path = m_MainMatNode->m_MaterialToModify->TextureFilepath;
-			std::string tex_name = tex_path.substr(tex_path.find_last_of("/\\" + 1, tex_path.size() - 1));
-
-			ImGui::Text("Texture");
-			ImGui::Indent(indent);
-			ImGui::Text("Texture %i: '%s'", m_MainMatNode->m_MaterialToModify->SpriteTexture->GetTextureID(), tex_name.c_str());
-			ImGui::SameLine();
-			ImGui::Text("(%ix%i)", m_MainMatNode->m_MaterialToModify->SpriteTexture->GetWidth(), m_MainMatNode->m_MaterialToModify->SpriteTexture->GetHeight());
-		}
-
-		// -- Texture Tiling Node --
-		ImGui::Text("Texture Tiling");
-		ImGui::SameLine(); ImGui::SetNextItemWidth(width);
-		ImGui::DragFloat("##spcomptextiling", &m_MainMatNode->m_MaterialToModify->TextureTiling, 0.2f);
-
-		if (ImGui::IsItemHovered() || ImGui::IsItemFocused() || ImGui::IsItemActive() || ImGui::IsItemEdited() || ImGui::IsItemClicked())
-			set_draggable = false;
-
-
-		// -- Texture UV Offset Node --
-		ImGui::Text("Texture Offset");
-		ImGui::SameLine(); ImGui::SetNextItemWidth(width * 2.0f);
-		ImGui::DragFloat2("##spcomptexoffx", glm::value_ptr(m_MainMatNode->m_MaterialToModify->TextureUVOffset), 0.2f);
-
-		if (ImGui::IsItemHovered() || ImGui::IsItemFocused() || ImGui::IsItemActive() || ImGui::IsItemEdited() || ImGui::IsItemClicked())
-			set_draggable = false;
-
-		// -- Central Node Dragging & Ending --
-		ImNodes::SetNodeDraggable(1, set_draggable);
-		ImNodes::EndNode();
+		//ImNodes::BeginNode(1);
+		//ImNodes::BeginNodeTitleBar();
+		//ImGui::Text("Central");
+		//ImNodes::EndNodeTitleBar();
+		//
+		//// -- Color Node --
+		//ImGui::Text("Color");
+		//ImGuiColorEditFlags color_flags = ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreview | ImGuiColorEditFlags_NoInputs;
+		//ImGui::SameLine();
+		//ImGui::ColorEdit4("##spcompcolor", glm::value_ptr(m_MainMatNode->m_MaterialToModify->Color), color_flags);
+		//
+		//if (ImGui::IsItemHovered() || ImGui::IsItemFocused() || ImGui::IsItemActive() || ImGui::IsItemEdited() || ImGui::IsItemClicked())
+		//	set_draggable = false;
+		//
+		//// -- Texture Node --
+		//if (m_MainMatNode->m_MaterialToModify->SpriteTexture)
+		//{
+		//	std::string tex_path = m_MainMatNode->m_MaterialToModify->TextureFilepath;
+		//	std::string tex_name = tex_path.substr(tex_path.find_last_of("/\\" + 1, tex_path.size() - 1));
+		//
+		//	ImGui::Text("Texture");
+		//	ImGui::Indent(indent);
+		//	ImGui::Text("Texture %i: '%s'", m_MainMatNode->m_MaterialToModify->SpriteTexture->GetTextureID(), tex_name.c_str());
+		//	ImGui::SameLine();
+		//	ImGui::Text("(%ix%i)", m_MainMatNode->m_MaterialToModify->SpriteTexture->GetWidth(), m_MainMatNode->m_MaterialToModify->SpriteTexture->GetHeight());
+		//}
+		//
+		//// -- Texture Tiling Node --
+		//ImGui::Text("Texture Tiling");
+		//ImGui::SameLine(); ImGui::SetNextItemWidth(width);
+		//ImGui::DragFloat("##spcomptextiling", &m_MainMatNode->m_MaterialToModify->TextureTiling, 0.2f);
+		//
+		//if (ImGui::IsItemHovered() || ImGui::IsItemFocused() || ImGui::IsItemActive() || ImGui::IsItemEdited() || ImGui::IsItemClicked())
+		//	set_draggable = false;
+		//
+		//
+		//// -- Texture UV Offset Node --
+		//ImGui::Text("Texture Offset");
+		//ImGui::SameLine(); ImGui::SetNextItemWidth(width * 2.0f);
+		//ImGui::DragFloat2("##spcomptexoffx", glm::value_ptr(m_MainMatNode->m_MaterialToModify->TextureUVOffset), 0.2f);
+		//
+		//if (ImGui::IsItemHovered() || ImGui::IsItemFocused() || ImGui::IsItemActive() || ImGui::IsItemEdited() || ImGui::IsItemClicked())
+		//	set_draggable = false;
+		//
+		//// -- Central Node Dragging & Ending --
+		//ImNodes::SetNodeDraggable(1, set_draggable);
+		//ImNodes::EndNode();
 
 
 		// ----------- NODES ------------------------------------------------------------------
@@ -240,7 +241,7 @@ namespace Kaimos {
 	{
 		for (Ref<MaterialNode>& node : m_Nodes)
 		{
-			if (node->GetID() != m_MainMatNode->GetID() && node->GetOutputPin()->ID == pinID)
+			if (node->GetID() != m_MainMatNode->GetID() && node->GetOutputPin()->GetID() == pinID)
 				return node->GetOutputPin();
 
 			MaterialNodePin* input_pin = node->FindInputPin(pinID);
@@ -256,28 +257,13 @@ namespace Kaimos {
 	// ----------------------- Public Material Editor Methods ---------------------------------------------
 	void MaterialEditorPanel::UnsetMaterialToModify() const
 	{
-		if (!m_MainMatNode)
-			return;
-
-		if (m_MainMatNode->m_MaterialToModify)
-			m_MainMatNode->m_MaterialToModify->InMaterialEditor = false;
-
-
-		m_MainMatNode->m_TextureTilingPin->DefaultValue = m_MainMatNode->m_TextureTilingPin->Value = 1.0f;
-		m_MainMatNode->m_MaterialToModify = nullptr;
+		if (m_MainMatNode.get() != nullptr)
+			m_MainMatNode->DettachMaterial();
 	}
 
 	void MaterialEditorPanel::SetMaterialToModify(SpriteRendererComponent* sprite_component) const
 	{
-		if (!m_MainMatNode)
-			return;
-
-		if(m_MainMatNode->m_MaterialToModify)
-			m_MainMatNode->m_MaterialToModify->InMaterialEditor = false;
-
-		m_MainMatNode->m_MaterialToModify = sprite_component;
-		m_MainMatNode->m_MaterialToModify->InMaterialEditor = true;
-
-		m_MainMatNode->m_TextureTilingPin->DefaultValue = m_MainMatNode->m_TextureTilingPin->Value = m_MainMatNode->m_MaterialToModify->TextureTiling;
+		if (m_MainMatNode)
+			m_MainMatNode->AttachMaterial(sprite_component);
 	}
 }
