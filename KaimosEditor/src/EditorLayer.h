@@ -57,8 +57,8 @@ namespace Kaimos {
 		SettingsPanel m_SettingsPanel = {};
 		ProjectPanel m_ProjectPanel = {};
 		ToolbarPanel m_ToolbarPanel = {};
-		MaterialEditorPanel m_KMEPanel = {}; // Kaimos Material Editor
 		ScenePanel m_ScenePanel;
+		MaterialEditor::MaterialEditorPanel m_KMEPanel = {}; // Kaimos Material Editor
 
 		Ref<Texture2D> m_IconsArray[8] = { 0 };
 

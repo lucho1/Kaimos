@@ -12,7 +12,7 @@ namespace Kaimos {
 
 		// --- Public Class Methods ---
 		ScenePanel() = default;
-		ScenePanel(const Ref<Scene>& context, MaterialEditorPanel* material_editor_panel);
+		ScenePanel(const Ref<Scene>& context, MaterialEditor::MaterialEditorPanel* material_editor_panel);
 		
 		void OnUIRender(bool& closing_bool);
 
@@ -33,7 +33,7 @@ namespace Kaimos {
 
 	private:
 
-		MaterialEditorPanel* m_KMEPanel = nullptr;
+		MaterialEditor::MaterialEditorPanel* m_KMEPanel = nullptr;
 		Ref<Scene> m_SceneContext = nullptr;
 		Entity m_SelectedEntity = {};
 	};

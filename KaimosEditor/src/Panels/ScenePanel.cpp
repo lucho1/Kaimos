@@ -16,7 +16,7 @@
 namespace Kaimos {
 
 	// ----------------------- Public Class Methods -------------------------------------------------------
-	ScenePanel::ScenePanel(const Ref<Scene>& context, MaterialEditorPanel* material_editor_panel)
+	ScenePanel::ScenePanel(const Ref<Scene>& context, MaterialEditor::MaterialEditorPanel* material_editor_panel)
 	{
 		m_SelectedEntity = {};
 		m_KMEPanel = material_editor_panel;

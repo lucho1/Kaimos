@@ -9,7 +9,7 @@
 //#include <glm/gtc/type_ptr.hpp>
 
 
-namespace Kaimos {
+namespace Kaimos::MaterialEditor {
 	
 	
 	// ----------------------- Public Class Methods -------------------------------------------------------

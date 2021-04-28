@@ -6,7 +6,7 @@
 #include <ImNodes/imnodes.h>
 
 
-namespace Kaimos {
+namespace Kaimos::MaterialEditor {
 	
 
 	// ---------------------------- BASE MAT NODE ---------------------------------------------------------

@@ -5,7 +5,7 @@
 #include <ImNodes/imnodes.h>
 
 
-namespace Kaimos {
+namespace Kaimos::MaterialEditor {
 
 
 	// ----------------------- Public Class Methods -------------------------------------------------------
@@ -68,7 +68,7 @@ namespace Kaimos {
 			if (m_OutputPinLinked)
 				m_OutputPinLinked->DeleteInputPin(m_ID);
 
-			// Connect output pin to this pin and pushback this pin into the output's inputs list
+			// Connect output pin to this pin and pushback this pin into the output's inputs list if(pin.type == type)
 			m_OutputPinLinked = output_pin;
 			output_pin->m_InputPinsLinked.push_back(this);
 		}

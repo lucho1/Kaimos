@@ -6,7 +6,7 @@
 #include "Scene/ECS/Components.h"
 
 
-namespace Kaimos {
+namespace Kaimos::MaterialEditor {
 
 	class MaterialNodePin;
 

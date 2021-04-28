@@ -4,12 +4,11 @@
 #include "MaterialNode.h"
 
 
-namespace Kaimos {
+namespace Kaimos::MaterialEditor {
+
 
 	class MaterialNodePin
 	{
-		//friend class MaterialNode;
-		//friend class MainMaterialNode;
 	public:
 
 		// --- Public Class Methods ---

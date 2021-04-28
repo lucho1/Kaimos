@@ -5,7 +5,7 @@
 #include "Scene/ECS/Components.h"
 #include "../MaterialEditor/MaterialNode.h"
 
-namespace Kaimos {
+namespace Kaimos::MaterialEditor {
 
 	class MaterialEditorPanel
 	{
