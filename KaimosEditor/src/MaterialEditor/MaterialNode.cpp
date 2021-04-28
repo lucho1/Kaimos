@@ -112,14 +112,8 @@ namespace Kaimos {
 		ImGui::Text("Main Node");
 		ImNodes::EndNodeTitleBar();
 
-
 		// -- Draw Input Pins --
-		//ImNodes::BeginInputAttribute(m_TextureTilingPin->GetID()); // Texture Tiling Input
-		//ImGui::Text(m_TextureTilingPin->GetName().c_str());
-		//ImNodes::EndInputAttribute();
-
 		bool set_node_draggable = true;
-
 		m_TextureTilingPin->DrawPinUI(m_AttachedMaterial->TextureTiling, set_node_draggable);
 		m_TextureOffsetPinX->DrawPinUI(m_AttachedMaterial->TextureUVOffset.x, set_node_draggable);
 		m_TextureOffsetPinY->DrawPinUI(m_AttachedMaterial->TextureUVOffset.y, set_node_draggable);
