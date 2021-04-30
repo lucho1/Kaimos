@@ -31,7 +31,6 @@ namespace Kaimos::MaterialEditor {
 	private:
 
 		// --- Node Creation Methods ---
-		void CreateNode();
 		void CreateNode(ConstantNodeType constant_type);
 		void CreateNode(OperationNodeType operation_type, PinDataType operation_data_type);
 

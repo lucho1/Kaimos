@@ -98,25 +98,37 @@ namespace Kaimos::MaterialEditor {
 
 		// ----------- NODES ------------------------------------------------------------------
 		// -- Right-Click Popup --
-		if (Input::IsKeyDown(KEY::V))
-			CreateNode();
-
 		if (ImGui::BeginPopupContextWindow(0, 1, false))
 		{
-			if (ImGui::MenuItem("Float Dummy Node"))
-				CreateNode();
-
 			if (ImGui::MenuItem("Texture Coordinates Node"))
 				CreateNode(ConstantNodeType::TCOORDS);
 
 			if (ImGui::MenuItem("Delta Time Node"))
 				CreateNode(ConstantNodeType::DELTATIME);
 
-			if (ImGui::MenuItem("Sum Node"))
+			if (ImGui::MenuItem("Float+Float Node"))
 				CreateNode(OperationNodeType::ADDITION, PinDataType::FLOAT);
 
-			if (ImGui::MenuItem("Multiplication Node"))
+			if (ImGui::MenuItem("Int+Int Node"))
+				CreateNode(OperationNodeType::ADDITION, PinDataType::INT);
+
+			if (ImGui::MenuItem("Vec2+Vec2 Node"))
+				CreateNode(OperationNodeType::ADDITION, PinDataType::VEC2);
+
+			if (ImGui::MenuItem("Vec4+Vec4 Node"))
+				CreateNode(OperationNodeType::ADDITION, PinDataType::VEC4);
+
+			if (ImGui::MenuItem("Float*Float Node"))
 				CreateNode(OperationNodeType::MULTIPLICATION, PinDataType::FLOAT);
+
+			if (ImGui::MenuItem("Int*Int Node"))
+				CreateNode(OperationNodeType::MULTIPLICATION, PinDataType::INT);
+
+			if (ImGui::MenuItem("Vec2*Vec2 Node"))
+				CreateNode(OperationNodeType::MULTIPLICATION, PinDataType::VEC2);
+
+			if (ImGui::MenuItem("Vec4*Vec4 Node"))
+				CreateNode(OperationNodeType::MULTIPLICATION, PinDataType::VEC4);
 		
 			ImGui::EndPopup();
 		}
@@ -181,14 +193,6 @@ namespace Kaimos::MaterialEditor {
 		
 	
 	// ----------------------- Node Creation Methods ------------------------------------------------------
-	void MaterialEditorPanel::CreateNode()
-	{
-		uint id = (uint)Kaimos::Random::GetRandomInt();
-		Ref<MaterialNode> mat_node = CreateRef<MaterialNode>(id, "DummyNode_" + std::to_string(id), MaterialNodeType::FLOAT_DUMMY);
-		mat_node->AddPin(false, PinDataType::FLOAT, "Float Output", 5.0f);
-		m_Nodes.push_back(mat_node);
-	}
-
 	void MaterialEditorPanel::CreateNode(ConstantNodeType constant_type)
 	{
 		ConstantMaterialNode* cnode = new ConstantMaterialNode(constant_type);

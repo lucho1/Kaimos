@@ -6,14 +6,29 @@
 
 
 namespace Kaimos::MaterialEditor {
-
-
+	
+	
 	// ----------------------- Public Class Methods -------------------------------------------------------
+	MaterialNodePin::MaterialNodePin(MaterialNode* owner, PinDataType type, const std::string& name, float default_value) : m_OwnerNode(owner), m_Type(type), m_Name(name)
+	{
+		m_ID = (uint)Kaimos::Random::GetRandomInt();
+		m_Value = CreateRef<float>(new float[4]{0.0f});
+		m_DefaultValue = CreateRef<float>(new float[4]{ default_value });
+	}
+
 	MaterialNodePin::~MaterialNodePin()
 	{
+		for (MaterialNodePin* pin : m_InputPinsLinked)
+			pin->DeleteLink();
+
 		m_InputPinsLinked.clear();
+
+		DeleteLink();
 		m_OutputPinLinked = nullptr;
 		m_OwnerNode = nullptr;
+		m_Value.reset();
+		m_DefaultValue.reset();
+		m_Value = m_DefaultValue = nullptr;
 	}
 
 	void MaterialNodePin::DrawPinUI(float& value_to_modify, bool& allow_node_drag)
@@ -22,30 +37,35 @@ namespace Kaimos::MaterialEditor {
 		ImGui::Text(m_Name.c_str());
 		ImNodes::EndInputAttribute();
 
-
 		if (m_OutputPinLinked)
 		{
-			m_Value = m_OutputPinLinked->m_Value;
-			value_to_modify = m_Value;
+			SetValue(m_OutputPinLinked->m_Value.get());
+			value_to_modify = m_Value.get()[0];
 		}
 		else
 		{
 			ImGui::PushID(m_ID);
 
 			ImGui::SameLine(); ImGui::SetNextItemWidth(30.0f);
-			ImGui::DragFloat("###float_val", &m_Value, 0.2f);
+			ImGui::DragFloat("###float_val", &m_Value.get()[0], 0.2f);
 
 			if (ImGui::IsItemHovered() || ImGui::IsItemFocused() || ImGui::IsItemActive() || ImGui::IsItemEdited() || ImGui::IsItemClicked())
 				allow_node_drag = false;
 
-			value_to_modify = m_DefaultValue = m_Value;
+			value_to_modify = m_Value.get()[0];
+			memcpy(m_DefaultValue.get(), m_Value.get(), 4);
 			ImGui::PopID();
 		}
 	}
 
 	void MaterialNodePin::ResetToDefault()
 	{
-		m_Value = m_DefaultValue;
+		memcpy(m_Value.get(), m_DefaultValue.get(), 16);
+	}
+
+	void MaterialNodePin::SetValue(float* value)
+	{
+		memcpy(m_Value.get(), value, 16);
 	}
 
 	
@@ -98,4 +118,5 @@ namespace Kaimos::MaterialEditor {
 			}
 		}
 	}
+
 }

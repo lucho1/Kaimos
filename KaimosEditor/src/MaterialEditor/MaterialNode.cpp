@@ -4,32 +4,48 @@
 
 #include <ImGui/imgui.h>
 #include <ImNodes/imnodes.h>
+#include <glm/gtc/type_ptr.hpp>
 
 
 namespace Kaimos::MaterialEditor {
-	
+
 
 	// ---------------------------- BASE MAT NODE ---------------------------------------------------------
 	// ----------------------- Public Class Methods -------------------------------------------------------
 	MaterialNode::~MaterialNode()
 	{
 		for (Ref<MaterialNodePin>& pin : m_NodeInputPins)
+		{
 			pin.reset();
+			pin = nullptr;
+		}
 
-		m_NodeOutputPin.reset();
 		m_NodeInputPins.clear();
+		m_NodeOutputPin.reset();
+		m_NodeOutputPin = nullptr;
 	}
 
 	void MaterialNode::DrawNodeUI()
 	{
-		// -- Draw Node --
+		// -- Draw Node & Header --
 		ImNodes::BeginNode(m_ID);
+
+		ImNodes::BeginNodeTitleBar();
+		ImGui::Text(m_Name.c_str());
+		ImNodes::EndNodeTitleBar();
 
 		// -- Draw Output Pin --
 		ImNodes::BeginOutputAttribute(m_NodeOutputPin->GetID());
-		ImGui::Indent(40.0f);
+		ImGui::Indent(50.0f);
 		ImGui::Text(m_NodeOutputPin->GetName().c_str());
 		ImNodes::EndOutputAttribute();
+
+		ImGui::Indent(50.0f);
+		m_NodeOutputPin->SetValue(CalculateNodeResult());
+
+		glm::vec4 res = GetOutputResult<glm::vec4>();
+		ImGui::Text("Value: %.1f, %.1f, %.1f, %.1f", res.x, res.y, res.z, res.w);
+
 
 		// -- Draw Input Pins --
 		bool set_node_draggable = true;
@@ -46,8 +62,8 @@ namespace Kaimos::MaterialEditor {
 		// -- Draw Links --
 		for (Ref<MaterialNodePin>& pin : m_NodeInputPins)
 		{
-			if (pin->GetOutputPin())
-				ImNodes::Link(pin->GetID(), pin->GetID(), pin->GetOutputPin()->GetID());	// Links have the same ID than its input pin
+			if (pin->GetOutputPinLinked())
+				ImNodes::Link(pin->GetID(), pin->GetID(), pin->GetOutputPinLinked()->GetID());	// Links have the same ID than its input pin
 		}
 	}
 
@@ -66,9 +82,9 @@ namespace Kaimos::MaterialEditor {
 	void MaterialNode::AddPin(bool input, PinDataType pin_type, const std::string& name, float default_value)
 	{
 		if (input)
-			m_NodeInputPins.push_back(CreateRef<MaterialNodePin>(this, (uint)Kaimos::Random::GetRandomInt(), pin_type, name, default_value));
+			m_NodeInputPins.push_back(CreateRef<MaterialNodePin>(this, pin_type, name, default_value));
 		else if (!m_NodeOutputPin)
-			m_NodeOutputPin = CreateRef<MaterialNodePin>(this, (uint)Kaimos::Random::GetRandomInt(), pin_type, name, default_value);
+			m_NodeOutputPin = CreateRef<MaterialNodePin>(this, pin_type, name, default_value);
 	}
 
 	void MaterialNode::AddPin(bool input, Ref<MaterialNodePin>& pin)
@@ -79,15 +95,23 @@ namespace Kaimos::MaterialEditor {
 			m_NodeOutputPin = pin;
 	}
 
+	float* MaterialNode::GetInputValue(uint input_index)
+	{
+		if (m_NodeInputPins[input_index]->GetOutputPinLinked())
+			return m_NodeInputPins[input_index]->GetOutputPinLinked()->GetNode()->CalculateNodeResult();
+
+		return &m_NodeInputPins[input_index]->GetValue()[0];
+	}
+
 
 
 	// ---------------------------- MAIN MAT NODE ---------------------------------------------------------
 	// ----------------------- Public Class Methods -------------------------------------------------------
-	MainMaterialNode::MainMaterialNode() : MaterialNode((uint)Kaimos::Random::GetRandomInt(), "Main Node", MaterialNodeType::MAIN)
+	MainMaterialNode::MainMaterialNode() : MaterialNode("Main Node", MaterialNodeType::MAIN)
 	{
-		m_TextureTilingPin = CreateRef<MaterialNodePin>(this, (uint)Kaimos::Random::GetRandomInt(), PinDataType::FLOAT, "Texture Tiling", 1.0f);
-		m_TextureOffsetPinX = CreateRef<MaterialNodePin>(this, (uint)Kaimos::Random::GetRandomInt(), PinDataType::VEC2, "Texture Offset X", 0.0f);
-		m_TextureOffsetPinY = CreateRef<MaterialNodePin>(this, (uint)Kaimos::Random::GetRandomInt(), PinDataType::VEC2, "Texture Offset Y", 0.0f);
+		m_TextureTilingPin = CreateRef<MaterialNodePin>(this, PinDataType::FLOAT, "Texture Tiling", 1.0f);
+		m_TextureOffsetPinX = CreateRef<MaterialNodePin>(this, PinDataType::VEC2, "Texture Offset X", 0.0f);
+		m_TextureOffsetPinY = CreateRef<MaterialNodePin>(this, PinDataType::VEC2, "Texture Offset Y", 0.0f);
 
 		AddPin(true, m_TextureTilingPin);
 		AddPin(true, m_TextureOffsetPinX);
@@ -99,12 +123,13 @@ namespace Kaimos::MaterialEditor {
 		m_TextureTilingPin.reset();
 		m_TextureOffsetPinX.reset();
 		m_TextureOffsetPinY.reset();
+		m_TextureOffsetPinX = m_TextureOffsetPinY = m_TextureTilingPin = nullptr;
 	}
 
 
 	void MainMaterialNode::DrawNodeUI()
 	{
-		// -- Draw Node --
+		// -- Draw Node & Header --
 		ImNodes::BeginNode(m_ID);
 
 		ImNodes::BeginNodeTitleBar();
@@ -120,12 +145,11 @@ namespace Kaimos::MaterialEditor {
 		ImNodes::SetNodeDraggable(m_ID, set_node_draggable);
 		ImNodes::EndNode();
 
-
 		// -- Draw Links --
 		for (Ref<MaterialNodePin>& pin : m_NodeInputPins)
 		{
-			if (pin->GetOutputPin())
-				ImNodes::Link(pin->GetID(), pin->GetID(), pin->GetOutputPin()->GetID());	// Links have the same ID than its input pin
+			if (pin->GetOutputPinLinked())
+				ImNodes::Link(pin->GetID(), pin->GetID(), pin->GetOutputPinLinked()->GetID());	// Links have the same ID than its input pin
 		}
 	}
 
@@ -160,10 +184,9 @@ namespace Kaimos::MaterialEditor {
 
 
 
-	// ---------------------------- OTHER NODES -----------------------------------------------------------
+	// ---------------------------- CONSTANT NODE ---------------------------------------------------------
 	// ----------------------- Public Class Methods -------------------------------------------------------
-	ConstantMaterialNode::ConstantMaterialNode(ConstantNodeType constant_type)
-		: MaterialNode((uint)Kaimos::Random::GetRandomInt(), "Constant Node", MaterialNodeType::CONSTANT)
+	ConstantMaterialNode::ConstantMaterialNode(ConstantNodeType constant_type) : MaterialNode("Constant Node", MaterialNodeType::CONSTANT)
 	{
 		m_ConstantType = constant_type;
 		switch (m_ConstantType)
@@ -182,23 +205,79 @@ namespace Kaimos::MaterialEditor {
 				break;
 			}
 
-			default: KS_ENGINE_ASSERT(false, "Attempted to create a non-supported Constant Node");
+			default: { KS_ERROR_AND_ASSERT("Attempted to create a non-supported Constant Node"); }
 		}
 	}
 
-	OperationMaterialNode::OperationMaterialNode(OperationNodeType operation_type, PinDataType operation_data_type)
-		: MaterialNode((uint)Kaimos::Random::GetRandomInt(), "Operation Node", MaterialNodeType::OPERATION)
+
+	float* ConstantMaterialNode::CalculateNodeResult()
+	{
+		float* ret = nullptr;
+		switch (m_ConstantType)
+		{
+			case ConstantNodeType::TCOORDS:
+			{
+				float val[2] = { 0.2f, 0.2f };
+				ret = static_cast<float*>(val);
+				break;
+			}
+
+			case ConstantNodeType::DELTATIME:
+			{
+				float val = 2.0f;
+				ret = static_cast<float*>(&val);
+				break;
+			}
+
+			default: { KS_ERROR_AND_ASSERT("Invalid Constant Node Type"); break; }
+		}
+
+		m_NodeOutputPin->SetValue(ret);
+		return m_NodeOutputPin->GetValue();
+	}
+
+
+
+	// ---------------------------- OPERATION NODE --------------------------------------------------------
+	// ----------------------- Public Class Methods -------------------------------------------------------
+	OperationMaterialNode::OperationMaterialNode(OperationNodeType operation_type, PinDataType operation_data_type) : MaterialNode("Operation Node", MaterialNodeType::OPERATION)
 	{
 		m_OperationType = operation_type;
 		switch (m_OperationType)
 		{
-			case OperationNodeType::ADDITION:		m_Name = "Sum Node";		break;
-			case OperationNodeType::MULTIPLICATION:	m_Name = "Multiply Node";	break;
-			default:								KS_ENGINE_ASSERT(false, "Attempted to create a non-supported Operation Node");
+			case OperationNodeType::ADDITION:			{ m_Name = "Sum Node";  break; }
+			case OperationNodeType::MULTIPLICATION:		{ m_Name = "Multiply Node"; break; }
+			default:									{ KS_ERROR_AND_ASSERT("Attempted to create a non-supported Operation Node"); }
 		}
 
 		AddPin(true, operation_data_type, "Value 1");
 		AddPin(true, operation_data_type, "Value 2");
 		AddPin(false, operation_data_type, "Out");
+	}	
+
+
+	float* OperationMaterialNode::CalculateNodeResult()
+	{
+		PinDataType data_type = m_NodeInputPins[0]->GetType();
+		float* ret = GetInputValue(0);
+
+		for (uint i = 1; i < m_NodeInputPins.size(); ++i)
+			ret = ProcessOperation(data_type, ret, GetInputValue(i));
+
+		return ret;
 	}
+
+
+	float* OperationMaterialNode::ProcessOperation(PinDataType data_type, const float* a, const float* b) const
+	{
+		switch (m_OperationType)
+		{
+			case OperationNodeType::ADDITION:		return NodeUtils::SumValues(data_type, a, b);
+			case OperationNodeType::MULTIPLICATION:	return NodeUtils::MultiplyValues(data_type, a, b);
+		}
+
+		KS_ERROR_AND_ASSERT("Attempted to perform a non-supported operation in OperationNode!");
+		return nullptr;
+	}
+
 }
