@@ -2,6 +2,8 @@
 #include "MaterialNode.h"
 #include "MaterialNodePin.h"
 
+#include "Core/Application/Application.h"
+
 #include <ImGui/imgui.h>
 #include <ImNodes/imnodes.h>
 #include <glm/gtc/type_ptr.hpp>
@@ -232,7 +234,7 @@ namespace Kaimos::MaterialEditor {
 
 			case ConstantNodeType::DELTATIME:
 			{
-				float val = 2.0f;
+				float val = Application::Get().GetTime();
 				ret = static_cast<float*>(&val);
 				break;
 			}

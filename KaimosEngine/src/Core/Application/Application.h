@@ -62,10 +62,12 @@ namespace Kaimos {
 
 		// --- Getters ---
 		inline static Application& Get()		  { return *s_Instance; }
+		inline float GetTime()				const { return m_Time; }
 		inline Window& GetWindow()			const { return *m_Window; }
 		inline ImGuiLayer* GetImGuiLayer()	const { return m_ImGuiLayer; }
 		
 		inline static const MemoryMetrics& GetMemoryMetrics() { return s_MemoryMetrics; }
+
 
 	private:
 
@@ -97,6 +99,7 @@ namespace Kaimos {
 		// --- Delta Time ---
 		Timestep m_Timestep = {};
 		float m_LastFrameTime = 0.0f;
+		float m_Time = 0.0f;
 	};
 	
 

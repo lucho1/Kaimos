@@ -98,16 +98,16 @@ namespace Kaimos {
 			KS_PROFILE_SCOPE("Run Loop");
 
 			// -- Delta Time --
-			float time = (float)glfwGetTime();			//QueryPerformanceFrequency(); QueryPerformanceCounter(); // Platform::GetTime() !!!!!!
-			Timestep timestep = time - m_LastFrameTime;	// How long this frame is (dt, current time vs last frame time)
-			m_LastFrameTime = time;
+			m_Time = (float)glfwGetTime();			//QueryPerformanceFrequency(); QueryPerformanceCounter(); // Platform::GetTime() !!!!!!
+			m_Timestep = m_Time - m_LastFrameTime;	// How long this frame is (dt, current time vs last frame time)
+			m_LastFrameTime = m_Time;
 
 			// -- Layers Update --
 			if (!m_Minimized)
 			{
 				KS_PROFILE_SCOPE("LayerStack Update");
 				for (Layer* layer : m_LayerStack)
-					layer->OnUpdate(timestep);
+					layer->OnUpdate(m_Timestep);
 			}
 
 			// -- UI & Rendering --
