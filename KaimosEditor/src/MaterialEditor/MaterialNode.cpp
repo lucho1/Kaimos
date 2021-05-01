@@ -31,6 +31,7 @@ namespace Kaimos::MaterialEditor {
 		ImNodes::BeginNode(m_ID);
 
 		ImNodes::BeginNodeTitleBar();
+		ImGui::NewLine(); ImGui::SameLine(ImGui::GetItemRectSize().x / 4.0f);
 		ImGui::Text(m_Name.c_str());
 		ImNodes::EndNodeTitleBar();
 
@@ -123,6 +124,11 @@ namespace Kaimos::MaterialEditor {
 
 	void MainMaterialNode::DrawNodeUI()
 	{
+		// -- Push Node Colors --
+		ImNodes::PushColorStyle(ImNodesCol_TitleBar, IM_COL32(179, 51, 51, 255));
+		ImNodes::PushColorStyle(ImNodesCol_TitleBarHovered, IM_COL32(230, 76, 76, 255));
+		ImNodes::PushColorStyle(ImNodesCol_TitleBarSelected, IM_COL32(230, 76, 76, 255));
+
 		// -- Draw Node & Header --
 		ImNodes::BeginNode(m_ID);
 
@@ -144,6 +150,11 @@ namespace Kaimos::MaterialEditor {
 			if (pin->IsConnected())
 				ImNodes::Link(pin->GetID(), pin->GetID(), pin->GetOutputLinkedID());	// Links have the same ID than its input pin
 		}
+
+		// -- Pop Node Colors --
+		ImNodes::PopColorStyle();
+		ImNodes::PopColorStyle();
+		ImNodes::PopColorStyle();
 	}
 
 	

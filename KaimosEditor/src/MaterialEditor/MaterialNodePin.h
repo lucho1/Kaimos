@@ -82,7 +82,7 @@ namespace Kaimos::MaterialEditor {
 	private:
 
 		// --- Private Pin Methods ---
-		void DrawOutputResult();
+		void DrawOutputResult(float text_indent);
 
 
 	private:

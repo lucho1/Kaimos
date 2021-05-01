@@ -141,8 +141,14 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 			}
 			case PinDataType::VEC4:
 			{
-				ImGui::SetNextItemWidth(90.0f);
-				ImGui::DragFloat4("###v2_val", value, 0.1f, 0.0f, 0.0f, "%.1f"); return;
+				ImGui::SetNextItemWidth(150.0f);
+				ImGuiColorEditFlags flags = ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_Float | ImGuiColorEditFlags_AlphaPreview
+					| ImGuiColorEditFlags_DisplayRGB;
+
+				ImGui::ColorPicker4("Value", value, flags);
+
+				return;
+				//ImGui::DragFloat4("###v2_val", value, 0.1f, 0.0f, 0.0f, "%.1f"); return;
 			}
 		}
 

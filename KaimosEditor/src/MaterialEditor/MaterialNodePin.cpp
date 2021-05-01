@@ -43,10 +43,11 @@ namespace Kaimos::MaterialEditor {
 	void NodeOutputPin::DrawUI()
 	{
 		ImNodes::BeginOutputAttribute(GetID());
-		ImGui::Indent(50.0f);
-		ImGui::Text(GetName().c_str());
 
-		DrawOutputResult();
+		float indent = ImNodes::GetNodeDimensions(m_OwnerNode->GetID()).x / 1.8f;
+		ImGui::NewLine(); ImGui::SameLine(indent);
+		ImGui::Text(GetName().c_str());
+		DrawOutputResult(indent);
 
 		ImNodes::EndOutputAttribute();
 		SetValue(m_OwnerNode->CalculateNodeResult()); // TODO: Don't calculate this each frame
@@ -55,8 +56,10 @@ namespace Kaimos::MaterialEditor {
 
 
 	// ----------------------- Private Pin Methods --------------------------------------------------------
-	void NodeOutputPin::DrawOutputResult()
+	void NodeOutputPin::DrawOutputResult(float text_indent)
 	{
+		ImGui::NewLine(); ImGui::SameLine(text_indent);
+
 		switch (GetType())
 		{
 			case PinDataType::FLOAT:
@@ -77,7 +80,7 @@ namespace Kaimos::MaterialEditor {
 			case PinDataType::VEC4:
 			{
 				glm::vec4 res = NodeUtils::GetDataFromType<glm::vec4>(m_Value.get(), GetType());
-				ImGui::Text("Value: %.1f, %.1f, %.1f, %.1f", res.x, res.y, res.z, res.w); return;
+				ImGui::Text("Value: %.2f, %.2f, %.2f, %.2f", res.x, res.y, res.z, res.w); return;
 			}
 		}
 
