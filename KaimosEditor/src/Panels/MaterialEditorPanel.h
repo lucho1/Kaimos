@@ -40,7 +40,7 @@ namespace Kaimos::MaterialEditor {
 		void DeleteSelection(int selected_links, int selected_nodes);
 
 		MaterialNode* FindNode(uint nodeID);
-		MaterialNodePin* FindNodePin(uint pinID);
+		NodePin* FindNodePin(uint pinID);
 
 	private:
 

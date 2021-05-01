@@ -6,7 +6,6 @@
 
 #include <ImGui/imgui.h>
 #include <ImNodes/imnodes.h>
-//#include <glm/gtc/type_ptr.hpp>
 
 
 namespace Kaimos::MaterialEditor {
@@ -100,34 +99,34 @@ namespace Kaimos::MaterialEditor {
 		// -- Right-Click Popup --
 		if (ImGui::BeginPopupContextWindow(0, 1, false))
 		{
-			if (ImGui::MenuItem("Texture Coordinates Node"))
+			if (ImGui::MenuItem("Texture Coordinates"))
 				CreateNode(ConstantNodeType::TCOORDS);
 
-			if (ImGui::MenuItem("Delta Time Node"))
+			if (ImGui::MenuItem("Delta Time"))
 				CreateNode(ConstantNodeType::DELTATIME);
 
-			if (ImGui::MenuItem("Float+Float Node"))
+			if (ImGui::MenuItem("Float + Float"))
 				CreateNode(OperationNodeType::ADDITION, PinDataType::FLOAT);
 
-			if (ImGui::MenuItem("Int+Int Node"))
+			if (ImGui::MenuItem("Int + Int"))
 				CreateNode(OperationNodeType::ADDITION, PinDataType::INT);
 
-			if (ImGui::MenuItem("Vec2+Vec2 Node"))
+			if (ImGui::MenuItem("Vec2 + Vec2"))
 				CreateNode(OperationNodeType::ADDITION, PinDataType::VEC2);
 
-			if (ImGui::MenuItem("Vec4+Vec4 Node"))
+			if (ImGui::MenuItem("Vec4 + Vec4"))
 				CreateNode(OperationNodeType::ADDITION, PinDataType::VEC4);
 
-			if (ImGui::MenuItem("Float*Float Node"))
+			if (ImGui::MenuItem("Float * Float"))
 				CreateNode(OperationNodeType::MULTIPLICATION, PinDataType::FLOAT);
 
-			if (ImGui::MenuItem("Int*Int Node"))
+			if (ImGui::MenuItem("Int * Int"))
 				CreateNode(OperationNodeType::MULTIPLICATION, PinDataType::INT);
 
-			if (ImGui::MenuItem("Vec2*Vec2 Node"))
+			if (ImGui::MenuItem("Vec2 * Vec2"))
 				CreateNode(OperationNodeType::MULTIPLICATION, PinDataType::VEC2);
 
-			if (ImGui::MenuItem("Vec4*Vec4 Node"))
+			if (ImGui::MenuItem("Vec4 * Vec4"))
 				CreateNode(OperationNodeType::MULTIPLICATION, PinDataType::VEC4);
 		
 			ImGui::EndPopup();
@@ -146,9 +145,9 @@ namespace Kaimos::MaterialEditor {
 		if (ImNodes::IsLinkCreated(&start, &end))
 		{
 			// Input pin is always end while Output pin is always start
-			MaterialNodePin* in_pin = FindNodePin(end);
-			if (in_pin)
-				in_pin->LinkPin(FindNodePin(start));
+			NodePin* pin = FindNodePin(end);
+			if (pin)
+				pin->LinkPin(FindNodePin(start));
 		}
 
 		// -- Check for Links & Nodes Destroys --
@@ -226,9 +225,9 @@ namespace Kaimos::MaterialEditor {
 
 	void MaterialEditorPanel::DeleteLink(uint pinID)
 	{
-		MaterialNodePin* in_pin = FindNodePin(pinID);
-		if (in_pin)
-			in_pin->DeleteLink();
+		NodePin* pin = FindNodePin(pinID);
+		if (pin)
+			pin->DeleteLink(pinID);
 	}
 
 	void MaterialEditorPanel::DeleteSelection(int selected_links, int selected_nodes)
@@ -256,25 +255,22 @@ namespace Kaimos::MaterialEditor {
 
 	MaterialNode* MaterialEditorPanel::FindNode(uint nodeID)
 	{
-		for (Ref<MaterialNode>& node : m_Nodes)
+		for (uint i = 0; i < m_Nodes.size(); ++i)
 		{
-			if (node->GetID() == nodeID)
-				return node.get();
+			if (m_Nodes[i]->GetID() == nodeID)
+				return m_Nodes[i].get();
 		}
 
 		return nullptr;
 	}
 
-	MaterialNodePin* MaterialEditorPanel::FindNodePin(uint pinID)
+	NodePin* MaterialEditorPanel::FindNodePin(uint pinID)
 	{
-		for (Ref<MaterialNode>& node : m_Nodes)
+		for (uint i = 0; i < m_Nodes.size(); ++i)
 		{
-			if (node->GetID() != m_MainMatNode->GetID() && node->GetOutputPin()->GetID() == pinID)
-				return node->GetOutputPin();
-
-			MaterialNodePin* input_pin = node->FindInputPin(pinID);
-			if (input_pin)
-				return input_pin;
+			NodePin* node_pin = m_Nodes[i]->FindPinInNode(pinID);
+			if (node_pin != nullptr)
+				return node_pin;
 		}
 
 		return nullptr;

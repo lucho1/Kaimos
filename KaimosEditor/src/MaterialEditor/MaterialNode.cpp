@@ -14,7 +14,7 @@ namespace Kaimos::MaterialEditor {
 	// ----------------------- Public Class Methods -------------------------------------------------------
 	MaterialNode::~MaterialNode()
 	{
-		for (Ref<MaterialNodePin>& pin : m_NodeInputPins)
+		for (Ref<NodeInputPin>& pin : m_NodeInputPins)
 		{
 			pin.reset();
 			pin = nullptr;
@@ -22,8 +22,8 @@ namespace Kaimos::MaterialEditor {
 
 		m_NodeInputPins.clear();
 		m_NodeOutputPin.reset();
-		m_NodeOutputPin = nullptr;
 	}
+
 
 	void MaterialNode::DrawNodeUI()
 	{
@@ -35,42 +35,46 @@ namespace Kaimos::MaterialEditor {
 		ImNodes::EndNodeTitleBar();
 
 		// -- Draw Output Pin --
-		ImNodes::BeginOutputAttribute(m_NodeOutputPin->GetID());
-		ImGui::Indent(50.0f);
-		ImGui::Text(m_NodeOutputPin->GetName().c_str());
-		ImNodes::EndOutputAttribute();
-
-		ImGui::Indent(50.0f);
-		m_NodeOutputPin->SetValue(CalculateNodeResult());
-
-		glm::vec4 res = GetOutputResult<glm::vec4>();
-		ImGui::Text("Value: %.1f, %.1f, %.1f, %.1f", res.x, res.y, res.z, res.w);
-
+		if(m_NodeOutputPin)
+			m_NodeOutputPin->DrawUI();
 
 		// -- Draw Input Pins --
+		float dummy_value = 0.0f;
 		bool set_node_draggable = true;
-		for (Ref<MaterialNodePin>& pin : m_NodeInputPins)
-		{
-			float dummy = 0.0f;
-			pin->DrawPinUI(dummy, set_node_draggable);
-		}
+
+		for (Ref<NodeInputPin>& pin : m_NodeInputPins)
+			pin->DrawUI(set_node_draggable, dummy_value);
+		
 
 		// -- End Node Drawing --
 		ImNodes::SetNodeDraggable(m_ID, set_node_draggable);
 		ImNodes::EndNode();
 
 		// -- Draw Links --
-		for (Ref<MaterialNodePin>& pin : m_NodeInputPins)
+		for (Ref<NodeInputPin>& pin : m_NodeInputPins)
 		{
-			if (pin->GetOutputPinLinked())
-				ImNodes::Link(pin->GetID(), pin->GetID(), pin->GetOutputPinLinked()->GetID());	// Links have the same ID than its input pin
+			if (pin->IsConnected())
+				ImNodes::Link(pin->GetID(), pin->GetID(), pin->GetOutputLinkedID());	// Links have the same ID than its input pin
 		}
+	}
+
+
+	NodePin* MaterialNode::FindPinInNode(uint pinID)
+	{
+		if (m_NodeOutputPin && m_NodeOutputPin->GetID() == pinID)
+			return static_cast<NodePin*>(m_NodeOutputPin.get());
+
+		NodeInputPin* pin = FindInputPin(pinID);
+		if (pin)
+			return static_cast<NodePin*>(pin);
+
+		return nullptr;
 	}
 
 
 
 	// ----------------------- Public Material Node Methods -----------------------------------------------
-	MaterialNodePin* MaterialNode::FindInputPin(uint pinID)
+	NodeInputPin* MaterialNode::FindInputPin(uint pinID)
 	{
 		for (uint i = 0; i < m_NodeInputPins.size(); ++i)
 			if (m_NodeInputPins[i]->GetID() == pinID)
@@ -82,26 +86,20 @@ namespace Kaimos::MaterialEditor {
 	void MaterialNode::AddPin(bool input, PinDataType pin_type, const std::string& name, float default_value)
 	{
 		if (input)
-			m_NodeInputPins.push_back(CreateRef<MaterialNodePin>(this, pin_type, name, default_value));
+			m_NodeInputPins.push_back(CreateRef<NodeInputPin>(this, pin_type, name, default_value));
 		else if (!m_NodeOutputPin)
-			m_NodeOutputPin = CreateRef<MaterialNodePin>(this, pin_type, name, default_value);
-	}
-
-	void MaterialNode::AddPin(bool input, Ref<MaterialNodePin>& pin)
-	{
-		if (input)
-			m_NodeInputPins.push_back(pin);
-		else if (!m_NodeOutputPin)
-			m_NodeOutputPin = pin;
+			m_NodeOutputPin = CreateRef<NodeOutputPin>(this, pin_type, name);
 	}
 
 	float* MaterialNode::GetInputValue(uint input_index)
 	{
-		if (m_NodeInputPins[input_index]->GetOutputPinLinked())
-			return m_NodeInputPins[input_index]->GetOutputPinLinked()->GetNode()->CalculateNodeResult();
+		if (input_index < m_NodeInputPins.size())
+			return m_NodeInputPins[input_index]->CalculateInputValue();
 
-		return &m_NodeInputPins[input_index]->GetValue()[0];
+		KS_ERROR_AND_ASSERT("Tried to access an out-of-bounds input!");
+		return nullptr;
 	}
+
 
 
 
@@ -109,21 +107,19 @@ namespace Kaimos::MaterialEditor {
 	// ----------------------- Public Class Methods -------------------------------------------------------
 	MainMaterialNode::MainMaterialNode() : MaterialNode("Main Node", MaterialNodeType::MAIN)
 	{
-		m_TextureTilingPin = CreateRef<MaterialNodePin>(this, PinDataType::FLOAT, "Texture Tiling", 1.0f);
-		m_TextureOffsetPinX = CreateRef<MaterialNodePin>(this, PinDataType::VEC2, "Texture Offset X", 0.0f);
-		m_TextureOffsetPinY = CreateRef<MaterialNodePin>(this, PinDataType::VEC2, "Texture Offset Y", 0.0f);
+		m_TextureTilingPin = CreateRef<NodeInputPin>(this, PinDataType::FLOAT, "Texture Tiling", 1.0f);
+		m_TextureOffsetPin = CreateRef<NodeInputPin>(this, PinDataType::VEC2, "Texture Offset", 0.0f);
 
-		AddPin(true, m_TextureTilingPin);
-		AddPin(true, m_TextureOffsetPinX);
-		AddPin(true, m_TextureOffsetPinY);
+		m_NodeInputPins.push_back(m_TextureTilingPin);
+		m_NodeInputPins.push_back(m_TextureOffsetPin);
 	}
+
 
 	MainMaterialNode::~MainMaterialNode()
 	{
+		DettachMaterial();
 		m_TextureTilingPin.reset();
-		m_TextureOffsetPinX.reset();
-		m_TextureOffsetPinY.reset();
-		m_TextureOffsetPinX = m_TextureOffsetPinY = m_TextureTilingPin = nullptr;
+		m_TextureOffsetPin.reset();
 	}
 
 
@@ -138,18 +134,17 @@ namespace Kaimos::MaterialEditor {
 
 		// -- Draw Input Pins --
 		bool set_node_draggable = true;
-		m_TextureTilingPin->DrawPinUI(m_AttachedMaterial->TextureTiling, set_node_draggable);
-		m_TextureOffsetPinX->DrawPinUI(m_AttachedMaterial->TextureUVOffset.x, set_node_draggable);
-		m_TextureOffsetPinY->DrawPinUI(m_AttachedMaterial->TextureUVOffset.y, set_node_draggable);
+		m_TextureTilingPin->DrawUI(set_node_draggable, m_AttachedMaterial->TextureTiling);
+		m_TextureOffsetPin->DrawUI(set_node_draggable, m_AttachedMaterial->TextureUVOffset.x);
 
 		ImNodes::SetNodeDraggable(m_ID, set_node_draggable);
 		ImNodes::EndNode();
 
 		// -- Draw Links --
-		for (Ref<MaterialNodePin>& pin : m_NodeInputPins)
+		for (Ref<NodeInputPin>& pin : m_NodeInputPins)
 		{
-			if (pin->GetOutputPinLinked())
-				ImNodes::Link(pin->GetID(), pin->GetID(), pin->GetOutputPinLinked()->GetID());	// Links have the same ID than its input pin
+			if (pin->IsConnected())
+				ImNodes::Link(pin->GetID(), pin->GetID(), pin->GetOutputLinkedID());	// Links have the same ID than its input pin
 		}
 	}
 
@@ -164,8 +159,7 @@ namespace Kaimos::MaterialEditor {
 
 		// -- Main Node Pins --
 		m_TextureTilingPin->ResetToDefault();
-		m_TextureOffsetPinX->ResetToDefault();
-		m_TextureOffsetPinY->ResetToDefault();
+		m_TextureOffsetPin->ResetToDefault();
 	}
 
 	void MainMaterialNode::AttachMaterial(SpriteRendererComponent* sprite_component)
@@ -178,17 +172,16 @@ namespace Kaimos::MaterialEditor {
 
 		// -- Main Node Pins --
 		m_TextureTilingPin->ResetToDefault();
-		m_TextureOffsetPinX->ResetToDefault();
-		m_TextureOffsetPinY->ResetToDefault();
+		m_TextureOffsetPin->ResetToDefault();
 	}
+
 
 
 
 	// ---------------------------- CONSTANT NODE ---------------------------------------------------------
 	// ----------------------- Public Class Methods -------------------------------------------------------
-	ConstantMaterialNode::ConstantMaterialNode(ConstantNodeType constant_type) : MaterialNode("Constant Node", MaterialNodeType::CONSTANT)
+	ConstantMaterialNode::ConstantMaterialNode(ConstantNodeType constant_type) : MaterialNode("Constant Node", MaterialNodeType::CONSTANT), m_ConstantType(constant_type)
 	{
-		m_ConstantType = constant_type;
 		switch (m_ConstantType)
 		{
 			case ConstantNodeType::TCOORDS:
@@ -232,9 +225,10 @@ namespace Kaimos::MaterialEditor {
 			default: { KS_ERROR_AND_ASSERT("Invalid Constant Node Type"); break; }
 		}
 
-		m_NodeOutputPin->SetValue(ret);
-		return m_NodeOutputPin->GetValue();
+		m_NodeOutputPin->SetOutputValue(ret);
+		return m_NodeOutputPin->GetValue().get();
 	}
+
 
 
 

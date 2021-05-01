@@ -5,55 +5,135 @@
 
 
 namespace Kaimos::MaterialEditor {
-		
-	class MaterialNodePin
+	
+	class NodeInputPin;
+	class NodeOutputPin;
+
+	// ---- Node Pin Base Class ----
+	class NodePin
 	{
-		//friend class MaterialNode;
-		//friend class ConstantMaterialNode;
+	protected:
+
+		// --- Protected Methods (for inheritance to use) ---
+		NodePin(MaterialNode* owner, PinDataType type, const std::string& name);
+		~NodePin() { m_OwnerNode = nullptr; m_Value.reset(); }
+
+		void SetValue(float* value) { memcpy(m_Value.get(), value, 16); }
+
+
 	public:
 
-		// --- Public Class Methods ---
-		MaterialNodePin(MaterialNode* owner, PinDataType type, const std::string& name, float default_value);
-		~MaterialNodePin();
+		// --- Public Pin Methods ---
+		virtual bool IsInput() const = 0;
+		virtual void LinkPin(NodePin* output_pin) = 0;
 
-		void DrawPinUI(float& value_to_modify, bool& allow_node_drag);
-		void ResetToDefault();
-		void SetValue(float* value);
+		void DeleteLink(int input_pin_id = -1);
 
-
-		// --- Public Node Pin Methods ---
-		void LinkPin(MaterialNodePin* output_pin);
-		void DeleteLink();
-		void DeleteInputPin(uint input_pinID);
 
 	public:
 
 		// --- Getters ---
-		uint GetID() const { return m_ID; }
-		PinDataType GetType() const { return m_Type; }
-		const std::string& GetName() const { return m_Name; }
+		uint GetID()					const	{ return m_ID; }
+		PinDataType GetType()			const	{ return m_Type; }
+		const std::string& GetName()	const	{ return m_Name; }
 
-		MaterialNode* GetNode() const { return m_OwnerNode; }
-		float* GetValue() const { return m_Value.get(); }
+		Ref<float>& GetValue()					{ return m_Value; }
+		
+		
+	protected:
 
-		const std::vector<MaterialNodePin*>& GetInputPinsLinked() const { return m_InputPinsLinked; }
-		const MaterialNodePin* GetOutputPinLinked() const { return m_OutputPinLinked; }
+		// --- Protected Variables ---
+		Ref<float> m_Value = nullptr;
+		MaterialNode* m_OwnerNode = nullptr;
 
 	private:
 
-
-		// --- Variables ---
+		// --- Private Variables ---
 		uint m_ID = 0;
 		std::string m_Name = "UnnamedPin";
 		PinDataType m_Type = PinDataType::NONE;
 
-		Ref<float> m_Value = nullptr;
-		Ref<float> m_DefaultValue = nullptr;
-		
-		MaterialNode* m_OwnerNode = nullptr;
-		MaterialNodePin* m_OutputPinLinked = nullptr;
-		std::vector<MaterialNodePin*> m_InputPinsLinked;
 	};
+
+
+
+	// ---- Output Pin Child Class ----
+	class NodeOutputPin : public NodePin
+	{
+		friend class NodeInputPin;
+	public:
+
+		// --- Public Class Methods ---
+		NodeOutputPin(MaterialNode* owner, PinDataType type, const std::string& name) : NodePin(owner, type, name) {}
+		~NodeOutputPin();
+
+		void DrawUI();
+
+
+	public:
+
+		// --- Public Pin Methods ---
+		virtual bool IsInput()						const override { return false; }
+		virtual void LinkPin(NodePin* input_pin)	override;
+
+		void DisconnectInputPin(uint input_pinID);
+		void SetOutputValue(float* value)			{ SetValue(value); }
+
+
+	private:
+
+		// --- Private Pin Methods ---
+		void DrawOutputResult();
+
+
+	private:
+
+		// --- Variables ---
+		std::vector<NodeInputPin*> m_InputsLinked;
+	};
+
+
+
+	// ---- Input Pin Child Class ----
+	class NodeInputPin : public NodePin
+	{
+	public:
+
+		// --- Public Class Methods ---
+		NodeInputPin(MaterialNode* owner, PinDataType type, const std::string& name, float default_value = 0.0f)
+			: NodePin(owner, type, name) { m_DefaultValue = CreateRef<float>(new float[4]{ default_value }); }
+
+		~NodeInputPin();
+
+		void DrawUI(bool& allow_node_drag, float& value_to_modify);
+
+
+	public:
+
+		// --- Public Pin Methods ---
+		virtual bool IsInput()						const override	{ return true; }
+		virtual void LinkPin(NodePin* output_pin)	override;
+
+		void DisconnectOutputPin();
+		float* CalculateInputValue();
+
+		void ResetToDefault()							  { memcpy(m_Value.get(), m_DefaultValue.get(), 16); }
+		bool IsConnected()							const { return m_OutputLinked != nullptr; }
+		int GetOutputLinkedID()						const { return m_OutputLinked->GetID(); }
+
+
+	private:
+
+		// --- Private Pin Methods ---
+		void SetDefaultValue(float* value)			{ memcpy(m_DefaultValue.get(), value, 16); }
+
+	private:
+
+		// --- Variables ---
+		Ref<float> m_DefaultValue = nullptr;
+		NodeOutputPin* m_OutputLinked = nullptr;
+	};
+
 }
 
 #endif //_MATERIALNODEPIN_H_

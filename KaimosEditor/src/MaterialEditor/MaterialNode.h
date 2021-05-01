@@ -10,7 +10,9 @@
 namespace Kaimos::MaterialEditor {
 
 	// ---- Forward Declarations & Enums ----
-	class MaterialNodePin;
+	class NodePin;
+	class NodeInputPin;
+	class NodeOutputPin;
 	enum class MaterialNodeType	{ NONE, MAIN, OPERATION, CONSTANT };
 	enum class PinDataType		{ NONE, FLOAT, INT, VEC2, VEC4 };
 
@@ -18,10 +20,13 @@ namespace Kaimos::MaterialEditor {
 	// ---- Base Material Node ----
 	class MaterialNode
 	{
+		friend class NodeOutputPin;
+		friend class NodeInputPin;
 	protected:
 
 		// --- Protected Class Methods ---
-		MaterialNode(const std::string& name, MaterialNodeType type) : m_Name(name), m_Type(type), m_ID((uint)Kaimos::Random::GetRandomInt()) {}
+		MaterialNode(const std::string& name, MaterialNodeType type)
+			: m_Name(name), m_Type(type), m_ID((uint)Kaimos::Random::GetRandomInt()) {}
 
 		// Defined in child classes according to what each node type does
 		virtual float* CalculateNodeResult() = 0;
@@ -30,26 +35,27 @@ namespace Kaimos::MaterialEditor {
 
 		// --- Public Class Methods ---
 		~MaterialNode();
+
 		virtual void DrawNodeUI();
+		NodePin* FindPinInNode(uint pinID);
+
+	protected:
 
 		// --- Public Material Node Methods ---
-		MaterialNodePin* FindInputPin(uint pinID);
+		NodeInputPin* FindInputPin(uint pinID);
 		void AddPin(bool input, PinDataType pin_type, const std::string& name, float default_value = 1.0f);
-		void AddPin(bool input, Ref<MaterialNodePin>& pin);
 
+		float* GetInputValue(uint input_index);
 
-		// --- Node Result Methods ---
 		template<typename T>
-		T& GetOutputResult()
+		T GetOutputResult()
 		{
 			if (m_NodeOutputPin)
-				return NodeUtils::GetDataFromType<T>(m_NodeOutputPin->GetValue(), m_NodeOutputPin->GetType());
+				return NodeUtils::GetDataFromType<T>(m_NodeOutputPin->GetValue().get(), m_NodeOutputPin->GetType());
 
 			KS_ERROR_AND_ASSERT("Invalid GetOutput() Operation in MaterialNode");
 			return *(T*)nullptr;
 		}
-
-		float* GetInputValue(uint input_index);
 
 
 	public:
@@ -59,8 +65,8 @@ namespace Kaimos::MaterialEditor {
 		MaterialNodeType GetType()									const { return m_Type; }
 		const std::string& GetName()								const { return m_Name; }
 
-		MaterialNodePin* GetOutputPin()								const { return m_NodeOutputPin.get(); }
-		const std::vector<Ref<MaterialNodePin>>* GetInputPins()		const { return &m_NodeInputPins; }
+		//MaterialNodePin* GetOutputPin()								const { return m_NodeOutputPin.get(); }
+		//const std::vector<Ref<MaterialNodePin>>* GetInputPins()		const { return &m_NodeInputPins; }
 
 	protected:
 
@@ -69,8 +75,8 @@ namespace Kaimos::MaterialEditor {
 		std::string m_Name = "unnamed";
 		MaterialNodeType m_Type = MaterialNodeType::NONE;
 
-		std::vector<Ref<MaterialNodePin>> m_NodeInputPins;
-		Ref<MaterialNodePin> m_NodeOutputPin = nullptr;
+		std::vector<Ref<NodeInputPin>> m_NodeInputPins;
+		Ref<NodeOutputPin> m_NodeOutputPin = nullptr;
 	};
 
 
@@ -97,20 +103,22 @@ namespace Kaimos::MaterialEditor {
 
 		virtual float* CalculateNodeResult() override { return nullptr; }
 
+
 		// --- Variables ---
 		mutable SpriteRendererComponent* m_AttachedMaterial = nullptr;
-		Ref<MaterialNodePin> m_TextureTilingPin = nullptr;
-		Ref<MaterialNodePin> m_TextureOffsetPinX = nullptr;
-		Ref<MaterialNodePin> m_TextureOffsetPinY = nullptr;
+		Ref<NodeInputPin> m_TextureTilingPin = nullptr;
+		Ref<NodeInputPin> m_TextureOffsetPin = nullptr;
 	};
 
 
 
 	// ---- Constant Node ----
 	enum class ConstantNodeType { NONE, TCOORDS, DELTATIME };
+
 	class ConstantMaterialNode : public MaterialNode
 	{
 	public:
+
 		ConstantMaterialNode(ConstantNodeType constant_type);
 
 	private:
@@ -123,9 +131,11 @@ namespace Kaimos::MaterialEditor {
 
 	// ---- Operation Node ----
 	enum class OperationNodeType { NONE, ADDITION, MULTIPLICATION };
+
 	class OperationMaterialNode : public MaterialNode
 	{
 	public:
+
 		OperationMaterialNode(OperationNodeType operation_type, PinDataType operation_data_type);
 
 	private:
