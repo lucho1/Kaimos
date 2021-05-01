@@ -105,7 +105,7 @@ namespace Kaimos::MaterialEditor {
 
 		~NodeInputPin();
 
-		void DrawUI(bool& allow_node_drag, float& value_to_modify);
+		void DrawUI(bool& allow_node_drag, float* value_to_modify = nullptr);
 
 
 	public:

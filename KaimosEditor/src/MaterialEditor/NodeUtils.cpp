@@ -3,11 +3,26 @@
 #include "MaterialNode.h"
 
 #include <glm/gtc/type_ptr.hpp>
+#include <imgui/imgui.h>
 
 
 namespace Kaimos::MaterialEditor::NodeUtils {
 		
 	// ----------------------- Data Conversions -----------------------------------------------------------
+	size_t GetDataSizeFromType(PinDataType type)
+	{
+		switch (type)
+		{
+			case PinDataType::FLOAT:	return (size_t)4;		// 4 bytes * 1 value
+			case PinDataType::INT:		return (size_t)4;		// 4 bytes * 1 value
+			case PinDataType::VEC2:		return (size_t)8;		// 4 bytes * 2 values
+			case PinDataType::VEC4:		return (size_t)16;		// 4 bytes * 4 values
+		}
+
+		KS_ERROR_AND_ASSERT("Tried to get the size of a non-supported data type (NodeUtils::GetDataSizeFromType())!");
+	}
+
+
 	template<typename T>
 	T GetDataFromType(const float* ptr, PinDataType type)
 	{
@@ -64,6 +79,8 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 				return static_cast<float*>(ret);
 			}
 		}
+
+		KS_ERROR_AND_ASSERT("Tried to perform a non-supported addition operation!");
 	}
 
 
@@ -95,5 +112,40 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 				return glm::value_ptr(ret);
 			}
 		}
+
+		KS_ERROR_AND_ASSERT("Tried to perform a non-supported multiply operation!");
+	}
+
+
+
+	// ----------------------- UI Methods -----------------------------------------------------------------
+	void DrawPinWidget(PinDataType pin_type, float* value)
+	{
+		ImGui::SameLine();
+		switch (pin_type)
+		{
+			case PinDataType::FLOAT:
+			{
+				ImGui::SetNextItemWidth(30.0f);
+				ImGui::DragFloat("###float_val", value, 0.1f, 0.0f, 0.0f, "%.1f"); return;
+			}
+			case PinDataType::INT:
+			{
+				ImGui::SetNextItemWidth(30.0f);
+				ImGui::DragFloat("###int_val", value, 1.0f, 0.0f, 0.0f, "%.0f"); return;
+			}
+			case PinDataType::VEC2:
+			{
+				ImGui::SetNextItemWidth(60.0f);
+				ImGui::DragFloat2("###v2_val", value, 0.1f, 0.0f, 0.0f, "%.1f"); return;
+			}
+			case PinDataType::VEC4:
+			{
+				ImGui::SetNextItemWidth(90.0f);
+				ImGui::DragFloat4("###v2_val", value, 0.1f, 0.0f, 0.0f, "%.1f"); return;
+			}
+		}
+
+		KS_ERROR_AND_ASSERT("Tried to draw a non-supported PinType!");
 	}
 }

@@ -120,13 +120,14 @@ namespace Kaimos::MaterialEditor {
 	}
 
 
-	void NodeInputPin::DrawUI(bool& allow_node_drag, float& value_to_modify)
+	void NodeInputPin::DrawUI(bool& allow_node_drag, float* value_to_modify) // TODO: Deharcode this, maybe a f(x) that sets a size according to type?
 	{
 		ImNodes::BeginInputAttribute(GetID());
 		ImGui::Text(GetName().c_str());
 		ImNodes::EndInputAttribute();
 
-		value_to_modify = m_Value.get()[0];
+		if(value_to_modify)
+			memcpy(value_to_modify, m_Value.get(), NodeUtils::GetDataSizeFromType(GetType()));		
 
 		if (m_OutputLinked)
 			SetValue(m_OutputLinked->GetValue().get()); // TODO: Don't calculate this each frame
@@ -134,8 +135,7 @@ namespace Kaimos::MaterialEditor {
 		{
 			ImGui::PushID(GetID());
 
-			ImGui::SameLine(); ImGui::SetNextItemWidth(30.0f);
-			ImGui::DragFloat("###float_val", &m_Value.get()[0], 0.2f); // TODO: Function to draw UI widget function of pin type
+			NodeUtils::DrawPinWidget(GetType(), m_Value.get());
 			SetDefaultValue(m_Value.get());
 
 			if (ImGui::IsItemHovered() || ImGui::IsItemFocused() || ImGui::IsItemActive() || ImGui::IsItemEdited() || ImGui::IsItemClicked())
@@ -188,7 +188,7 @@ namespace Kaimos::MaterialEditor {
 		if (m_OutputLinked)
 			return m_OutputLinked->m_OwnerNode->CalculateNodeResult();
 
-		return &m_Value.get()[0];
+		return m_Value.get();
 	}
 
 }

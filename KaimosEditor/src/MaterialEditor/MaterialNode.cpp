@@ -39,11 +39,9 @@ namespace Kaimos::MaterialEditor {
 			m_NodeOutputPin->DrawUI();
 
 		// -- Draw Input Pins --
-		float dummy_value = 0.0f;
 		bool set_node_draggable = true;
-
 		for (Ref<NodeInputPin>& pin : m_NodeInputPins)
-			pin->DrawUI(set_node_draggable, dummy_value);
+			pin->DrawUI(set_node_draggable);
 		
 
 		// -- End Node Drawing --
@@ -134,8 +132,8 @@ namespace Kaimos::MaterialEditor {
 
 		// -- Draw Input Pins --
 		bool set_node_draggable = true;
-		m_TextureTilingPin->DrawUI(set_node_draggable, m_AttachedMaterial->TextureTiling);
-		m_TextureOffsetPin->DrawUI(set_node_draggable, m_AttachedMaterial->TextureUVOffset.x);
+		m_TextureTilingPin->DrawUI(set_node_draggable, &m_AttachedMaterial->TextureTiling);
+		m_TextureOffsetPin->DrawUI(set_node_draggable, glm::value_ptr(m_AttachedMaterial->TextureUVOffset));
 
 		ImNodes::SetNodeDraggable(m_ID, set_node_draggable);
 		ImNodes::EndNode();
