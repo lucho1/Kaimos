@@ -7,7 +7,6 @@
 namespace Kaimos::MaterialEditor {
 	
 	class NodeInputPin;
-	class NodeOutputPin;
 
 	// ---- Node Pin Base Class ----
 	class NodePin

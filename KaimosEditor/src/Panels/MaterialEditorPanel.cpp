@@ -2,7 +2,6 @@
 #include "MaterialEditorPanel.h"
 
 #include "Core/Utils/Maths/RandomGenerator.h"
-#include "../MaterialEditor/MaterialNodePin.h"
 
 #include <ImGui/imgui.h>
 #include <ImNodes/imnodes.h>

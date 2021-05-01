@@ -4,6 +4,8 @@
 #include "Kaimos.h"
 #include "Scene/ECS/Components.h"
 #include "../MaterialEditor/MaterialNode.h"
+#include "../MaterialEditor/MaterialNodePin.h"
+
 
 namespace Kaimos::MaterialEditor {
 

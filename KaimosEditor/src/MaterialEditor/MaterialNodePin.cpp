@@ -61,22 +61,22 @@ namespace Kaimos::MaterialEditor {
 		{
 			case PinDataType::FLOAT:
 			{
-				float res = m_OwnerNode->GetOutputResult<float>();
+				float res = NodeUtils::GetDataFromType<float>(m_Value.get(), GetType());
 				ImGui::Text("Value: %.1f", res); return;
 			}
 			case PinDataType::INT:
 			{
-				int res = m_OwnerNode->GetOutputResult<int>();
+				int res = NodeUtils::GetDataFromType<int>(m_Value.get(), GetType());
 				ImGui::Text("Value: %i", res); return;
 			}
 			case PinDataType::VEC2:
 			{
-				glm::vec2 res = m_OwnerNode->GetOutputResult<glm::vec2>();
+				glm::vec2 res = NodeUtils::GetDataFromType<glm::vec2>(m_Value.get(), GetType());
 				ImGui::Text("Value: %.1f, %.1f", res.x, res.y); return;
 			}
 			case PinDataType::VEC4:
 			{
-				glm::vec4 res = m_OwnerNode->GetOutputResult<glm::vec4>();
+				glm::vec4 res = NodeUtils::GetDataFromType<glm::vec4>(m_Value.get(), GetType());
 				ImGui::Text("Value: %.1f, %.1f, %.1f, %.1f", res.x, res.y, res.z, res.w); return;
 			}
 		}
