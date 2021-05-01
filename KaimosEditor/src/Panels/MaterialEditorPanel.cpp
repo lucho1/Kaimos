@@ -165,7 +165,7 @@ namespace Kaimos::MaterialEditor {
 			DeleteNode((uint)item_hovered);
 
 		// SUPR/DEL pressed + nodes/link selection
-		if (Input::IsKeyDown(KEY::DEL))
+		if (Input::IsKeyDown(KEY::DEL) || ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_Delete)))
 		{
 			int selected_links = ImNodes::NumSelectedLinks(), selected_nodes = ImNodes::NumSelectedNodes();
 			if (selected_links > 0 || selected_nodes > 0)
