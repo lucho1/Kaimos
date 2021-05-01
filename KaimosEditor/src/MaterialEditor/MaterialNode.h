@@ -95,6 +95,7 @@ namespace Kaimos::MaterialEditor {
 		mutable SpriteRendererComponent* m_AttachedMaterial = nullptr;
 		Ref<NodeInputPin> m_TextureTilingPin = nullptr;
 		Ref<NodeInputPin> m_TextureOffsetPin = nullptr;
+		Ref<NodeInputPin> m_ColorPin = nullptr;
 	};
 
 

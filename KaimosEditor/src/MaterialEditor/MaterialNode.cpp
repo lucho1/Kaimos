@@ -108,9 +108,11 @@ namespace Kaimos::MaterialEditor {
 	{
 		m_TextureTilingPin = CreateRef<NodeInputPin>(this, PinDataType::FLOAT, "Texture Tiling", 1.0f);
 		m_TextureOffsetPin = CreateRef<NodeInputPin>(this, PinDataType::VEC2, "Texture Offset", 0.0f);
+		m_ColorPin = CreateRef<NodeInputPin>(this, PinDataType::VEC4, "Color", 1.0f);
 
 		m_NodeInputPins.push_back(m_TextureTilingPin);
 		m_NodeInputPins.push_back(m_TextureOffsetPin);
+		m_NodeInputPins.push_back(m_ColorPin);
 	}
 
 
@@ -119,6 +121,7 @@ namespace Kaimos::MaterialEditor {
 		DettachMaterial();
 		m_TextureTilingPin.reset();
 		m_TextureOffsetPin.reset();
+		m_ColorPin.reset();
 	}
 
 
@@ -140,6 +143,7 @@ namespace Kaimos::MaterialEditor {
 		bool set_node_draggable = true;
 		m_TextureTilingPin->DrawUI(set_node_draggable, &m_AttachedMaterial->TextureTiling);
 		m_TextureOffsetPin->DrawUI(set_node_draggable, glm::value_ptr(m_AttachedMaterial->TextureUVOffset));
+		m_ColorPin->DrawUI(set_node_draggable, glm::value_ptr(m_AttachedMaterial->Color));
 
 		ImNodes::SetNodeDraggable(m_ID, set_node_draggable);
 		ImNodes::EndNode();
@@ -169,6 +173,7 @@ namespace Kaimos::MaterialEditor {
 		// -- Main Node Pins --
 		m_TextureTilingPin->ResetToDefault();
 		m_TextureOffsetPin->ResetToDefault();
+		m_ColorPin->ResetToDefault();
 	}
 
 	void MainMaterialNode::AttachMaterial(SpriteRendererComponent* sprite_component)
@@ -182,6 +187,7 @@ namespace Kaimos::MaterialEditor {
 		// -- Main Node Pins --
 		m_TextureTilingPin->ResetToDefault();
 		m_TextureOffsetPin->ResetToDefault();
+		m_ColorPin->ResetToDefault();
 	}
 
 
