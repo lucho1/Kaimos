@@ -214,19 +214,32 @@ namespace Kaimos {
 		StartBatch();
 	}
 
-	void Renderer2D::SetupVertexArray(const glm::mat4& transform, const glm::vec4& color, int entity_id, float texture_index, float texture_tiling, glm::vec2 texture_uvoffset)
-	{
+
+	
+	// ----------------------- Drawing Methods ------------------------------------------------------------
+	void Renderer2D::DrawSprite(const glm::mat4& transform, const SpriteRendererComponent& sprite, int entity_id)
+	{		
+		// -- Get Texture index if Sprite has Texture --
+		uint texture_index = GetTextureIndex(sprite.SpriteTexture);
+
+		// -- New Batch if Needed --
+		if (s_Data->QuadIndicesDrawCount >= s_Data->MaxIndices)
+			NextBatch();
+
+		// -- Setup Vertex Array & Vertex Attributes --
 		constexpr size_t quad_vertex_count = 4;
 		constexpr glm::vec2 tex_coords[] = { {0.0f, 0.0f}, {1.0f, 0.0f}, {1.0f, 1.0f}, {0.0f, 1.0f} };
 
 		for (size_t i = 0; i < quad_vertex_count; ++i)
 		{
 			s_Data->QuadVBufferPtr->Pos = transform * s_Data->VerticesPositions[i];
-			s_Data->QuadVBufferPtr->TexCoord = tex_coords[i] - texture_uvoffset;
-			s_Data->QuadVBufferPtr->Color = color;
+			s_Data->QuadVBufferPtr->TexCoord = tex_coords[i] - sprite.TextureUVOffset;
+
+			s_Data->QuadVBufferPtr->Color = sprite.Color;
 			s_Data->QuadVBufferPtr->TexIndex = texture_index;
-			s_Data->QuadVBufferPtr->TilingFactor = texture_tiling;
+			s_Data->QuadVBufferPtr->TilingFactor = sprite.TextureTiling;
 			s_Data->QuadVBufferPtr->EntityID = entity_id;
+
 			++s_Data->QuadVBufferPtr;
 		}
 
@@ -235,64 +248,35 @@ namespace Kaimos {
 	}
 
 
-	
-	// ----------------------- Public Drawing Methods -----------------------------------------------------
-	void Renderer2D::DrawSprite(const glm::mat4& transform, const SpriteRendererComponent& sprite, int entity_id)
+	uint Renderer2D::GetTextureIndex(const Ref<Texture2D>& texture)
 	{
-		if (sprite.SpriteTexture)
-			DrawQuad(transform, sprite.SpriteTexture, entity_id, sprite.Color, sprite.TextureTiling, sprite.TextureUVOffset);
-		else
-			DrawQuad(transform, sprite.Color, entity_id);
-	}
-	
-	void Renderer2D::DrawQuad(const glm::mat4& transform, const glm::vec4& color, int entity_id)
-	{
-		KS_PROFILE_FUNCTION();
-
-		// -- New Batch if Needed --
-		if (s_Data->QuadIndicesDrawCount >= s_Data->MaxIndices)
-			NextBatch();
-
-		// -- Set Vertex Array --
-		SetupVertexArray(transform, color, entity_id);
-	}
-
-
-	void Renderer2D::DrawQuad(const glm::mat4& transform, const Ref<Texture2D> texture, int entity_id, const glm::vec4& tintColor, float tiling, glm::vec2 texture_uvoffset)
-	{
-		KS_PROFILE_FUNCTION();
-
-		// -- New Batch if Needed --
-		if (s_Data->QuadIndicesDrawCount >= s_Data->MaxIndices)
-			NextBatch();
-
-		// -- Texture Index Retrieval --
-		uint texture_index = 0;
+		uint ret = 0;
 		if (texture)
 		{
+			// -- Find Texture if Exists --
 			for (uint i = 1; i < s_Data->TextureSlotIndex; ++i)
 			{
 				if (*s_Data->TextureSlots[i] == *texture)
 				{
-					texture_index = i;
+					ret = i;
 					break;
 				}
 			}
 
-			if (texture_index == 0)
+			// -- If it doesn't exists, add it to batch data --
+			if (ret == 0)
 			{
-				// -- New Batch if Needed --
+				// - New Batch if Needed -
 				if (s_Data->TextureSlotIndex >= s_Data->MaxTextureSlots)
 					NextBatch();
 
-				// -- Set Texture --
-				texture_index = s_Data->TextureSlotIndex;
+				// - Set Texture -
+				ret = s_Data->TextureSlotIndex;
 				s_Data->TextureSlots[s_Data->TextureSlotIndex] = texture;
 				++s_Data->TextureSlotIndex;
 			}
 		}
 
-		// -- Set Vertex Array --
-		SetupVertexArray(transform, tintColor, entity_id, (float)texture_index, tiling, texture_uvoffset);
+		return ret;
 	}
 }
