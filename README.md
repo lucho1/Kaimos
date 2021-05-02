@@ -1,10 +1,47 @@
 # Kaimos Engine
-Kaimos Engine is, a basic engine for educational purposes. It aims to be a 3D Geometry visualizer with a basic OpenGL renderer in order to be a basis for the development of the Degree Thesis of my degree at at the Videogames' Design and Development Degree in CITM-UPC.
+Kaimos Engine is, a basic engine for educational purposes. It aims to be a 3D Geometry visualizer with a basic OpenGL renderer in order to be a basis for the development of the Degree Thesis (TFG) of my degree in Videogames Design and Development at CITM-UPC.
 
 The purpose of the TFG is to build a node-based Material Editor (like the Unreal's one) in order to make the understanding and creation of materials and environments edition easy for anyone without having a deep understanding of the subject and without having to write any kind of code. As well, my purpose is to gather the documentation to made this in the mentioned thesis (found here).
 
+## Camera Controls
+To move through the scene, shown in the scene viewport, the **editor camera** can be used with the next controls (LMB, RMB and MMB refer to the left, right and middle mouse buttons respectively):
 
-Kaimos Engine will support, in its first version, and apart of what's already mentioned, a basic events sytem, a geometry loader with full UI Support using Dear ImGui (making use of its plugins for docking and for the node/graph editor), an Entity Component System (ECS) with transformations based on glm math library and a cameras system.
+      - Look Around:                   RMB
+      - Forward Movement:              LMB
+      - Orbit:                         ALT + LMB
+      - FPS Movement:                  RMB + WASDQE
+      - Double Speed FPS Movement:     RMB + WASDQE + Shift
+      - Control FPS Movement Speed:    RMB + Mouse Scroll
+
+      - Zoom:                          ALR + RMB or Mouse Scroll
+      - Panning:                       MMB or LMB + RMB
+      - Focus:                         F Key (center or selected object)
+
+
+Some of this controls can be used together. Note that some **options of this camera** can be modified by clicking in a button on top of the upper right corner of the viewport.
+
+A list of the **scene objects** can be seen at the left (*Scene Panel*), which can be clicked and have their **components modified** through the *Properties Panel* (objects parenting is not implemented yet!).
+Also, they can be **moved, rotated and scaled** by clicking on them and using the **Guizmo** that will apppear on the viewport. The Guizmo modification operation (move, rotate, scale) can be switched with WER keys or through the buttons on top of the viewport, at the left. Also, this guizmo can be unused by triggering the **selection key**, with Q key or its button on top-left too.
+
+In addition, **snapping** can be used with Guizmo by pressing CTRL key while using itwith its selection button on top of the viewport, in the same place as the Guizmo operation buttons. As well, the **Guizmo Mode** can be switched between Local/Global space with the spacebar key while using it or with its selection button in the same place. 
+
+Note that the panels of the engine can be displaced and docked as the user sees fit.
+
+## Material Editor Controls
+If an object has a Sprite Renderer Component attached, the component in the Properties Panel will display a button that will allow the user to open the **Kaimos Material Editor** window. This tool allows to modify the Sprite Renderer Component through a nodal editor, giving better results than the plain component editor.
+
+This window can be moved and docked as any panel, even can be separated as another window. The **controls** of this editor are the next ones (LMB, RMB and MMB refer to the left, right and middle mouse buttons respectively):
+
+      - Create Node:          RMB on Editor (opens a node selector)
+      - Delete Node:          Double MMB click on top
+      - Delete Link:          Double MMB click on top or ALT + LMB click or drag to empty space
+      - Editor Panning:       ALT + LMB or MMB
+      - Zoom:                 Not implemented yet
+
+Note that **nodes and links can be selected and moved** with LMB (even more than one with Shift key pressed or multiple selection with LMB drag). The **selections can also be deleted** with SUPR/DEL key.
+
+## Kaimos Engine Core
+Kaimos Engine supports, in its first version, and apart of what's already mentioned, a basic events sytem, a geometry loader with full UI Support using Dear ImGui (making use of its plugins for docking and for the node/graph editor), an Entity Component System (ECS) with transformations based on glm math library and a cameras system. Note that some of the mentioned features are currently under development.
 
 This project is licenced under Apache License 2.0 which can be found in the "LICENSE" file in the very same directory than this README file.
 
