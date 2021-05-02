@@ -12,7 +12,8 @@ namespace Kaimos::MaterialEditor {
 	NodePin::NodePin(MaterialNode* owner, PinDataType type, const std::string& name) : m_OwnerNode(owner), m_Type(type), m_Name(name)
 	{
 		m_ID = (uint)Kaimos::Random::GetRandomInt();
-		m_Value = CreateRef<float>(new float[4]{ 0.0f });
+		m_Value = CreateRef<float>(new float[4]);
+		std::fill(m_Value.get(), m_Value.get() + 4, 0.0f);
 	}
 
 	void NodePin::DeleteLink(int input_pin_id)
@@ -110,11 +111,18 @@ namespace Kaimos::MaterialEditor {
 		}
 	}
 	
-
-
+	
 
 	// ---------------------------- INPUT PIN -------------------------------------------------------------
 	// ----------------------- Public Class Methods -------------------------------------------------------
+	NodeInputPin::NodeInputPin(MaterialNode* owner, PinDataType type, const std::string& name, float default_value) : NodePin(owner, type, name)
+	{
+		m_DefaultValue = CreateRef<float>(new float[4]);
+		std::fill(m_DefaultValue.get(), m_DefaultValue.get() + 4, default_value);
+		ResetToDefault();
+	}
+
+
 	NodeInputPin::~NodeInputPin()
 	{
 		DisconnectOutputPin();

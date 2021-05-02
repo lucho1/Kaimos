@@ -99,8 +99,7 @@ namespace Kaimos::MaterialEditor {
 	public:
 
 		// --- Public Class Methods ---
-		NodeInputPin(MaterialNode* owner, PinDataType type, const std::string& name, float default_value = 0.0f)
-			: NodePin(owner, type, name) { m_DefaultValue = CreateRef<float>(new float[4]{ default_value }); }
+		NodeInputPin(MaterialNode* owner, PinDataType type, const std::string& name, float default_value = 0.0f);
 
 		~NodeInputPin();
 
