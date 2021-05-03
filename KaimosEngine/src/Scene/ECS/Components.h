@@ -1,7 +1,7 @@
 #ifndef _COMPONENTS_H_
 #define _COMPONENTS_H_
 
-#include "Renderer/Resources/Texture.h"
+#include "Renderer/Resources/Material.h"
 #include "Renderer/Cameras/Camera.h"
 #include "ScriptableEntity.h"
 
@@ -10,6 +10,7 @@
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/quaternion.hpp>
+
 
 namespace Kaimos {
 
@@ -51,37 +52,35 @@ namespace Kaimos {
 
 	struct SpriteRendererComponent
 	{
-		bool InMaterialEditor = false;
+		Ref<Material> SpriteMaterial = nullptr;
 
-		glm::vec4 Color = glm::vec4(1.0f);
-		Ref<Texture2D> SpriteTexture = nullptr;
-		std::string TextureFilepath = "";
-		float TextureTiling = 1.0f;
-		glm::vec2 TextureUVOffset = glm::vec2(0.0f);
+		inline void SetMaterial(Ref<Material>& material)
+		{
+			if (SpriteMaterial)
+				RemoveMaterial();
+
+			SpriteMaterial = material;
+		}
+
+		inline void RemoveMaterial()
+		{
+			SpriteMaterial = nullptr;
+		}
 
 		inline void RemoveTexture()
 		{
-			SpriteTexture = nullptr;
-			TextureFilepath.clear();
+			if(SpriteMaterial)
+				SpriteMaterial->RemoveTexture();
 		}
 
 		void SetTexture(const std::string& filepath)
 		{
-			Ref<Texture2D> texture = Texture2D::Create(filepath);
-			if (texture)
-			{
-				SpriteTexture = texture;
-				TextureFilepath = filepath;
-			}
-			else
-				KS_EDITOR_WARN("Couldn't Load Texture from '{0}'", filepath.c_str());
+			if(SpriteMaterial)
+				SpriteMaterial->SetTexture(filepath);
 		}
 
-		SpriteRendererComponent() = default;
-		SpriteRendererComponent(const SpriteRendererComponent&) = default;
-		SpriteRendererComponent(const glm::vec4& color) : Color(color) {}
-		SpriteRendererComponent(const glm::vec4& color, Ref<Texture2D> texture) : Color(color), SpriteTexture(texture) {}
-		SpriteRendererComponent(const glm::vec4& color, const std::string& file) : Color(color) { SetTexture(file); }
+		SpriteRendererComponent()								= default;
+		SpriteRendererComponent(const SpriteRendererComponent&)	= default;
 	};
 
 	struct CameraComponent

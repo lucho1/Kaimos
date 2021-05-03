@@ -220,7 +220,7 @@ namespace Kaimos {
 	void Renderer2D::DrawSprite(const glm::mat4& transform, const SpriteRendererComponent& sprite, int entity_id)
 	{		
 		// -- Get Texture index if Sprite has Texture --
-		uint texture_index = GetTextureIndex(sprite.SpriteTexture);
+		uint texture_index = GetTextureIndex(sprite.SpriteMaterial->GetTexture());
 
 		// -- New Batch if Needed --
 		if (s_Data->QuadIndicesDrawCount >= s_Data->MaxIndices)
@@ -233,11 +233,11 @@ namespace Kaimos {
 		for (size_t i = 0; i < quad_vertex_count; ++i)
 		{
 			s_Data->QuadVBufferPtr->Pos = transform * s_Data->VerticesPositions[i];
-			s_Data->QuadVBufferPtr->TexCoord = tex_coords[i] - sprite.TextureUVOffset;
+			s_Data->QuadVBufferPtr->TexCoord = tex_coords[i] - sprite.SpriteMaterial->TextureUVOffset;
 
-			s_Data->QuadVBufferPtr->Color = sprite.Color;
+			s_Data->QuadVBufferPtr->Color = sprite.SpriteMaterial->Color;
 			s_Data->QuadVBufferPtr->TexIndex = texture_index;
-			s_Data->QuadVBufferPtr->TilingFactor = sprite.TextureTiling;
+			s_Data->QuadVBufferPtr->TilingFactor = sprite.SpriteMaterial->TextureTiling;
 			s_Data->QuadVBufferPtr->EntityID = entity_id;
 
 			++s_Data->QuadVBufferPtr;

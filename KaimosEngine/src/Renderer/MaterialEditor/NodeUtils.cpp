@@ -3,7 +3,7 @@
 #include "MaterialNode.h"
 
 #include <glm/gtc/type_ptr.hpp>
-#include <imgui/imgui.h>
+#include <imgui.h>
 
 
 namespace Kaimos::MaterialEditor::NodeUtils {
@@ -142,13 +142,9 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 			case PinDataType::VEC4:
 			{
 				ImGui::SetNextItemWidth(150.0f);
-				ImGuiColorEditFlags flags = ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_Float | ImGuiColorEditFlags_AlphaPreview
-					| ImGuiColorEditFlags_DisplayRGB;
-
-				ImGui::ColorPicker4("Value", value, flags);
-
+				ImGuiColorEditFlags flags = ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_Float | ImGuiColorEditFlags_AlphaPreview | ImGuiColorEditFlags_NoInputs;
+				ImGui::ColorEdit4("Value", value, flags);
 				return;
-				//ImGui::DragFloat4("###v2_val", value, 0.1f, 0.0f, 0.0f, "%.1f"); return;
 			}
 		}
 

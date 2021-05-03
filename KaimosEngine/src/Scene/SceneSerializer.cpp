@@ -1,6 +1,8 @@
 #include "kspch.h"
 #include "SceneSerializer.h"
 
+#include "Renderer/Renderer.h"
+
 #include "ECS/Entity.h"
 #include "ECS/Components.h"
 
@@ -185,10 +187,10 @@ namespace Kaimos {
 
 			output << YAML::Key << "SpriteRendererComponent";
 			output << YAML::BeginMap;
-			output << YAML::Key << "Color" << YAML::Value << sprite_comp.Color;
-			output << YAML::Key << "TextureFile" << YAML::Value << sprite_comp.TextureFilepath;
-			output << YAML::Key << "TextureTiling" << YAML::Value << sprite_comp.TextureTiling;
-			output << YAML::Key << "TextureUVOffset" << YAML::Value << sprite_comp.TextureUVOffset;
+			output << YAML::Key << "Color" << YAML::Value << sprite_comp.SpriteMaterial->Color;
+			output << YAML::Key << "TextureFile" << YAML::Value << sprite_comp.SpriteMaterial->GetTexturePath();
+			output << YAML::Key << "TextureTiling" << YAML::Value << sprite_comp.SpriteMaterial->TextureTiling;
+			output << YAML::Key << "TextureUVOffset" << YAML::Value << sprite_comp.SpriteMaterial->TextureUVOffset;
 			output << YAML::EndMap;
 		}
 		
@@ -310,20 +312,24 @@ namespace Kaimos {
 				YAML::Node sprite_node = entity["SpriteRendererComponent"];
 				if (sprite_node)
 				{
-					SpriteRendererComponent& sprite_comp = deserialized_entity.AddComponent<SpriteRendererComponent>();
-					sprite_comp.Color = sprite_node["Color"].as<glm::vec4>();
+					Ref<Material>* mat = &Renderer::CreateMaterial();
+					(*mat)->Color = sprite_node["Color"].as<glm::vec4>();
 
 					auto file_node = sprite_node["TextureFile"];
 					if (file_node && !file_node.as<std::string>().empty())
-						sprite_comp.SetTexture(file_node.as<std::string>());
+						(*mat)->SetTexture(file_node.as<std::string>());
 
 					auto tile_node = sprite_node["TextureTiling"];
 					if (tile_node)
-						sprite_comp.TextureTiling = tile_node.as<float>();
+						(*mat)->TextureTiling = tile_node.as<float>();
 
 					auto offset_node = sprite_node["TextureUVOffset"];
 					if (offset_node)
-						sprite_comp.TextureUVOffset = offset_node.as<glm::vec2>();
+						(*mat)->TextureUVOffset = offset_node.as<glm::vec2>();
+					
+					SpriteRendererComponent& sprite_comp = deserialized_entity.AddComponent<SpriteRendererComponent>();
+					sprite_comp.SetMaterial(*mat);
+					(*mat)->UpdateGraphValues();
 				}
 			}
 		}

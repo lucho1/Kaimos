@@ -1,8 +1,8 @@
 #include "kspch.h"
 #include "MaterialNodePin.h"
 
-#include <ImGui/imgui.h>
-#include <ImNodes/imnodes.h>
+#include <imgui.h>
+#include <imnodes.h>
 
 
 namespace Kaimos::MaterialEditor {

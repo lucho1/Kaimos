@@ -3,6 +3,7 @@
 
 #include "Foundations/RenderCommand.h"
 #include "Renderer/Resources/Shader.h"
+#include "Renderer/Resources/Material.h"
 #include "Renderer/Cameras/Camera.h"
 
 namespace Kaimos {
@@ -21,6 +22,9 @@ namespace Kaimos {
 
 		static void Submit(const Ref<Shader>& shader, const Ref<VertexArray>& vertex_array, const glm::mat4& transformation = glm::mat4(1.0f));
 
+		static Ref<Material> CreateMaterial();
+		static Ref<Material> GetMaterial(uint material_id);
+
 	public:
 
 		// --- Event Methods ---
@@ -34,6 +38,7 @@ namespace Kaimos {
 		struct SceneData
 		{
 			glm::mat4 ViewProjectionMatrix = glm::mat4(1.0f);
+			std::vector<Ref<Material>> Materials;
 		};
 
 		static ScopePtr<SceneData> s_SceneData;

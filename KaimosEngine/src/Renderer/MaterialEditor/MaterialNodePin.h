@@ -19,7 +19,6 @@ namespace Kaimos::MaterialEditor {
 
 		void SetValue(float* value) { memcpy(m_Value.get(), value, 16); }
 
-
 	public:
 
 		// --- Public Pin Methods ---
@@ -28,7 +27,6 @@ namespace Kaimos::MaterialEditor {
 
 		void DeleteLink(int input_pin_id = -1);
 
-
 	public:
 
 		// --- Getters ---
@@ -36,8 +34,7 @@ namespace Kaimos::MaterialEditor {
 		PinDataType GetType()			const	{ return m_Type; }
 		const std::string& GetName()	const	{ return m_Name; }
 
-		Ref<float>& GetValue()					{ return m_Value; }
-		
+		Ref<float>& GetValue()					{ return m_Value; }		
 		
 	protected:
 
@@ -51,7 +48,6 @@ namespace Kaimos::MaterialEditor {
 		uint m_ID = 0;
 		std::string m_Name = "UnnamedPin";
 		PinDataType m_Type = PinDataType::NONE;
-
 	};
 
 
@@ -68,7 +64,6 @@ namespace Kaimos::MaterialEditor {
 
 		void DrawUI();
 
-
 	public:
 
 		// --- Public Pin Methods ---
@@ -78,12 +73,10 @@ namespace Kaimos::MaterialEditor {
 		void DisconnectInputPin(uint input_pinID);
 		void SetOutputValue(float* value)			{ SetValue(value); }
 
-
 	private:
 
 		// --- Private Pin Methods ---
 		void DrawOutputResult(float text_indent);
-
 
 	private:
 
@@ -100,11 +93,11 @@ namespace Kaimos::MaterialEditor {
 
 		// --- Public Class Methods ---
 		NodeInputPin(MaterialNode* owner, PinDataType type, const std::string& name, float default_value = 0.0f);
-
 		~NodeInputPin();
 
 		void DrawUI(bool& allow_node_drag, float* value_to_modify = nullptr);
 
+		void SetInitialValue(float* value) { SetValue(value); } // TODO: This should have an alternative way of doing it
 
 	public:
 

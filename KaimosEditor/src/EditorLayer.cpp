@@ -57,14 +57,12 @@ namespace Kaimos {
 		SceneSerializer m_Serializer(m_CurrentScene);
 		m_Serializer.Deserialize("assets/scenes/CubeScene.kaimos");
 		m_ScenePanel = ScenePanel(m_CurrentScene, &m_KMEPanel);
-		m_KMEPanel.Start();
 	}
 
 
 	void EditorLayer::OnDetach()
 	{
 		KS_PROFILE_FUNCTION();
-		m_KMEPanel.CleanUp();
 	}
 
 
@@ -369,8 +367,6 @@ namespace Kaimos {
 			ImGui::PopStyleVar();
 			ImGui::End();
 		}
-
-		
 	}
 
 
@@ -619,7 +615,7 @@ namespace Kaimos {
 			m_CurrentScene->SetViewportSize((uint)m_ViewportSize.x, (uint)m_ViewportSize.y);
 
 		ImGui::LoadIniSettingsFromDisk("imgui.ini");
-		m_KMEPanel.LoadIniEditorSettings();
+		m_KMEPanel.LoadCurrentGraphSettings();
 	}
 
 	void EditorLayer::SaveScene()
@@ -634,7 +630,7 @@ namespace Kaimos {
 
 		// -- Save Editor Settings (ini files) --
 		ImGui::SaveIniSettingsToDisk("imgui.ini");
-		m_KMEPanel.SaveIniEditorSettings();
+		m_KMEPanel.SaveCurrentGraphSettings();
 	}
 
 	void EditorLayer::SaveSceneAs()
@@ -662,7 +658,7 @@ namespace Kaimos {
 
 			// -- Save Editor Settings (ini files) --
 			ImGui::SaveIniSettingsToDisk("imgui.ini");
-			m_KMEPanel.SaveIniEditorSettings();
+			m_KMEPanel.SaveCurrentGraphSettings();
 		}
 	}
 

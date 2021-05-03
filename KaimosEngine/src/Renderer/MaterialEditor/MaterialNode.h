@@ -4,7 +4,8 @@
 #include "NodeUtils.h"
 #include "Core/Core.h"
 #include "Core/Utils/Maths/RandomGenerator.h"
-#include "Scene/ECS/Components.h"
+
+namespace Kaimos { class Material; }
 
 
 namespace Kaimos::MaterialEditor {
@@ -35,15 +36,13 @@ namespace Kaimos::MaterialEditor {
 		virtual void DrawNodeUI();
 		NodePin* FindPinInNode(uint pinID);
 
-
 	protected:
 
 		// --- Public Material Node Methods ---
 		NodeInputPin* FindInputPin(uint pinID);
-		void AddPin(bool input, PinDataType pin_type, const std::string& name, float default_value = 1.0f);
-		
-		float* GetInputValue(uint input_index);
+		void AddPin(bool input, PinDataType pin_type, const std::string& name, float default_value = 1.0f);		
 
+		float* GetInputValue(uint input_index);
 
 	public:
 
@@ -74,25 +73,18 @@ namespace Kaimos::MaterialEditor {
 	public:
 
 		// --- Public Class Methods ---
-		MainMaterialNode();
+		MainMaterialNode(Material* attached_material);
 		~MainMaterialNode();
 
 		virtual void DrawNodeUI() override;
-
-
-		// --- Public Main Material Node Methods ---
-		void DettachMaterial();
-		void AttachMaterial(SpriteRendererComponent* sprite_component);
-
-		bool HasMaterialAttached() const { return m_AttachedMaterial != nullptr; }
-
+		void SyncValuesWithMaterial();
 			
 	private:
 
 		virtual float* CalculateNodeResult() override { return nullptr; }
 
 		// --- Variables ---
-		mutable SpriteRendererComponent* m_AttachedMaterial = nullptr;
+		Material* m_AttachedMaterial = nullptr;
 		Ref<NodeInputPin> m_TextureTilingPin = nullptr;
 		Ref<NodeInputPin> m_TextureOffsetPin = nullptr;
 		Ref<NodeInputPin> m_ColorPin = nullptr;
@@ -106,7 +98,6 @@ namespace Kaimos::MaterialEditor {
 	class ConstantMaterialNode : public MaterialNode
 	{
 	public:
-
 		ConstantMaterialNode(ConstantNodeType constant_type);
 
 	private:
@@ -123,7 +114,6 @@ namespace Kaimos::MaterialEditor {
 	class OperationMaterialNode : public MaterialNode
 	{
 	public:
-
 		OperationMaterialNode(OperationNodeType operation_type, PinDataType operation_data_type);
 
 	private:

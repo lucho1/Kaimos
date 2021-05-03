@@ -3,9 +3,10 @@
 #include "MaterialNodePin.h"
 
 #include "Core/Application/Application.h"
+#include "Scene/ECS/Components.h"
 
-#include <ImGui/imgui.h>
-#include <ImNodes/imnodes.h>
+#include <imgui.h>
+#include <imnodes.h>
 #include <glm/gtc/type_ptr.hpp>
 
 
@@ -106,7 +107,8 @@ namespace Kaimos::MaterialEditor {
 
 	// ---------------------------- MAIN MAT NODE ---------------------------------------------------------
 	// ----------------------- Public Class Methods -------------------------------------------------------
-	MainMaterialNode::MainMaterialNode() : MaterialNode("Main Node", MaterialNodeType::MAIN)
+	MainMaterialNode::MainMaterialNode(Material* attached_material)
+		: MaterialNode("Main Node", MaterialNodeType::MAIN), m_AttachedMaterial(attached_material)
 	{
 		m_TextureTilingPin = CreateRef<NodeInputPin>(this, PinDataType::FLOAT, "Texture Tiling", 1.0f);
 		m_TextureOffsetPin = CreateRef<NodeInputPin>(this, PinDataType::VEC2, "Texture Offset", 0.0f);
@@ -120,7 +122,7 @@ namespace Kaimos::MaterialEditor {
 
 	MainMaterialNode::~MainMaterialNode()
 	{
-		DettachMaterial();
+		//DettachMaterial();
 		m_TextureTilingPin.reset();
 		m_TextureOffsetPin.reset();
 		m_ColorPin.reset();
@@ -143,6 +145,7 @@ namespace Kaimos::MaterialEditor {
 
 		// -- Draw Input Pins --
 		bool set_node_draggable = true;
+
 		m_TextureTilingPin->DrawUI(set_node_draggable, &m_AttachedMaterial->TextureTiling);
 		m_TextureOffsetPin->DrawUI(set_node_draggable, glm::value_ptr(m_AttachedMaterial->TextureUVOffset));
 		m_ColorPin->DrawUI(set_node_draggable, glm::value_ptr(m_AttachedMaterial->Color));
@@ -163,33 +166,11 @@ namespace Kaimos::MaterialEditor {
 		ImNodes::PopColorStyle();
 	}
 
-	
-	// ----------------------- Public Main Material Node Methods ------------------------------------------
-	void MainMaterialNode::DettachMaterial()
+	void MainMaterialNode::SyncValuesWithMaterial()
 	{
-		if(m_AttachedMaterial)
-			m_AttachedMaterial->InMaterialEditor = false;
-
-		m_AttachedMaterial = nullptr;
-
-		// -- Main Node Pins --
-		m_TextureTilingPin->ResetToDefault();
-		m_TextureOffsetPin->ResetToDefault();
-		m_ColorPin->ResetToDefault();
-	}
-
-	void MainMaterialNode::AttachMaterial(SpriteRendererComponent* sprite_component)
-	{
-		if (m_AttachedMaterial)
-			m_AttachedMaterial->InMaterialEditor = false;
-
-		m_AttachedMaterial = sprite_component;
-		m_AttachedMaterial->InMaterialEditor = true;
-
-		// -- Main Node Pins --
-		m_TextureTilingPin->ResetToDefault();
-		m_TextureOffsetPin->ResetToDefault();
-		m_ColorPin->ResetToDefault();
+		m_TextureTilingPin->SetInitialValue(&m_AttachedMaterial->TextureTiling);
+		m_TextureOffsetPin->SetInitialValue(glm::value_ptr(m_AttachedMaterial->TextureUVOffset));
+		m_ColorPin->SetInitialValue(glm::value_ptr(m_AttachedMaterial->Color));
 	}
 
 

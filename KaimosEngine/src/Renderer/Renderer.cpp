@@ -20,6 +20,12 @@ namespace Kaimos {
 	void Renderer::Shutdown()
 	{
 		Renderer2D::Shutdown();
+
+		for (Ref<Material>& mat : s_SceneData->Materials)
+			mat.reset();
+
+		s_SceneData->Materials.clear();
+		s_SceneData.reset();
 	}
 
 
@@ -47,7 +53,27 @@ namespace Kaimos {
 		//vertexArray->Unbind(); //TODO: ?
 	}
 
-	// --- Resize Event ---
+	Ref<Material> Renderer::CreateMaterial()
+	{
+		Ref<Material> material = CreateRef<Material>(new Material());
+		s_SceneData->Materials.push_back(material);
+		return material;
+	}
+
+	Ref<Material> Renderer::GetMaterial(uint material_id)
+	{
+		for (Ref<Material>& mat : s_SceneData->Materials)
+		{
+			if (mat->GetID() == material_id)
+				return mat;
+		}
+
+		return nullptr;
+	}
+
+
+	
+	// ----------------------- Event Methods -----------------------------------------------------------------
 	void Renderer::OnWindowResize(uint width, uint height)
 	{
 		RenderCommand::SetViewport(0, 0, width, height);
