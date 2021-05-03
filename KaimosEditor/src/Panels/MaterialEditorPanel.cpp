@@ -23,14 +23,17 @@ namespace Kaimos {
 
 		// -- Begin Editor --
 		ImNodes::BeginNodeEditor();
-		//ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 5.0f);
-		//ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 250.0f);
-		//ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(15.0f, 15.0f));
-		//ImGui::PushStyleVar(ImGuiStyleVar_ChildBorderSize, ImVec2(20.0f, 20.0f));
-		//ImGuiStyleVar_FrameBorderSize;
-		//ImGuiStyleVar_FramePadding;
-		//ImGuiStyleVar_PopupBorderSize;
-		//ImGuiStyleVar_PopupRounding;
+
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 10.0f);
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 4.0f);
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(20.0f, 12.0f));
+		ImGui::PushStyleVar(ImGuiStyleVar_ChildBorderSize, 2.0f);
+		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(1.0f, 1.0f));
+		ImGui::PushStyleVar(ImGuiStyleVar_PopupBorderSize, 2.0f);
+		ImGui::PushStyleVar(ImGuiStyleVar_PopupRounding, 5.0f);
+
+		ImNodes::PushColorStyle(ImNodesCol_NodeOutline, IM_COL32(0.0f, 142.0f, 255.0f, 40.0f));
+		ImNodes::PushStyleVar(ImNodesStyleVar_NodeBorderThickness, 2.0f);
 		
 		
 		
@@ -38,17 +41,6 @@ namespace Kaimos {
 		//bool set_draggable = true;
 		//float indent = 5.0f, width = 30.0f;
 
-		// -- Central Node Beginning --
-		//
-		//// -- Color Node --
-		//ImGui::Text("Color");
-		//ImGuiColorEditFlags color_flags = ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreview | ImGuiColorEditFlags_NoInputs;
-		//ImGui::SameLine();
-		//ImGui::ColorEdit4("##spcompcolor", glm::value_ptr(m_MainMatNode->m_MaterialToModify->Color), color_flags);
-		//
-		//if (ImGui::IsItemHovered() || ImGui::IsItemFocused() || ImGui::IsItemActive() || ImGui::IsItemEdited() || ImGui::IsItemClicked())
-		//	set_draggable = false;
-		//
 		//// -- Texture Node --
 		//if (m_MainMatNode->m_MaterialToModify->SpriteTexture)
 		//{
@@ -61,27 +53,6 @@ namespace Kaimos {
 		//	ImGui::SameLine();
 		//	ImGui::Text("(%ix%i)", m_MainMatNode->m_MaterialToModify->SpriteTexture->GetWidth(), m_MainMatNode->m_MaterialToModify->SpriteTexture->GetHeight());
 		//}
-		//
-		//// -- Texture Tiling Node --
-		//ImGui::Text("Texture Tiling");
-		//ImGui::SameLine(); ImGui::SetNextItemWidth(width);
-		//ImGui::DragFloat("##spcomptextiling", &m_MainMatNode->m_MaterialToModify->TextureTiling, 0.2f);
-		//
-		//if (ImGui::IsItemHovered() || ImGui::IsItemFocused() || ImGui::IsItemActive() || ImGui::IsItemEdited() || ImGui::IsItemClicked())
-		//	set_draggable = false;
-		//
-		//
-		//// -- Texture UV Offset Node --
-		//ImGui::Text("Texture Offset");
-		//ImGui::SameLine(); ImGui::SetNextItemWidth(width * 2.0f);
-		//ImGui::DragFloat2("##spcomptexoffx", glm::value_ptr(m_MainMatNode->m_MaterialToModify->TextureUVOffset), 0.2f);
-		//
-		//if (ImGui::IsItemHovered() || ImGui::IsItemFocused() || ImGui::IsItemActive() || ImGui::IsItemEdited() || ImGui::IsItemClicked())
-		//	set_draggable = false;
-		//
-		//// -- Central Node Dragging & Ending --
-		//ImNodes::SetNodeDraggable(1, set_draggable);
-		//ImNodes::EndNode();
 
 
 		// ----------- NODES ------------------------------------------------------------------
@@ -126,7 +97,10 @@ namespace Kaimos {
 		m_CurrentGraph->DrawNodes();
 
 		// -- End Material Node Editor --
-		//ImGui::PopStyleVar(8);
+		ImGui::PopStyleVar(7);
+		ImNodes::PopColorStyle();
+		ImNodes::PopStyleVar();
+
 		ImNodes::EndNodeEditor();
 		
 		// -- Create Links between Node Pins --
