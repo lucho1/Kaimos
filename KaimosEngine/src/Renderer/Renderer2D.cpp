@@ -31,7 +31,7 @@ namespace Kaimos {
 		uint TextureSlotIndex = 1;									// Slot 0 is for White Texture 
 
 		glm::vec4 VerticesPositions[4] = {};						// It's a vec4 so it's easier to multiply by a matrix (4th has to be 1)
-		glm::vec2 VerticesTCoords[2] = {};
+		glm::vec2 VerticesTCoords[4] = {};
 	};
 	
 	static Renderer2DData* s_Data = nullptr;	// On shutdown, this is deleted, and ~VertexArray() called, freeing GPU Memory too
