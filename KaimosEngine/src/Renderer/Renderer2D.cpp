@@ -31,6 +31,7 @@ namespace Kaimos {
 		uint TextureSlotIndex = 1;									// Slot 0 is for White Texture 
 
 		glm::vec4 VerticesPositions[4] = {};						// It's a vec4 so it's easier to multiply by a matrix (4th has to be 1)
+		glm::vec2 VerticesTCoords[2] = {};
 	};
 	
 	static Renderer2DData* s_Data = nullptr;	// On shutdown, this is deleted, and ~VertexArray() called, freeing GPU Memory too
@@ -61,11 +62,16 @@ namespace Kaimos {
 		KS_PROFILE_FUNCTION();
 		s_Data = new Renderer2DData();
 
-		// -- Vertices Positions --
+		// -- Vertices Positions & TCoords Definition --
 		s_Data->VerticesPositions[0] = { -0.5f, -0.5f, 0.0f, 1.0f };
 		s_Data->VerticesPositions[1] = {  0.5f, -0.5f, 0.0f, 1.0f };
 		s_Data->VerticesPositions[2] = {  0.5f,  0.5f, 0.0f, 1.0f };
 		s_Data->VerticesPositions[3] = { -0.5f,  0.5f, 0.0f, 1.0f };
+
+		s_Data->VerticesTCoords[0] = { 0.0f, 0.0f };
+		s_Data->VerticesTCoords[1] = { 1.0f, 0.0f};
+		s_Data->VerticesTCoords[2] = { 1.0f, 1.0f};
+		s_Data->VerticesTCoords[3] = { 0.0f, 1.0f};
 
 		// -- Index Buffer --
 		Ref<IndexBuffer> index_buffer;
@@ -228,12 +234,10 @@ namespace Kaimos {
 
 		// -- Setup Vertex Array & Vertex Attributes --
 		constexpr size_t quad_vertex_count = 4;
-		constexpr glm::vec2 tex_coords[] = { {0.0f, 0.0f}, {1.0f, 0.0f}, {1.0f, 1.0f}, {0.0f, 1.0f} };
-
 		for (size_t i = 0; i < quad_vertex_count; ++i)
 		{
 			s_Data->QuadVBufferPtr->Pos = transform * s_Data->VerticesPositions[i];
-			s_Data->QuadVBufferPtr->TexCoord = tex_coords[i] - sprite.SpriteMaterial->TextureUVOffset;
+			s_Data->QuadVBufferPtr->TexCoord = s_Data->VerticesTCoords[i] - sprite.SpriteMaterial->TextureUVOffset;
 
 			s_Data->QuadVBufferPtr->Color = sprite.SpriteMaterial->Color;
 			s_Data->QuadVBufferPtr->TexIndex = texture_index;
