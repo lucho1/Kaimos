@@ -329,7 +329,7 @@ namespace Kaimos {
 					
 					SpriteRendererComponent& sprite_comp = deserialized_entity.AddComponent<SpriteRendererComponent>();
 					sprite_comp.SetMaterial(*mat);
-					(*mat)->UpdateGraphValues();
+					(*mat)->SyncGraphValuesWithMaterial();
 				}
 			}
 		}

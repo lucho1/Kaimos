@@ -43,11 +43,11 @@ namespace Kaimos::MaterialEditor {
 
 	void NodeOutputPin::DrawUI()
 	{
-		ImNodes::BeginOutputAttribute(GetID());
+		ImNodes::BeginOutputAttribute(m_ID);
 
 		float indent = ImNodes::GetNodeDimensions(m_OwnerNode->GetID()).x / 1.8f;
 		ImGui::NewLine(); ImGui::SameLine(indent);
-		ImGui::Text(GetName().c_str());
+		ImGui::Text(m_Name.c_str());
 		DrawOutputResult(indent);
 
 		ImNodes::EndOutputAttribute();
@@ -61,26 +61,26 @@ namespace Kaimos::MaterialEditor {
 	{
 		ImGui::NewLine(); ImGui::SameLine(text_indent);
 
-		switch (GetType())
+		switch (m_Type)
 		{
 			case PinDataType::FLOAT:
 			{
-				float res = NodeUtils::GetDataFromType<float>(m_Value.get(), GetType());
+				float res = NodeUtils::GetDataFromType<float>(m_Value.get(), m_Type);
 				ImGui::Text("Value: %.1f", res); return;
 			}
 			case PinDataType::INT:
 			{
-				int res = NodeUtils::GetDataFromType<int>(m_Value.get(), GetType());
+				int res = NodeUtils::GetDataFromType<int>(m_Value.get(), m_Type);
 				ImGui::Text("Value: %i", res); return;
 			}
 			case PinDataType::VEC2:
 			{
-				glm::vec2 res = NodeUtils::GetDataFromType<glm::vec2>(m_Value.get(), GetType());
+				glm::vec2 res = NodeUtils::GetDataFromType<glm::vec2>(m_Value.get(), m_Type);
 				ImGui::Text("Value: %.1f, %.1f", res.x, res.y); return;
 			}
 			case PinDataType::VEC4:
 			{
-				glm::vec4 res = NodeUtils::GetDataFromType<glm::vec4>(m_Value.get(), GetType());
+				glm::vec4 res = NodeUtils::GetDataFromType<glm::vec4>(m_Value.get(), m_Type);
 				ImGui::Text("Value: %.2f, %.2f, %.2f, %.2f", res.x, res.y, res.z, res.w); return;
 			}
 		}
@@ -133,20 +133,20 @@ namespace Kaimos::MaterialEditor {
 
 	void NodeInputPin::DrawUI(bool& allow_node_drag, float* value_to_modify) // TODO: Deharcode this, maybe a f(x) that sets a size according to type?
 	{
-		ImNodes::BeginInputAttribute(GetID());
-		ImGui::Text(GetName().c_str());
+		ImNodes::BeginInputAttribute(m_ID);
+		ImGui::Text(m_Name.c_str());
 		ImNodes::EndInputAttribute();
 
 		if(value_to_modify)
-			memcpy(value_to_modify, m_Value.get(), NodeUtils::GetDataSizeFromType(GetType()));		
+			memcpy(value_to_modify, m_Value.get(), NodeUtils::GetDataSizeFromType(m_Type));
 
 		if (m_OutputLinked)
-			SetValue(m_OutputLinked->GetValue().get()); // TODO: Don't calculate this each frame
+			SetValue(m_OutputLinked->m_Value.get()); // TODO: Don't calculate this each frame
 		else
 		{
-			ImGui::PushID(GetID());
+			ImGui::PushID(m_ID);
 
-			NodeUtils::DrawPinWidget(GetType(), m_Value.get());
+			NodeUtils::DrawPinWidget(m_Type, m_Value.get());
 			SetDefaultValue(m_Value.get());
 
 			if (ImGui::IsItemHovered() || ImGui::IsItemFocused() || ImGui::IsItemActive() || ImGui::IsItemEdited() || ImGui::IsItemClicked())
@@ -161,9 +161,9 @@ namespace Kaimos::MaterialEditor {
 	// ----------------------- Public Pin Methods ---------------------------------------------------------
 	void NodeInputPin::LinkPin(NodePin* output_pin)
 	{
-		if (output_pin && !output_pin->IsInput() && output_pin->GetType() == GetType())
+		if (output_pin && !output_pin->IsInput() && output_pin->GetType() == m_Type)
 		{
-			// Check if this pin's node is connected to the node of the output_pin					// TODO!
+			// Check if this pin's node is connected to the node of the output_pin	// TODO: Handle unavailable connections (loops, ...)				// TODO!
 			//NodeOutputPin* node_output = m_OwnerNode->GetOutputPin();
 			//if (node_output)
 			//{
@@ -174,7 +174,7 @@ namespace Kaimos::MaterialEditor {
 
 			// If this pin has output erase it from output's inputs
 			if (m_OutputLinked)
-				m_OutputLinked->DisconnectInputPin(GetID());
+				m_OutputLinked->DisconnectInputPin(m_ID);
 
 			// Connect output to this pin & pushback this pin into the output's inputs
 			m_OutputLinked = static_cast<NodeOutputPin*>(output_pin);
@@ -187,7 +187,7 @@ namespace Kaimos::MaterialEditor {
 	{
 		if (m_OutputLinked)
 		{
-			m_OutputLinked->DisconnectInputPin(GetID());
+			m_OutputLinked->DisconnectInputPin(m_ID);
 			m_OutputLinked = nullptr;
 			ResetToDefault();
 		}

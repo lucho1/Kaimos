@@ -47,9 +47,9 @@ namespace Kaimos::MaterialEditor {
 	public:
 
 		// --- Getters ---
-		uint GetID()												const { return m_ID; }
-		MaterialNodeType GetType()									const { return m_Type; }
-		const std::string& GetName()								const { return m_Name; }
+		uint GetID()					const { return m_ID; }
+		MaterialNodeType GetType()		const { return m_Type; }
+		const std::string& GetName()	const { return m_Name; }
 
 		// Defined in child classes according to what each node type does
 		virtual float* CalculateNodeResult() = 0;
@@ -70,6 +70,7 @@ namespace Kaimos::MaterialEditor {
 	// ---- Main Material Node ----
 	class MainMaterialNode : public MaterialNode
 	{
+		friend class MaterialGraph;
 	public:
 
 		// --- Public Class Methods ---
@@ -77,14 +78,18 @@ namespace Kaimos::MaterialEditor {
 		~MainMaterialNode();
 
 		virtual void DrawNodeUI() override;
-		void SyncValuesWithMaterial();
 			
 	private:
 
+		// --- Private Node Methods ---
+		void SyncValuesWithMaterial();
 		virtual float* CalculateNodeResult() override { return nullptr; }
+
+	private:
 
 		// --- Variables ---
 		Material* m_AttachedMaterial = nullptr;
+
 		Ref<NodeInputPin> m_TextureTilingPin = nullptr;
 		Ref<NodeInputPin> m_TextureOffsetPin = nullptr;
 		Ref<NodeInputPin> m_ColorPin = nullptr;

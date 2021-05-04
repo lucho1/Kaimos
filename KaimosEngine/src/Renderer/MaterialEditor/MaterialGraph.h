@@ -39,7 +39,7 @@ namespace Kaimos::MaterialEditor {
 		void SaveGraph() const;
 
 		// --- Public Material Graph Methods ---
-		void SyncGraphValues();
+		void SyncMainNodeValuesWithMaterial();
 
 	private:
 

@@ -1,7 +1,5 @@
 #include "kspch.h"
 #include "MaterialEditorPanel.h"
-
-#include "Core/Utils/Maths/RandomGenerator.h"
 #include "Renderer/Renderer.h"
 
 #include <ImGui/imgui.h>
@@ -169,16 +167,16 @@ namespace Kaimos {
 		m_CurrentGraph = nullptr;
 	}
 	
-	void MaterialEditorPanel::SetMaterialToModify(uint material_id)
+	void MaterialEditorPanel::SetGraphToModifyFromMaterial(uint material_id)
 	{
 		Ref<Material> mat = Renderer::GetMaterial(material_id);
-		if (mat)
+		if (mat && (mat)->m_AttachedGraph)
 			m_CurrentGraph = (mat)->m_AttachedGraph.get();
 	}
 
 	bool MaterialEditorPanel::IsModifyingMaterialGraph(Material* material)
 	{
-		if (m_CurrentGraph && m_CurrentGraph->GetID() == material->GetGraphID())
+		if (m_CurrentGraph && m_CurrentGraph->GetID() == material->GetAttachedGraphID())
 			return true;
 
 		return false;

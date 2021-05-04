@@ -83,7 +83,7 @@ namespace Kaimos::MaterialEditor {
 
 
 	// ----------------------- Private/Public Material Graph Methods -------------------------------------
-	void MaterialGraph::SyncGraphValues()
+	void MaterialGraph::SyncMainNodeValuesWithMaterial()
 	{
 		m_MainMatNode->SyncValuesWithMaterial();
 	}

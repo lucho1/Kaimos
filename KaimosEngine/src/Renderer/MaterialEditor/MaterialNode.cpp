@@ -168,9 +168,9 @@ namespace Kaimos::MaterialEditor {
 
 	void MainMaterialNode::SyncValuesWithMaterial()
 	{
-		m_TextureTilingPin->SetInitialValue(&m_AttachedMaterial->TextureTiling);
-		m_TextureOffsetPin->SetInitialValue(glm::value_ptr(m_AttachedMaterial->TextureUVOffset));
-		m_ColorPin->SetInitialValue(glm::value_ptr(m_AttachedMaterial->Color));
+		m_TextureTilingPin->SetInputValue(&m_AttachedMaterial->TextureTiling);
+		m_TextureOffsetPin->SetInputValue(glm::value_ptr(m_AttachedMaterial->TextureUVOffset));
+		m_ColorPin->SetInputValue(glm::value_ptr(m_AttachedMaterial->Color));
 	}
 
 

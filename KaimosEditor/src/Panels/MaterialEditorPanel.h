@@ -21,7 +21,7 @@ namespace Kaimos {
 
 		// --- Public Material Editor Panel Methods ---
 		void UnsetGraphToModify();
-		void SetMaterialToModify(uint material_id);
+		void SetGraphToModifyFromMaterial(uint material_id);
 
 		bool IsModifyingMaterialGraph(Material* material);
 

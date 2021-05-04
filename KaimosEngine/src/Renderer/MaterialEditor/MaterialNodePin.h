@@ -32,22 +32,19 @@ namespace Kaimos::MaterialEditor {
 		// --- Getters ---
 		uint GetID()					const	{ return m_ID; }
 		PinDataType GetType()			const	{ return m_Type; }
-		const std::string& GetName()	const	{ return m_Name; }
+		//const std::string& GetName()	const	{ return m_Name; }
 
 		Ref<float>& GetValue()					{ return m_Value; }		
 		
 	protected:
 
-		// --- Protected Variables ---
-		Ref<float> m_Value = nullptr;
-		MaterialNode* m_OwnerNode = nullptr;
-
-	private:
-
-		// --- Private Variables ---
+		// --- Variables ---
 		uint m_ID = 0;
 		std::string m_Name = "UnnamedPin";
 		PinDataType m_Type = PinDataType::NONE;
+
+		Ref<float> m_Value = nullptr;
+		MaterialNode* m_OwnerNode = nullptr;
 	};
 
 
@@ -97,7 +94,6 @@ namespace Kaimos::MaterialEditor {
 
 		void DrawUI(bool& allow_node_drag, float* value_to_modify = nullptr);
 
-		void SetInitialValue(float* value) { SetValue(value); } // TODO: This should have an alternative way of doing it
 
 	public:
 
@@ -108,6 +104,7 @@ namespace Kaimos::MaterialEditor {
 		void DisconnectOutputPin();
 		float* CalculateInputValue();
 
+		void SetInputValue(float* value)				  { SetValue(value); }
 		void ResetToDefault()							  { memcpy(m_Value.get(), m_DefaultValue.get(), 16); }
 		bool IsConnected()							const { return m_OutputLinked != nullptr; }
 		int GetOutputLinkedID()						const { return m_OutputLinked->GetID(); }

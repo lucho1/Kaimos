@@ -369,45 +369,57 @@ namespace Kaimos {
 		DrawComponentUI<SpriteRendererComponent>("Sprite Renderer", entity, [&](auto& component)
 			{
 				// Color Picker for Sprite Color
-				ImGuiColorEditFlags color_flags = ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreview | ImGuiColorEditFlags_NoInputs;
-				ImGui::ColorEdit4("Color", glm::value_ptr(component.SpriteMaterial->Color), color_flags);
-
-				// Texture Button for Sprite Texture
-				const uint id = component.SpriteMaterial->GetTexture() == nullptr ? 0 : component.SpriteMaterial->GetTexture()->GetTextureID();
-				ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { 0.0f, 0.0f });
-
-				ImGui::NewLine();
-				ImGui::Text("Texture");
-				ImGui::SameLine(ImGui::GetContentRegionAvail().x * 0.5f);
-
-				if (KaimosUI::UIFunctionalities::DrawTexturedButton("###sprite_texture_btn", id, glm::vec2(80.0f), glm::vec3(0.1f)))
-				{
-					std::string texture_file = FileDialogs::OpenFile("Texture (*.png)\0*.png\0");
-					if (!texture_file.empty())
-						component.SetTexture(texture_file);
-				}
-
-				KaimosUI::UIFunctionalities::PopButton(false);
-
-				// Remove Texture Button
-				ImGui::SameLine();
-				if (KaimosUI::UIFunctionalities::DrawColoredButton("X", { 20.0f, 80.0f }, glm::vec3(0.2f), true))
-					component.RemoveTexture();
+				//ImGuiColorEditFlags color_flags = ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreview | ImGuiColorEditFlags_NoInputs;
+				//ImGui::ColorEdit4("Color", glm::value_ptr(component.SpriteMaterial->Color), color_flags);
+				ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_FramePadding
+					| ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_SpanAvailWidth;
 				
-				KaimosUI::UIFunctionalities::PopButton(true);				
-				ImGui::PopStyleVar();
+				bool open = ImGui::TreeNodeEx("###mattreenode", flags, "Material");
+				if (open)
+				{
+					// Texture Button for Sprite Texture
+					const uint id = component.SpriteMaterial->GetTexture() == nullptr ? 0 : component.SpriteMaterial->GetTexture()->GetTextureID();
+					ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { 0.0f, 0.0f });
 
-				// Tiling & UV Offset Drag Floats
-				ImGui::NewLine();
-				KaimosUI::UIFunctionalities::DrawInlineDragFloat("Tiling", "##tiling", &component.SpriteMaterial->TextureTiling, 0.1f, 100.0f);
-				KaimosUI::UIFunctionalities::DrawInlineDragFloat2("UV Offset", "##uv_offset", component.SpriteMaterial->TextureUVOffset, 0.1f, 208.0f);
+					ImGui::NewLine();
+					ImGui::Text("Texture");
+					ImGui::SameLine(ImGui::GetContentRegionAvail().x * 0.5f);
 
-				// Open in Material Editor Button
-				float btn_width = 196.0f;
-				ImGui::NewLine(); ImGui::NewLine();
-				ImGui::SameLine(ImGui::GetWindowContentRegionWidth() * 0.5f - btn_width * 0.5f);
-				if (ImGui::Button("Open in Material Editor", ImVec2(btn_width, 25.0f)))
-					m_KMEPanel->SetMaterialToModify(component.SpriteMaterial->GetID());
+					if (KaimosUI::UIFunctionalities::DrawTexturedButton("###sprite_texture_btn", id, glm::vec2(80.0f), glm::vec3(0.1f)))
+					{
+						std::string texture_file = FileDialogs::OpenFile("Texture (*.png)\0*.png\0");
+						if (!texture_file.empty())
+							component.SetTexture(texture_file);
+					}
+
+					KaimosUI::UIFunctionalities::PopButton(false);
+
+					// Remove Texture Button
+					ImGui::SameLine();
+					if (KaimosUI::UIFunctionalities::DrawColoredButton("X", { 20.0f, 80.0f }, glm::vec3(0.2f), true))
+						component.RemoveTexture();
+
+					KaimosUI::UIFunctionalities::PopButton(true);
+					ImGui::PopStyleVar();
+
+					// Tiling & UV Offset Drag Floats
+					ImGui::NewLine();
+					ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[1]);
+					glm::ivec4 col = component.SpriteMaterial->Color * 255.0f;
+					ImGui::Text("Color:\t\t\t\t\t\tRGBA(%i, %i, %i, %i)", col.r, col.g, col.b, col.a);
+					ImGui::Text("Texture Tiling:\t\t%.2f", component.SpriteMaterial->TextureTiling);
+					ImGui::Text("Texture Offset:\t\tXY(%.1f, %.1f)", component.SpriteMaterial->TextureUVOffset.x, component.SpriteMaterial->TextureUVOffset.y);
+					ImGui::PopFont();
+
+					// Open in Material Editor Button
+					float btn_width = 196.0f;
+					ImGui::NewLine(); ImGui::NewLine();
+					ImGui::SameLine(ImGui::GetWindowContentRegionWidth() * 0.5f - btn_width * 0.5f);
+					if (ImGui::Button("Open in Material Editor", ImVec2(btn_width, 25.0f)))
+						m_KMEPanel->SetGraphToModifyFromMaterial(component.SpriteMaterial->GetID());
+
+					ImGui::TreePop();
+				}
 			});
 	}
 }
