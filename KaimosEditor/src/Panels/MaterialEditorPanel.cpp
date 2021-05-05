@@ -58,7 +58,7 @@ namespace Kaimos {
 		if (ImGui::BeginPopupContextWindow(0, 1, false))
 		{
 			if (ImGui::MenuItem("Texture Coordinates"))
-				m_CurrentGraph->CreateNode(MaterialEditor::ConstantNodeType::TCOORDS);
+				m_CurrentGraph->CreateNode(MaterialEditor::VertexParameterNodeType::TEX_COORDS);
 
 			if (ImGui::MenuItem("Delta Time"))
 				m_CurrentGraph->CreateNode(MaterialEditor::ConstantNodeType::DELTATIME);

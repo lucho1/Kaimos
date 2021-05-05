@@ -14,7 +14,7 @@ namespace Kaimos::MaterialEditor {
 	class NodePin;
 	class NodeOutputPin;
 	class NodeInputPin;
-	enum class MaterialNodeType	{ NONE, MAIN, OPERATION, CONSTANT };
+	enum class MaterialNodeType	{ NONE, MAIN, VERTEX_PARAMETER, OPERATION, CONSTANT };
 	enum class PinDataType		{ NONE, FLOAT, INT, VEC2, VEC4 };
 
 
@@ -40,7 +40,8 @@ namespace Kaimos::MaterialEditor {
 
 		// --- Public Material Node Methods ---
 		NodeInputPin* FindInputPin(uint pinID);
-		void AddPin(bool input, PinDataType pin_type, const std::string& name, float default_value = 1.0f);		
+		void AddInputPin(PinDataType pin_data_type, const std::string& name, float default_value = 1.0f);
+		virtual void AddOutputPin(PinDataType pin_data_type, const std::string& name, float default_value = 1.0f);
 
 		float* GetInputValue(uint input_index);
 
@@ -68,6 +69,8 @@ namespace Kaimos::MaterialEditor {
 
 
 	// ---- Main Material Node ----
+	enum class VertexParameterNodeType { NONE, TEX_COORDS };
+
 	class MainMaterialNode : public MaterialNode
 	{
 		friend class MaterialGraph;
@@ -78,7 +81,22 @@ namespace Kaimos::MaterialEditor {
 		~MainMaterialNode();
 
 		virtual void DrawNodeUI() override;
-			
+		
+		template<typename T>
+		T& GetVertexAttributeInput(VertexParameterNodeType vtxpm_node_type)
+		{
+			switch (vtxpm_node_type)
+			{
+				case VertexParameterNodeType::TEX_COORDS:
+				{
+					return NodeUtils::GetDataFromType<T>(m_TextureCoordinatesPin->CalculateInputValue(), PinDataType::VEC2);
+				}
+				
+				default: { KS_ERROR_AND_ASSERT("Tried to retrieve an invalid Vertex Attribute Input from Main Node!"); }
+			}
+		}
+
+
 	private:
 
 		// --- Private Node Methods ---
@@ -90,6 +108,7 @@ namespace Kaimos::MaterialEditor {
 		// --- Variables ---
 		Material* m_AttachedMaterial = nullptr;
 
+		Ref<NodeInputPin> m_TextureCoordinatesPin = nullptr;
 		Ref<NodeInputPin> m_TextureTilingPin = nullptr;
 		Ref<NodeInputPin> m_TextureOffsetPin = nullptr;
 		Ref<NodeInputPin> m_ColorPin = nullptr;
@@ -97,8 +116,28 @@ namespace Kaimos::MaterialEditor {
 
 
 
+	// ---- Vertex Parameter Node ----
+	class VertexParameterMaterialNode : public MaterialNode
+	{
+	public:
+
+		VertexParameterMaterialNode(VertexParameterNodeType parameter_type);
+		
+		void SetNodeOutputResult(float* value);
+		virtual void AddOutputPin(PinDataType pin_data_type, const std::string& name, float default_value = 1.0f) override;
+		
+		VertexParameterNodeType GetParameterType() const { return m_ParameterType; }
+
+	private:
+
+		virtual float* CalculateNodeResult() override;
+		VertexParameterNodeType m_ParameterType = VertexParameterNodeType::NONE;
+	};
+
+
+
 	// ---- Constant Node ----
-	enum class ConstantNodeType { NONE, TCOORDS, DELTATIME };
+	enum class ConstantNodeType { NONE, DELTATIME };
 
 	class ConstantMaterialNode : public MaterialNode
 	{

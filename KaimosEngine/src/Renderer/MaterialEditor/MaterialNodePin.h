@@ -14,7 +14,7 @@ namespace Kaimos::MaterialEditor {
 	protected:
 
 		// --- Protected Methods (for inheritance to use) ---
-		NodePin(MaterialNode* owner, PinDataType type, const std::string& name);
+		NodePin(MaterialNode* owner, PinDataType pin_data_type, const std::string& name);
 		~NodePin() { m_OwnerNode = nullptr; m_Value.reset(); }
 
 		void SetValue(float* value) { memcpy(m_Value.get(), value, 16); }
@@ -31,7 +31,7 @@ namespace Kaimos::MaterialEditor {
 
 		// --- Getters ---
 		uint GetID()					const	{ return m_ID; }
-		PinDataType GetType()			const	{ return m_Type; }
+		PinDataType GetType()			const	{ return m_PinDataType; }
 		//const std::string& GetName()	const	{ return m_Name; }
 
 		Ref<float>& GetValue()					{ return m_Value; }		
@@ -41,14 +41,14 @@ namespace Kaimos::MaterialEditor {
 		// --- Variables ---
 		uint m_ID = 0;
 		std::string m_Name = "UnnamedPin";
-		PinDataType m_Type = PinDataType::NONE;
+		PinDataType m_PinDataType = PinDataType::NONE;
 
 		Ref<float> m_Value = nullptr;
 		MaterialNode* m_OwnerNode = nullptr;
 	};
 
 
-
+		
 	// ---- Output Pin Child Class ----
 	class NodeOutputPin : public NodePin
 	{
@@ -56,10 +56,11 @@ namespace Kaimos::MaterialEditor {
 	public:
 
 		// --- Public Class Methods ---
-		NodeOutputPin(MaterialNode* owner, PinDataType type, const std::string& name) : NodePin(owner, type, name) {}
-		~NodeOutputPin();
+		NodeOutputPin(MaterialNode* owner, PinDataType pin_data_type, const std::string& name, bool vertex_parameter = false)
+			: NodePin(owner, pin_data_type, name), m_VertexParameter(vertex_parameter) {}
 
-		void DrawUI();
+		~NodeOutputPin();
+		virtual void DrawUI();
 
 	public:
 
@@ -79,6 +80,7 @@ namespace Kaimos::MaterialEditor {
 
 		// --- Variables ---
 		std::vector<NodeInputPin*> m_InputsLinked;
+		bool m_VertexParameter = false;
 	};
 
 
@@ -89,10 +91,10 @@ namespace Kaimos::MaterialEditor {
 	public:
 
 		// --- Public Class Methods ---
-		NodeInputPin(MaterialNode* owner, PinDataType type, const std::string& name, float default_value = 0.0f);
+		NodeInputPin(MaterialNode* owner, PinDataType pin_data_type, const std::string& name, float default_value = 0.0f);
 		~NodeInputPin();
 
-		void DrawUI(bool& allow_node_drag, float* value_to_modify = nullptr);
+		void DrawUI(bool& allow_node_drag, float* value_to_modify = nullptr, bool is_vtxattribute = false);
 
 
 	public:

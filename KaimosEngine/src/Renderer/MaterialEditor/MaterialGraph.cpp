@@ -30,19 +30,43 @@ namespace Kaimos::MaterialEditor {
 	{
 		for (Ref<MaterialNode>& node : m_Nodes)
 			node->DrawNodeUI();
-	}	
-	
+	}
+
 
 
 	// ----------------------- Creation Methods ----------------------------------------------------------
+	void MaterialGraph::CreateNode(VertexParameterNodeType vertexparam_type)
+	{
+		if (vertexparam_type == VertexParameterNodeType::NONE)
+		{
+			KS_ERROR_AND_ASSERT("Tried to create an invalid Vertex Parameter Node");
+			return;
+		}
+
+		VertexParameterMaterialNode* vpm_node = new VertexParameterMaterialNode(vertexparam_type);
+		m_Nodes.push_back(CreateRef<MaterialNode>((MaterialNode*)vpm_node));
+	}
+
 	void MaterialGraph::CreateNode(ConstantNodeType constant_type)
 	{
+		if (constant_type == ConstantNodeType::NONE)
+		{
+			KS_ERROR_AND_ASSERT("Tried to create an invalid Constant Node");
+			return;
+		}
+
 		ConstantMaterialNode* cnode = new ConstantMaterialNode(constant_type);
 		m_Nodes.push_back(CreateRef<MaterialNode>((MaterialNode*)cnode));
 	}
 
 	void MaterialGraph::CreateNode(OperationNodeType operation_type, PinDataType operation_data_type)
 	{
+		if (operation_type == OperationNodeType::NONE || operation_data_type == PinDataType::NONE)
+		{
+			KS_ERROR_AND_ASSERT("Tried to create an invalid Operation Node");
+			return;
+		}
+
 		OperationMaterialNode* onode = new OperationMaterialNode(operation_type, operation_data_type);
 		m_Nodes.push_back(CreateRef<MaterialNode>((MaterialNode*)onode));
 	}
@@ -86,6 +110,20 @@ namespace Kaimos::MaterialEditor {
 	void MaterialGraph::SyncMainNodeValuesWithMaterial()
 	{
 		m_MainMatNode->SyncValuesWithMaterial();
+	}
+
+	void MaterialGraph::SyncVertexParameterNodes(VertexParameterNodeType vtxpm_node_type, float* value)
+	{
+		std::vector<Ref<MaterialNode>>::const_iterator it = m_Nodes.begin();
+		for (; it != m_Nodes.end(); ++it)
+		{
+			if ((*it)->GetType() == MaterialNodeType::VERTEX_PARAMETER)
+			{
+				VertexParameterMaterialNode* vpm_node = (VertexParameterMaterialNode*)(*it).get();
+				if (vpm_node->GetParameterType() == vtxpm_node_type)
+					vpm_node->SetNodeOutputResult(value);
+			}
+		}
 	}
 
 	NodePin* MaterialGraph::FindNodePin(uint pinID)

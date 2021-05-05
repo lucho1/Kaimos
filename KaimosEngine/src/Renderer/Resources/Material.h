@@ -48,6 +48,17 @@ namespace Kaimos {
 			m_AttachedGraph->SyncMainNodeValuesWithMaterial();
 		}
 
+		template<typename T>
+		inline T& GetVertexAttributeResult(MaterialEditor::VertexParameterNodeType vtxpm_node_type)
+		{
+			return m_AttachedGraph->GetVertexParameterResult<T>(vtxpm_node_type);
+		}
+
+		inline void UpdateVertexParameter(MaterialEditor::VertexParameterNodeType vtxpm_node_type, float* value) const
+		{
+			m_AttachedGraph->SyncVertexParameterNodes(vtxpm_node_type, value);
+		}
+
 
 	public:
 
@@ -57,6 +68,7 @@ namespace Kaimos {
 
 		uint GetID()						const { return m_ID; }
 		uint GetAttachedGraphID()			const { return m_AttachedGraph->GetID(); }
+
 		
 	public:
 

@@ -23,6 +23,7 @@ namespace Kaimos::MaterialEditor {
 	public:
 
 		// --- Creation Methods ---
+		void CreateNode(VertexParameterNodeType constant_type);
 		void CreateNode(ConstantNodeType constant_type);
 		void CreateNode(OperationNodeType operation_type, PinDataType operation_data_type);
 
@@ -40,6 +41,13 @@ namespace Kaimos::MaterialEditor {
 
 		// --- Public Material Graph Methods ---
 		void SyncMainNodeValuesWithMaterial();
+		void SyncVertexParameterNodes(VertexParameterNodeType vtxpm_node_type, float* value);
+
+		template<typename T>
+		T& GetVertexParameterResult(VertexParameterNodeType vtxpm_node_type)
+		{
+			return m_MainMatNode->GetVertexAttributeInput<T>(vtxpm_node_type);
+		}
 
 	private:
 

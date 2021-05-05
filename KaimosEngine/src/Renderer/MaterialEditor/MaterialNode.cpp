@@ -85,12 +85,14 @@ namespace Kaimos::MaterialEditor {
 		return nullptr;
 	}
 
-	void MaterialNode::AddPin(bool input, PinDataType pin_type, const std::string& name, float default_value)
+	void MaterialNode::AddInputPin(PinDataType pin_data_type, const std::string& name, float default_value)
 	{
-		if (input)
-			m_NodeInputPins.push_back(CreateRef<NodeInputPin>(this, pin_type, name, default_value));
-		else if (!m_NodeOutputPin)
-			m_NodeOutputPin = CreateRef<NodeOutputPin>(this, pin_type, name);
+		m_NodeInputPins.push_back(CreateRef<NodeInputPin>(this, pin_data_type, name, default_value));
+	}
+
+	void MaterialNode::AddOutputPin(PinDataType pin_data_type, const std::string& name, float default_value)
+	{
+		m_NodeOutputPin = CreateRef<NodeOutputPin>(this, pin_data_type, name);
 	}
 
 	float* MaterialNode::GetInputValue(uint input_index)
@@ -106,14 +108,15 @@ namespace Kaimos::MaterialEditor {
 
 
 	// ---------------------------- MAIN MAT NODE ---------------------------------------------------------
-	// ----------------------- Public Class Methods -------------------------------------------------------
 	MainMaterialNode::MainMaterialNode(Material* attached_material)
 		: MaterialNode("Main Node", MaterialNodeType::MAIN), m_AttachedMaterial(attached_material)
 	{
+		m_TextureCoordinatesPin = CreateRef<NodeInputPin>(this, PinDataType::VEC2, "Texture Coordinates", 0.0f);
 		m_TextureTilingPin = CreateRef<NodeInputPin>(this, PinDataType::FLOAT, "Texture Tiling", 1.0f);
 		m_TextureOffsetPin = CreateRef<NodeInputPin>(this, PinDataType::VEC2, "Texture Offset", 0.0f);
 		m_ColorPin = CreateRef<NodeInputPin>(this, PinDataType::VEC4, "Color", 1.0f);
 
+		m_NodeInputPins.push_back(m_TextureCoordinatesPin);
 		m_NodeInputPins.push_back(m_TextureTilingPin);
 		m_NodeInputPins.push_back(m_TextureOffsetPin);
 		m_NodeInputPins.push_back(m_ColorPin);
@@ -123,6 +126,7 @@ namespace Kaimos::MaterialEditor {
 	MainMaterialNode::~MainMaterialNode()
 	{
 		//DettachMaterial();
+		m_TextureCoordinatesPin.reset();
 		m_TextureTilingPin.reset();
 		m_TextureOffsetPin.reset();
 		m_ColorPin.reset();
@@ -145,6 +149,8 @@ namespace Kaimos::MaterialEditor {
 
 		// -- Draw Input Pins --
 		bool set_node_draggable = true;
+
+		m_TextureCoordinatesPin->DrawUI(set_node_draggable, nullptr, true);
 
 		m_TextureTilingPin->DrawUI(set_node_draggable, &m_AttachedMaterial->TextureTiling);
 		m_TextureOffsetPin->DrawUI(set_node_draggable, glm::value_ptr(m_AttachedMaterial->TextureUVOffset));
@@ -176,23 +182,49 @@ namespace Kaimos::MaterialEditor {
 
 
 
+	// ---------------------------- VERTEX PARAMETER NODE -------------------------------------------------
+	VertexParameterMaterialNode::VertexParameterMaterialNode(VertexParameterNodeType parameter_type) : MaterialNode("VtxParam Node", MaterialNodeType::VERTEX_PARAMETER), m_ParameterType(parameter_type)
+	{
+		switch (m_ParameterType)
+		{
+			case VertexParameterNodeType::TEX_COORDS:
+			{
+				m_Name = "TCoords";
+				AddOutputPin(PinDataType::VEC2, "XY");
+				break;
+			}
+
+			default: { KS_ERROR_AND_ASSERT("Attempted to create a non-supported Vertex parameter Node"); }
+		}
+	}
+
+	void VertexParameterMaterialNode::SetNodeOutputResult(float* value)
+	{
+		m_NodeOutputPin->SetOutputValue(value);
+	}
+
+	float* VertexParameterMaterialNode::CalculateNodeResult()
+	{
+		return this->m_NodeOutputPin->GetValue().get();
+	}
+
+	void VertexParameterMaterialNode::AddOutputPin(PinDataType pin_data_type, const std::string& name, float default_value)
+	{
+		m_NodeOutputPin = CreateRef<NodeOutputPin>(this, pin_data_type, name, true);
+	}
+
+
+
+
 	// ---------------------------- CONSTANT NODE ---------------------------------------------------------
-	// ----------------------- Public Class Methods -------------------------------------------------------
 	ConstantMaterialNode::ConstantMaterialNode(ConstantNodeType constant_type) : MaterialNode("Constant Node", MaterialNodeType::CONSTANT), m_ConstantType(constant_type)
 	{
 		switch (m_ConstantType)
 		{
-			case ConstantNodeType::TCOORDS:
-			{
-				m_Name = "Texture Coordinates Node";
-				AddPin(false, PinDataType::VEC2, "TCoords");
-				break;
-			}
-			
 			case ConstantNodeType::DELTATIME:
 			{
 				m_Name = "Delta Time";
-				AddPin(false, PinDataType::FLOAT, "Time");
+				AddOutputPin(PinDataType::FLOAT, "Time");
 				break;
 			}
 
@@ -206,13 +238,6 @@ namespace Kaimos::MaterialEditor {
 		float* ret = nullptr;
 		switch (m_ConstantType)
 		{
-			case ConstantNodeType::TCOORDS:
-			{
-				float val[2] = { 0.2f, 0.2f };
-				ret = static_cast<float*>(val);
-				break;
-			}
-
 			case ConstantNodeType::DELTATIME:
 			{
 				float val = Application::Get().GetTime();
@@ -231,7 +256,6 @@ namespace Kaimos::MaterialEditor {
 
 
 	// ---------------------------- OPERATION NODE --------------------------------------------------------
-	// ----------------------- Public Class Methods -------------------------------------------------------
 	OperationMaterialNode::OperationMaterialNode(OperationNodeType operation_type, PinDataType operation_data_type) : MaterialNode("Operation Node", MaterialNodeType::OPERATION)
 	{
 		m_OperationType = operation_type;
@@ -242,9 +266,9 @@ namespace Kaimos::MaterialEditor {
 			default:									{ KS_ERROR_AND_ASSERT("Attempted to create a non-supported Operation Node"); }
 		}
 
-		AddPin(true, operation_data_type, "Value 1");
-		AddPin(true, operation_data_type, "Value 2");
-		AddPin(false, operation_data_type, "Out");
+		AddInputPin(operation_data_type, "Value 1");
+		AddInputPin(operation_data_type, "Value 2");
+		AddOutputPin(operation_data_type, "Out");
 	}	
 
 

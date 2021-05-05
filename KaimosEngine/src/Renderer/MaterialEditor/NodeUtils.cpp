@@ -9,9 +9,9 @@
 namespace Kaimos::MaterialEditor::NodeUtils {
 		
 	// ----------------------- Data Conversions -----------------------------------------------------------
-	size_t GetDataSizeFromType(PinDataType type)
+	size_t GetDataSizeFromType(PinDataType pin_data_type)
 	{
-		switch (type)
+		switch (pin_data_type)
 		{
 			case PinDataType::FLOAT:	return (size_t)4;		// 4 bytes * 1 value
 			case PinDataType::INT:		return (size_t)4;		// 4 bytes * 1 value
@@ -20,36 +20,37 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 		}
 
 		KS_ERROR_AND_ASSERT("Tried to get the size of a non-supported data type (NodeUtils::GetDataSizeFromType())!");
+		return 0;
 	}
 
 
 	template<typename T>
-	T GetDataFromType(const float* ptr, PinDataType type)
+	T GetDataFromType(const float* ptr, PinDataType pin_data_type)
 	{
 		KS_ERROR_AND_ASSERT("Invalid Data Type passed to cast!");
 		static_assert(false);
 	}
 
 	template<>
-	float GetDataFromType(const float* ptr, PinDataType type)
+	float GetDataFromType(const float* ptr, PinDataType pin_data_type)
 	{
 		return (float)ptr[0];
 	}
 
 	template<>
-	int GetDataFromType(const float* ptr, PinDataType type)
+	int GetDataFromType(const float* ptr, PinDataType pin_data_type)
 	{
 		return (int)ptr[0];
 	}
 
 	template<>
-	glm::vec2 GetDataFromType(const float* ptr, PinDataType type)
+	glm::vec2 GetDataFromType(const float* ptr, PinDataType pin_data_type)
 	{
 		return glm::vec2({ ptr[0], ptr[1] });
 	}
 
 	template<>
-	glm::vec4 GetDataFromType(const float* ptr, PinDataType type)
+	glm::vec4 GetDataFromType(const float* ptr, PinDataType pin_data_type)
 	{
 		return glm::vec4({ ptr[0], ptr[1], ptr[2], ptr[3] });
 	}
@@ -57,9 +58,9 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 		
 
 	// ----------------------- Data Operations ------------------------------------------------------------
-	float* SumValues(PinDataType values_type, const float* a, const float* b)
+	float* SumValues(PinDataType values_data_type, const float* a, const float* b)
 	{
-		switch (values_type)
+		switch (values_data_type)
 		{
 			// FLOAT falls into INT case
 			case PinDataType::FLOAT:
@@ -84,9 +85,9 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 	}
 
 
-	float* MultiplyValues(PinDataType values_type, const float* a, const float* b)
+	float* MultiplyValues(PinDataType values_data_type, const float* a, const float* b)
 	{
-		switch (values_type)
+		switch (values_data_type)
 		{
 			// FLOAT falls into INT case
 			case PinDataType::FLOAT:
@@ -119,10 +120,10 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 
 
 	// ----------------------- UI Methods -----------------------------------------------------------------
-	void DrawPinWidget(PinDataType pin_type, float* value)
+	void DrawPinWidget(PinDataType pin_data_type, float* value)
 	{
 		ImGui::SameLine();
-		switch (pin_type)
+		switch (pin_data_type)
 		{
 			case PinDataType::FLOAT:
 			{

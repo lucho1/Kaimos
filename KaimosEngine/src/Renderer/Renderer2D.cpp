@@ -5,6 +5,8 @@
 #include "Resources/Buffer.h"
 #include "Resources/Shader.h"
 
+#include <glm/gtc/type_ptr.hpp>
+
 
 namespace Kaimos {
 	
@@ -236,8 +238,15 @@ namespace Kaimos {
 		constexpr size_t quad_vertex_count = 4;
 		for (size_t i = 0; i < quad_vertex_count; ++i)
 		{
+			// Update the Nodes with vertex parameters on each vertex
+			sprite.SpriteMaterial->UpdateVertexParameter(MaterialEditor::VertexParameterNodeType::TEX_COORDS, glm::value_ptr(s_Data->VerticesTCoords[i]));
+
+			// Get the vertex parameters in the main node once updated the nodes
+			glm::vec2 tcoords = sprite.SpriteMaterial->GetVertexAttributeResult<glm::vec2>(MaterialEditor::VertexParameterNodeType::TEX_COORDS);
+
+			// Set the vertex data
 			s_Data->QuadVBufferPtr->Pos = transform * s_Data->VerticesPositions[i];
-			s_Data->QuadVBufferPtr->TexCoord = s_Data->VerticesTCoords[i] - sprite.SpriteMaterial->TextureUVOffset;
+			s_Data->QuadVBufferPtr->TexCoord = tcoords - sprite.SpriteMaterial->TextureUVOffset;
 
 			s_Data->QuadVBufferPtr->Color = sprite.SpriteMaterial->Color;
 			s_Data->QuadVBufferPtr->TexIndex = texture_index;
