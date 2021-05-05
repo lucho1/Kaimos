@@ -82,6 +82,11 @@ namespace Kaimos::MaterialEditor {
 				glm::vec2 res = NodeUtils::GetDataFromType<glm::vec2>(m_Value.get(), m_PinDataType);
 				ImGui::Text("Value: %.1f, %.1f", res.x, res.y); return;
 			}
+			case PinDataType::VEC3:
+			{
+				glm::vec3 res = NodeUtils::GetDataFromType<glm::vec3>(m_Value.get(), m_PinDataType);
+				ImGui::Text("Value: %.1f, %.1f, %.1f", res.x, res.y, res.z); return;
+			}
 			case PinDataType::VEC4:
 			{
 				glm::vec4 res = NodeUtils::GetDataFromType<glm::vec4>(m_Value.get(), m_PinDataType);

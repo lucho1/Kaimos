@@ -32,7 +32,7 @@ namespace Kaimos {
 		std::array<Ref<Texture2D>, MaxTextureSlots> TextureSlots;
 		uint TextureSlotIndex = 1;									// Slot 0 is for White Texture 
 
-		glm::vec4 VerticesPositions[4] = {};						// It's a vec4 so it's easier to multiply by a matrix (4th has to be 1)
+		glm::vec3 VerticesPositions[4] = {};						// It's a vec4 so it's easier to multiply by a matrix (4th has to be 1)
 		glm::vec2 VerticesTCoords[4] = {};
 	};
 	
@@ -65,10 +65,10 @@ namespace Kaimos {
 		s_Data = new Renderer2DData();
 
 		// -- Vertices Positions & TCoords Definition --
-		s_Data->VerticesPositions[0] = { -0.5f, -0.5f, 0.0f, 1.0f };
-		s_Data->VerticesPositions[1] = {  0.5f, -0.5f, 0.0f, 1.0f };
-		s_Data->VerticesPositions[2] = {  0.5f,  0.5f, 0.0f, 1.0f };
-		s_Data->VerticesPositions[3] = { -0.5f,  0.5f, 0.0f, 1.0f };
+		s_Data->VerticesPositions[0] = { -0.5f, -0.5f, 0.0f };
+		s_Data->VerticesPositions[1] = {  0.5f, -0.5f, 0.0f };
+		s_Data->VerticesPositions[2] = {  0.5f,  0.5f, 0.0f };
+		s_Data->VerticesPositions[3] = { -0.5f,  0.5f, 0.0f };
 
 		s_Data->VerticesTCoords[0] = { 0.0f, 0.0f };
 		s_Data->VerticesTCoords[1] = { 1.0f, 0.0f};
@@ -240,12 +240,14 @@ namespace Kaimos {
 		{
 			// Update the Nodes with vertex parameters on each vertex
 			sprite.SpriteMaterial->UpdateVertexParameter(MaterialEditor::VertexParameterNodeType::TEX_COORDS, glm::value_ptr(s_Data->VerticesTCoords[i]));
+			sprite.SpriteMaterial->UpdateVertexParameter(MaterialEditor::VertexParameterNodeType::POSITION, glm::value_ptr(s_Data->VerticesPositions[i]));
 
 			// Get the vertex parameters in the main node once updated the nodes
 			glm::vec2 tcoords = sprite.SpriteMaterial->GetVertexAttributeResult<glm::vec2>(MaterialEditor::VertexParameterNodeType::TEX_COORDS);
+			glm::vec3 vpos = sprite.SpriteMaterial->GetVertexAttributeResult<glm::vec3>(MaterialEditor::VertexParameterNodeType::POSITION);
 
 			// Set the vertex data
-			s_Data->QuadVBufferPtr->Pos = transform * s_Data->VerticesPositions[i];
+			s_Data->QuadVBufferPtr->Pos = transform * glm::vec4(vpos, 1.0f);
 			s_Data->QuadVBufferPtr->TexCoord = tcoords - sprite.SpriteMaterial->TextureUVOffset;
 
 			s_Data->QuadVBufferPtr->Color = sprite.SpriteMaterial->Color;

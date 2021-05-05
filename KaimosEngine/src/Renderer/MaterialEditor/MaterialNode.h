@@ -15,7 +15,7 @@ namespace Kaimos::MaterialEditor {
 	class NodeOutputPin;
 	class NodeInputPin;
 	enum class MaterialNodeType	{ NONE, MAIN, VERTEX_PARAMETER, OPERATION, CONSTANT };
-	enum class PinDataType		{ NONE, FLOAT, INT, VEC2, VEC4 };
+	enum class PinDataType		{ NONE, FLOAT, INT, VEC2, VEC3, VEC4 };
 
 
 	// ---- Base Material Node ----
@@ -69,7 +69,7 @@ namespace Kaimos::MaterialEditor {
 
 
 	// ---- Main Material Node ----
-	enum class VertexParameterNodeType { NONE, TEX_COORDS };
+	enum class VertexParameterNodeType { NONE, TEX_COORDS, POSITION };
 
 	class MainMaterialNode : public MaterialNode
 	{
@@ -88,9 +88,9 @@ namespace Kaimos::MaterialEditor {
 			switch (vtxpm_node_type)
 			{
 				case VertexParameterNodeType::TEX_COORDS:
-				{
 					return NodeUtils::GetDataFromType<T>(m_TextureCoordinatesPin->CalculateInputValue(), PinDataType::VEC2);
-				}
+				case VertexParameterNodeType::POSITION:
+					return NodeUtils::GetDataFromType<T>(m_VertexPositionPin->CalculateInputValue(), PinDataType::VEC3);
 				
 				default: { KS_ERROR_AND_ASSERT("Tried to retrieve an invalid Vertex Attribute Input from Main Node!"); }
 			}
@@ -109,6 +109,8 @@ namespace Kaimos::MaterialEditor {
 		Material* m_AttachedMaterial = nullptr;
 
 		Ref<NodeInputPin> m_TextureCoordinatesPin = nullptr;
+		Ref<NodeInputPin> m_VertexPositionPin = nullptr;
+
 		Ref<NodeInputPin> m_TextureTilingPin = nullptr;
 		Ref<NodeInputPin> m_TextureOffsetPin = nullptr;
 		Ref<NodeInputPin> m_ColorPin = nullptr;

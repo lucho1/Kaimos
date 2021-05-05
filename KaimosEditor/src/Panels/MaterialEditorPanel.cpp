@@ -60,6 +60,9 @@ namespace Kaimos {
 			if (ImGui::MenuItem("Texture Coordinates"))
 				m_CurrentGraph->CreateNode(MaterialEditor::VertexParameterNodeType::TEX_COORDS);
 
+			if (ImGui::MenuItem("Vertex Position"))
+				m_CurrentGraph->CreateNode(MaterialEditor::VertexParameterNodeType::POSITION);
+
 			if (ImGui::MenuItem("Delta Time"))
 				m_CurrentGraph->CreateNode(MaterialEditor::ConstantNodeType::DELTATIME);
 
@@ -72,6 +75,9 @@ namespace Kaimos {
 			if (ImGui::MenuItem("Vec2 + Vec2"))
 				m_CurrentGraph->CreateNode(MaterialEditor::OperationNodeType::ADDITION, MaterialEditor::PinDataType::VEC2);
 
+			if (ImGui::MenuItem("Vec3 + Vec3"))
+				m_CurrentGraph->CreateNode(MaterialEditor::OperationNodeType::ADDITION, MaterialEditor::PinDataType::VEC3);
+
 			if (ImGui::MenuItem("Vec4 + Vec4"))
 				m_CurrentGraph->CreateNode(MaterialEditor::OperationNodeType::ADDITION, MaterialEditor::PinDataType::VEC4);
 
@@ -83,6 +89,9 @@ namespace Kaimos {
 
 			if (ImGui::MenuItem("Vec2 * Vec2"))
 				m_CurrentGraph->CreateNode(MaterialEditor::OperationNodeType::MULTIPLICATION, MaterialEditor::PinDataType::VEC2);
+
+			if (ImGui::MenuItem("Vec3 * Vec3"))
+				m_CurrentGraph->CreateNode(MaterialEditor::OperationNodeType::MULTIPLICATION, MaterialEditor::PinDataType::VEC3);
 
 			if (ImGui::MenuItem("Vec4 * Vec4"))
 				m_CurrentGraph->CreateNode(MaterialEditor::OperationNodeType::MULTIPLICATION, MaterialEditor::PinDataType::VEC4);

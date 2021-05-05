@@ -112,11 +112,14 @@ namespace Kaimos::MaterialEditor {
 		: MaterialNode("Main Node", MaterialNodeType::MAIN), m_AttachedMaterial(attached_material)
 	{
 		m_TextureCoordinatesPin = CreateRef<NodeInputPin>(this, PinDataType::VEC2, "Texture Coordinates", 0.0f);
+		m_VertexPositionPin = CreateRef<NodeInputPin>(this, PinDataType::VEC3, "Vertex Position", 0.0f);
+
 		m_TextureTilingPin = CreateRef<NodeInputPin>(this, PinDataType::FLOAT, "Texture Tiling", 1.0f);
 		m_TextureOffsetPin = CreateRef<NodeInputPin>(this, PinDataType::VEC2, "Texture Offset", 0.0f);
 		m_ColorPin = CreateRef<NodeInputPin>(this, PinDataType::VEC4, "Color", 1.0f);
 
 		m_NodeInputPins.push_back(m_TextureCoordinatesPin);
+		m_NodeInputPins.push_back(m_VertexPositionPin);
 		m_NodeInputPins.push_back(m_TextureTilingPin);
 		m_NodeInputPins.push_back(m_TextureOffsetPin);
 		m_NodeInputPins.push_back(m_ColorPin);
@@ -127,6 +130,7 @@ namespace Kaimos::MaterialEditor {
 	{
 		//DettachMaterial();
 		m_TextureCoordinatesPin.reset();
+		m_VertexPositionPin.reset();
 		m_TextureTilingPin.reset();
 		m_TextureOffsetPin.reset();
 		m_ColorPin.reset();
@@ -151,6 +155,7 @@ namespace Kaimos::MaterialEditor {
 		bool set_node_draggable = true;
 
 		m_TextureCoordinatesPin->DrawUI(set_node_draggable, nullptr, true);
+		m_VertexPositionPin->DrawUI(set_node_draggable, nullptr, true);
 
 		m_TextureTilingPin->DrawUI(set_node_draggable, &m_AttachedMaterial->TextureTiling);
 		m_TextureOffsetPin->DrawUI(set_node_draggable, glm::value_ptr(m_AttachedMaterial->TextureUVOffset));
@@ -191,6 +196,13 @@ namespace Kaimos::MaterialEditor {
 			{
 				m_Name = "TCoords";
 				AddOutputPin(PinDataType::VEC2, "XY");
+				break;
+			}
+
+			case VertexParameterNodeType::POSITION:
+			{
+				m_Name = "VertexPos";
+				AddOutputPin(PinDataType::VEC3, "XYZ");
 				break;
 			}
 
