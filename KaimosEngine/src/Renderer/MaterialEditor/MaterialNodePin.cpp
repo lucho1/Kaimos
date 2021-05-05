@@ -1,5 +1,6 @@
 #include "kspch.h"
 #include "MaterialNodePin.h"
+#include "MaterialNode.h"
 
 #include <imgui.h>
 #include <imnodes.h>

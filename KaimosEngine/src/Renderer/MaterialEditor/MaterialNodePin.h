@@ -1,12 +1,12 @@
 #ifndef _MATERIALNODEPIN_H_
 #define _MATERIALNODEPIN_H_
 
-#include "MaterialNode.h"
-
 
 namespace Kaimos::MaterialEditor {
 	
+	class MaterialNode;
 	class NodeInputPin;
+	enum class PinDataType { NONE, FLOAT, INT, VEC2, VEC3, VEC4 };
 
 	// ---- Node Pin Base Class ----
 	class NodePin
@@ -32,8 +32,6 @@ namespace Kaimos::MaterialEditor {
 		// --- Getters ---
 		uint GetID()					const	{ return m_ID; }
 		PinDataType GetType()			const	{ return m_PinDataType; }
-		//const std::string& GetName()	const	{ return m_Name; }
-
 		Ref<float>& GetValue()					{ return m_Value; }		
 		
 	protected:

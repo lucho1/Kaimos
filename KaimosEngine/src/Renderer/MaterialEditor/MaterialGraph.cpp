@@ -15,6 +15,14 @@ namespace Kaimos::MaterialEditor {
 		m_ID = (uint)Kaimos::Random::GetRandomInt();
 		m_MainMatNode = CreateRef<MainMaterialNode>(attached_material);
 		m_Nodes.push_back(m_MainMatNode);
+
+		uint pos_node_id = CreateNode(VertexParameterNodeType::POSITION)->GetOutputPinID();
+		uint norm_node_id = CreateNode(VertexParameterNodeType::NORMAL)->GetOutputPinID();
+		uint tcoords_node_id = CreateNode(VertexParameterNodeType::TEX_COORDS)->GetOutputPinID();
+
+		CreateLink(pos_node_id, m_MainMatNode->GetVertexPositionPinID());
+		CreateLink(norm_node_id, m_MainMatNode->GetVertexNormalPinID());
+		CreateLink(tcoords_node_id, m_MainMatNode->GetTCoordsPinID());
 	}
 
 	MaterialGraph::~MaterialGraph()
@@ -35,40 +43,43 @@ namespace Kaimos::MaterialEditor {
 
 
 	// ----------------------- Creation Methods ----------------------------------------------------------
-	void MaterialGraph::CreateNode(VertexParameterNodeType vertexparam_type)
+	MaterialNode* MaterialGraph::CreateNode(VertexParameterNodeType vertexparam_type)
 	{
 		if (vertexparam_type == VertexParameterNodeType::NONE)
 		{
 			KS_ERROR_AND_ASSERT("Tried to create an invalid Vertex Parameter Node");
-			return;
+			return 0;
 		}
 
-		VertexParameterMaterialNode* vpm_node = new VertexParameterMaterialNode(vertexparam_type);
-		m_Nodes.push_back(CreateRef<MaterialNode>((MaterialNode*)vpm_node));
+		MaterialNode* node = static_cast<MaterialNode*>(new VertexParameterMaterialNode(vertexparam_type));
+		m_Nodes.push_back(CreateRef<MaterialNode>(node));
+		return node;
 	}
 
-	void MaterialGraph::CreateNode(ConstantNodeType constant_type)
+	MaterialNode* MaterialGraph::CreateNode(ConstantNodeType constant_type)
 	{
 		if (constant_type == ConstantNodeType::NONE)
 		{
 			KS_ERROR_AND_ASSERT("Tried to create an invalid Constant Node");
-			return;
+			return 0;
 		}
 
-		ConstantMaterialNode* cnode = new ConstantMaterialNode(constant_type);
-		m_Nodes.push_back(CreateRef<MaterialNode>((MaterialNode*)cnode));
+		MaterialNode* node = static_cast<MaterialNode*>(new ConstantMaterialNode(constant_type));
+		m_Nodes.push_back(CreateRef<MaterialNode>(node));
+		return node;
 	}
 
-	void MaterialGraph::CreateNode(OperationNodeType operation_type, PinDataType operation_data_type)
+	MaterialNode* MaterialGraph::CreateNode(OperationNodeType operation_type, PinDataType operation_data_type)
 	{
 		if (operation_type == OperationNodeType::NONE || operation_data_type == PinDataType::NONE)
 		{
 			KS_ERROR_AND_ASSERT("Tried to create an invalid Operation Node");
-			return;
+			return 0;
 		}
 
-		OperationMaterialNode* onode = new OperationMaterialNode(operation_type, operation_data_type);
-		m_Nodes.push_back(CreateRef<MaterialNode>((MaterialNode*)onode));
+		MaterialNode* node = static_cast<MaterialNode*>(new OperationMaterialNode(operation_type, operation_data_type));
+		m_Nodes.push_back(CreateRef<MaterialNode>(node));
+		return node;
 	}
 
 	void MaterialGraph::CreateLink(uint output_pinID, uint input_pinID)

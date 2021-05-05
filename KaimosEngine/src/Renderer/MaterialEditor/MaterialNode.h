@@ -2,8 +2,11 @@
 #define _MATERIALNODE_H_
 
 #include "NodeUtils.h"
+#include "MaterialNodePin.h"
+
 #include "Core/Core.h"
 #include "Core/Utils/Maths/RandomGenerator.h"
+
 
 namespace Kaimos { class Material; }
 
@@ -11,11 +14,8 @@ namespace Kaimos { class Material; }
 namespace Kaimos::MaterialEditor {
 
 	// ---- Forward Declarations & Enums ----
-	class NodePin;
-	class NodeOutputPin;
-	class NodeInputPin;
+	enum class PinDataType;
 	enum class MaterialNodeType	{ NONE, MAIN, VERTEX_PARAMETER, OPERATION, CONSTANT };
-	enum class PinDataType		{ NONE, FLOAT, INT, VEC2, VEC3, VEC4 };
 
 
 	// ---- Base Material Node ----
@@ -36,10 +36,14 @@ namespace Kaimos::MaterialEditor {
 		virtual void DrawNodeUI();
 		NodePin* FindPinInNode(uint pinID);
 
+		// Defined in child classes according to what each node type does
+		virtual float* CalculateNodeResult() = 0;
+
 	protected:
 
 		// --- Public Material Node Methods ---
 		NodeInputPin* FindInputPin(uint pinID);
+
 		void AddInputPin(PinDataType pin_data_type, const std::string& name, float default_value = 1.0f);
 		virtual void AddOutputPin(PinDataType pin_data_type, const std::string& name, float default_value = 1.0f);
 
@@ -51,9 +55,8 @@ namespace Kaimos::MaterialEditor {
 		uint GetID()					const { return m_ID; }
 		MaterialNodeType GetType()		const { return m_Type; }
 		const std::string& GetName()	const { return m_Name; }
-
-		// Defined in child classes according to what each node type does
-		virtual float* CalculateNodeResult() = 0;
+		
+		uint GetOutputPinID()			const { if (m_NodeOutputPin) return m_NodeOutputPin->GetID(); return 0; }
 
 	protected:
 
@@ -105,14 +108,18 @@ namespace Kaimos::MaterialEditor {
 		void SyncValuesWithMaterial();
 		virtual float* CalculateNodeResult() override { return nullptr; }
 
+		uint GetVertexPositionPinID()	const { return m_VertexPositionPin->GetID(); }
+		uint GetVertexNormalPinID()		const { return m_VertexNormalPin->GetID(); }
+		uint GetTCoordsPinID()			const { return m_TextureCoordinatesPin->GetID(); }
+
 	private:
 
 		// --- Variables ---
 		Material* m_AttachedMaterial = nullptr;
 
-		Ref<NodeInputPin> m_TextureCoordinatesPin = nullptr;
 		Ref<NodeInputPin> m_VertexPositionPin = nullptr;
 		Ref<NodeInputPin> m_VertexNormalPin = nullptr;
+		Ref<NodeInputPin> m_TextureCoordinatesPin = nullptr;
 
 		Ref<NodeInputPin> m_TextureTilingPin = nullptr;
 		Ref<NodeInputPin> m_TextureOffsetPin = nullptr;
