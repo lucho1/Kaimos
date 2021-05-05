@@ -378,37 +378,50 @@ namespace Kaimos {
 				if (open)
 				{
 					// Texture Button for Sprite Texture
-					const uint id = component.SpriteMaterial->GetTexture() == nullptr ? 0 : component.SpriteMaterial->GetTexture()->GetTextureID();
-					ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { 0.0f, 0.0f });
+					//const uint id = component.SpriteMaterial->GetTexture() == nullptr ? 0 : component.SpriteMaterial->GetTexture()->GetTextureID();
+					//ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { 0.0f, 0.0f });
+					//
+					//ImGui::NewLine();
+					//ImGui::Text("Texture");
+					//ImGui::SameLine(ImGui::GetContentRegionAvail().x * 0.5f);
+					//
+					//if (KaimosUI::UIFunctionalities::DrawTexturedButton("###sprite_texture_btn", id, glm::vec2(80.0f), glm::vec3(0.1f)))
+					//{
+					//	std::string texture_file = FileDialogs::OpenFile("Texture (*.png)\0*.png\0");
+					//	if (!texture_file.empty())
+					//		component.SetTexture(texture_file);
+					//}
+					//
+					//KaimosUI::UIFunctionalities::PopButton(false);
+					//
+					//// Remove Texture Button
+					//ImGui::SameLine();
+					//if (KaimosUI::UIFunctionalities::DrawColoredButton("X", { 20.0f, 80.0f }, glm::vec3(0.2f), true))
+					//	component.RemoveTexture();
+					//
+					//KaimosUI::UIFunctionalities::PopButton(true);
+					//ImGui::PopStyleVar();
 
-					ImGui::NewLine();
-					ImGui::Text("Texture");
-					ImGui::SameLine(ImGui::GetContentRegionAvail().x * 0.5f);
+					// Texture Info
+					ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[1]);
 
-					if (KaimosUI::UIFunctionalities::DrawTexturedButton("###sprite_texture_btn", id, glm::vec2(80.0f), glm::vec3(0.1f)))
+					if (component.SpriteMaterial->GetTexture())
 					{
-						std::string texture_file = FileDialogs::OpenFile("Texture (*.png)\0*.png\0");
-						if (!texture_file.empty())
-							component.SetTexture(texture_file);
+						std::string tex_path = component.SpriteMaterial->GetTexturePath();
+						std::string tex_name = tex_path;
+						if (!tex_path.empty())
+							tex_name = tex_path.substr(tex_path.find_last_of("/\\" + 1, tex_path.size() - 1) + 1);
+					
+						ImGui::Text("Texture (ID %i):\t%s (%ix%i)", component.SpriteMaterial->GetTexture()->GetTextureID(), tex_name.c_str(),
+							component.SpriteMaterial->GetTexture()->GetWidth(), component.SpriteMaterial->GetTexture()->GetHeight());
 					}
 
-					KaimosUI::UIFunctionalities::PopButton(false);
-
-					// Remove Texture Button
-					ImGui::SameLine();
-					if (KaimosUI::UIFunctionalities::DrawColoredButton("X", { 20.0f, 80.0f }, glm::vec3(0.2f), true))
-						component.RemoveTexture();
-
-					KaimosUI::UIFunctionalities::PopButton(true);
-					ImGui::PopStyleVar();
-
-					// Tiling & UV Offset Drag Floats
-					ImGui::NewLine();
-					ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[1]);
+					// Tiling & UV Offset Info
 					glm::ivec4 col = component.SpriteMaterial->Color * 255.0f;
 					ImGui::Text("Color:\t\t\t\t\t\tRGBA(%i, %i, %i, %i)", col.r, col.g, col.b, col.a);
 					ImGui::Text("Texture Tiling:\t\t%.2f", component.SpriteMaterial->TextureTiling);
 					ImGui::Text("Texture Offset:\t\tXY(%.1f, %.1f)", component.SpriteMaterial->TextureUVOffset.x, component.SpriteMaterial->TextureUVOffset.y);
+
 					ImGui::PopFont();
 
 					// Open in Material Editor Button

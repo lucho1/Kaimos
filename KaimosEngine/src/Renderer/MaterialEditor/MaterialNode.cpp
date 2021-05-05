@@ -5,6 +5,9 @@
 #include "Core/Application/Application.h"
 #include "Scene/ECS/Components.h"
 
+#include "Imgui/ImGuiUtils.h"
+#include "Core/Utils/PlatformUtils.h"
+
 #include <imgui.h>
 #include <imnodes.h>
 #include <glm/gtc/type_ptr.hpp>
@@ -167,6 +170,45 @@ namespace Kaimos::MaterialEditor {
 		m_ColorPin->DrawUI(set_node_draggable, glm::value_ptr(m_AttachedMaterial->Color));
 
 		ImNodes::SetNodeDraggable(m_ID, set_node_draggable);
+
+
+		// -- Draw Texture "Input" (Button) --
+		uint id = m_AttachedMaterial->GetTexture() == nullptr ? 0 : m_AttachedMaterial->GetTexture()->GetTextureID();
+		ImGui::Text("Texture");
+		ImGui::SameLine();
+		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { 0.0f, 0.0f });
+
+		if (KaimosUI::UIFunctionalities::DrawTexturedButton("###mttexture_btn", id, glm::vec2(50.0f), glm::vec3(0.1f)))
+		{
+			std::string texture_file = FileDialogs::OpenFile("Texture (*.png)\0*.png\0");
+			if (!texture_file.empty())
+				m_AttachedMaterial->SetTexture(texture_file);
+		}
+
+		KaimosUI::UIFunctionalities::PopButton(false);
+
+		ImGui::SameLine();
+		if (KaimosUI::UIFunctionalities::DrawColoredButton("X", { 20.0f, 50.0f }, glm::vec3(0.2f), true))
+			m_AttachedMaterial->RemoveTexture();
+
+		KaimosUI::UIFunctionalities::PopButton(true);
+		ImGui::PopStyleVar();
+
+		if (m_AttachedMaterial->GetTexture())
+		{
+			std::string tex_path = m_AttachedMaterial->GetTexturePath();
+			std::string tex_name = tex_path;
+
+			if (!tex_path.empty())
+				tex_name = tex_path.substr(tex_path.find_last_of("/\\" + 1, tex_path.size() - 1) + 1);
+
+			ImGui::Indent(ImGui::CalcTextSize("Texture").x + 12.0f);
+			ImGui::Text("%s", tex_name.c_str());
+			ImGui::Text("%ix%i (ID %i)", m_AttachedMaterial->GetTexture()->GetWidth(), m_AttachedMaterial->GetTexture()->GetHeight(), id);
+		}
+		
+
+		// -- End Node Draw --
 		ImNodes::EndNode();
 
 		// -- Draw Links --

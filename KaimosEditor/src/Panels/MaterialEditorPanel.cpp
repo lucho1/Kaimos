@@ -33,28 +33,8 @@ namespace Kaimos {
 		ImNodes::PushColorStyle(ImNodesCol_NodeOutline, IM_COL32(0.0f, 142.0f, 255.0f, 40.0f));
 		ImNodes::PushStyleVar(ImNodesStyleVar_NodeBorderThickness, 2.0f);
 		
-		
-		
-		// ----------- CENTRAL HARDCODED NODE -------------------------------------------------
-		//bool set_draggable = true;
-		//float indent = 5.0f, width = 30.0f;
 
-		//// -- Texture Node --
-		//if (m_MainMatNode->m_MaterialToModify->SpriteTexture)
-		//{
-		//	std::string tex_path = m_MainMatNode->m_MaterialToModify->TextureFilepath;
-		//	std::string tex_name = tex_path.substr(tex_path.find_last_of("/\\" + 1, tex_path.size() - 1));
-		//
-		//	ImGui::Text("Texture");
-		//	ImGui::Indent(indent);
-		//	ImGui::Text("Texture %i: '%s'", m_MainMatNode->m_MaterialToModify->SpriteTexture->GetTextureID(), tex_name.c_str());
-		//	ImGui::SameLine();
-		//	ImGui::Text("(%ix%i)", m_MainMatNode->m_MaterialToModify->SpriteTexture->GetWidth(), m_MainMatNode->m_MaterialToModify->SpriteTexture->GetHeight());
-		//}
-
-
-		// ----------- NODES ------------------------------------------------------------------
-		// -- Right-Click Popup --
+		// -- Nodes Creation Right-Click Popup --
 		if (ImGui::BeginPopupContextWindow(0, 1, false))
 		{
 			if (ImGui::MenuItem("Texture Coordinates"))
