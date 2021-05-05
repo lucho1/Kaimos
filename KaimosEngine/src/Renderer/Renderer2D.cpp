@@ -32,7 +32,8 @@ namespace Kaimos {
 		std::array<Ref<Texture2D>, MaxTextureSlots> TextureSlots;
 		uint TextureSlotIndex = 1;									// Slot 0 is for White Texture 
 
-		glm::vec3 VerticesPositions[4] = {};						// It's a vec4 so it's easier to multiply by a matrix (4th has to be 1)
+		glm::vec3 VerticesPositions[4] = {};
+		glm::vec3 VerticesNormals[4] = {};
 		glm::vec2 VerticesTCoords[4] = {};
 	};
 	
@@ -70,6 +71,11 @@ namespace Kaimos {
 		s_Data->VerticesPositions[2] = {  0.5f,  0.5f, 0.0f };
 		s_Data->VerticesPositions[3] = { -0.5f,  0.5f, 0.0f };
 
+		s_Data->VerticesNormals[0] = { 0.0f,  0.0f, -1.0f };
+		s_Data->VerticesNormals[1] = { 0.0f,  0.0f, -1.0f };
+		s_Data->VerticesNormals[2] = { 0.0f,  0.0f, -1.0f };
+		s_Data->VerticesNormals[3] = { 0.0f,  0.0f, -1.0f };
+
 		s_Data->VerticesTCoords[0] = { 0.0f, 0.0f };
 		s_Data->VerticesTCoords[1] = { 1.0f, 0.0f};
 		s_Data->VerticesTCoords[2] = { 1.0f, 1.0f};
@@ -102,6 +108,7 @@ namespace Kaimos {
 		index_buffer = IndexBuffer::Create(quad_indices, s_Data->MaxIndices);
 		BufferLayout layout = {
 			{ SHADER_DATATYPE::FLOAT3,	"a_Position" },
+			{ SHADER_DATATYPE::FLOAT3,	"a_Normal" },
 			{ SHADER_DATATYPE::FLOAT2,	"a_TexCoord" },
 			{ SHADER_DATATYPE::FLOAT4,	"a_Color" },
 			{ SHADER_DATATYPE::FLOAT ,	"a_TexIndex" },
@@ -239,15 +246,18 @@ namespace Kaimos {
 		for (size_t i = 0; i < quad_vertex_count; ++i)
 		{
 			// Update the Nodes with vertex parameters on each vertex
-			sprite.SpriteMaterial->UpdateVertexParameter(MaterialEditor::VertexParameterNodeType::TEX_COORDS, glm::value_ptr(s_Data->VerticesTCoords[i]));
 			sprite.SpriteMaterial->UpdateVertexParameter(MaterialEditor::VertexParameterNodeType::POSITION, glm::value_ptr(s_Data->VerticesPositions[i]));
+			sprite.SpriteMaterial->UpdateVertexParameter(MaterialEditor::VertexParameterNodeType::NORMAL, glm::value_ptr(s_Data->VerticesNormals[i]));
+			sprite.SpriteMaterial->UpdateVertexParameter(MaterialEditor::VertexParameterNodeType::TEX_COORDS, glm::value_ptr(s_Data->VerticesTCoords[i]));
 
 			// Get the vertex parameters in the main node once updated the nodes
-			glm::vec2 tcoords = sprite.SpriteMaterial->GetVertexAttributeResult<glm::vec2>(MaterialEditor::VertexParameterNodeType::TEX_COORDS);
 			glm::vec3 vpos = sprite.SpriteMaterial->GetVertexAttributeResult<glm::vec3>(MaterialEditor::VertexParameterNodeType::POSITION);
+			glm::vec3 vnorm = sprite.SpriteMaterial->GetVertexAttributeResult<glm::vec3>(MaterialEditor::VertexParameterNodeType::NORMAL);
+			glm::vec2 tcoords = sprite.SpriteMaterial->GetVertexAttributeResult<glm::vec2>(MaterialEditor::VertexParameterNodeType::TEX_COORDS);
 
 			// Set the vertex data
 			s_Data->QuadVBufferPtr->Pos = transform * glm::vec4(vpos, 1.0f);
+			s_Data->QuadVBufferPtr->Normal = vnorm;
 			s_Data->QuadVBufferPtr->TexCoord = tcoords - sprite.SpriteMaterial->TextureUVOffset;
 
 			s_Data->QuadVBufferPtr->Color = sprite.SpriteMaterial->Color;

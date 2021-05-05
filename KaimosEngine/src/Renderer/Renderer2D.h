@@ -14,6 +14,7 @@ namespace Kaimos {
 	{
 		// --- Vertex Variables ---
 		glm::vec3 Pos		= glm::vec3(0.0f);
+		glm::vec3 Normal	= glm::vec3(0.0f);
 		glm::vec2 TexCoord	= glm::vec2(0.0f);
 		glm::vec4 Color		= glm::vec4(1.0f);
 		float TexIndex		= 0.0f;

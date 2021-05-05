@@ -63,6 +63,9 @@ namespace Kaimos {
 			if (ImGui::MenuItem("Vertex Position"))
 				m_CurrentGraph->CreateNode(MaterialEditor::VertexParameterNodeType::POSITION);
 
+			if (ImGui::MenuItem("Vertex Normal"))
+				m_CurrentGraph->CreateNode(MaterialEditor::VertexParameterNodeType::NORMAL);
+
 			if (ImGui::MenuItem("Delta Time"))
 				m_CurrentGraph->CreateNode(MaterialEditor::ConstantNodeType::DELTATIME);
 
