@@ -344,17 +344,17 @@ namespace Kaimos::MaterialEditor {
 	{
 		PinDataType data_type = m_NodeInputPins[0]->GetType();
 
-		float* ret = new float[4];
-		memcpy(ret, GetInputValue(0).get(), 16);
+		float* op_result = new float[4];
+		memcpy(op_result, GetInputValue(0).get(), 16);
 
 		for (uint i = 1; i < m_NodeInputPins.size(); ++i)
-			memcpy(ret, ProcessOperation(ret, GetInputValue(i).get(), data_type, m_NodeInputPins[i]->GetType()), 16);
+			memcpy(op_result, ProcessOperation(op_result, GetInputValue(i).get(), data_type, m_NodeInputPins[i]->GetType()), 16);
 
-		Ref<float> r = CreateRef<float>(static_cast<float*>(malloc(16)));
-		memcpy(r.get(), ret, 16);
-		delete[] ret;
+		Ref<float> ret = CreateRef<float>(static_cast<float*>(malloc(16)));
+		memcpy(ret.get(), op_result, 16);
+		delete[] op_result;
 
-		return r;
+		return ret;
 	}
 
 
