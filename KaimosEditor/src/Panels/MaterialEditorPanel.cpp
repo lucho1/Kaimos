@@ -73,6 +73,9 @@ namespace Kaimos {
 			if (ImGui::MenuItem("Vec2 * Vec2"))
 				m_CurrentGraph->CreateNode(MaterialEditor::OperationNodeType::MULTIPLICATION, MaterialEditor::PinDataType::VEC2);
 
+			if (ImGui::MenuItem("Float * Vec2"))
+				m_CurrentGraph->CreateNode(MaterialEditor::OperationNodeType::FLOATVEC2_MULTIPLY, MaterialEditor::PinDataType::FLOAT);
+
 			if (ImGui::MenuItem("Vec3 * Vec3"))
 				m_CurrentGraph->CreateNode(MaterialEditor::OperationNodeType::MULTIPLICATION, MaterialEditor::PinDataType::VEC3);
 

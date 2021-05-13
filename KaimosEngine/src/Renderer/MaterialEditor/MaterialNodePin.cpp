@@ -34,7 +34,7 @@ namespace Kaimos::MaterialEditor {
 	{
 		for (NodeInputPin* pin : m_InputsLinked)
 		{
-			pin->DisconnectOutputPin(); // This already calls for DisconnectInputPin(pin->GetID()) in its (this) output
+			pin->DisconnectOutputPin(true); // This already calls for DisconnectInputPin(pin->GetID()) in its (this) output
 			pin = nullptr;
 		}
 
@@ -55,8 +55,15 @@ namespace Kaimos::MaterialEditor {
 
 		ImNodes::EndOutputAttribute();
 
-		if(!m_VertexParameter)
-			SetValue(m_OwnerNode->CalculateNodeResult()); // TODO: Don't calculate this each frame
+		if (!m_VertexParameter)
+		{
+			float* new_value = new float[4];
+			Ref<float> node_value = m_OwnerNode->CalculateNodeResult(); // Like this because of my marvelous manner of handling memory... sniff... pathetic...
+
+			memcpy(new_value, node_value.get(), 16);
+			SetValue(new_value); // TODO: Don't calculate this each frame
+			delete[] new_value;
+		}
 	}
 
 
@@ -99,12 +106,59 @@ namespace Kaimos::MaterialEditor {
 	}
 
 
+	void NodeOutputPin::SetOutputDataType()
+	{
+		bool vec2_input_found = false;
+
+		for (uint i = 0; i < m_OwnerNode->GetInputsQuantity(); ++i)
+		{
+			if (m_OwnerNode->GetInputPin(i)->GetType() == PinDataType::VEC2)
+			{
+				vec2_input_found = true;
+				break;
+			}
+		}
+
+		bool type_changed = false;
+		if (vec2_input_found)
+		{
+			if (m_PinDataType == PinDataType::FLOAT)
+			{
+				type_changed = true;
+				m_PinDataType = PinDataType::VEC2;
+			}
+		}
+		else
+		{
+			if (m_PinDataType == PinDataType::VEC2)
+			{
+				type_changed = true;
+				m_PinDataType = PinDataType::FLOAT;
+			}
+		}
+
+		if (type_changed)
+			DisconnectAllInputPins();
+	}
+
+
 
 	// ----------------------- Public Pin Methods ---------------------------------------------------------
 	void NodeOutputPin::LinkPin(NodePin* input_pin)
 	{
 		if (input_pin && input_pin->IsInput())
 			static_cast<NodeInputPin*>(input_pin)->LinkPin(this);
+	}
+
+	void NodeOutputPin::DisconnectAllInputPins()
+	{
+		for (NodeInputPin* pin : m_InputsLinked)
+		{
+			pin->DisconnectOutputPin(); // This already calls for DisconnectInputPin(pin->GetID()) in its (this) output
+			pin = nullptr;
+		}
+
+		m_InputsLinked.clear();
 	}
 
 
@@ -125,7 +179,7 @@ namespace Kaimos::MaterialEditor {
 
 	// ---------------------------- INPUT PIN -------------------------------------------------------------
 	// ----------------------- Public Class Methods -------------------------------------------------------
-	NodeInputPin::NodeInputPin(MaterialNode* owner, PinDataType pin_data_type, const std::string& name, float default_value) : NodePin(owner, pin_data_type, name)
+	NodeInputPin::NodeInputPin(MaterialNode* owner, PinDataType pin_data_type, bool allows_multi_type, const std::string& name, float default_value) : NodePin(owner, pin_data_type, name), m_AllowsMultipleTypes(allows_multi_type)
 	{
 		m_DefaultValue = CreateRef<float>(new float[4]);
 		std::fill(m_DefaultValue.get(), m_DefaultValue.get() + 4, default_value);
@@ -167,11 +221,41 @@ namespace Kaimos::MaterialEditor {
 	}
 
 
-	
+		
+	// ----------------------- Private Pin Methods --------------------------------------------------------
+	bool NodeInputPin::CheckLinkage(NodePin* output_pin)
+	{
+		if (!output_pin || output_pin->IsInput())
+			return false;
+
+		PinDataType output_type = output_pin->GetType();
+		if (m_OwnerNode->GetType() == MaterialNodeType::OPERATION)
+		{
+			bool ret = false;
+			OperationNodeType op_type = ((OperationMaterialNode*)m_OwnerNode)->GetOperationType();
+
+			if(op_type == OperationNodeType::FLOATVEC2_MULTIPLY && (m_PinDataType == PinDataType::FLOAT || m_PinDataType == PinDataType::VEC2))
+			{
+				ret = (output_type == PinDataType::FLOAT || output_type == PinDataType::VEC2);
+				if (ret)
+				{
+					m_PinDataType = output_type;
+					m_OwnerNode->CheckOutputType();
+				}
+
+				return ret;
+			}
+		}
+
+		return output_type == m_PinDataType;
+	}
+
+
+
 	// ----------------------- Public Pin Methods ---------------------------------------------------------
 	void NodeInputPin::LinkPin(NodePin* output_pin)
 	{
-		if (output_pin && !output_pin->IsInput() && output_pin->GetType() == m_PinDataType)
+		if (CheckLinkage(output_pin))
 		{
 			// Check if this pin's node is connected to the node of the output_pin	// TODO: Handle unavailable connections (loops, ...)				// TODO!
 			//NodeOutputPin* node_output = m_OwnerNode->GetOutputPin();
@@ -193,10 +277,20 @@ namespace Kaimos::MaterialEditor {
 	}
 
 
-	void NodeInputPin::DisconnectOutputPin()
+	void NodeInputPin::DisconnectOutputPin(bool is_destroying)
 	{
 		if (m_OutputLinked)
 		{
+			if (m_OwnerNode->GetType() == MaterialNodeType::OPERATION && !is_destroying)
+			{
+				OperationNodeType op_type = ((OperationMaterialNode*)m_OwnerNode)->GetOperationType();
+				if (op_type == OperationNodeType::FLOATVEC2_MULTIPLY)
+				{
+					m_PinDataType = PinDataType::FLOAT;
+					m_OwnerNode->CheckOutputType();
+				}
+			}
+
 			m_OutputLinked->DisconnectInputPin(m_ID);
 			m_OutputLinked = nullptr;
 			ResetToDefault();
@@ -204,12 +298,12 @@ namespace Kaimos::MaterialEditor {
 	}
 
 
-	float* NodeInputPin::CalculateInputValue()
+	Ref<float> NodeInputPin::CalculateInputValue()
 	{
 		if (m_OutputLinked)
 			return m_OutputLinked->m_OwnerNode->CalculateNodeResult();
 
-		return m_Value.get();
+		return m_Value;
 	}
 
 }

@@ -37,26 +37,31 @@ namespace Kaimos::MaterialEditor {
 		NodePin* FindPinInNode(uint pinID);
 
 		// Defined in child classes according to what each node type does
-		virtual float* CalculateNodeResult() = 0;
+		virtual Ref<float> CalculateNodeResult() = 0;
 
 	protected:
 
 		// --- Public Material Node Methods ---
 		NodeInputPin* FindInputPin(uint pinID);
 
-		void AddInputPin(PinDataType pin_data_type, const std::string& name, float default_value = 1.0f);
+		void AddInputPin(PinDataType pin_data_type, bool multi_type_pin, const std::string& name, float default_value = 1.0f);
 		virtual void AddOutputPin(PinDataType pin_data_type, const std::string& name, float default_value = 1.0f);
 
-		float* GetInputValue(uint input_index);
+		Ref<float> GetInputValue(uint input_index);
 
 	public:
 
 		// --- Getters ---
-		uint GetID()					const { return m_ID; }
-		MaterialNodeType GetType()		const { return m_Type; }
-		const std::string& GetName()	const { return m_Name; }
+		uint GetID()									const { return m_ID; }
+		MaterialNodeType GetType()						const { return m_Type; }
+		const std::string& GetName()					const { return m_Name; }
 		
-		uint GetOutputPinID()			const { if (m_NodeOutputPin) return m_NodeOutputPin->GetID(); return 0; }
+		uint GetOutputPinID()							const { if (m_NodeOutputPin) return m_NodeOutputPin->GetID(); return 0; }
+		Ref<NodeInputPin> GetInputPin(uint input_pinID)	const { return m_NodeInputPins[input_pinID]; }
+		uint GetInputsQuantity()						const { return m_NodeInputPins.size(); }
+
+		// --- Other Methods ---
+		void CheckOutputType() { if(m_NodeOutputPin) m_NodeOutputPin->SetOutputDataType(); }
 
 	protected:
 
@@ -91,11 +96,11 @@ namespace Kaimos::MaterialEditor {
 			switch (vtxpm_node_type)
 			{
 				case VertexParameterNodeType::TEX_COORDS:
-					return NodeUtils::GetDataFromType<T>(m_TextureCoordinatesPin->CalculateInputValue(), PinDataType::VEC2);
+					return NodeUtils::GetDataFromType<T>(m_TextureCoordinatesPin->CalculateInputValue().get(), PinDataType::VEC2);
 				case VertexParameterNodeType::POSITION:
-					return NodeUtils::GetDataFromType<T>(m_VertexPositionPin->CalculateInputValue(), PinDataType::VEC3);
+					return NodeUtils::GetDataFromType<T>(m_VertexPositionPin->CalculateInputValue().get(), PinDataType::VEC3);
 				case VertexParameterNodeType::NORMAL:
-					return NodeUtils::GetDataFromType<T>(m_VertexNormalPin->CalculateInputValue(), PinDataType::VEC3);
+					return NodeUtils::GetDataFromType<T>(m_VertexNormalPin->CalculateInputValue().get(), PinDataType::VEC3);
 				
 				default: { KS_ERROR_AND_ASSERT("Tried to retrieve an invalid Vertex Attribute Input from Main Node!"); }
 			}
@@ -106,7 +111,7 @@ namespace Kaimos::MaterialEditor {
 
 		// --- Private Node Methods ---
 		void SyncValuesWithMaterial();
-		virtual float* CalculateNodeResult() override { return nullptr; }
+		virtual Ref<float> CalculateNodeResult() override { return nullptr; }
 
 		uint GetVertexPositionPinID()	const { return m_VertexPositionPin->GetID(); }
 		uint GetVertexNormalPinID()		const { return m_VertexNormalPin->GetID(); }
@@ -142,7 +147,7 @@ namespace Kaimos::MaterialEditor {
 
 	private:
 
-		virtual float* CalculateNodeResult() override;
+		virtual Ref<float> CalculateNodeResult() override;
 		VertexParameterNodeType m_ParameterType = VertexParameterNodeType::NONE;
 	};
 
@@ -158,24 +163,26 @@ namespace Kaimos::MaterialEditor {
 
 	private:
 
-		virtual float* CalculateNodeResult() override;
+		virtual Ref<float> CalculateNodeResult() override;
 		ConstantNodeType m_ConstantType = ConstantNodeType::NONE;
 	};
 
 
 
 	// ---- Operation Node ----
-	enum class OperationNodeType { NONE, ADDITION, MULTIPLICATION };
+	enum class OperationNodeType { NONE, ADDITION, MULTIPLICATION, FLOATVEC2_MULTIPLY };
 
 	class OperationMaterialNode : public MaterialNode
 	{
 	public:
+
 		OperationMaterialNode(OperationNodeType operation_type, PinDataType operation_data_type);
+		OperationNodeType GetOperationType() const { return m_OperationType; }
 
 	private:
 
-		virtual float* CalculateNodeResult() override;
-		float* ProcessOperation(PinDataType data_type, const float* a, const float* b) const;
+		virtual Ref<float> CalculateNodeResult() override;
+		float* ProcessOperation(const float* a, const float* b, PinDataType a_data_type, PinDataType b_data_type) const;
 
 		OperationNodeType m_OperationType = OperationNodeType::NONE;
 	};

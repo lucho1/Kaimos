@@ -48,8 +48,7 @@ namespace Kaimos::MaterialEditor {
 		// -- Draw Input Pins --
 		bool set_node_draggable = true;
 		for (Ref<NodeInputPin>& pin : m_NodeInputPins)
-			pin->DrawUI(set_node_draggable);
-		
+			pin->DrawUI(set_node_draggable);		
 
 		// -- End Node Drawing --
 		ImNodes::SetNodeDraggable(m_ID, set_node_draggable);
@@ -88,9 +87,9 @@ namespace Kaimos::MaterialEditor {
 		return nullptr;
 	}
 
-	void MaterialNode::AddInputPin(PinDataType pin_data_type, const std::string& name, float default_value)
+	void MaterialNode::AddInputPin(PinDataType pin_data_type, bool multi_type_pin, const std::string& name, float default_value)
 	{
-		m_NodeInputPins.push_back(CreateRef<NodeInputPin>(this, pin_data_type, name, default_value));
+		m_NodeInputPins.push_back(CreateRef<NodeInputPin>(this, pin_data_type, multi_type_pin, name, default_value));
 	}
 
 	void MaterialNode::AddOutputPin(PinDataType pin_data_type, const std::string& name, float default_value)
@@ -98,7 +97,7 @@ namespace Kaimos::MaterialEditor {
 		m_NodeOutputPin = CreateRef<NodeOutputPin>(this, pin_data_type, name);
 	}
 
-	float* MaterialNode::GetInputValue(uint input_index)
+	Ref<float> MaterialNode::GetInputValue(uint input_index)
 	{
 		if (input_index < m_NodeInputPins.size())
 			return m_NodeInputPins[input_index]->CalculateInputValue();
@@ -114,13 +113,13 @@ namespace Kaimos::MaterialEditor {
 	MainMaterialNode::MainMaterialNode(Material* attached_material)
 		: MaterialNode("Main Node", MaterialNodeType::MAIN), m_AttachedMaterial(attached_material)
 	{
-		m_VertexPositionPin = CreateRef<NodeInputPin>(this, PinDataType::VEC3, "Vertex Position", 0.0f);
-		m_VertexNormalPin = CreateRef<NodeInputPin>(this, PinDataType::VEC3, "Vertex Normal", 0.0f);
-		m_TextureCoordinatesPin = CreateRef<NodeInputPin>(this, PinDataType::VEC2, "Texture Coordinates", 0.0f);
+		m_VertexPositionPin = CreateRef<NodeInputPin>(this, PinDataType::VEC3, false, "Vertex Position", 0.0f);
+		m_VertexNormalPin = CreateRef<NodeInputPin>(this, PinDataType::VEC3, false, "Vertex Normal", 0.0f);
+		m_TextureCoordinatesPin = CreateRef<NodeInputPin>(this, PinDataType::VEC2, false, "Texture Coordinates", 0.0f);
 
-		m_TextureTilingPin = CreateRef<NodeInputPin>(this, PinDataType::FLOAT, "Texture Tiling", 1.0f);
-		m_TextureOffsetPin = CreateRef<NodeInputPin>(this, PinDataType::VEC2, "Texture Offset", 0.0f);
-		m_ColorPin = CreateRef<NodeInputPin>(this, PinDataType::VEC4, "Color", 1.0f);
+		m_TextureTilingPin = CreateRef<NodeInputPin>(this, PinDataType::FLOAT, false, "Texture Tiling", 1.0f);
+		m_TextureOffsetPin = CreateRef<NodeInputPin>(this, PinDataType::VEC2, false, "Texture Offset", 0.0f);
+		m_ColorPin = CreateRef<NodeInputPin>(this, PinDataType::VEC4, false, "Color", 1.0f);
 
 		m_NodeInputPins.push_back(m_VertexPositionPin);
 		m_NodeInputPins.push_back(m_VertexNormalPin);
@@ -134,7 +133,7 @@ namespace Kaimos::MaterialEditor {
 
 	MainMaterialNode::~MainMaterialNode()
 	{
-		//DettachMaterial();
+		// Technically, this is unnecessary because they are smart pointers
 		m_VertexPositionPin.reset();
 		m_VertexNormalPin.reset();
 		m_TextureCoordinatesPin.reset();
@@ -269,9 +268,9 @@ namespace Kaimos::MaterialEditor {
 		m_NodeOutputPin->SetOutputValue(value);
 	}
 
-	float* VertexParameterMaterialNode::CalculateNodeResult()
+	Ref<float> VertexParameterMaterialNode::CalculateNodeResult()
 	{
-		return this->m_NodeOutputPin->GetValue().get();
+		return this->m_NodeOutputPin->GetValue();
 	}
 
 	void VertexParameterMaterialNode::AddOutputPin(PinDataType pin_data_type, const std::string& name, float default_value)
@@ -299,7 +298,7 @@ namespace Kaimos::MaterialEditor {
 	}
 
 
-	float* ConstantMaterialNode::CalculateNodeResult()
+	Ref<float> ConstantMaterialNode::CalculateNodeResult()
 	{
 		float* ret = nullptr;
 		switch (m_ConstantType)
@@ -315,47 +314,57 @@ namespace Kaimos::MaterialEditor {
 		}
 
 		m_NodeOutputPin->SetOutputValue(ret);
-		return m_NodeOutputPin->GetValue().get();
+		return m_NodeOutputPin->GetValue();
 	}
 
 
 
 
 	// ---------------------------- OPERATION NODE --------------------------------------------------------
-	OperationMaterialNode::OperationMaterialNode(OperationNodeType operation_type, PinDataType operation_data_type) : MaterialNode("Operation Node", MaterialNodeType::OPERATION)
+	OperationMaterialNode::OperationMaterialNode(OperationNodeType operation_type, PinDataType operation_data_type) : MaterialNode("Operation Node", MaterialNodeType::OPERATION), m_OperationType(operation_type)
 	{
-		m_OperationType = operation_type;
+		PinDataType op_datatype = operation_data_type;
+		bool multi_type_pin = false;
+
 		switch (m_OperationType)
 		{
 			case OperationNodeType::ADDITION:			{ m_Name = "Sum Node";  break; }
 			case OperationNodeType::MULTIPLICATION:		{ m_Name = "Multiply Node"; break; }
+			case OperationNodeType::FLOATVEC2_MULTIPLY: { m_Name = "Float-Vec2 Multiply Node"; multi_type_pin = true; op_datatype = PinDataType::FLOAT; break; }
 			default:									{ KS_ERROR_AND_ASSERT("Attempted to create a non-supported Operation Node"); }
 		}
 
-		AddInputPin(operation_data_type, "Value 1");
-		AddInputPin(operation_data_type, "Value 2");
-		AddOutputPin(operation_data_type, "Out");
+		AddInputPin(op_datatype, multi_type_pin, "Value 1");
+		AddInputPin(op_datatype, multi_type_pin, "Value 2");
+		AddOutputPin(op_datatype, "Out");
 	}	
 
 
-	float* OperationMaterialNode::CalculateNodeResult()
+	Ref<float> OperationMaterialNode::CalculateNodeResult()
 	{
 		PinDataType data_type = m_NodeInputPins[0]->GetType();
-		float* ret = GetInputValue(0);
+
+		float* ret = new float[4];
+		memcpy(ret, GetInputValue(0).get(), 16);
 
 		for (uint i = 1; i < m_NodeInputPins.size(); ++i)
-			ret = ProcessOperation(data_type, ret, GetInputValue(i));
+			memcpy(ret, ProcessOperation(ret, GetInputValue(i).get(), data_type, m_NodeInputPins[i]->GetType()), 16);
 
-		return ret;
+		Ref<float> r = CreateRef<float>(static_cast<float*>(malloc(16)));
+		memcpy(r.get(), ret, 16);
+		delete[] ret;
+
+		return r;
 	}
 
 
-	float* OperationMaterialNode::ProcessOperation(PinDataType data_type, const float* a, const float* b) const
+	float* OperationMaterialNode::ProcessOperation(const float* a, const float* b, PinDataType a_data_type, PinDataType b_data_type) const
 	{
 		switch (m_OperationType)
 		{
-			case OperationNodeType::ADDITION:		return NodeUtils::SumValues(data_type, a, b);
-			case OperationNodeType::MULTIPLICATION:	return NodeUtils::MultiplyValues(data_type, a, b);
+			case OperationNodeType::ADDITION:			return NodeUtils::SumValues(a_data_type, a, b);
+			case OperationNodeType::MULTIPLICATION:		return NodeUtils::MultiplyValues(a_data_type, a, b);
+			case OperationNodeType::FLOATVEC2_MULTIPLY:	return NodeUtils::MultiplyFloatAndVec(a, b, a_data_type, b_data_type);
 		}
 
 		KS_ERROR_AND_ASSERT("Attempted to perform a non-supported operation in OperationNode!");

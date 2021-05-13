@@ -94,6 +94,7 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 		}
 
 		KS_ERROR_AND_ASSERT("Tried to perform a non-supported addition operation!");
+		return nullptr;
 	}
 
 
@@ -135,6 +136,52 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 		}
 
 		KS_ERROR_AND_ASSERT("Tried to perform a non-supported multiply operation!");
+		return nullptr;
+	}
+
+
+	float* ProcessFloatAndVecMultiplication(const float float_val, const float* vec_val, PinDataType vec_data_type)
+	{
+		switch (vec_data_type)
+		{
+			case PinDataType::VEC2:
+			{
+				glm::vec2 ret = float_val * glm::vec2(vec_val[0], vec_val[1]);
+				return glm::value_ptr(ret);
+			}
+
+			case PinDataType::VEC3:
+			{
+				glm::vec3 ret = float_val * glm::vec3(vec_val[0], vec_val[1], vec_val[2]);
+				return glm::value_ptr(ret);
+			}
+
+			case PinDataType::VEC4:
+			{
+				glm::vec4 ret = float_val * glm::vec4(vec_val[0], vec_val[1], vec_val[2], vec_val[3]);
+				return glm::value_ptr(ret);
+			}
+		}
+
+		KS_ERROR_AND_ASSERT("Tried to perform a non-supported float-vec multiplication operation!");
+		return nullptr;
+	}
+
+
+	float* MultiplyFloatAndVec(const float* a, const float* b, PinDataType a_data_type, PinDataType b_data_type)
+	{
+
+		if (a_data_type == PinDataType::FLOAT && b_data_type == PinDataType::FLOAT)
+			return MultiplyValues(PinDataType::FLOAT, a, b);
+		else if (a_data_type == PinDataType::VEC2 && b_data_type == PinDataType::VEC2)
+			return MultiplyValues(PinDataType::VEC2, a, b);
+		else if (a_data_type == PinDataType::FLOAT)
+			return ProcessFloatAndVecMultiplication(a[0], b, b_data_type);
+		else if (b_data_type == PinDataType::FLOAT)
+			return ProcessFloatAndVecMultiplication(b[0], a, a_data_type);
+
+		KS_ERROR_AND_ASSERT("Tried to perform a non-supported multiple-type multiplication operation!");
+		return nullptr;
 	}
 
 

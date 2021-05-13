@@ -17,7 +17,7 @@ namespace Kaimos::MaterialEditor {
 		NodePin(MaterialNode* owner, PinDataType pin_data_type, const std::string& name);
 		~NodePin() { m_OwnerNode = nullptr; m_Value.reset(); }
 
-		void SetValue(float* value) { memcpy(m_Value.get(), value, 16); }
+		void SetValue(const float* value) { memcpy(m_Value.get(), value, 16); }
 
 	public:
 
@@ -66,8 +66,11 @@ namespace Kaimos::MaterialEditor {
 		virtual bool IsInput()						const override { return false; }
 		virtual void LinkPin(NodePin* input_pin)	override;
 
-		void DisconnectInputPin(uint input_pinID);
 		void SetOutputValue(float* value)			{ SetValue(value); }
+		void SetOutputDataType();
+		
+		void DisconnectInputPin(uint input_pinID);
+		void DisconnectAllInputPins();
 
 	private:
 
@@ -89,7 +92,7 @@ namespace Kaimos::MaterialEditor {
 	public:
 
 		// --- Public Class Methods ---
-		NodeInputPin(MaterialNode* owner, PinDataType pin_data_type, const std::string& name, float default_value = 0.0f);
+		NodeInputPin(MaterialNode* owner, PinDataType pin_data_type, bool allows_multi_type, const std::string& name, float default_value = 0.0f);
 		~NodeInputPin();
 
 		void DrawUI(bool& allow_node_drag, float* value_to_modify = nullptr, bool is_vtxattribute = false);
@@ -101,8 +104,8 @@ namespace Kaimos::MaterialEditor {
 		virtual bool IsInput()						const override	{ return true; }
 		virtual void LinkPin(NodePin* output_pin)	override;
 
-		void DisconnectOutputPin();
-		float* CalculateInputValue();
+		void DisconnectOutputPin(bool is_destroying = false);
+		Ref<float> CalculateInputValue();
 
 		void SetInputValue(float* value)				  { SetValue(value); }
 		void ResetToDefault()							  { memcpy(m_Value.get(), m_DefaultValue.get(), 16); }
@@ -114,12 +117,15 @@ namespace Kaimos::MaterialEditor {
 
 		// --- Private Pin Methods ---
 		void SetDefaultValue(float* value)			{ memcpy(m_DefaultValue.get(), value, 16); }
+		bool CheckLinkage(NodePin* output_pin);
 
 	private:
 
 		// --- Variables ---
 		Ref<float> m_DefaultValue = nullptr;
 		NodeOutputPin* m_OutputLinked = nullptr;
+
+		bool m_AllowsMultipleTypes = false;
 	};
 
 }
