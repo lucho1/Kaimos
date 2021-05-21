@@ -330,7 +330,9 @@ namespace Kaimos::MaterialEditor {
 		{
 			case OperationNodeType::ADDITION:			{ m_Name = "Sum Node";  break; }
 			case OperationNodeType::MULTIPLICATION:		{ m_Name = "Multiply Node"; break; }
-			case OperationNodeType::FLOATVEC2_MULTIPLY: { m_Name = "Float-Vec2 Multiply Node"; multi_type_pin = true; op_datatype = PinDataType::FLOAT; break; }
+			case OperationNodeType::FLOATVEC2_MULTIPLY:	{ m_Name = "Float-Vec2 Multiply Node"; multi_type_pin = true; op_datatype = PinDataType::FLOAT; break; }
+			case OperationNodeType::FLOATVEC3_MULTIPLY:	{ m_Name = "Float-Vec3 Multiply Node"; multi_type_pin = true; op_datatype = PinDataType::FLOAT; break; }
+			case OperationNodeType::FLOATVEC4_MULTIPLY:	{ m_Name = "Float-Vec4 Multiply Node"; multi_type_pin = true; op_datatype = PinDataType::FLOAT; break; }
 			default:									{ KS_ERROR_AND_ASSERT("Attempted to create a non-supported Operation Node"); }
 		}
 
@@ -364,7 +366,9 @@ namespace Kaimos::MaterialEditor {
 		{
 			case OperationNodeType::ADDITION:			return NodeUtils::SumValues(a_data_type, a, b);
 			case OperationNodeType::MULTIPLICATION:		return NodeUtils::MultiplyValues(a_data_type, a, b);
-			case OperationNodeType::FLOATVEC2_MULTIPLY:	return NodeUtils::MultiplyFloatAndVec(a, b, a_data_type, b_data_type);
+			case OperationNodeType::FLOATVEC2_MULTIPLY:	return NodeUtils::MultiplyFloatAndVec2(a, b, a_data_type, b_data_type);
+			case OperationNodeType::FLOATVEC3_MULTIPLY:	return NodeUtils::MultiplyFloatAndVec3(a, b, a_data_type, b_data_type);
+			case OperationNodeType::FLOATVEC4_MULTIPLY:	return NodeUtils::MultiplyFloatAndVec4(a, b, a_data_type, b_data_type);
 		}
 
 		KS_ERROR_AND_ASSERT("Attempted to perform a non-supported operation in OperationNode!");

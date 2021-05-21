@@ -168,9 +168,8 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 	}
 
 
-	float* MultiplyFloatAndVec(const float* a, const float* b, PinDataType a_data_type, PinDataType b_data_type)
+	float* MultiplyFloatAndVec2(const float* a, const float* b, PinDataType a_data_type, PinDataType b_data_type)
 	{
-
 		if (a_data_type == PinDataType::FLOAT && b_data_type == PinDataType::FLOAT)
 			return MultiplyValues(PinDataType::FLOAT, a, b);
 		else if (a_data_type == PinDataType::VEC2 && b_data_type == PinDataType::VEC2)
@@ -180,7 +179,39 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 		else if (b_data_type == PinDataType::FLOAT)
 			return ProcessFloatAndVecMultiplication(b[0], a, a_data_type);
 
-		KS_ERROR_AND_ASSERT("Tried to perform a non-supported multiple-type multiplication operation!");
+		KS_ERROR_AND_ASSERT("Tried to perform a non-supported vec2 multiple-type multiplication operation!");
+		return nullptr;
+	}
+
+
+	float* MultiplyFloatAndVec3(const float* a, const float* b, PinDataType a_data_type, PinDataType b_data_type)
+	{
+		if (a_data_type == PinDataType::FLOAT && b_data_type == PinDataType::FLOAT)
+			return MultiplyValues(PinDataType::FLOAT, a, b);
+		else if (a_data_type == PinDataType::VEC3 && b_data_type == PinDataType::VEC3)
+			return MultiplyValues(PinDataType::VEC3, a, b);
+		else if (a_data_type == PinDataType::FLOAT)
+			return ProcessFloatAndVecMultiplication(a[0], b, b_data_type);
+		else if (b_data_type == PinDataType::FLOAT)
+			return ProcessFloatAndVecMultiplication(b[0], a, a_data_type);
+
+		KS_ERROR_AND_ASSERT("Tried to perform a non-supported vec2 multiple-type multiplication operation!");
+		return nullptr;
+	}
+
+
+	float* MultiplyFloatAndVec4(const float* a, const float* b, PinDataType a_data_type, PinDataType b_data_type)
+	{
+		if (a_data_type == PinDataType::FLOAT && b_data_type == PinDataType::FLOAT)
+			return MultiplyValues(PinDataType::FLOAT, a, b);
+		else if (a_data_type == PinDataType::VEC4 && b_data_type == PinDataType::VEC4)
+			return MultiplyValues(PinDataType::VEC4, a, b);
+		else if (a_data_type == PinDataType::FLOAT)
+			return ProcessFloatAndVecMultiplication(a[0], b, b_data_type);
+		else if (b_data_type == PinDataType::FLOAT)
+			return ProcessFloatAndVecMultiplication(b[0], a, a_data_type);
+
+		KS_ERROR_AND_ASSERT("Tried to perform a non-supported vec2 multiple-type multiplication operation!");
 		return nullptr;
 	}
 

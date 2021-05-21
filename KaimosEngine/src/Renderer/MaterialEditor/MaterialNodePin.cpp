@@ -106,13 +106,13 @@ namespace Kaimos::MaterialEditor {
 	}
 
 
-	void NodeOutputPin::SetOutputDataType()
+	void NodeOutputPin::SetOutputDataType(PinDataType datatype_to_set)
 	{
 		bool vec2_input_found = false;
 
 		for (uint i = 0; i < m_OwnerNode->GetInputsQuantity(); ++i)
 		{
-			if (m_OwnerNode->GetInputPin(i)->GetType() == PinDataType::VEC2)
+			if (m_OwnerNode->GetInputPin(i)->GetType() == datatype_to_set)
 			{
 				vec2_input_found = true;
 				break;
@@ -125,12 +125,12 @@ namespace Kaimos::MaterialEditor {
 			if (m_PinDataType == PinDataType::FLOAT)
 			{
 				type_changed = true;
-				m_PinDataType = PinDataType::VEC2;
+				m_PinDataType = datatype_to_set;
 			}
 		}
 		else
 		{
-			if (m_PinDataType == PinDataType::VEC2)
+			if (m_PinDataType == datatype_to_set)
 			{
 				type_changed = true;
 				m_PinDataType = PinDataType::FLOAT;
@@ -189,7 +189,7 @@ namespace Kaimos::MaterialEditor {
 
 	NodeInputPin::~NodeInputPin()
 	{
-		DisconnectOutputPin();
+		DisconnectOutputPin(true);
 		m_OutputLinked = nullptr;
 		m_DefaultValue.reset();
 	}
@@ -233,14 +233,28 @@ namespace Kaimos::MaterialEditor {
 		{
 			bool ret = false;
 			OperationNodeType op_type = ((OperationMaterialNode*)m_OwnerNode)->GetOperationType();
+			PinDataType datatype_to_check = PinDataType::VEC2;
+			OperationNodeType optype_to_check = OperationNodeType::FLOATVEC2_MULTIPLY;
 
-			if(op_type == OperationNodeType::FLOATVEC2_MULTIPLY && (m_PinDataType == PinDataType::FLOAT || m_PinDataType == PinDataType::VEC2))
+			if (op_type == OperationNodeType::FLOATVEC3_MULTIPLY)
 			{
-				ret = (output_type == PinDataType::FLOAT || output_type == PinDataType::VEC2);
+				datatype_to_check = PinDataType::VEC3;
+				optype_to_check = OperationNodeType::FLOATVEC3_MULTIPLY;
+			}
+			else if (op_type == OperationNodeType::FLOATVEC4_MULTIPLY)
+			{
+				datatype_to_check = PinDataType::VEC4;
+				optype_to_check = OperationNodeType::FLOATVEC4_MULTIPLY;
+			}
+
+
+			if(op_type == optype_to_check && (m_PinDataType == PinDataType::FLOAT || m_PinDataType == datatype_to_check))
+			{
+				ret = (output_type == PinDataType::FLOAT || output_type == datatype_to_check);
 				if (ret)
 				{
 					m_PinDataType = output_type;
-					m_OwnerNode->CheckOutputType();
+					m_OwnerNode->CheckOutputType(datatype_to_check);
 				}
 
 				return ret;
@@ -284,10 +298,17 @@ namespace Kaimos::MaterialEditor {
 			if (m_OwnerNode->GetType() == MaterialNodeType::OPERATION && !is_destroying)
 			{
 				OperationNodeType op_type = ((OperationMaterialNode*)m_OwnerNode)->GetOperationType();
-				if (op_type == OperationNodeType::FLOATVEC2_MULTIPLY)
+				if (op_type == OperationNodeType::FLOATVEC2_MULTIPLY || op_type == OperationNodeType::FLOATVEC3_MULTIPLY || op_type == OperationNodeType::FLOATVEC4_MULTIPLY)
 				{
 					m_PinDataType = PinDataType::FLOAT;
-					m_OwnerNode->CheckOutputType();
+
+					PinDataType datatype_check = PinDataType::VEC2;
+					if(op_type == OperationNodeType::FLOATVEC3_MULTIPLY)
+						datatype_check = PinDataType::VEC3;
+					else if(op_type == OperationNodeType::FLOATVEC4_MULTIPLY)
+						datatype_check = PinDataType::VEC4;
+
+					m_OwnerNode->CheckOutputType(datatype_check);
 				}
 			}
 

@@ -61,7 +61,7 @@ namespace Kaimos::MaterialEditor {
 		uint GetInputsQuantity()						const { return m_NodeInputPins.size(); }
 
 		// --- Other Methods ---
-		void CheckOutputType() { if(m_NodeOutputPin) m_NodeOutputPin->SetOutputDataType(); }
+		void CheckOutputType(PinDataType datatype_to_check) { if(m_NodeOutputPin) m_NodeOutputPin->SetOutputDataType(datatype_to_check); }
 
 	protected:
 
@@ -170,7 +170,7 @@ namespace Kaimos::MaterialEditor {
 
 
 	// ---- Operation Node ----
-	enum class OperationNodeType { NONE, ADDITION, MULTIPLICATION, FLOATVEC2_MULTIPLY };
+	enum class OperationNodeType { NONE, ADDITION, MULTIPLICATION, FLOATVEC2_MULTIPLY, FLOATVEC3_MULTIPLY, FLOATVEC4_MULTIPLY };
 
 	class OperationMaterialNode : public MaterialNode
 	{

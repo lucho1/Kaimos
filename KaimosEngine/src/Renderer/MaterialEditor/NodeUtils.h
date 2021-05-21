@@ -17,7 +17,10 @@ namespace Kaimos::MaterialEditor {
 		// --- Data Operations ---
 		float* SumValues(PinDataType values_data_type, const float* a, const float* b);
 		float* MultiplyValues(PinDataType values_data_type, const float* a, const float* b);
-		float* MultiplyFloatAndVec(const float* a, const float* b, PinDataType a_data_type, PinDataType b_data_type);
+		float* MultiplyFloatAndVec2(const float* a, const float* b, PinDataType a_data_type, PinDataType b_data_type);
+		float* MultiplyFloatAndVec3(const float* a, const float* b, PinDataType a_data_type, PinDataType b_data_type);
+		float* MultiplyFloatAndVec4(const float* a, const float* b, PinDataType a_data_type, PinDataType b_data_type);
+
 		float* ProcessFloatAndVecMultiplication(const float float_val, const float* vec_val, PinDataType vec_data_type);
 
 

@@ -67,7 +67,7 @@ namespace Kaimos::MaterialEditor {
 		virtual void LinkPin(NodePin* input_pin)	override;
 
 		void SetOutputValue(float* value)			{ SetValue(value); }
-		void SetOutputDataType();
+		void SetOutputDataType(PinDataType datatype_to_set);
 		
 		void DisconnectInputPin(uint input_pinID);
 		void DisconnectAllInputPins();
