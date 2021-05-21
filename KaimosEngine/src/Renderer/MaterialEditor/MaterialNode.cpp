@@ -113,13 +113,13 @@ namespace Kaimos::MaterialEditor {
 	MainMaterialNode::MainMaterialNode(Material* attached_material)
 		: MaterialNode("Main Node", MaterialNodeType::MAIN), m_AttachedMaterial(attached_material)
 	{
-		m_VertexPositionPin = CreateRef<NodeInputPin>(this, PinDataType::VEC3, false, "Vertex Position", 0.0f);
-		m_VertexNormalPin = CreateRef<NodeInputPin>(this, PinDataType::VEC3, false, "Vertex Normal", 0.0f);
-		m_TextureCoordinatesPin = CreateRef<NodeInputPin>(this, PinDataType::VEC2, false, "Texture Coordinates", 0.0f);
+		m_VertexPositionPin = CreateRef<NodeInputPin>(this, PinDataType::VEC3, false, "Vertex Position (Vec3)", 0.0f);
+		m_VertexNormalPin = CreateRef<NodeInputPin>(this, PinDataType::VEC3, false, "Vertex Normal (Vec3)", 0.0f);
+		m_TextureCoordinatesPin = CreateRef<NodeInputPin>(this, PinDataType::VEC2, false, "Texture Coordinates (Vec2)", 0.0f);
 
-		m_TextureTilingPin = CreateRef<NodeInputPin>(this, PinDataType::FLOAT, false, "Texture Tiling", 1.0f);
-		m_TextureOffsetPin = CreateRef<NodeInputPin>(this, PinDataType::VEC2, false, "Texture Offset", 0.0f);
-		m_ColorPin = CreateRef<NodeInputPin>(this, PinDataType::VEC4, false, "Color", 1.0f);
+		m_TextureTilingPin = CreateRef<NodeInputPin>(this, PinDataType::FLOAT, false, "Texture Tiling (float)", 1.0f);
+		m_TextureOffsetPin = CreateRef<NodeInputPin>(this, PinDataType::VEC2, false, "Texture Offset (Vec2)", 0.0f);
+		m_ColorPin = CreateRef<NodeInputPin>(this, PinDataType::VEC4, false, "Color (Vec4)", 1.0f);
 
 		m_NodeInputPins.push_back(m_VertexPositionPin);
 		m_NodeInputPins.push_back(m_VertexNormalPin);
@@ -241,21 +241,21 @@ namespace Kaimos::MaterialEditor {
 			case VertexParameterNodeType::TEX_COORDS:
 			{
 				m_Name = "TCoords";
-				AddOutputPin(PinDataType::VEC2, "XY");
+				AddOutputPin(PinDataType::VEC2, "XY (Vec2)");
 				break;
 			}
 
 			case VertexParameterNodeType::POSITION:
 			{
 				m_Name = "VertexPos";
-				AddOutputPin(PinDataType::VEC3, "XYZ");
+				AddOutputPin(PinDataType::VEC3, "XYZ (Vec3)");
 				break;
 			}
 
 			case VertexParameterNodeType::NORMAL:
 			{
 				m_Name = "VertexNorm";
-				AddOutputPin(PinDataType::VEC3, "XYZ");
+				AddOutputPin(PinDataType::VEC3, "XYZ  (Vec3)");
 				break;
 			}
 
@@ -309,7 +309,7 @@ namespace Kaimos::MaterialEditor {
 			{
 				m_Name = "Float";
 				AddInputPin(PinDataType::FLOAT, false, "Value");
-				AddOutputPin(PinDataType::FLOAT, "Value");
+				AddOutputPin(PinDataType::FLOAT, "Value (float)");
 				break;
 			}
 			case ConstantNodeType::VEC2:
@@ -348,7 +348,6 @@ namespace Kaimos::MaterialEditor {
 		float* ret = nullptr;
 		switch (m_ConstantType)
 		{
-			//INT, FLOAT, VEC2, VEC3, VEC4
 			case ConstantNodeType::DELTATIME:
 			{
 				float val = Application::Get().GetTime();
