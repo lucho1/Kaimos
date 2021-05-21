@@ -289,9 +289,54 @@ namespace Kaimos::MaterialEditor {
 			case ConstantNodeType::DELTATIME:
 			{
 				m_Name = "Delta Time";
-				AddOutputPin(PinDataType::FLOAT, "Time");
+				AddOutputPin(PinDataType::FLOAT, "Time (float)");
 				break;
 			}
+			case ConstantNodeType::PI:
+			{
+				m_Name = "Pi";
+				AddOutputPin(PinDataType::FLOAT, "Pi (float)");
+				break;
+			}
+			case ConstantNodeType::INT:
+			{
+				m_Name = "Int";
+				AddInputPin(PinDataType::INT, false, "Value");
+				AddOutputPin(PinDataType::INT, "Value (int)");
+				break;
+			}
+			case ConstantNodeType::FLOAT:
+			{
+				m_Name = "Float";
+				AddInputPin(PinDataType::FLOAT, false, "Value");
+				AddOutputPin(PinDataType::FLOAT, "Value");
+				break;
+			}
+			case ConstantNodeType::VEC2:
+			{
+				m_Name = "Vec2";
+				AddInputPin(PinDataType::FLOAT, false, "X");
+				AddInputPin(PinDataType::FLOAT, false, "Y");
+				AddOutputPin(PinDataType::VEC2, "Value (Vec2)");
+				break;
+			}
+			case ConstantNodeType::VEC3:
+			{
+				m_Name = "Vec3";
+				AddInputPin(PinDataType::FLOAT, false, "X");
+				AddInputPin(PinDataType::FLOAT, false, "Y");
+				AddInputPin(PinDataType::FLOAT, false, "Z");
+				AddOutputPin(PinDataType::VEC3, "Value (Vec3)");
+				break;
+			}
+			case ConstantNodeType::VEC4:
+			{
+				m_Name = "Vec4";
+				AddInputPin(PinDataType::VEC4, false, "Value");
+				AddOutputPin(PinDataType::VEC4, "Value (Vec4)");
+				break;
+			}
+
 
 			default: { KS_ERROR_AND_ASSERT("Attempted to create a non-supported Constant Node"); }
 		}
@@ -303,10 +348,37 @@ namespace Kaimos::MaterialEditor {
 		float* ret = nullptr;
 		switch (m_ConstantType)
 		{
+			//INT, FLOAT, VEC2, VEC3, VEC4
 			case ConstantNodeType::DELTATIME:
 			{
 				float val = Application::Get().GetTime();
 				ret = static_cast<float*>(&val);
+				break;
+			}
+			case ConstantNodeType::PI:
+			{
+				float val = glm::pi<float>();
+				ret = static_cast<float*>(&val);
+				break;
+			}
+			case ConstantNodeType::INT:		// Falls into float case
+			case ConstantNodeType::VEC4:	// Falls into float case
+			case ConstantNodeType::FLOAT:
+			{
+				ret = GetInputValue(0).get();
+				break;
+			}
+			case ConstantNodeType::VEC2:
+			{
+				ret = GetInputValue(0).get();
+				ret[1] = GetInputValue(1).get()[0];
+				break;
+			}
+			case ConstantNodeType::VEC3:
+			{
+				ret = GetInputValue(0).get();
+				ret[1] = GetInputValue(1).get()[0];
+				ret[2] = GetInputValue(2).get()[0];
 				break;
 			}
 

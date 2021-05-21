@@ -49,6 +49,24 @@ namespace Kaimos {
 			if (ImGui::MenuItem("Delta Time"))
 				m_CurrentGraph->CreateNode(MaterialEditor::ConstantNodeType::DELTATIME);
 
+			if (ImGui::MenuItem("PI"))
+				m_CurrentGraph->CreateNode(MaterialEditor::ConstantNodeType::PI);
+
+			if (ImGui::MenuItem("INT"))
+				m_CurrentGraph->CreateNode(MaterialEditor::ConstantNodeType::INT);
+
+			if (ImGui::MenuItem("FLOAT"))
+				m_CurrentGraph->CreateNode(MaterialEditor::ConstantNodeType::FLOAT);
+
+			if (ImGui::MenuItem("VEC2"))
+				m_CurrentGraph->CreateNode(MaterialEditor::ConstantNodeType::VEC2);
+
+			if (ImGui::MenuItem("VEC3"))
+				m_CurrentGraph->CreateNode(MaterialEditor::ConstantNodeType::VEC3);
+
+			if (ImGui::MenuItem("VEC4"))
+				m_CurrentGraph->CreateNode(MaterialEditor::ConstantNodeType::VEC4);
+
 			if (ImGui::MenuItem("Float + Float"))
 				m_CurrentGraph->CreateNode(MaterialEditor::OperationNodeType::ADDITION, MaterialEditor::PinDataType::FLOAT);
 

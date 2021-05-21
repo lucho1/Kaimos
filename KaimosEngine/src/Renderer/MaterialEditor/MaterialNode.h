@@ -154,7 +154,7 @@ namespace Kaimos::MaterialEditor {
 
 
 	// ---- Constant Node ----
-	enum class ConstantNodeType { NONE, DELTATIME };
+	enum class ConstantNodeType { NONE, DELTATIME, PI, INT, FLOAT, VEC2, VEC3, VEC4 };
 
 	class ConstantMaterialNode : public MaterialNode
 	{
