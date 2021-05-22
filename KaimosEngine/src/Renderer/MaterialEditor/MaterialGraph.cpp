@@ -154,13 +154,13 @@ namespace Kaimos::MaterialEditor {
 	// ----------------------- Public Serialization Methods ----------------------------------------------
 	void MaterialGraph::LoadGraph() const
 	{
-		std::string filename = "settings/mat_graphs/NodeGraph_" + std::to_string(m_ID);
+		std::string filename = "settings/mat_graphs/NodeGraph_" + std::to_string(m_ID) + ".ini";
 		ImNodes::LoadCurrentEditorStateFromIniFile(filename.c_str());
 	}
 
 	void MaterialGraph::SaveGraph() const
 	{
-		std::string filename = "settings/mat_graphs/NodeGraph_" + std::to_string(m_ID);
+		std::string filename = "settings/mat_graphs/NodeGraph_" + std::to_string(m_ID) + ".ini";
 		ImNodes::SaveCurrentEditorStateToIniFile(filename.c_str());
 	}
 

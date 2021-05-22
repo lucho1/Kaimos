@@ -183,14 +183,20 @@ namespace Kaimos {
 	// ----------------------- Public Material Editor Panel Methods ---------------------------------------
 	void MaterialEditorPanel::UnsetGraphToModify()
 	{
+		SaveCurrentGraphSettings();
 		m_CurrentGraph = nullptr;
 	}
 	
 	void MaterialEditorPanel::SetGraphToModifyFromMaterial(uint material_id)
 	{
+		SaveCurrentGraphSettings();
+
 		Ref<Material> mat = Renderer::GetMaterial(material_id);
 		if (mat && (mat)->m_AttachedGraph)
+		{
 			m_CurrentGraph = (mat)->m_AttachedGraph.get();
+			LoadCurrentGraphSettings();
+		}
 	}
 
 	bool MaterialEditorPanel::IsModifyingMaterialGraph(Material* material)

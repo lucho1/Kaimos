@@ -613,9 +613,6 @@ namespace Kaimos {
 		m_ScenePanel.SetContext(m_CurrentScene);		
 		if(set_viewport)
 			m_CurrentScene->SetViewportSize((uint)m_ViewportSize.x, (uint)m_ViewportSize.y);
-
-		ImGui::LoadIniSettingsFromDisk("imgui.ini");
-		m_KMEPanel.LoadCurrentGraphSettings();
 	}
 
 	void EditorLayer::SaveScene()
