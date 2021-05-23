@@ -11,6 +11,7 @@
 #include <imgui.h>
 #include <imnodes.h>
 #include <glm/gtc/type_ptr.hpp>
+#include <yaml-cpp/yaml.h>
 
 
 namespace Kaimos::MaterialEditor {
@@ -104,6 +105,24 @@ namespace Kaimos::MaterialEditor {
 
 		KS_ERROR_AND_ASSERT("Tried to access an out-of-bounds input!");
 		return nullptr;
+	}
+
+	void MaterialNode::SerializeBaseNode(YAML::Emitter& output_emitter) const
+	{
+		// -- Serialize Variables --
+		output_emitter << YAML::Key << "Name" << YAML::Value << m_Name.c_str();
+		output_emitter << YAML::Key << "Type" << YAML::Value << (int)m_Type;
+		output_emitter << YAML::Key << "ID" << YAML::Value << m_ID;
+
+		// -- Serialize Pins (Inputs as Sequence) --
+		if (m_NodeOutputPin)
+			m_NodeOutputPin->SerializePin(output_emitter);
+
+		output_emitter << YAML::Key << "InputPins" << YAML::Value << YAML::BeginSeq;
+		for (uint i = 0; i < m_NodeInputPins.size(); ++i)
+			m_NodeInputPins[i]->SerializePin(output_emitter);
+
+		output_emitter << YAML::EndSeq;
 	}
 
 
@@ -230,6 +249,16 @@ namespace Kaimos::MaterialEditor {
 		m_ColorPin->SetInputValue(glm::value_ptr(m_AttachedMaterial->Color));
 	}
 
+	void MainMaterialNode::SerializeNode(YAML::Emitter& output_emitter) const
+	{
+		// -- Begin YAML Map for Node & Serialize --
+		output_emitter << YAML::BeginMap;
+		SerializeBaseNode(output_emitter);
+
+		// -- End YAML Map for Node --
+		output_emitter << YAML::EndMap;
+	}
+
 
 
 
@@ -271,6 +300,17 @@ namespace Kaimos::MaterialEditor {
 	Ref<float> VertexParameterMaterialNode::CalculateNodeResult()
 	{
 		return this->m_NodeOutputPin->GetValue();
+	}
+
+	void VertexParameterMaterialNode::SerializeNode(YAML::Emitter& output_emitter) const
+	{
+		// -- Begin YAML Map for Node & Serialize --
+		output_emitter << YAML::BeginMap;
+		SerializeBaseNode(output_emitter);
+		output_emitter << YAML::Key << "VParamNodeType" << YAML::Value << (int)m_ParameterType;
+
+		// -- End YAML Map for Node --
+		output_emitter << YAML::EndMap;
 	}
 
 	void VertexParameterMaterialNode::AddOutputPin(PinDataType pin_data_type, const std::string& name, float default_value)
@@ -388,6 +428,17 @@ namespace Kaimos::MaterialEditor {
 		return m_NodeOutputPin->GetValue();
 	}
 
+	void ConstantMaterialNode::SerializeNode(YAML::Emitter& output_emitter) const
+	{
+		// -- Begin YAML Map for Node & Serialize --
+		output_emitter << YAML::BeginMap;
+		SerializeBaseNode(output_emitter);
+		output_emitter << YAML::Key << "ConstNodeType" << YAML::Value << (int)m_ConstantType;
+
+		// -- End YAML Map for Node --
+		output_emitter << YAML::EndMap;
+	}
+
 
 
 
@@ -444,6 +495,18 @@ namespace Kaimos::MaterialEditor {
 
 		KS_ERROR_AND_ASSERT("Attempted to perform a non-supported operation in OperationNode!");
 		return nullptr;
+	}
+
+
+	void OperationMaterialNode::SerializeNode(YAML::Emitter& output_emitter) const
+	{
+		// -- Begin YAML Map for Node & Serialize --
+		output_emitter << YAML::BeginMap;
+		SerializeBaseNode(output_emitter);
+		output_emitter << YAML::Key << "OpNodeType" << YAML::Value << (int)m_OperationType;
+
+		// -- End YAML Map for Node --
+		output_emitter << YAML::EndMap;
 	}
 
 }

@@ -8,6 +8,7 @@
 #include "Core/Utils/Maths/RandomGenerator.h"
 
 
+namespace YAML { class Emitter; }
 namespace Kaimos { class Material; }
 
 
@@ -38,16 +39,20 @@ namespace Kaimos::MaterialEditor {
 
 		// Defined in child classes according to what each node type does
 		virtual Ref<float> CalculateNodeResult() = 0;
+		virtual void SerializeNode(YAML::Emitter& output_emitter) const = 0;
 
 	protected:
 
-		// --- Public Material Node Methods ---
+		// --- Protected Material Node Methods ---
 		NodeInputPin* FindInputPin(uint pinID);
 
 		void AddInputPin(PinDataType pin_data_type, bool multi_type_pin, const std::string& name, float default_value = 1.0f);
 		virtual void AddOutputPin(PinDataType pin_data_type, const std::string& name, float default_value = 1.0f);
 
 		Ref<float> GetInputValue(uint input_index);
+
+		void SerializeBaseNode(YAML::Emitter& output_emitter) const;
+
 
 	public:
 
@@ -112,6 +117,7 @@ namespace Kaimos::MaterialEditor {
 		// --- Private Node Methods ---
 		void SyncValuesWithMaterial();
 		virtual Ref<float> CalculateNodeResult() override { return nullptr; }
+		virtual void SerializeNode(YAML::Emitter& output_emitter) const override;
 
 		uint GetVertexPositionPinID()	const { return m_VertexPositionPin->GetID(); }
 		uint GetVertexNormalPinID()		const { return m_VertexNormalPin->GetID(); }
@@ -148,6 +154,8 @@ namespace Kaimos::MaterialEditor {
 	private:
 
 		virtual Ref<float> CalculateNodeResult() override;
+		virtual void SerializeNode(YAML::Emitter& output_emitter) const override;
+
 		VertexParameterNodeType m_ParameterType = VertexParameterNodeType::NONE;
 	};
 
@@ -164,6 +172,8 @@ namespace Kaimos::MaterialEditor {
 	private:
 
 		virtual Ref<float> CalculateNodeResult() override;
+		virtual void SerializeNode(YAML::Emitter& output_emitter) const override;
+
 		ConstantNodeType m_ConstantType = ConstantNodeType::NONE;
 	};
 
@@ -182,6 +192,8 @@ namespace Kaimos::MaterialEditor {
 	private:
 
 		virtual Ref<float> CalculateNodeResult() override;
+		virtual void SerializeNode(YAML::Emitter& output_emitter) const override;
+
 		float* ProcessOperation(const float* a, const float* b, PinDataType a_data_type, PinDataType b_data_type) const;
 
 		OperationNodeType m_OperationType = OperationNodeType::NONE;

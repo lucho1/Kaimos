@@ -4,6 +4,9 @@
 #include "Renderer/OpenGL/Resources/OGLShader.h"
 #include "Renderer2D.h"
 
+#include <yaml-cpp/yaml.h>
+
+
 namespace Kaimos {
 
 	ScopePtr<Renderer::SceneData> Renderer::s_SceneData = CreateScopePtr<Renderer::SceneData>();
@@ -69,6 +72,39 @@ namespace Kaimos {
 		}
 
 		return nullptr;
+	}
+
+	void Renderer::SerializeRenderer()
+	{
+		KS_PROFILE_FUNCTION();
+
+		// -- Begin Renderer Map --
+		YAML::Emitter output;
+		output << YAML::BeginMap;
+		output << YAML::Key << "KaimosSaveFile" << YAML::Value << "KaimosRenderer";
+		
+		// -- Serialize Materials (as Sequence) --
+		output << YAML::Key << "Materials" << YAML::Value << YAML::BeginSeq;
+		for (Ref<Material>& mat : s_SceneData->Materials)
+		{
+			output << YAML::BeginMap;
+			output << YAML::Key << "Material" << YAML::Value << mat->GetID();
+			output << YAML::Key << "AttachedGraph";
+			mat->m_AttachedGraph->SerializeGraph(output);
+			output << YAML::EndMap;
+		}
+
+		// -- End Materials Sequence & Renderer Map --
+		output << YAML::EndSeq;
+		output << YAML::EndMap;
+
+		// -- Save File --
+		std::ofstream file("../KaimosEngine/res/settings/KaimosRendererSettings.kaimossave");
+		file << output.c_str();
+	}
+
+	void Renderer::DeserializeRenderer()
+	{
 	}
 
 

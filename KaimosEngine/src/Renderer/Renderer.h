@@ -25,6 +25,9 @@ namespace Kaimos {
 		static Ref<Material> CreateMaterial();
 		static Ref<Material> GetMaterial(uint material_id);
 
+		static void SerializeRenderer();
+		static void DeserializeRenderer();
+
 	public:
 
 		// --- Event Methods ---

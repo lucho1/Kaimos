@@ -13,6 +13,7 @@ namespace Kaimos {
 	class Material
 	{
 		friend class MaterialEditorPanel;
+		friend class Renderer;
 	public:
 
 		// --- Public Class Methods ---

@@ -205,6 +205,7 @@ namespace Kaimos {
 	void SceneSerializer::Serialize(const std::string& filepath) const
 	{
 		KS_PROFILE_FUNCTION();
+		Renderer::SerializeRenderer();
 		
 		YAML::Emitter output;
 		output << YAML::BeginMap;

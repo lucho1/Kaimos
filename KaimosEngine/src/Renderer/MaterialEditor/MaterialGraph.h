@@ -5,7 +5,9 @@
 #include "MaterialNodePin.h"
 
 
+namespace YAML { class Emitter; }
 namespace Kaimos { class Material; }
+
 
 namespace Kaimos::MaterialEditor {
 
@@ -36,8 +38,10 @@ namespace Kaimos::MaterialEditor {
 	public:
 
 		// --- Public Serialization Methods ---
-		void LoadGraph() const;
-		void SaveGraph() const;
+		void DeserializeGraph() const;
+		void SerializeGraph(YAML::Emitter& output_emitter) const;
+		void SaveEditorSettings() const;
+		void LoadEditorSettings() const;
 
 		// --- Public Material Graph Methods ---
 		void SyncMainNodeValuesWithMaterial();

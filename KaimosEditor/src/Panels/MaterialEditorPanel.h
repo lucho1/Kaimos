@@ -25,8 +25,8 @@ namespace Kaimos {
 
 		bool IsModifyingMaterialGraph(Material* material);
 
-		void LoadCurrentGraphSettings() const { if (m_CurrentGraph) m_CurrentGraph->LoadGraph(); }
-		void SaveCurrentGraphSettings() const { if (m_CurrentGraph) m_CurrentGraph->SaveGraph(); }
+		void LoadCurrentGraphSettings() const { if (m_CurrentGraph) m_CurrentGraph->LoadEditorSettings(); }
+		void SaveCurrentGraphSettings() const { if (m_CurrentGraph) m_CurrentGraph->SaveEditorSettings(); }
 
 	private:
 

@@ -1,6 +1,7 @@
 #ifndef _MATERIALNODEPIN_H_
 #define _MATERIALNODEPIN_H_
 
+namespace YAML { class Emitter; }
 
 namespace Kaimos::MaterialEditor {
 	
@@ -18,12 +19,14 @@ namespace Kaimos::MaterialEditor {
 		~NodePin() { m_OwnerNode = nullptr; m_Value.reset(); }
 
 		void SetValue(const float* value) { memcpy(m_Value.get(), value, 16); }
+		void SerializeBasePin(YAML::Emitter& output_emitter) const;
 
 	public:
 
 		// --- Public Pin Methods ---
 		virtual bool IsInput() const = 0;
 		virtual void LinkPin(NodePin* output_pin) = 0;
+		virtual void SerializePin(YAML::Emitter& output_emitter) const = 0;
 
 		void DeleteLink(int input_pin_id = -1);
 
@@ -63,10 +66,11 @@ namespace Kaimos::MaterialEditor {
 	public:
 
 		// --- Public Pin Methods ---
-		virtual bool IsInput()						const override { return false; }
-		virtual void LinkPin(NodePin* input_pin)	override;
+		virtual bool IsInput()										const override { return false; }
+		virtual void LinkPin(NodePin* input_pin)					override;
+		virtual void SerializePin(YAML::Emitter& output_emitter)	const override;
 
-		void SetOutputValue(float* value)			{ SetValue(value); }
+		void SetOutputValue(float* value)							{ SetValue(value); }
 		void SetOutputDataType(PinDataType datatype_to_set);
 		
 		void DisconnectInputPin(uint input_pinID);
@@ -103,6 +107,8 @@ namespace Kaimos::MaterialEditor {
 		// --- Public Pin Methods ---
 		virtual bool IsInput()						const override	{ return true; }
 		virtual void LinkPin(NodePin* output_pin)	override;
+
+		virtual void SerializePin(YAML::Emitter& output_emitter) const override;
 
 		void DisconnectOutputPin(bool is_destroying = false);
 		Ref<float> CalculateInputValue();

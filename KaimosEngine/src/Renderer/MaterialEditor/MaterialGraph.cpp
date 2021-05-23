@@ -4,6 +4,7 @@
 
 #include <imgui.h>
 #include <imnodes.h>
+#include <yaml-cpp/yaml.h>
 
 
 namespace Kaimos::MaterialEditor {
@@ -152,16 +153,42 @@ namespace Kaimos::MaterialEditor {
 
 
 	// ----------------------- Public Serialization Methods ----------------------------------------------
-	void MaterialGraph::LoadGraph() const
+	void MaterialGraph::DeserializeGraph() const
 	{
-		std::string filename = "settings/mat_graphs/NodeGraph_" + std::to_string(m_ID) + ".ini";
-		ImNodes::LoadCurrentEditorStateFromIniFile(filename.c_str());
+		LoadEditorSettings();
 	}
 
-	void MaterialGraph::SaveGraph() const
+	void MaterialGraph::SerializeGraph(YAML::Emitter& output_emitter) const
 	{
-		std::string filename = "settings/mat_graphs/NodeGraph_" + std::to_string(m_ID) + ".ini";
+		// -- Begin Graph Map --
+		output_emitter << YAML::BeginMap;
+		output_emitter << YAML::Key << "MaterialGraph" << YAML::Value << m_ID;
+
+		// -- Serialize Main Node --
+		output_emitter << YAML::Key << "MainRootNode";
+		m_MainMatNode->SerializeNode(output_emitter);
+
+		// -- Serialize Nodes (as Sequence) --
+		output_emitter << YAML::Key << "Nodes" << YAML::Value << YAML::BeginSeq;
+		for (uint i = 1; i < m_Nodes.size(); ++i)
+			m_Nodes[i]->SerializeNode(output_emitter);
+
+		// -- End Nodes Sequence & Graph Map & Save .ini File --
+		output_emitter << YAML::EndSeq;
+		output_emitter << YAML::EndMap;
+		SaveEditorSettings();
+	}
+
+	void MaterialGraph::SaveEditorSettings() const
+	{
+		std::string filename = "../KaimosEngine/res/settings/mat_graphs/NodeGraph_" + std::to_string(m_ID) + ".ini";
 		ImNodes::SaveCurrentEditorStateToIniFile(filename.c_str());
+	}
+
+	void MaterialGraph::LoadEditorSettings() const
+	{
+		std::string filename = "../KaimosEngine/res/settings/mat_graphs/NodeGraph_" + std::to_string(m_ID) + ".ini";
+		ImNodes::LoadCurrentEditorStateFromIniFile(filename.c_str());
 	}
 
 }

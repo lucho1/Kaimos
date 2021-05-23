@@ -4,6 +4,7 @@
 
 #include <imgui.h>
 #include <imnodes.h>
+#include <yaml-cpp/yaml.h>
 
 
 namespace Kaimos::MaterialEditor {
@@ -23,6 +24,19 @@ namespace Kaimos::MaterialEditor {
 			((NodeInputPin*)this)->DisconnectOutputPin();
 		else if (input_pin_id != -1)
 			((NodeOutputPin*)this)->DisconnectInputPin(input_pin_id);
+	}
+
+
+	void NodePin::SerializeBasePin(YAML::Emitter& output_emitter) const
+	{
+		// -- Serialize Variables --
+		output_emitter << YAML::Key << "ID" << YAML::Value << m_ID;
+		output_emitter << YAML::Key << "Name" << YAML::Value << m_Name.c_str();
+		output_emitter << YAML::Key << "DataType" << YAML::Value << (int)m_PinDataType;
+
+		// -- Serialize Pin Value --
+		glm::vec4 val = { m_Value.get()[0], m_Value.get()[1], m_Value.get()[2], m_Value.get()[3] };
+		output_emitter << YAML::Key << "Value" << YAML::Value << val;
 	}
 
 
@@ -150,6 +164,7 @@ namespace Kaimos::MaterialEditor {
 			static_cast<NodeInputPin*>(input_pin)->LinkPin(this);
 	}
 
+
 	void NodeOutputPin::DisconnectAllInputPins()
 	{
 		for (NodeInputPin* pin : m_InputsLinked)
@@ -173,6 +188,32 @@ namespace Kaimos::MaterialEditor {
 				break;
 			}
 		}
+	}
+
+
+	void NodeOutputPin::SerializePin(YAML::Emitter& output_emitter) const
+	{
+		// -- Begin Pin Map --
+		output_emitter << YAML::Key << "OutputPin";
+		output_emitter << YAML::BeginMap;
+
+		// -- Serialize Base Pin & Variables --
+		SerializeBasePin(output_emitter);
+		output_emitter << YAML::Key << "IsVertexParam" << YAML::Value << m_VertexParameter;
+
+		// -- Serialize Inputs Linked --
+		output_emitter << YAML::Key << "InputPinsLinked" << YAML::Value << YAML::BeginSeq;
+		for (uint i = 0; i < m_InputsLinked.size(); ++i)
+		{
+			output_emitter << YAML::BeginMap;
+			std::string input_keyval = "InputPinLinked" + std::to_string(i);
+			output_emitter << YAML::Key << input_keyval.c_str() << YAML::Value << m_InputsLinked[i]->GetID();
+			output_emitter << YAML::EndMap;
+		}
+
+		// -- End Inputs Sequence & Pin Map --
+		output_emitter << YAML::EndSeq;
+		output_emitter << YAML::EndMap;
 	}
 	
 	
@@ -325,6 +366,24 @@ namespace Kaimos::MaterialEditor {
 			return m_OutputLinked->m_OwnerNode->CalculateNodeResult();
 
 		return m_Value;
+	}
+
+
+	void NodeInputPin::SerializePin(YAML::Emitter& output_emitter) const
+	{
+		// -- Begin Pin Map --
+		output_emitter << YAML::BeginMap;
+
+		// -- Serialize Base Pin & Variables --
+		SerializeBasePin(output_emitter);
+		output_emitter << YAML::Key << "AllowsMultipleTypes" << YAML::Value << m_AllowsMultipleTypes;
+
+		// -- Serialize Pin Default Value --
+		glm::vec4 def_val = { m_DefaultValue.get()[0], m_DefaultValue.get()[1], m_DefaultValue.get()[2], m_DefaultValue.get()[3] };
+		output_emitter << YAML::Key << "DefValue" << YAML::Value << def_val;
+
+		// -- End Pin Map --
+		output_emitter << YAML::EndMap;
 	}
 
 }
