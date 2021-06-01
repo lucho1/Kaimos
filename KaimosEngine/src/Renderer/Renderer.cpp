@@ -63,6 +63,13 @@ namespace Kaimos {
 		return material;
 	}
 
+	Ref<Material> Renderer::CreateMaterialWithID(uint id)
+	{
+		Ref<Material> material = CreateRef<Material>(new Material(id));
+		s_SceneData->Materials.push_back(material);
+		return material;
+	}
+
 	Ref<Material> Renderer::GetMaterial(uint material_id)
 	{
 		for (Ref<Material>& mat : s_SceneData->Materials)
@@ -105,6 +112,67 @@ namespace Kaimos {
 
 	void Renderer::DeserializeRenderer()
 	{
+		// -- File Load --
+		YAML::Node data;
+
+		std::string filename = "../KaimosEngine/res/settings/KaimosRendererSettings.kaimossave";
+		std::ifstream f(filename.c_str());
+
+		if (!f.good())
+			return;
+
+		try { data = YAML::LoadFile(filename); }
+		catch (const YAML::ParserException& exception)
+		{
+			KS_ENGINE_ERROR("Error Loading Renderer\nError: {0}", exception.what());
+			return;
+		}
+
+		if (!data["KaimosSaveFile"])
+		{
+			KS_ENGINE_ERROR("Error Loading Renderer\nError: Wrong File, it has no 'KaimosSaveFile' node");
+			return;
+		}
+
+		// -- Scene Setup --
+		KS_ENGINE_TRACE("Deserializing KaimosRenderer");
+		YAML::Node materials_node = data["Materials"];
+		if (materials_node)
+		{
+			for (auto material_subnode : materials_node)
+			{
+				//output << YAML::BeginMap;
+				//output << YAML::Key << "Material" << YAML::Value << mat->GetID();
+				//output << YAML::Key << "AttachedGraph";
+				//mat->m_AttachedGraph->SerializeGraph(output);
+
+				auto graph_subnode = material_subnode["AttachedGraph"];
+				if (material_subnode["Material"] && graph_subnode)
+				{
+					// Get or Create Material with ID
+					uint mat_id = material_subnode["Material"].as<uint>();
+					Ref<Material> material = GetMaterial(mat_id);
+
+					if(!material)
+						material = CreateMaterialWithID(mat_id);
+
+					// Remove the Graph (if exists)
+					material->RemoveGraph();
+
+					// Create a graph with ID and call him to deseralize passing file
+					uint graph_id = graph_subnode["MaterialGraph"].as<uint>();
+					ScopePtr<MaterialEditor::MaterialGraph> mat_graph = CreateScopePtr<MaterialEditor::MaterialGraph>(new MaterialEditor::MaterialGraph(graph_id));
+
+					std::string mat_texture_file;
+					mat_graph->DeserializeGraph(graph_subnode, material, mat_texture_file);
+
+					// Finally, assign graph & texture to material
+					material->SetGraphUniqueRef(mat_graph);
+					if(!mat_texture_file.empty())
+						material->SetTexture(mat_texture_file);
+				}
+			}
+		}
 	}
 
 

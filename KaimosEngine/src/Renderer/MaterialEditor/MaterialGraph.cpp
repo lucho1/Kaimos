@@ -5,10 +5,11 @@
 #include <imgui.h>
 #include <imnodes.h>
 #include <yaml-cpp/yaml.h>
+#include "Scene/KaimosYAMLExtension.h"
+
 
 
 namespace Kaimos::MaterialEditor {
-
 
 	// ----------------------- Public Class Methods ------------------------------------------------------
 	MaterialGraph::MaterialGraph(Material* attached_material)
@@ -42,6 +43,7 @@ namespace Kaimos::MaterialEditor {
 	}
 
 
+	
 
 	// ----------------------- Creation Methods ----------------------------------------------------------
 	MaterialNode* MaterialGraph::CreateNode(VertexParameterNodeType vertexparam_type)
@@ -49,7 +51,7 @@ namespace Kaimos::MaterialEditor {
 		if (vertexparam_type == VertexParameterNodeType::NONE)
 		{
 			KS_ERROR_AND_ASSERT("Tried to create an invalid Vertex Parameter Node");
-			return 0;
+			return nullptr;
 		}
 
 		MaterialNode* node = static_cast<MaterialNode*>(new VertexParameterMaterialNode(vertexparam_type));
@@ -62,7 +64,7 @@ namespace Kaimos::MaterialEditor {
 		if (constant_type == ConstantNodeType::NONE)
 		{
 			KS_ERROR_AND_ASSERT("Tried to create an invalid Constant Node");
-			return 0;
+			return nullptr;
 		}
 
 		MaterialNode* node = static_cast<MaterialNode*>(new ConstantMaterialNode(constant_type));
@@ -75,7 +77,7 @@ namespace Kaimos::MaterialEditor {
 		if (operation_type == OperationNodeType::NONE || operation_data_type == PinDataType::NONE)
 		{
 			KS_ERROR_AND_ASSERT("Tried to create an invalid Operation Node");
-			return 0;
+			return nullptr;
 		}
 
 		MaterialNode* node = static_cast<MaterialNode*>(new OperationMaterialNode(operation_type, operation_data_type));
@@ -124,6 +126,11 @@ namespace Kaimos::MaterialEditor {
 		m_MainMatNode->SyncValuesWithMaterial();
 	}
 
+	void MaterialGraph::SyncMaterialValuesWithGraph()
+	{
+		m_MainMatNode->SyncMaterialValues();
+	}
+
 	void MaterialGraph::SyncVertexParameterNodes(VertexParameterNodeType vtxpm_node_type, float* value)
 	{
 		std::vector<Ref<MaterialNode>>::const_iterator it = m_Nodes.begin();
@@ -153,8 +160,121 @@ namespace Kaimos::MaterialEditor {
 
 
 	// ----------------------- Public Serialization Methods ----------------------------------------------
-	void MaterialGraph::DeserializeGraph() const
+	void MaterialGraph::DeserializeGraph(const YAML::Node& yaml_graph_node, Ref<Material> attached_material, std::string& texture_path)
 	{
+		// Setup main root node by deserializing the node
+		// Then run through nodes to deserialize and add each
+		// Fill a map (or similar) with links
+		// Setup all the links
+
+		//m_MainMatNode = CreateRef<MainMaterialNode>(attached_material);
+		//m_Nodes.push_back(m_MainMatNode);
+		texture_path = "";
+		auto main_node = yaml_graph_node["MainRootNode"];
+
+		if (main_node)
+		{
+			if(main_node["TextureFile"])
+				texture_path = main_node["TextureFile"].as<std::string>();
+
+			m_MainMatNode = CreateRef<MainMaterialNode>(attached_material.get(), main_node["Node"].as<uint>());
+			m_MainMatNode->DeserializeMainNode(main_node["InputPins"]);
+			m_Nodes.push_back(m_MainMatNode);
+		}
+		else
+			m_MainMatNode = CreateRef<MainMaterialNode>(attached_material.get());
+
+
+		YAML::Node nodes_node = yaml_graph_node["Nodes"];
+		if (nodes_node)
+		{
+			std::vector<std::pair<uint, uint>> links_vector;
+			for (auto node_val : nodes_node)
+			{
+				MaterialNode* node = nullptr;
+
+				std::string node_name = node_val["Name"].as<std::string>();
+				uint node_id = node_val["Node"].as<uint>();
+				MaterialEditor::MaterialNodeType node_type = (MaterialEditor::MaterialNodeType)(node_val["Type"].as<int>());
+
+				switch (node_type)
+				{
+					case MaterialEditor::MaterialNodeType::CONSTANT:
+					{
+						auto spectype_node = node_val["ConstNodeType"];
+						if (spectype_node)
+						{
+							MaterialEditor::ConstantNodeType const_type = (MaterialEditor::ConstantNodeType)spectype_node.as<int>();
+							node = static_cast<MaterialNode*>(new ConstantMaterialNode(node_name, const_type, node_id));
+							break;
+						}
+					}
+					case MaterialEditor::MaterialNodeType::OPERATION:
+					{
+						auto spectype_node = node_val["OpNodeType"];
+						if (spectype_node)
+						{
+							MaterialEditor::OperationNodeType op_type = (MaterialEditor::OperationNodeType)spectype_node.as<int>();
+							node = static_cast<MaterialNode*>(new OperationMaterialNode(node_name, op_type, node_id));
+							break;
+						}
+					}
+					case MaterialEditor::MaterialNodeType::VERTEX_PARAMETER:
+					{
+						auto spectype_node = node_val["VParamNodeType"];
+						if (spectype_node)
+						{
+							MaterialEditor::VertexParameterNodeType vparam_type = (MaterialEditor::VertexParameterNodeType)spectype_node.as<int>();
+							node = static_cast<MaterialNode*>(new VertexParameterMaterialNode(node_name, vparam_type, node_id));
+							break;
+						}
+					}
+				}
+
+				if (node)
+				{
+					auto outputpin_node = node_val["OutputPin"];
+					if (outputpin_node)
+					{
+						uint pin_id = outputpin_node["Pin"].as<uint>();
+						std::string pin_name = outputpin_node["Name"].as<std::string>();
+						int pin_datatype = outputpin_node["DataType"].as<int>();
+						glm::vec4 pin_value = outputpin_node["Value"].as<glm::vec4>();
+						bool is_vertparam = outputpin_node["IsVertexParam"].as<bool>();
+
+						for (auto input_linked : outputpin_node["InputPinsLinkedIDs"])
+						{
+							uint linkedinputpin_id = input_linked.as<uint>();
+							links_vector.push_back(std::make_pair(pin_id, linkedinputpin_id));
+						}
+
+						node->AddDeserializedOutputPin(pin_name, pin_id, pin_datatype, pin_value, is_vertparam);
+					}
+
+					auto inputpins_node = node_val["InputPins"];
+					if (inputpins_node)
+					{
+						for (auto inputpin_node : inputpins_node)
+						{
+							uint pin_id = inputpin_node["Pin"].as<uint>();
+							std::string pin_name = inputpin_node["Name"].as<std::string>();
+							int pin_datatype = inputpin_node["DataType"].as<int>();
+							glm::vec4 pin_value = inputpin_node["Value"].as<glm::vec4>();
+							glm::vec4 pin_defvalue = inputpin_node["DefValue"].as<glm::vec4>();
+							bool multitype_pin = inputpin_node["AllowsMultipleTypes"].as<bool>();
+
+							node->AddDeserializedInputPin(pin_name, pin_id, pin_datatype, pin_value, pin_defvalue, multitype_pin);
+						}
+					}
+
+					m_Nodes.push_back(CreateRef<MaterialNode>(node));
+				}
+			}
+
+			for (auto link_pair : links_vector)
+				CreateLink(link_pair.first, link_pair.second);
+		}
+
 		LoadEditorSettings();
 	}
 
@@ -166,12 +286,18 @@ namespace Kaimos::MaterialEditor {
 
 		// -- Serialize Main Node --
 		output_emitter << YAML::Key << "MainRootNode";
+		output_emitter << YAML::BeginMap;
 		m_MainMatNode->SerializeNode(output_emitter);
+		output_emitter << YAML::EndMap;
 
 		// -- Serialize Nodes (as Sequence) --
 		output_emitter << YAML::Key << "Nodes" << YAML::Value << YAML::BeginSeq;
 		for (uint i = 1; i < m_Nodes.size(); ++i)
+		{
+			output_emitter << YAML::BeginMap;
 			m_Nodes[i]->SerializeNode(output_emitter);
+			output_emitter << YAML::EndMap;
+		}
 
 		// -- End Nodes Sequence & Graph Map & Save .ini File --
 		output_emitter << YAML::EndSeq;

@@ -23,14 +23,11 @@ Entities:
       Tag: Sprite
     TransformComponent:
       EntityActive: true
-      Translation: [-1.60000002, 0, 0]
+      Translation: [-1.5, 0, 0]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     SpriteRendererComponent:
-      Color: [1, 0, 0, 1]
-      TextureFile: D:\GitHub\Kaimos\KaimosEditor\assets\textures\ChernoLogo.png
-      TextureTiling: 0.5
-      TextureUVOffset: [17.7999992, 2.5]
+      Material: 1169275854
   - Entity: 74182393
     TagComponent:
       Tag: LeftSquare
@@ -40,10 +37,7 @@ Entities:
       Rotation: [0, -0.785398185, 0]
       Scale: [1, 1, 1]
     SpriteRendererComponent:
-      Color: [0, 0.567347765, 0.915492952, 1]
-      TextureFile: ""
-      TextureTiling: 1
-      TextureUVOffset: [0, 0]
+      Material: 1703891235
   - Entity: 476626698
     TagComponent:
       Tag: TopSquare
@@ -53,10 +47,7 @@ Entities:
       Rotation: [1.57079637, 0.785398185, 0]
       Scale: [1, 1, 1]
     SpriteRendererComponent:
-      Color: [0, 0.476274103, 0.765258193, 1]
-      TextureFile: ""
-      TextureTiling: 1
-      TextureUVOffset: [0, 0]
+      Material: 1165219968
   - Entity: 1924290077
     TagComponent:
       Tag: RightSquare
@@ -66,7 +57,4 @@ Entities:
       Rotation: [0, 0.785398185, 0]
       Scale: [1, 1, 1]
     SpriteRendererComponent:
-      Color: [0, 0.338953316, 0.544600964, 1]
-      TextureFile: ""
-      TextureTiling: 1
-      TextureUVOffset: [0, 0]
+      Material: 1911314598

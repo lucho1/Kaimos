@@ -7,116 +7,117 @@
 #include "ECS/Components.h"
 
 #include <yaml-cpp/yaml.h>
+#include "KaimosYAMLExtension.h"
 
 
 // ---------------------------------------------------------------------------------------------------
 // ----------------------- YAML Additions Static Methods ---------------------------------------------
 // TODO: Make this in another place ???
-namespace YAML {
-	
-	template<>
-	struct convert<glm::vec2>
-	{
-		static Node encode(const glm::vec2& vec)
-		{
-			Node node;
-			node.push_back(vec.x);
-			node.push_back(vec.y);
-			node.SetStyle(EmitterStyle::Flow);
-			return node;
-		}
-
-		static bool decode(const Node& node, glm::vec2& vec)
-		{
-			if (!node.IsSequence() || node.size() != 2)
-				return false;
-
-			vec.x = node[0].as<float>();
-			vec.y = node[1].as<float>();
-			return true;
-		}
-	};
-
-	template<>
-	struct convert<glm::vec3>
-	{
-		static Node encode(const glm::vec3& vec)
-		{
-			Node node;
-			node.push_back(vec.x);
-			node.push_back(vec.y);
-			node.push_back(vec.z);
-			node.SetStyle(EmitterStyle::Flow);
-			return node;
-		}
-
-		static bool decode(const Node& node, glm::vec3& vec)
-		{
-			if (!node.IsSequence() || node.size() != 3)
-				return false;
-
-			vec.x = node[0].as<float>();
-			vec.y = node[1].as<float>();
-			vec.z = node[2].as<float>();
-			return true;
-		}
-	};
-
-	template<>
-	struct convert<glm::vec4>
-	{
-		static Node encode(const glm::vec4& vec)
-		{
-			Node node;
-			node.push_back(vec.x);
-			node.push_back(vec.y);
-			node.push_back(vec.z);
-			node.push_back(vec.w);
-			node.SetStyle(EmitterStyle::Flow);
-			return node;
-		}
-
-		static bool decode(const Node& node, glm::vec4& vec)
-		{
-			if (!node.IsSequence() || node.size() != 4)
-				return false;
-
-			vec.x = node[0].as<float>();
-			vec.y = node[1].as<float>();
-			vec.z = node[2].as<float>();
-			vec.w = node[3].as<float>();
-			return true;
-		}
-	};
-}
+//namespace YAML {
+//	
+//	template<>
+//	struct convert<glm::vec2>
+//	{
+//		static Node encode(const glm::vec2& vec)
+//		{
+//			Node node;
+//			node.push_back(vec.x);
+//			node.push_back(vec.y);
+//			node.SetStyle(EmitterStyle::Flow);
+//			return node;
+//		}
+//
+//		static bool decode(const Node& node, glm::vec2& vec)
+//		{
+//			if (!node.IsSequence() || node.size() != 2)
+//				return false;
+//
+//			vec.x = node[0].as<float>();
+//			vec.y = node[1].as<float>();
+//			return true;
+//		}
+//	};
+//
+//	template<>
+//	struct convert<glm::vec3>
+//	{
+//		static Node encode(const glm::vec3& vec)
+//		{
+//			Node node;
+//			node.push_back(vec.x);
+//			node.push_back(vec.y);
+//			node.push_back(vec.z);
+//			node.SetStyle(EmitterStyle::Flow);
+//			return node;
+//		}
+//
+//		static bool decode(const Node& node, glm::vec3& vec)
+//		{
+//			if (!node.IsSequence() || node.size() != 3)
+//				return false;
+//
+//			vec.x = node[0].as<float>();
+//			vec.y = node[1].as<float>();
+//			vec.z = node[2].as<float>();
+//			return true;
+//		}
+//	};
+//
+//	template<>
+//	struct convert<glm::vec4>
+//	{
+//		static Node encode(const glm::vec4& vec)
+//		{
+//			Node node;
+//			node.push_back(vec.x);
+//			node.push_back(vec.y);
+//			node.push_back(vec.z);
+//			node.push_back(vec.w);
+//			node.SetStyle(EmitterStyle::Flow);
+//			return node;
+//		}
+//
+//		static bool decode(const Node& node, glm::vec4& vec)
+//		{
+//			if (!node.IsSequence() || node.size() != 4)
+//				return false;
+//
+//			vec.x = node[0].as<float>();
+//			vec.y = node[1].as<float>();
+//			vec.z = node[2].as<float>();
+//			vec.w = node[3].as<float>();
+//			return true;
+//		}
+//	};
+//}
 // ---------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------
 
 
 namespace Kaimos {
 
-	// ----------------------- YAML Operators Methods ----------------------------------------------------
-	YAML::Emitter& operator<<(YAML::Emitter& output, const glm::vec2& vec)
-	{
-		output << YAML::Flow;
-		output << YAML::BeginSeq << vec.x << vec.y << YAML::EndSeq;
-		return output;
-	}
+	//// ----------------------- YAML Operators Methods ----------------------------------------------------
+	//YAML::Emitter& operator<<(YAML::Emitter& output, const glm::vec2& vec)
+	//{
+	//	output << YAML::Flow;
+	//	output << YAML::BeginSeq << vec.x << vec.y << YAML::EndSeq;
+	//	return output;
+	//}
 
-	YAML::Emitter& operator<<(YAML::Emitter& output, const glm::vec3& vec)
-	{
-		// Flow, instead of serializing each value separatedly (x; y; z) will put them together as [x, y, z]
-		output << YAML::Flow;
-		output << YAML::BeginSeq << vec.x << vec.y << vec.z << YAML::EndSeq;
-		return output;
-	}
+	//YAML::Emitter& operator<<(YAML::Emitter& output, const glm::vec3& vec)
+	//{
+	//	// Flow, instead of serializing each value separatedly (x; y; z) will put them together as [x, y, z]
+	//	output << YAML::Flow;
+	//	output << YAML::BeginSeq << vec.x << vec.y << vec.z << YAML::EndSeq;
+	//	return output;
+	//}
 
-	YAML::Emitter& operator<<(YAML::Emitter& output, const glm::vec4& vec)
-	{
-		output << YAML::Flow;
-		output << YAML::BeginSeq << vec.x << vec.y << vec.z << vec.w << YAML::EndSeq;
-		return output;
-	}
+	//YAML::Emitter& operator<<(YAML::Emitter& output, const glm::vec4& vec)
+	//{
+	//	output << YAML::Flow;
+	//	output << YAML::BeginSeq << vec.x << vec.y << vec.z << vec.w << YAML::EndSeq;
+	//	return output;
+	//}
 
 
 
@@ -187,10 +188,11 @@ namespace Kaimos {
 
 			output << YAML::Key << "SpriteRendererComponent";
 			output << YAML::BeginMap;
-			output << YAML::Key << "Color" << YAML::Value << sprite_comp.SpriteMaterial->Color;
-			output << YAML::Key << "TextureFile" << YAML::Value << sprite_comp.SpriteMaterial->GetTexturePath();
-			output << YAML::Key << "TextureTiling" << YAML::Value << sprite_comp.SpriteMaterial->TextureTiling;
-			output << YAML::Key << "TextureUVOffset" << YAML::Value << sprite_comp.SpriteMaterial->TextureUVOffset;
+			output << YAML::Key << "Material" << YAML::Value << sprite_comp.SpriteMaterial->GetID();
+			//output << YAML::Key << "Color" << YAML::Value << sprite_comp.SpriteMaterial->Color;
+			//output << YAML::Key << "TextureFile" << YAML::Value << sprite_comp.SpriteMaterial->GetTexturePath();
+			//output << YAML::Key << "TextureTiling" << YAML::Value << sprite_comp.SpriteMaterial->TextureTiling;
+			//output << YAML::Key << "TextureUVOffset" << YAML::Value << sprite_comp.SpriteMaterial->TextureUVOffset;
 			output << YAML::EndMap;
 		}
 		
@@ -235,6 +237,7 @@ namespace Kaimos {
 	bool SceneSerializer::Deserialize(const std::string& filepath) const
 	{
 		KS_PROFILE_FUNCTION();
+		Renderer::DeserializeRenderer();
 
 		// -- File Load --
 		YAML::Node data;
@@ -313,24 +316,35 @@ namespace Kaimos {
 				YAML::Node sprite_node = entity["SpriteRendererComponent"];
 				if (sprite_node)
 				{
-					Ref<Material>* mat = &Renderer::CreateMaterial();
-					(*mat)->Color = sprite_node["Color"].as<glm::vec4>();
+					//Ref<Material>* mat = &Renderer::CreateMaterial();
+					//(*mat)->Color = sprite_node["Color"].as<glm::vec4>();
+					//
+					//auto file_node = sprite_node["TextureFile"];
+					//if (file_node && !file_node.as<std::string>().empty())
+					//	(*mat)->SetTexture(file_node.as<std::string>());
+					//
+					//auto tile_node = sprite_node["TextureTiling"];
+					//if (tile_node)
+					//	(*mat)->TextureTiling = tile_node.as<float>();
+					//
+					//auto offset_node = sprite_node["TextureUVOffset"];
+					//if (offset_node)
+					//	(*mat)->TextureUVOffset = offset_node.as<glm::vec2>();
 
-					auto file_node = sprite_node["TextureFile"];
-					if (file_node && !file_node.as<std::string>().empty())
-						(*mat)->SetTexture(file_node.as<std::string>());
 
-					auto tile_node = sprite_node["TextureTiling"];
-					if (tile_node)
-						(*mat)->TextureTiling = tile_node.as<float>();
+					uint mat_node = 0;
+					//if(sprite_node["Material"])
+						mat_node = sprite_node["Material"].as<uint>();
 
-					auto offset_node = sprite_node["TextureUVOffset"];
-					if (offset_node)
-						(*mat)->TextureUVOffset = offset_node.as<glm::vec2>();
+
+					Ref<Material>* mat = &Renderer::GetMaterial(mat_node);
+
+					if(!mat)
+						mat = &Renderer::CreateMaterial();
 					
 					SpriteRendererComponent& sprite_comp = deserialized_entity.AddComponent<SpriteRendererComponent>();
 					sprite_comp.SetMaterial(*mat);
-					(*mat)->SyncGraphValuesWithMaterial();
+					//(*mat)->SyncGraphValuesWithMaterial(); // TODO: Delete this?
 				}
 			}
 		}

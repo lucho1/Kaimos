@@ -4,6 +4,7 @@
 
 #include "Core/Application/Application.h"
 #include "Scene/ECS/Components.h"
+#include "Scene/KaimosYAMLExtension.h"
 
 #include "Imgui/ImGuiUtils.h"
 #include "Core/Utils/PlatformUtils.h"
@@ -14,8 +15,8 @@
 #include <yaml-cpp/yaml.h>
 
 
-namespace Kaimos::MaterialEditor {
 
+namespace Kaimos::MaterialEditor {
 
 	// ---------------------------- BASE MAT NODE ---------------------------------------------------------
 	// ----------------------- Public Class Methods -------------------------------------------------------
@@ -76,6 +77,18 @@ namespace Kaimos::MaterialEditor {
 		return nullptr;
 	}
 
+	Ref<NodeInputPin> MaterialNode::AddDeserializedInputPin(const std::string& pin_name, uint pin_id, int pin_datatype, const glm::vec4& pin_value, const glm::vec4& pin_defvalue, bool multitype)
+	{
+		Ref<NodeInputPin> in_pin = CreateRef<NodeInputPin>(this, pin_name, pin_id, (PinDataType)pin_datatype, glm::value_ptr(pin_value), glm::value_ptr(pin_defvalue), multitype);
+		m_NodeInputPins.push_back(in_pin);
+		return in_pin;
+	}
+
+	void MaterialNode::AddDeserializedOutputPin(const std::string& pin_name, uint pin_id, int pin_datatype, const glm::vec4& pin_value, bool is_vtxparam)
+	{
+		m_NodeOutputPin = CreateRef<NodeOutputPin>(this, pin_name, pin_id, (PinDataType)pin_datatype, glm::value_ptr(pin_value), is_vtxparam);
+	}
+
 
 
 	// ----------------------- Public Material Node Methods -----------------------------------------------
@@ -110,9 +123,9 @@ namespace Kaimos::MaterialEditor {
 	void MaterialNode::SerializeBaseNode(YAML::Emitter& output_emitter) const
 	{
 		// -- Serialize Variables --
+		output_emitter << YAML::Key << "Node" << YAML::Value << m_ID;
 		output_emitter << YAML::Key << "Name" << YAML::Value << m_Name.c_str();
 		output_emitter << YAML::Key << "Type" << YAML::Value << (int)m_Type;
-		output_emitter << YAML::Key << "ID" << YAML::Value << m_ID;
 
 		// -- Serialize Pins (Inputs as Sequence) --
 		if (m_NodeOutputPin)
@@ -159,6 +172,36 @@ namespace Kaimos::MaterialEditor {
 		m_TextureTilingPin.reset();
 		m_TextureOffsetPin.reset();
 		m_ColorPin.reset();
+	}
+
+
+	void MainMaterialNode::DeserializeMainNode(const YAML::Node& inputs_nodes)
+	{
+		for (auto inputpin_node : inputs_nodes)
+		{
+			uint pin_id = inputpin_node["Pin"].as<uint>();
+			std::string pin_name = inputpin_node["Name"].as<std::string>();
+			int pin_datatype = inputpin_node["DataType"].as<int>();
+			glm::vec4 pin_value = inputpin_node["Value"].as<glm::vec4>();
+			glm::vec4 pin_defvalue = inputpin_node["DefValue"].as<glm::vec4>();
+			bool multitype_pin = inputpin_node["AllowsMultipleTypes"].as<bool>();
+
+
+			Ref<NodeInputPin> pin = AddDeserializedInputPin(pin_name, pin_id, pin_datatype, pin_value, pin_defvalue, multitype_pin);
+
+			if (pin_name == "Vertex Position (Vec3)")
+				m_VertexPositionPin = pin;
+			else if (pin_name == "Vertex Normal (Vec3)")
+				m_VertexNormalPin = pin;
+			else if (pin_name == "Texture Coordinates (Vec2)")
+				m_TextureCoordinatesPin = pin;
+			else if (pin_name == "Texture Tiling (float)")
+				m_TextureTilingPin = pin;
+			else if (pin_name == "Texture Offset (Vec2)")
+				m_TextureOffsetPin = pin;
+			else if (pin_name == "Color (Vec4)")
+				m_ColorPin = pin;
+		}
 	}
 
 
@@ -249,14 +292,22 @@ namespace Kaimos::MaterialEditor {
 		m_ColorPin->SetInputValue(glm::value_ptr(m_AttachedMaterial->Color));
 	}
 
+	void MainMaterialNode::SyncMaterialValues()
+	{
+		m_AttachedMaterial->TextureTiling = m_TextureTilingPin->GetValue().get()[0];
+		m_AttachedMaterial->TextureUVOffset = { m_TextureOffsetPin->GetValue().get()[0], m_TextureOffsetPin->GetValue().get()[1] };
+		m_AttachedMaterial->Color = { m_ColorPin->GetValue().get()[0], m_ColorPin->GetValue().get()[1], m_ColorPin->GetValue().get()[2], m_ColorPin->GetValue().get()[3] };
+
+		//m_VertexPositionPin->DrawUI(set_node_draggable, nullptr, true);
+		//m_VertexNormalPin->DrawUI(set_node_draggable, nullptr, true);
+		//m_TextureCoordinatesPin->DrawUI(set_node_draggable, nullptr, true);
+	}
+
 	void MainMaterialNode::SerializeNode(YAML::Emitter& output_emitter) const
 	{
-		// -- Begin YAML Map for Node & Serialize --
-		output_emitter << YAML::BeginMap;
+		// -- Serialize Base Node --
+		output_emitter << YAML::Key << "TextureFile" << YAML::Value << m_AttachedMaterial->GetTexturePath();
 		SerializeBaseNode(output_emitter);
-
-		// -- End YAML Map for Node --
-		output_emitter << YAML::EndMap;
 	}
 
 
@@ -304,13 +355,9 @@ namespace Kaimos::MaterialEditor {
 
 	void VertexParameterMaterialNode::SerializeNode(YAML::Emitter& output_emitter) const
 	{
-		// -- Begin YAML Map for Node & Serialize --
-		output_emitter << YAML::BeginMap;
+		// -- Serialize Base Node & VParam Type --
 		SerializeBaseNode(output_emitter);
 		output_emitter << YAML::Key << "VParamNodeType" << YAML::Value << (int)m_ParameterType;
-
-		// -- End YAML Map for Node --
-		output_emitter << YAML::EndMap;
 	}
 
 	void VertexParameterMaterialNode::AddOutputPin(PinDataType pin_data_type, const std::string& name, float default_value)
@@ -430,13 +477,9 @@ namespace Kaimos::MaterialEditor {
 
 	void ConstantMaterialNode::SerializeNode(YAML::Emitter& output_emitter) const
 	{
-		// -- Begin YAML Map for Node & Serialize --
-		output_emitter << YAML::BeginMap;
+		// -- Serialize Base Node & Const Type --
 		SerializeBaseNode(output_emitter);
 		output_emitter << YAML::Key << "ConstNodeType" << YAML::Value << (int)m_ConstantType;
-
-		// -- End YAML Map for Node --
-		output_emitter << YAML::EndMap;
 	}
 
 
@@ -500,13 +543,9 @@ namespace Kaimos::MaterialEditor {
 
 	void OperationMaterialNode::SerializeNode(YAML::Emitter& output_emitter) const
 	{
-		// -- Begin YAML Map for Node & Serialize --
-		output_emitter << YAML::BeginMap;
+		// -- Serialize Base Node & Op. Type --
 		SerializeBaseNode(output_emitter);
 		output_emitter << YAML::Key << "OpNodeType" << YAML::Value << (int)m_OperationType;
-
-		// -- End YAML Map for Node --
-		output_emitter << YAML::EndMap;
 	}
 
 }

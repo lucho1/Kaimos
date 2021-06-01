@@ -93,10 +93,9 @@ namespace Kaimos {
 	template<typename T>
 	using ScopePtr = std::unique_ptr<T>;
 	template<typename T, typename ... Args>
-	constexpr ScopePtr<T> CreateScopePtr(Args&& ... args)
-	{
-		return std::make_unique<T>(std::forward<Args>(args)...);
-	}
+	constexpr ScopePtr<T> CreateScopePtr(Args&& ... args) { return std::make_unique<T>(std::forward<Args>(args)...); }
+	template<typename T>
+	constexpr ScopePtr<T> CreateScopePtr(T* t) { return std::unique_ptr<T>(t); }
 
 	template<typename T>
 	using Ref = std::shared_ptr<T>;

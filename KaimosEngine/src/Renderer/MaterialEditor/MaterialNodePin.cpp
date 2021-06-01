@@ -1,6 +1,7 @@
 #include "kspch.h"
 #include "MaterialNodePin.h"
 #include "MaterialNode.h"
+#include "Scene/KaimosYAMLExtension.h"
 
 #include <imgui.h>
 #include <imnodes.h>
@@ -17,6 +18,11 @@ namespace Kaimos::MaterialEditor {
 		m_Value = CreateRef<float>(new float[4]);
 		std::fill(m_Value.get(), m_Value.get() + 4, 0.0f);
 	}
+	
+	NodePin::NodePin(MaterialNode* owner, PinDataType pin_data_type, const std::string& name, uint id, const float* value) : m_OwnerNode(owner), m_PinDataType(pin_data_type), m_Name(name), m_ID(id)
+	{
+		m_Value = CreateRef<float>(new float[4]{ value[0], value[1], value[2], value[3] });
+	}
 
 	void NodePin::DeleteLink(int input_pin_id)
 	{
@@ -30,7 +36,7 @@ namespace Kaimos::MaterialEditor {
 	void NodePin::SerializeBasePin(YAML::Emitter& output_emitter) const
 	{
 		// -- Serialize Variables --
-		output_emitter << YAML::Key << "ID" << YAML::Value << m_ID;
+		output_emitter << YAML::Key << "Pin" << YAML::Value << m_ID;
 		output_emitter << YAML::Key << "Name" << YAML::Value << m_Name.c_str();
 		output_emitter << YAML::Key << "DataType" << YAML::Value << (int)m_PinDataType;
 
@@ -202,13 +208,14 @@ namespace Kaimos::MaterialEditor {
 		output_emitter << YAML::Key << "IsVertexParam" << YAML::Value << m_VertexParameter;
 
 		// -- Serialize Inputs Linked --
-		output_emitter << YAML::Key << "InputPinsLinked" << YAML::Value << YAML::BeginSeq;
+		output_emitter << YAML::Key << "InputPinsLinkedIDs" << YAML::Value << YAML::BeginSeq;
 		for (uint i = 0; i < m_InputsLinked.size(); ++i)
 		{
-			output_emitter << YAML::BeginMap;
+			//output_emitter << YAML::BeginMap;
 			std::string input_keyval = "InputPinLinked" + std::to_string(i);
-			output_emitter << YAML::Key << input_keyval.c_str() << YAML::Value << m_InputsLinked[i]->GetID();
-			output_emitter << YAML::EndMap;
+			//output_emitter << YAML::Key << input_keyval.c_str() << YAML::Value << m_InputsLinked[i]->GetID();
+			output_emitter << YAML::Value << m_InputsLinked[i]->GetID();
+			//output_emitter << YAML::EndMap;
 		}
 
 		// -- End Inputs Sequence & Pin Map --
@@ -220,10 +227,18 @@ namespace Kaimos::MaterialEditor {
 
 	// ---------------------------- INPUT PIN -------------------------------------------------------------
 	// ----------------------- Public Class Methods -------------------------------------------------------
-	NodeInputPin::NodeInputPin(MaterialNode* owner, PinDataType pin_data_type, bool allows_multi_type, const std::string& name, float default_value) : NodePin(owner, pin_data_type, name), m_AllowsMultipleTypes(allows_multi_type)
+	NodeInputPin::NodeInputPin(MaterialNode* owner, PinDataType pin_data_type, bool allows_multi_type, const std::string& name, float default_value)
+		: NodePin(owner, pin_data_type, name), m_AllowsMultipleTypes(allows_multi_type)
 	{
 		m_DefaultValue = CreateRef<float>(new float[4]);
 		std::fill(m_DefaultValue.get(), m_DefaultValue.get() + 4, default_value);
+		ResetToDefault();
+	}
+
+	NodeInputPin::NodeInputPin(MaterialNode* owner, const std::string& name, uint id, PinDataType pin_data_type, const float* value, const float* default_value, bool allows_multi_type)
+		: NodePin(owner, pin_data_type, name, id, value), m_AllowsMultipleTypes(allows_multi_type)
+	{
+		m_DefaultValue = CreateRef<float>(new float[4]{ default_value[0], default_value[1], default_value[2], default_value[3] });
 		ResetToDefault();
 	}
 

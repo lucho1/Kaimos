@@ -8,7 +8,7 @@
 #include "Core/Utils/Maths/RandomGenerator.h"
 
 
-namespace YAML { class Emitter; }
+namespace YAML { class Emitter; class Node; }
 namespace Kaimos { class Material; }
 
 
@@ -25,8 +25,7 @@ namespace Kaimos::MaterialEditor {
 	protected:
 
 		// --- Protected Class Methods ---
-		MaterialNode(const std::string& name, MaterialNodeType type)
-			: m_Name(name), m_Type(type), m_ID((uint)Kaimos::Random::GetRandomInt()) {}
+		MaterialNode(const std::string& name, MaterialNodeType type, uint id = 0) : m_Name(name), m_Type(type) { m_ID = (id == 0 ? (uint)Kaimos::Random::GetRandomInt() : id); }
 		
 
 	public:
@@ -36,6 +35,9 @@ namespace Kaimos::MaterialEditor {
 
 		virtual void DrawNodeUI();
 		NodePin* FindPinInNode(uint pinID);
+
+		Ref<NodeInputPin> AddDeserializedInputPin(const std::string& pin_name, uint pin_id, int pin_datatype, const glm::vec4& pin_value, const glm::vec4& pin_defvalue, bool multitype);
+		void AddDeserializedOutputPin(const std::string& pin_name, uint pin_id, int pin_datatype, const glm::vec4& pin_value, bool is_vtxparam);
 
 		// Defined in child classes according to what each node type does
 		virtual Ref<float> CalculateNodeResult() = 0;
@@ -91,9 +93,11 @@ namespace Kaimos::MaterialEditor {
 
 		// --- Public Class Methods ---
 		MainMaterialNode(Material* attached_material);
+		MainMaterialNode(Material* attached_material, uint id) : MaterialNode("Main Node", MaterialNodeType::MAIN, id), m_AttachedMaterial(attached_material) {}
 		~MainMaterialNode();
 
 		virtual void DrawNodeUI() override;
+		void DeserializeMainNode(const YAML::Node& inputs_nodes);
 		
 		template<typename T>
 		T& GetVertexAttributeInput(VertexParameterNodeType vtxpm_node_type)
@@ -116,6 +120,8 @@ namespace Kaimos::MaterialEditor {
 
 		// --- Private Node Methods ---
 		void SyncValuesWithMaterial();
+		void SyncMaterialValues();
+
 		virtual Ref<float> CalculateNodeResult() override { return nullptr; }
 		virtual void SerializeNode(YAML::Emitter& output_emitter) const override;
 
@@ -145,6 +151,8 @@ namespace Kaimos::MaterialEditor {
 	public:
 
 		VertexParameterMaterialNode(VertexParameterNodeType parameter_type);
+		VertexParameterMaterialNode(const std::string& name, VertexParameterNodeType parameter_type, uint id)
+			: MaterialNode(name, MaterialNodeType::VERTEX_PARAMETER, id), m_ParameterType(parameter_type) {}
 		
 		void SetNodeOutputResult(float* value);
 		virtual void AddOutputPin(PinDataType pin_data_type, const std::string& name, float default_value = 1.0f) override;
@@ -167,7 +175,10 @@ namespace Kaimos::MaterialEditor {
 	class ConstantMaterialNode : public MaterialNode
 	{
 	public:
+
 		ConstantMaterialNode(ConstantNodeType constant_type);
+		ConstantMaterialNode(const std::string& name, ConstantNodeType constant_type, uint id)
+			: MaterialNode(name, MaterialNodeType::CONSTANT, id), m_ConstantType(constant_type) {}
 
 	private:
 
@@ -187,6 +198,9 @@ namespace Kaimos::MaterialEditor {
 	public:
 
 		OperationMaterialNode(OperationNodeType operation_type, PinDataType operation_data_type);
+		OperationMaterialNode(const std::string& name, OperationNodeType operation_type, uint id)
+			: MaterialNode(name, MaterialNodeType::OPERATION, id), m_OperationType(operation_type) {}
+
 		OperationNodeType GetOperationType() const { return m_OperationType; }
 
 	private:

@@ -16,6 +16,8 @@ namespace Kaimos::MaterialEditor {
 
 		// --- Protected Methods (for inheritance to use) ---
 		NodePin(MaterialNode* owner, PinDataType pin_data_type, const std::string& name);
+		NodePin(MaterialNode* owner, PinDataType pin_data_type, const std::string& name, uint id, const float* value);
+
 		~NodePin() { m_OwnerNode = nullptr; m_Value.reset(); }
 
 		void SetValue(const float* value) { memcpy(m_Value.get(), value, 16); }
@@ -60,6 +62,10 @@ namespace Kaimos::MaterialEditor {
 		NodeOutputPin(MaterialNode* owner, PinDataType pin_data_type, const std::string& name, bool vertex_parameter = false)
 			: NodePin(owner, pin_data_type, name), m_VertexParameter(vertex_parameter) {}
 
+		NodeOutputPin(MaterialNode* owner, const std::string& name, uint id, PinDataType pin_data_type, const float* value, bool vertex_parameter)
+			: NodePin(owner, pin_data_type, name, id, value), m_VertexParameter(vertex_parameter) {}
+
+
 		~NodeOutputPin();
 		virtual void DrawUI();
 
@@ -97,6 +103,8 @@ namespace Kaimos::MaterialEditor {
 
 		// --- Public Class Methods ---
 		NodeInputPin(MaterialNode* owner, PinDataType pin_data_type, bool allows_multi_type, const std::string& name, float default_value = 0.0f);
+		NodeInputPin(MaterialNode* owner, const std::string& name, uint id, PinDataType pin_data_type, const float* value, const float* default_value, bool allows_multi_type);
+
 		~NodeInputPin();
 
 		void DrawUI(bool& allow_node_drag, float* value_to_modify = nullptr, bool is_vtxattribute = false);

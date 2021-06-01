@@ -20,9 +20,16 @@ namespace Kaimos {
 		Material()	{ m_ID = (uint)Kaimos::Random::GetRandomInt(); m_AttachedGraph = CreateScopePtr<MaterialEditor::MaterialGraph>(this); }
 		~Material()	{ RemoveTexture(); if (m_AttachedGraph) m_AttachedGraph.reset(); }
 
+	protected:
+
+		// This constructor requires its attached graph to be created and assigned just after this material
+		// As is a bit "unsecure" is protected so only renderer (and other friends tho) can access
+		// It is thought to deserialize a material
+		Material(uint id) { m_ID = id; }
+
 	public:
 
-		// --- Public Material Methods ---
+		// --- Public Texture Methods ---
 		void SetTexture(const std::string& filepath)
 		{
 			Ref<Texture2D> texture = Texture2D::Create(filepath);
@@ -44,11 +51,11 @@ namespace Kaimos {
 			m_TextureFilepath.clear();
 		}
 
-		inline void SyncGraphValuesWithMaterial()
-		{
-			m_AttachedGraph->SyncMainNodeValuesWithMaterial();
-		}
+		
 
+	public:
+
+		// --- Public Graph Methods ---
 		template<typename T>
 		inline T& GetVertexAttributeResult(MaterialEditor::VertexParameterNodeType vtxpm_node_type)
 		{
@@ -58,6 +65,28 @@ namespace Kaimos {
 		inline void UpdateVertexParameter(MaterialEditor::VertexParameterNodeType vtxpm_node_type, float* value) const
 		{
 			m_AttachedGraph->SyncVertexParameterNodes(vtxpm_node_type, value);
+		}
+
+		inline void SyncGraphValuesWithMaterial()
+		{
+			m_AttachedGraph->SyncMainNodeValuesWithMaterial();
+		}
+
+		void RemoveGraph()
+		{
+			if (m_AttachedGraph)
+				m_AttachedGraph.reset();
+		}
+
+		// This will set the material graph to the passed one and delete the passed one
+		void SetGraphUniqueRef(ScopePtr<MaterialEditor::MaterialGraph>& new_graph)
+		{
+			if (m_AttachedGraph)
+				m_AttachedGraph.reset();
+
+			m_AttachedGraph = std::move(new_graph);
+			m_AttachedGraph->SyncMaterialValuesWithGraph();
+			new_graph.reset();
 		}
 
 

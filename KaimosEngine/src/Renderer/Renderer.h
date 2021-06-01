@@ -38,6 +38,11 @@ namespace Kaimos {
 
 	private:
 
+		// --- Private Renderer Methods ---
+		static Ref<Material> CreateMaterialWithID(uint id);
+
+	private:
+
 		struct SceneData
 		{
 			glm::mat4 ViewProjectionMatrix = glm::mat4(1.0f);
