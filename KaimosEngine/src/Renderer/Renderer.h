@@ -22,9 +22,13 @@ namespace Kaimos {
 
 		static void Submit(const Ref<Shader>& shader, const Ref<VertexArray>& vertex_array, const glm::mat4& transformation = glm::mat4(1.0f));
 
+		// --- Public Renderer Materials Methods ---
 		static Ref<Material> CreateMaterial();
 		static Ref<Material> GetMaterial(uint material_id);
+		static uint GetMaterialsQuantity();
+		static Ref<Material> GetMaterialFromIndex(uint index);
 
+		// --- Public Renderer Serialization Methods ---
 		static void SerializeRenderer();
 		static void DeserializeRenderer();
 

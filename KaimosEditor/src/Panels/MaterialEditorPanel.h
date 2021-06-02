@@ -28,6 +28,8 @@ namespace Kaimos {
 		void LoadCurrentGraphSettings() const { if (m_CurrentGraph) m_CurrentGraph->LoadEditorSettings(); }
 		void SaveCurrentGraphSettings() const { if (m_CurrentGraph) m_CurrentGraph->SaveEditorSettings(); }
 
+		void SerializeGraphs();
+
 	private:
 
 		// --- Private Material Editor Panel Methods ---

@@ -26,7 +26,7 @@ namespace Kaimos::MaterialEditor {
 	protected:
 
 		// This constructor requires to create and/or assign all graph values and stuff after this call
-		// As is a bit "unsecure" is protected so only renderer (and other friends tho) can access
+		// As is a bit "insecure" is protected so only renderer (and other friends tho) can access
 		// It is thought to deserialize a graph, and it just be enough to call for the graph deserialization
 		// after this constructor to have it setted up
 		MaterialGraph(uint id) : m_ID(id) {}
@@ -53,6 +53,7 @@ namespace Kaimos::MaterialEditor {
 		void LoadEditorSettings() const;
 
 		// --- Public Material Graph Methods ---
+		uint GetMaterialAttachedID();
 		void SyncMainNodeValuesWithMaterial();
 		void SyncMaterialValuesWithGraph();
 		void SyncVertexParameterNodes(VertexParameterNodeType vtxpm_node_type, float* value);

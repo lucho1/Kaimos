@@ -50,12 +50,15 @@ namespace Kaimos {
 		shader->SetUMat4("u_ViewProjection", s_SceneData->ViewProjectionMatrix);
 		shader->SetUMat4("u_Model", transformation);
 
-		// -- Vertex Array bound here since RenderCommands should NOT do multiple things, they are just commands (unless specifically suposed-to) --
+		// -- Vertex Array bound here since RenderCommands should NOT do multiple things, they are just commands (unless specifically supposed-to) --
 		vertex_array->Bind();
 		RenderCommand::DrawIndexed(vertex_array);
 		//vertexArray->Unbind(); //TODO: ?
 	}
 
+
+
+	// ----------------------- Public Renderer Materials Methods ---------------------------------------------
 	Ref<Material> Renderer::CreateMaterial()
 	{
 		Ref<Material> material = CreateRef<Material>(new Material());
@@ -81,6 +84,25 @@ namespace Kaimos {
 		return nullptr;
 	}
 
+	Kaimos::Ref<Kaimos::Material> Renderer::GetMaterialFromIndex(uint index)
+	{
+		if (s_SceneData && index < s_SceneData->Materials.size())
+			return s_SceneData->Materials[index];
+
+		return nullptr;
+	}
+
+	uint Renderer::GetMaterialsQuantity()
+	{
+		if (s_SceneData)
+			return s_SceneData->Materials.size();
+
+		return 0;
+	}
+
+
+
+	// ----------------------- Public Renderer Serialization Methods -----------------------------------------
 	void Renderer::SerializeRenderer()
 	{
 		KS_PROFILE_FUNCTION();
@@ -115,6 +137,9 @@ namespace Kaimos {
 		// -- File Load --
 		YAML::Node data;
 
+		if (!std::filesystem::exists("../KaimosEngine/res/settings/mat_graphs") || !std::filesystem::is_directory("../KaimosEngine/res/settings/mat_graphs"))
+			std::filesystem::create_directories("../KaimosEngine/res/settings/mat_graphs");
+
 		std::string filename = "../KaimosEngine/res/settings/KaimosRendererSettings.kaimossave";
 		std::ifstream f(filename.c_str());
 
@@ -141,11 +166,6 @@ namespace Kaimos {
 		{
 			for (auto material_subnode : materials_node)
 			{
-				//output << YAML::BeginMap;
-				//output << YAML::Key << "Material" << YAML::Value << mat->GetID();
-				//output << YAML::Key << "AttachedGraph";
-				//mat->m_AttachedGraph->SerializeGraph(output);
-
 				auto graph_subnode = material_subnode["AttachedGraph"];
 				if (material_subnode["Material"] && graph_subnode)
 				{

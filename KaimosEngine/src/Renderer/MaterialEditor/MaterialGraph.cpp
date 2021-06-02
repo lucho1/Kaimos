@@ -121,6 +121,11 @@ namespace Kaimos::MaterialEditor {
 
 
 	// ----------------------- Private/Public Material Graph Methods -------------------------------------
+	uint MaterialGraph::GetMaterialAttachedID()
+	{
+		return m_MainMatNode->m_AttachedMaterial->GetID();
+	}
+
 	void MaterialGraph::SyncMainNodeValuesWithMaterial()
 	{
 		m_MainMatNode->SyncValuesWithMaterial();
@@ -162,13 +167,6 @@ namespace Kaimos::MaterialEditor {
 	// ----------------------- Public Serialization Methods ----------------------------------------------
 	void MaterialGraph::DeserializeGraph(const YAML::Node& yaml_graph_node, Ref<Material> attached_material, std::string& texture_path)
 	{
-		// Setup main root node by deserializing the node
-		// Then run through nodes to deserialize and add each
-		// Fill a map (or similar) with links
-		// Setup all the links
-
-		//m_MainMatNode = CreateRef<MainMaterialNode>(attached_material);
-		//m_Nodes.push_back(m_MainMatNode);
 		texture_path = "";
 		auto main_node = yaml_graph_node["MainRootNode"];
 
@@ -274,8 +272,6 @@ namespace Kaimos::MaterialEditor {
 			for (auto link_pair : links_vector)
 				CreateLink(link_pair.first, link_pair.second);
 		}
-
-		LoadEditorSettings();
 	}
 
 	void MaterialGraph::SerializeGraph(YAML::Emitter& output_emitter) const
@@ -302,7 +298,6 @@ namespace Kaimos::MaterialEditor {
 		// -- End Nodes Sequence & Graph Map & Save .ini File --
 		output_emitter << YAML::EndSeq;
 		output_emitter << YAML::EndMap;
-		SaveEditorSettings();
 	}
 
 	void MaterialGraph::SaveEditorSettings() const
@@ -316,5 +311,4 @@ namespace Kaimos::MaterialEditor {
 		std::string filename = "../KaimosEngine/res/settings/mat_graphs/NodeGraph_" + std::to_string(m_ID) + ".ini";
 		ImNodes::LoadCurrentEditorStateFromIniFile(filename.c_str());
 	}
-
 }

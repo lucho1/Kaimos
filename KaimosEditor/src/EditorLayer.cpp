@@ -617,6 +617,7 @@ namespace Kaimos {
 
 	void EditorLayer::SaveScene()
 	{
+		m_KMEPanel.SerializeGraphs();
 		SceneSerializer m_Serializer(m_CurrentScene);
 
 		// TODO: This should be handled by a filepath class/assets class or something
@@ -627,7 +628,6 @@ namespace Kaimos {
 
 		// -- Save Editor Settings (ini files) --
 		ImGui::SaveIniSettingsToDisk("imgui.ini");
-		m_KMEPanel.SaveCurrentGraphSettings();
 	}
 
 	void EditorLayer::SaveSceneAs()
@@ -649,13 +649,13 @@ namespace Kaimos {
 			m_CurrentScene->SetPath(filepath);
 			m_CurrentScene->SetName(filepath.substr(last_slash, last_dot - last_slash));
 
-			// -- Save --
+			// -- Save Graphs & Scene --
+			m_KMEPanel.SerializeGraphs();
 			SceneSerializer m_Serializer(m_CurrentScene);
 			m_Serializer.Serialize(filepath);
 
-			// -- Save Editor Settings (ini files) --
+			// -- Save Editor Settings (ini file) --
 			ImGui::SaveIniSettingsToDisk("imgui.ini");
-			m_KMEPanel.SaveCurrentGraphSettings();
 		}
 	}
 

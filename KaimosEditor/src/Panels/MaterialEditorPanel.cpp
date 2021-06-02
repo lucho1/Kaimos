@@ -190,7 +190,6 @@ namespace Kaimos {
 	void MaterialEditorPanel::SetGraphToModifyFromMaterial(uint material_id)
 	{
 		SaveCurrentGraphSettings();
-
 		Ref<Material> mat = Renderer::GetMaterial(material_id);
 		if (mat && (mat)->m_AttachedGraph)
 		{
@@ -206,4 +205,26 @@ namespace Kaimos {
 
 		return false;
 	}
+
+	void MaterialEditorPanel::SerializeGraphs()
+	{
+		uint material_modifying = 0;
+		if (m_CurrentGraph)
+			material_modifying = m_CurrentGraph->GetMaterialAttachedID();
+
+		uint materials_size = Renderer::GetMaterialsQuantity();
+		for (uint i = 0; i < materials_size; ++i)
+		{
+			Ref<Material> mat = Renderer::GetMaterialFromIndex(i);
+			if (mat)
+			{
+				SetGraphToModifyFromMaterial(mat->GetID());
+				m_CurrentGraph->SaveEditorSettings();
+			}
+		}
+
+		if (material_modifying != 0)
+			SetGraphToModifyFromMaterial(material_modifying);
+	}
+
 }
