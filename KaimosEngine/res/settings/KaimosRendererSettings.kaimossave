@@ -4,7 +4,7 @@ Materials:
     AttachedGraph:
       MaterialGraph: 876177254
       MainRootNode:
-        TextureFile: D:\GitHub\Kaimos\KaimosEditor\assets\textures\ChernoLogo.png
+        TextureFile: assets\textures\ChernoLogo.png
         Node: 1151624965
         Name: Main Node
         Type: 1
@@ -100,19 +100,19 @@ Materials:
           - Pin: 1336218933
             Name: Vertex Position (Vec3)
             DataType: 4
-            Value: [-0.5, 0.5, 0, 0]
+            Value: [0, 0, 0, 0]
             AllowsMultipleTypes: false
             DefValue: [0, 0, 0, 0]
           - Pin: 81506064
             Name: Vertex Normal (Vec3)
             DataType: 4
-            Value: [0, 0, -1, 0]
+            Value: [0, 0, 0, 0]
             AllowsMultipleTypes: false
             DefValue: [0, 0, 0, 0]
           - Pin: 1638909631
             Name: Texture Coordinates (Vec2)
             DataType: 3
-            Value: [0, 1, 0, -4.22016832e+37]
+            Value: [0, 0, 0, 0]
             AllowsMultipleTypes: false
             DefValue: [0, 0, 0, 0]
           - Pin: 1129879820
@@ -188,19 +188,19 @@ Materials:
           - Pin: 1465985725
             Name: Vertex Position (Vec3)
             DataType: 4
-            Value: [-0.5, 0.5, 0, 0]
+            Value: [0, 0, 0, 0]
             AllowsMultipleTypes: false
             DefValue: [0, 0, 0, 0]
           - Pin: 675368377
             Name: Vertex Normal (Vec3)
             DataType: 4
-            Value: [0, 0, -1, 0]
+            Value: [0, 0, 0, 0]
             AllowsMultipleTypes: false
             DefValue: [0, 0, 0, 0]
           - Pin: 414937507
             Name: Texture Coordinates (Vec2)
             DataType: 3
-            Value: [0, 1, 0, -4.22016832e+37]
+            Value: [0, 0, 0, 0]
             AllowsMultipleTypes: false
             DefValue: [0, 0, 0, 0]
           - Pin: 1822987841
@@ -276,19 +276,19 @@ Materials:
           - Pin: 570638882
             Name: Vertex Position (Vec3)
             DataType: 4
-            Value: [-0.5, 0.5, 0, 0]
+            Value: [0, 0, 0, 0]
             AllowsMultipleTypes: false
             DefValue: [0, 0, 0, 0]
           - Pin: 443939548
             Name: Vertex Normal (Vec3)
             DataType: 4
-            Value: [0, 0, -1, 0]
+            Value: [0, 0, 0, 0]
             AllowsMultipleTypes: false
             DefValue: [0, 0, 0, 0]
           - Pin: 978748983
             Name: Texture Coordinates (Vec2)
             DataType: 3
-            Value: [0, 1, 0, -4.22016832e+37]
+            Value: [0, 0, 0, 0]
             AllowsMultipleTypes: false
             DefValue: [0, 0, 0, 0]
           - Pin: 884145289
