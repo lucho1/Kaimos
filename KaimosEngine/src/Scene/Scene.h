@@ -18,8 +18,8 @@ namespace Kaimos {
 	public:
 
 		// --- Public Class Methods ---
-		Scene() = default;
-		Scene(const std::string& name) : m_Name(name) {}
+		Scene();
+		Scene(const std::string& name);
 		~Scene() = default;
 
 		// --- Public Scene Methods ---

@@ -609,8 +609,9 @@ namespace Kaimos {
 	// ----------------------- Private Editor Methods -----------------------------------------------------
 	void EditorLayer::NewScene(bool set_viewport)
 	{
+		m_KMEPanel.UnsetGraphToModify();
 		m_CurrentScene = CreateRef<Scene>();
-		m_ScenePanel.SetContext(m_CurrentScene);		
+		m_ScenePanel.SetContext(m_CurrentScene);
 		if(set_viewport)
 			m_CurrentScene->SetViewportSize((uint)m_ViewportSize.x, (uint)m_ViewportSize.y);
 	}

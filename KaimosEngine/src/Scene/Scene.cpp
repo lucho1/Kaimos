@@ -10,7 +10,7 @@
 
 namespace Kaimos {
 
-	static Entity m_PrimaryCamera = {};
+	static Entity m_PrimaryCamera;
 	// entt::entity entity = registry.create();						-- To create entities in the registry
 	// registry.clear();											-- To clear the registry (remove all in it)
 
@@ -27,7 +27,20 @@ namespace Kaimos {
 	//																-- If "group" is iterated, we could code "auto&[c1, c2] = group.get<Comp1, Comp2>(ent)" (c1, c2 being variables)
 
 
+
+	// ----------------------- Public Class Methods -------------------------------------------------------
+	Scene::Scene()
+	{
+		m_PrimaryCamera = {};
+	}
+
+	Scene::Scene(const std::string& name) : m_Name(name)
+	{
+		m_PrimaryCamera = {};
+	}
 	
+
+
 	// ----------------------- Public/Private Scene Methods -----------------------------------------------
 	void Scene::RenderScene()
 	{
@@ -39,7 +52,6 @@ namespace Kaimos {
 				Renderer2D::DrawSprite(transform.GetTransform(), sprite, (int)ent);
 		}
 	}
-
 
 	void Scene::OnUpdateEditor(Timestep dt, const Camera& camera)
 	{
