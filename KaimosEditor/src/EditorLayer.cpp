@@ -408,7 +408,7 @@ namespace Kaimos {
 
 		// Mini-Screen Pos
 		float mini_posX = ImGui::GetWindowPos().x + ImGui::GetWindowContentRegionMin().x - camera_img_size.x * 1.45f;
-		float mini_posY = ImGui::GetWindowPos().y + ImGui::GetWindowContentRegionMin().y - camera_img_size.y * 2.0f;
+		float mini_posY = ImGui::GetWindowPos().y + ImGui::GetWindowContentRegionMin().y - camera_img_size.y * 2.1f;
 		static glm::vec2 size_increase = glm::vec2(0.0f);
 
 		glm::vec2 mini_screen_pos = { mini_posX + ImGui::GetWindowSize().x, mini_posY + ImGui::GetWindowSize().y };
