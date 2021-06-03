@@ -208,7 +208,6 @@ namespace Kaimos {
 		static bool show_performance_panel = true;
 		static bool show_viewport_panel = true;
 		static bool show_game_panel = true;
-		static bool show_materialeditor_panel = true;
 		static bool show_uidemo = false;
 		
 		// -- Upper Menu Tab Bar --
@@ -240,7 +239,7 @@ namespace Kaimos {
 				ImGui::MenuItem("Scene Panel", nullptr, &show_scene_panel);
 				ImGui::MenuItem("Viewport", nullptr, &show_viewport_panel);
 				ImGui::MenuItem("Game Panel", nullptr, &show_game_panel);
-				ImGui::MenuItem("Material Editor", nullptr, &show_materialeditor_panel);
+				ImGui::MenuItem("Material Editor", nullptr, &m_KMEPanel.ShowPanel);
 				ImGui::MenuItem("Settings Panel", nullptr, &show_settings_panel);
 				ImGui::MenuItem("Performance Panel", nullptr, &show_performance_panel);
 				ImGui::MenuItem("Project Panel", nullptr, &show_project_panel);
@@ -283,7 +282,7 @@ namespace Kaimos {
 		m_ProjectPanel.OnUIRender(show_project_panel, show_console_panel);
 
 		// -- Material Editor Panel --
-		if (show_materialeditor_panel)
+		if (m_KMEPanel.ShowPanel)
 			m_KMEPanel.OnUIRender();
 
 		if (show_game_panel)

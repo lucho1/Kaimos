@@ -35,9 +35,14 @@ namespace Kaimos {
 		// --- Private Material Editor Panel Methods ---
 		void DeleteSelection(int selected_links, int selected_nodes);
 
+	public:
+
+		// --- Public Variables ---
+		bool ShowPanel = true;
+
 	private:
 
-		// --- Variables ---
+		// --- Private Variables ---
 		MaterialEditor::MaterialGraph* m_CurrentGraph = nullptr;
 	};
 }

@@ -12,7 +12,7 @@ namespace Kaimos {
 	// ----------------------- Public Class Methods -------------------------------------------------------
 	void MaterialEditorPanel::OnUIRender()
 	{
-		ImGui::Begin("Kaimos Material Editor");
+		ImGui::Begin("Kaimos Material Editor", &ShowPanel);
 		if (!m_CurrentGraph)
 		{
 			ImGui::End();
@@ -195,6 +195,7 @@ namespace Kaimos {
 		{
 			m_CurrentGraph = (mat)->m_AttachedGraph.get();
 			LoadCurrentGraphSettings();
+			ShowPanel = true;
 		}
 	}
 
