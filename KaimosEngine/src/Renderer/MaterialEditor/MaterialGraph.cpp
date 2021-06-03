@@ -56,6 +56,7 @@ namespace Kaimos::MaterialEditor {
 
 		MaterialNode* node = static_cast<MaterialNode*>(new VertexParameterMaterialNode(vertexparam_type));
 		m_Nodes.push_back(CreateRef<MaterialNode>(node));
+		ImNodes::SetNodeScreenSpacePos(node->GetID(), ImGui::GetMousePos());
 		return node;
 	}
 
@@ -69,6 +70,7 @@ namespace Kaimos::MaterialEditor {
 
 		MaterialNode* node = static_cast<MaterialNode*>(new ConstantMaterialNode(constant_type));
 		m_Nodes.push_back(CreateRef<MaterialNode>(node));
+		ImNodes::SetNodeScreenSpacePos(node->GetID(), ImGui::GetMousePos());
 		return node;
 	}
 
@@ -82,6 +84,7 @@ namespace Kaimos::MaterialEditor {
 
 		MaterialNode* node = static_cast<MaterialNode*>(new OperationMaterialNode(operation_type, operation_data_type));
 		m_Nodes.push_back(CreateRef<MaterialNode>(node));
+		ImNodes::SetNodeScreenSpacePos(node->GetID(), ImGui::GetMousePos());
 		return node;
 	}
 
