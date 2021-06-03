@@ -281,10 +281,7 @@ namespace Kaimos {
 
 		m_ProjectPanel.OnUIRender(show_project_panel, show_console_panel);
 
-		// -- Material Editor Panel --
-		if (m_KMEPanel.ShowPanel)
-			m_KMEPanel.OnUIRender();
-
+		// -- Game Panels --
 		if (show_game_panel)
 		{
 			m_RenderGamePanel = true;
@@ -366,6 +363,10 @@ namespace Kaimos {
 			ImGui::PopStyleVar();
 			ImGui::End();
 		}
+
+		// -- Material Editor Panel --
+		if (m_KMEPanel.ShowPanel)
+			m_KMEPanel.OnUIRender();
 	}
 
 
