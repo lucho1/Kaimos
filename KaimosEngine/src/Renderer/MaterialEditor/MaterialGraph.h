@@ -34,9 +34,9 @@ namespace Kaimos::MaterialEditor {
 	public:
 
 		// --- Creation Methods ---
-		MaterialNode* CreateNode(VertexParameterNodeType constant_type);
-		MaterialNode* CreateNode(ConstantNodeType constant_type);
-		MaterialNode* CreateNode(OperationNodeType operation_type, PinDataType operation_data_type);
+		MaterialNode* CreateNode(VertexParameterNodeType constant_type, bool on_mouse_pos = true);
+		MaterialNode* CreateNode(ConstantNodeType constant_type, bool on_mouse_pos = true);
+		MaterialNode* CreateNode(OperationNodeType operation_type, PinDataType operation_data_type, bool on_mouse_pos = true);
 
 		void CreateLink(uint output_pinID, uint input_pinID);
 

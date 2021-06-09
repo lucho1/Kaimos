@@ -18,9 +18,9 @@ namespace Kaimos::MaterialEditor {
 		m_MainMatNode = CreateRef<MainMaterialNode>(attached_material);
 		m_Nodes.push_back(m_MainMatNode);
 
-		uint pos_node_id = CreateNode(VertexParameterNodeType::POSITION)->GetOutputPinID();
-		uint norm_node_id = CreateNode(VertexParameterNodeType::NORMAL)->GetOutputPinID();
-		uint tcoords_node_id = CreateNode(VertexParameterNodeType::TEX_COORDS)->GetOutputPinID();
+		uint pos_node_id = CreateNode(VertexParameterNodeType::POSITION, false)->GetOutputPinID();
+		uint norm_node_id = CreateNode(VertexParameterNodeType::NORMAL, false)->GetOutputPinID();
+		uint tcoords_node_id = CreateNode(VertexParameterNodeType::TEX_COORDS, false)->GetOutputPinID();
 
 		CreateLink(pos_node_id, m_MainMatNode->GetVertexPositionPinID());
 		CreateLink(norm_node_id, m_MainMatNode->GetVertexNormalPinID());
@@ -46,7 +46,7 @@ namespace Kaimos::MaterialEditor {
 	
 
 	// ----------------------- Creation Methods ----------------------------------------------------------
-	MaterialNode* MaterialGraph::CreateNode(VertexParameterNodeType vertexparam_type)
+	MaterialNode* MaterialGraph::CreateNode(VertexParameterNodeType vertexparam_type, bool on_mouse_pos)
 	{
 		if (vertexparam_type == VertexParameterNodeType::NONE)
 		{
@@ -56,11 +56,11 @@ namespace Kaimos::MaterialEditor {
 
 		MaterialNode* node = static_cast<MaterialNode*>(new VertexParameterMaterialNode(vertexparam_type));
 		m_Nodes.push_back(CreateRef<MaterialNode>(node));
-		ImNodes::SetNodeScreenSpacePos(node->GetID(), ImGui::GetMousePos());
+		ImNodes::SetNodeScreenSpacePos(node->GetID(), on_mouse_pos ? ImGui::GetMousePos() : ImVec2(0.0f, 0.0f));
 		return node;
 	}
 
-	MaterialNode* MaterialGraph::CreateNode(ConstantNodeType constant_type)
+	MaterialNode* MaterialGraph::CreateNode(ConstantNodeType constant_type, bool on_mouse_pos)
 	{
 		if (constant_type == ConstantNodeType::NONE)
 		{
@@ -70,11 +70,11 @@ namespace Kaimos::MaterialEditor {
 
 		MaterialNode* node = static_cast<MaterialNode*>(new ConstantMaterialNode(constant_type));
 		m_Nodes.push_back(CreateRef<MaterialNode>(node));
-		ImNodes::SetNodeScreenSpacePos(node->GetID(), ImGui::GetMousePos());
+		ImNodes::SetNodeScreenSpacePos(node->GetID(), on_mouse_pos ? ImGui::GetMousePos() : ImVec2(0.0f, 0.0f));
 		return node;
 	}
 
-	MaterialNode* MaterialGraph::CreateNode(OperationNodeType operation_type, PinDataType operation_data_type)
+	MaterialNode* MaterialGraph::CreateNode(OperationNodeType operation_type, PinDataType operation_data_type, bool on_mouse_pos)
 	{
 		if (operation_type == OperationNodeType::NONE || operation_data_type == PinDataType::NONE)
 		{
@@ -84,7 +84,7 @@ namespace Kaimos::MaterialEditor {
 
 		MaterialNode* node = static_cast<MaterialNode*>(new OperationMaterialNode(operation_type, operation_data_type));
 		m_Nodes.push_back(CreateRef<MaterialNode>(node));
-		ImNodes::SetNodeScreenSpacePos(node->GetID(), ImGui::GetMousePos());
+		ImNodes::SetNodeScreenSpacePos(node->GetID(), on_mouse_pos ? ImGui::GetMousePos() : ImVec2(.0f, 0.0f));
 		return node;
 	}
 
