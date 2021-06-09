@@ -59,7 +59,15 @@
 
 
 
+
 // --- GENERAL DEFINES ---
+// Paths
+#define INTERNAL_FONTS_PATH "internal/resources/fonts/"
+#define INTERNAL_ICONS_PATH "internal/resources/icons/"
+#define INTERNAL_SETTINGS_PATH "internal/settings/"
+#define INTERNAL_OUTPUTFILES_PATH "internal/output_files/"
+
+// Others
 #define BIT(x) (1 << x)
 //#define KS_BIND_EVENT_FN(x) std::bind(&x, this, std::placeholders::_1)
 

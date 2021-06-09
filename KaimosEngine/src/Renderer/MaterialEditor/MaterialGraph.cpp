@@ -305,13 +305,13 @@ namespace Kaimos::MaterialEditor {
 
 	void MaterialGraph::SaveEditorSettings() const
 	{
-		std::string filename = "../KaimosEngine/res/settings/mat_graphs/NodeGraph_" + std::to_string(m_ID) + ".ini";
+		std::string filename = INTERNAL_SETTINGS_PATH + std::string("mat_graphs/NodeGraph_") + std::to_string(m_ID) + ".ini";
 		ImNodes::SaveCurrentEditorStateToIniFile(filename.c_str());
 	}
 
 	void MaterialGraph::LoadEditorSettings() const
 	{
-		std::string filename = "../KaimosEngine/res/settings/mat_graphs/NodeGraph_" + std::to_string(m_ID) + ".ini";
+		std::string filename = INTERNAL_SETTINGS_PATH + std::string("mat_graphs/NodeGraph_") + std::to_string(m_ID) + ".ini";
 		ImNodes::LoadCurrentEditorStateFromIniFile(filename.c_str());
 	}
 }

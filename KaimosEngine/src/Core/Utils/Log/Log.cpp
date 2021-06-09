@@ -15,7 +15,7 @@ namespace Kaimos {
 		// -- spdlog Initialization --
 		std::vector<spdlog::sink_ptr> log_sinks;
 		log_sinks.emplace_back(CreateRef<spdlog::sinks::stdout_color_sink_mt>());
-		log_sinks.emplace_back(CreateRef<spdlog::sinks::basic_file_sink_mt>("../ResultOutputFiles/Kaimos.log", true)); // To output a file with all the logs
+		log_sinks.emplace_back(CreateRef<spdlog::sinks::basic_file_sink_mt>(INTERNAL_OUTPUTFILES_PATH+std::string("Kaimos.log"), true)); // To output a file with all the logs
 
 		log_sinks[0]->set_pattern("%^[%T] %n: %v%$");
 		log_sinks[1]->set_pattern("[%T] [%l] %n: %v");

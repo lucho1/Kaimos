@@ -128,7 +128,8 @@ namespace Kaimos {
 		output << YAML::EndMap;
 
 		// -- Save File --
-		std::ofstream file("../KaimosEngine/res/settings/KaimosRendererSettings.kaimossave");
+		std::string filepath = INTERNAL_SETTINGS_PATH + std::string("KaimosRendererSettings.kaimossave");
+		std::ofstream file(filepath.c_str());
 		file << output.c_str();
 	}
 
@@ -137,14 +138,14 @@ namespace Kaimos {
 		// -- File Load --
 		YAML::Node data;
 
-		if (!std::filesystem::exists("../KaimosEngine/res/settings/mat_graphs") || !std::filesystem::is_directory("../KaimosEngine/res/settings/mat_graphs"))
-			std::filesystem::create_directories("../KaimosEngine/res/settings/mat_graphs");
-
-		std::string filename = "../KaimosEngine/res/settings/KaimosRendererSettings.kaimossave";
+		std::string filename = INTERNAL_SETTINGS_PATH + std::string("KaimosRendererSettings.kaimossave");
 		std::ifstream f(filename.c_str());
 
 		if (!f.good())
+		{
+			KS_ENGINE_WARN("Error Loading Renderer, filepath invalid");
 			return;
+		}
 
 		try { data = YAML::LoadFile(filename); }
 		catch (const YAML::ParserException& exception)

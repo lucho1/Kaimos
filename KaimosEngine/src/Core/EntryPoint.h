@@ -18,13 +18,13 @@
 	// ----------------------- Profiling ------------------------------------------------------------------
 	#if KS_DEBUG
 		#define SESSION_NAME(name) "<KS_DEBUG> - "##name
-		#define SESSION_FILENAME(name) "../ResultOutputFiles/KaimosDebug_Profile"##name
+		#define SESSION_FILENAME(name) INTERNAL_OUTPUTFILES_PATH##"KaimosDebug_Profile"##name
 	#elif KS_RELEASE
 		#define SESSION_NAME(name) "<KS_RELEASE> - "##name
-		#define SESSION_FILENAME(name) "../ResultOutputFiles/KaimosRelease_Profile"##name
+		#define SESSION_FILENAME(name) INTERNAL_OUTPUTFILES_PATH##"KaimosRelease_Profile"##name
 	#else
 		#define SESSION_NAME(name) "<WRONG_CONFIG> - "##name
-		#define SESSION_FILENAME(name) "../ResultOutputFiles/WrongConfig_Profile"##name
+		#define SESSION_FILENAME(name) INTERNAL_OUTPUTFILES_PATH##"WrongConfig_Profile"##name
 	#endif
 
 
@@ -33,6 +33,19 @@
 	extern Kaimos::Application* Kaimos::CreateApplication();
 	int main(int argc, char** argv)
 	{
+		// -- Filesystem Stuff Creation --
+		if (!std::filesystem::exists(INTERNAL_OUTPUTFILES_PATH) || !std::filesystem::is_directory(INTERNAL_OUTPUTFILES_PATH))
+			std::filesystem::create_directories(INTERNAL_OUTPUTFILES_PATH);
+
+		if (!std::filesystem::exists(INTERNAL_SETTINGS_PATH) || !std::filesystem::is_directory(INTERNAL_SETTINGS_PATH))
+			std::filesystem::create_directories(INTERNAL_SETTINGS_PATH);
+
+		//INTERNAL_SETTINGS_PATH
+		std::string materials_settings_path = INTERNAL_SETTINGS_PATH + std::string("mat_graphs");
+		if (!std::filesystem::exists(materials_settings_path) || !std::filesystem::is_directory(materials_settings_path))
+			std::filesystem::create_directories(materials_settings_path);
+
+
 		// -- Initialization --
 		Kaimos::Log::Init();
 		KS_ENGINE_INFO("--- Kaimos Engine Started ---");

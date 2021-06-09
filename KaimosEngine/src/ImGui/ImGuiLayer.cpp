@@ -126,19 +126,22 @@ namespace Kaimos {
 
 		
 		// -- Fonts Load --
+		std::string rudasemi_path = INTERNAL_FONTS_PATH + std::string("Ruda/Ruda-SemiBold.ttf");			// You can also try "Opensans/OpenSans-SemiBold.ttf" (in 14.0f)
+		std::string rudablack_path = INTERNAL_FONTS_PATH + std::string("Ruda/Ruda-SemiBold.ttf");
+		std::string rudafont_path = INTERNAL_FONTS_PATH + std::string("Ruda/Ruda-VariableFont_wght.ttf");
+
 		// Default Font + Secondary one
-		io.FontDefault = io.Fonts->AddFontFromFileTTF("../KaimosEngine/res/fonts/Ruda/Ruda-SemiBold.ttf", Window::s_ScreenDPIScaleFactor * 13.0f); // You can also try "Opensans/OpenSans-SemiBold.ttf" (in 14.0f)
-		io.Fonts->AddFontFromFileTTF("../KaimosEngine/res/fonts/Ruda/Ruda-Black.ttf", Window::s_ScreenDPIScaleFactor * 13.0f);
+		io.FontDefault = io.Fonts->AddFontFromFileTTF(rudasemi_path.c_str(), Window::s_ScreenDPIScaleFactor * 13.0f);
+		io.Fonts->AddFontFromFileTTF(rudablack_path.c_str(), Window::s_ScreenDPIScaleFactor * 13.0f);
 		
 		// Load different fonts in different positions so ImGui can handle fonts variations
-		std::string font_path = "../KaimosEngine/res/fonts/Ruda/Ruda-VariableFont_wght.ttf";
-		io.Fonts->AddFontFromFileTTF(font_path.c_str(), Window::s_ScreenDPIScaleFactor * 10.0f);
-		io.Fonts->AddFontFromFileTTF(font_path.c_str(), Window::s_ScreenDPIScaleFactor * 12.0f);
-		io.Fonts->AddFontFromFileTTF(font_path.c_str(), Window::s_ScreenDPIScaleFactor * 16.0f);
-		io.Fonts->AddFontFromFileTTF(font_path.c_str(), Window::s_ScreenDPIScaleFactor * 18.0f);
-		io.Fonts->AddFontFromFileTTF(font_path.c_str(), Window::s_ScreenDPIScaleFactor * 20.0f);
-		io.Fonts->AddFontFromFileTTF(font_path.c_str(), Window::s_ScreenDPIScaleFactor * 22.0f);
-		io.Fonts->AddFontFromFileTTF(font_path.c_str(), Window::s_ScreenDPIScaleFactor * 24.0f);
+		io.Fonts->AddFontFromFileTTF(rudafont_path.c_str(), Window::s_ScreenDPIScaleFactor * 10.0f);
+		io.Fonts->AddFontFromFileTTF(rudafont_path.c_str(), Window::s_ScreenDPIScaleFactor * 12.0f);
+		io.Fonts->AddFontFromFileTTF(rudafont_path.c_str(), Window::s_ScreenDPIScaleFactor * 16.0f);
+		io.Fonts->AddFontFromFileTTF(rudafont_path.c_str(), Window::s_ScreenDPIScaleFactor * 18.0f);
+		io.Fonts->AddFontFromFileTTF(rudafont_path.c_str(), Window::s_ScreenDPIScaleFactor * 20.0f);
+		io.Fonts->AddFontFromFileTTF(rudafont_path.c_str(), Window::s_ScreenDPIScaleFactor * 22.0f);
+		io.Fonts->AddFontFromFileTTF(rudafont_path.c_str(), Window::s_ScreenDPIScaleFactor * 24.0f);
 
 
 		// -- UI Style Settings --
