@@ -13,6 +13,8 @@
 #include "Core/Utils/Log/Log.h"
 #include "Core/Utils/Time/Timestep.h"
 
+#include "Core/Resources/Resource.h"
+
 #include "ImGui/ImGuiLayer.h"
 
 #include "Scene/Scene.h"
