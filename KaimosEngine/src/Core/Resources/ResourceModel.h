@@ -2,48 +2,24 @@
 #define _RESOURCEMODEL_H_
 
 #include "Resource.h"
-#include "Renderer/Resources/Buffer.h"
+#include "Renderer/Resources/Mesh.h"
 
-namespace Kaimos
-{
-	class Mesh;
+namespace Kaimos::Importers { class ImporterModel; }
+namespace Kaimos::Resources {
 
 	class ResourceModel : public Resource
 	{
+		friend class Kaimos::Importers::ImporterModel;
 	public:
-
-		ResourceModel(const std::string& filepath, uint id = 0) : Resource(RESOURCE_TYPE::MODEL, filepath, id) {}
 		~ResourceModel() = default;
 
-	private:
-		Mesh* m_RootMesh = nullptr;
-	};
+		Ref<Kaimos::Mesh> GetMesh() const { return m_RootMesh; }
 
+	protected:
+		ResourceModel(const std::string& filepath, uint id = 0, Ref<Kaimos::Mesh> root_mesh = nullptr)
+			: Resource(RESOURCE_TYPE::MODEL, filepath, id), m_RootMesh(root_mesh) {}
 
-	class Mesh
-	{
-	public:
-
-		//Mesh();
-		//~Mesh();
-
-		uint GetID() const { return m_ID; }
-		const std::string& GetName() const { return m_Name; }
-
-		uint GetMaterialID() const { return m_MaterialID; }
-
-	private:
-
-		uint m_ID = 0;
-		std::string m_Name = "Unnamed";
-
-		uint m_MaterialID = 0;
-		std::vector<Ref<Mesh>> m_Submeshes;
-
-		Mesh* m_ParentMesh = nullptr;
-		ResourceModel* m_ParentModel = nullptr;
-
-		Ref<VertexArray> m_VertexArray = nullptr;
+		Ref<Kaimos::Mesh> m_RootMesh = nullptr;
 	};
 }
 

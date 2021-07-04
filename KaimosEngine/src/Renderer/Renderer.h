@@ -2,9 +2,9 @@
 #define _RENDERER_H_
 
 #include "Foundations/RenderCommand.h"
-#include "Renderer/Resources/Shader.h"
-#include "Renderer/Resources/Material.h"
-#include "Renderer/Cameras/Camera.h"
+#include "Resources/Shader.h"
+#include "Resources/Material.h"
+#include "Cameras/Camera.h"
 
 namespace Kaimos {
 

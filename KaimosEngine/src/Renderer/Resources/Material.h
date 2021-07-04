@@ -23,7 +23,7 @@ namespace Kaimos {
 	protected:
 
 		// This constructor requires its attached graph to be created and assigned just after this material
-		// As is a bit "unsecure" is protected so only renderer (and other friends tho) can access
+		// As is a bit "unsecure" is protected so only renderer (and other friends tho) can access.
 		// It is thought to deserialize a material
 		Material(uint id) { m_ID = id; }
 
@@ -114,7 +114,7 @@ namespace Kaimos {
 		ScopePtr<MaterialEditor::MaterialGraph> m_AttachedGraph = nullptr;
 
 		Ref<Texture2D> m_Texture = nullptr;
-		std::string m_TextureFilepath = "";		
+		std::string m_TextureFilepath = "";
 	};
 }
 
