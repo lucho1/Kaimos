@@ -1,6 +1,7 @@
 #ifndef _COMPONENTS_H_
 #define _COMPONENTS_H_
 
+#include "Renderer/Renderer.h"
 #include "Renderer/Resources/Material.h"
 #include "Renderer/Cameras/Camera.h"
 #include "ScriptableEntity.h"
@@ -52,31 +53,22 @@ namespace Kaimos {
 
 	struct SpriteRendererComponent
 	{
-		Ref<Material> SpriteMaterial = nullptr;
+		uint SpriteMaterialID = 0;
 
-		inline void SetMaterial(Ref<Material>& material)
+		inline void SetMaterial(uint material_id)
 		{
-			if (SpriteMaterial)
+			if (material_id == SpriteMaterialID || Renderer::GetMaterialIfExists(material_id) == 0)
+				return;
+
+			if (SpriteMaterialID != 0)
 				RemoveMaterial();
-
-			SpriteMaterial = material;
+		
+			SpriteMaterialID = material_id;
 		}
-
+		
 		inline void RemoveMaterial()
 		{
-			SpriteMaterial = nullptr;
-		}
-
-		inline void RemoveTexture()
-		{
-			if(SpriteMaterial)
-				SpriteMaterial->RemoveTexture();
-		}
-
-		void SetTexture(const std::string& filepath)
-		{
-			if(SpriteMaterial)
-				SpriteMaterial->SetTexture(filepath);
+			SpriteMaterialID = Renderer::GetDefaultMaterialID();
 		}
 
 		SpriteRendererComponent()								= default;

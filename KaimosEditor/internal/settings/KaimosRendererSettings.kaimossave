@@ -1,5 +1,183 @@
 KaimosSaveFile: KaimosRenderer
 Materials:
+  - Material: 1049825518
+    Name: DefaultMaterial
+    AttachedGraph:
+      MaterialGraph: 464095264
+      MainRootNode:
+        TextureFile: ""
+        Node: 1823861949
+        Name: Main Node
+        Type: 1
+        InputPins:
+          - Pin: 560444448
+            Name: Vertex Position (Vec3)
+            DataType: 4
+            Value: [0, 0, 0, 0]
+            AllowsMultipleTypes: false
+            DefValue: [0, 0, 0, 0]
+          - Pin: 1546704399
+            Name: Vertex Normal (Vec3)
+            DataType: 4
+            Value: [0, 0, 0, 0]
+            AllowsMultipleTypes: false
+            DefValue: [0, 0, 0, 0]
+          - Pin: 1943800770
+            Name: Texture Coordinates (Vec2)
+            DataType: 3
+            Value: [0, 0, 0, 0]
+            AllowsMultipleTypes: false
+            DefValue: [0, 0, 0, 0]
+          - Pin: 1859194135
+            Name: Texture Tiling (float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 1373412007
+            Name: Texture Offset (Vec2)
+            DataType: 3
+            Value: [0, 0, 0, 0]
+            AllowsMultipleTypes: false
+            DefValue: [0, 0, 0, 0]
+          - Pin: 1294205302
+            Name: Color (Vec4)
+            DataType: 5
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+      Nodes:
+        - Node: 1321728223
+          Name: VertexPos
+          Type: 2
+          OutputPin:
+            Pin: 995221499
+            Name: XYZ (Vec3)
+            DataType: 4
+            Value: [0, 0, 0, 0]
+            IsVertexParam: true
+            InputPinsLinkedIDs:
+              - 560444448
+          InputPins:
+            []
+          VParamNodeType: 2
+        - Node: 605704400
+          Name: VertexNorm
+          Type: 2
+          OutputPin:
+            Pin: 1824766588
+            Name: XYZ  (Vec3)
+            DataType: 4
+            Value: [0, 0, 0, 0]
+            IsVertexParam: true
+            InputPinsLinkedIDs:
+              - 1546704399
+          InputPins:
+            []
+          VParamNodeType: 3
+        - Node: 1211971116
+          Name: TCoords
+          Type: 2
+          OutputPin:
+            Pin: 1751024334
+            Name: XY (Vec2)
+            DataType: 3
+            Value: [0, 0, 0, 0]
+            IsVertexParam: true
+            InputPinsLinkedIDs:
+              - 1943800770
+          InputPins:
+            []
+          VParamNodeType: 1
+  - Material: 676505225
+    Name: DefaultMaterial
+    AttachedGraph:
+      MaterialGraph: 321416116
+      MainRootNode:
+        TextureFile: assets\textures\Checkerboard.png
+        Node: 1072906908
+        Name: Main Node
+        Type: 1
+        InputPins:
+          - Pin: 626130312
+            Name: Vertex Position (Vec3)
+            DataType: 4
+            Value: [-0.5, 0.5, 0, 0]
+            AllowsMultipleTypes: false
+            DefValue: [0, 0, 0, 0]
+          - Pin: 1640273208
+            Name: Vertex Normal (Vec3)
+            DataType: 4
+            Value: [0, 0, -1, 0]
+            AllowsMultipleTypes: false
+            DefValue: [0, 0, 0, 0]
+          - Pin: 1301937836
+            Name: Texture Coordinates (Vec2)
+            DataType: 3
+            Value: [0, 1, 0, -4.22016832e+37]
+            AllowsMultipleTypes: false
+            DefValue: [0, 0, 0, 0]
+          - Pin: 1903910061
+            Name: Texture Tiling (float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 1550323382
+            Name: Texture Offset (Vec2)
+            DataType: 3
+            Value: [0, 0, 0, 0]
+            AllowsMultipleTypes: false
+            DefValue: [0, 0, 0, 0]
+          - Pin: 1578901485
+            Name: Color (Vec4)
+            DataType: 5
+            Value: [0.306501538, 0.647058845, 0.384523958, 1]
+            AllowsMultipleTypes: false
+            DefValue: [0.306501538, 0.647058845, 0.384523958, 1]
+      Nodes:
+        - Node: 136623076
+          Name: VertexPos
+          Type: 2
+          OutputPin:
+            Pin: 69909805
+            Name: XYZ (Vec3)
+            DataType: 4
+            Value: [-0.5, 0.5, 0, 0]
+            IsVertexParam: true
+            InputPinsLinkedIDs:
+              - 626130312
+          InputPins:
+            []
+          VParamNodeType: 2
+        - Node: 1660487098
+          Name: VertexNorm
+          Type: 2
+          OutputPin:
+            Pin: 1817323721
+            Name: XYZ  (Vec3)
+            DataType: 4
+            Value: [0, 0, -1, 0]
+            IsVertexParam: true
+            InputPinsLinkedIDs:
+              - 1640273208
+          InputPins:
+            []
+          VParamNodeType: 3
+        - Node: 119309160
+          Name: TCoords
+          Type: 2
+          OutputPin:
+            Pin: 893622623
+            Name: XY (Vec2)
+            DataType: 3
+            Value: [0, 1, 0, -4.22016832e+37]
+            IsVertexParam: true
+            InputPinsLinkedIDs:
+              - 1301937836
+          InputPins:
+            []
+          VParamNodeType: 1
   - Material: 1065702136
     Name: DefaultMaterial
     AttachedGraph:
@@ -102,19 +280,19 @@ Materials:
           - Pin: 1063844372
             Name: Vertex Position (Vec3)
             DataType: 4
-            Value: [0, 0, 0, 0]
+            Value: [-0.5, 0.5, 0, 0]
             AllowsMultipleTypes: false
             DefValue: [0, 0, 0, 0]
           - Pin: 552182889
             Name: Vertex Normal (Vec3)
             DataType: 4
-            Value: [0, 0, 0, 0]
+            Value: [0, 0, -1, 0]
             AllowsMultipleTypes: false
             DefValue: [0, 0, 0, 0]
           - Pin: 1160227781
             Name: Texture Coordinates (Vec2)
             DataType: 3
-            Value: [0, 0, 0, 0]
+            Value: [0, 1, 0, -4.22016832e+37]
             AllowsMultipleTypes: false
             DefValue: [0, 0, 0, 0]
           - Pin: 386912639
@@ -191,19 +369,19 @@ Materials:
           - Pin: 1336218933
             Name: Vertex Position (Vec3)
             DataType: 4
-            Value: [0, 0, 0, 0]
+            Value: [-0.5, 0.5, 0, 0]
             AllowsMultipleTypes: false
             DefValue: [0, 0, 0, 0]
           - Pin: 81506064
             Name: Vertex Normal (Vec3)
             DataType: 4
-            Value: [0, 0, 0, 0]
+            Value: [0, 0, -1, 0]
             AllowsMultipleTypes: false
             DefValue: [0, 0, 0, 0]
           - Pin: 1638909631
             Name: Texture Coordinates (Vec2)
             DataType: 3
-            Value: [0, 0, 0, 0]
+            Value: [0, 1, 0, -4.22016832e+37]
             AllowsMultipleTypes: false
             DefValue: [0, 0, 0, 0]
           - Pin: 1129879820

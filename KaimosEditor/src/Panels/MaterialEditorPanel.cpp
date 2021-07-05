@@ -201,7 +201,7 @@ namespace Kaimos {
 
 	bool MaterialEditorPanel::IsModifyingMaterialGraph(Material* material)
 	{
-		if (m_CurrentGraph && m_CurrentGraph->GetID() == material->GetAttachedGraphID())
+		if (material && m_CurrentGraph && m_CurrentGraph->GetID() == material->GetAttachedGraphID())
 			return true;
 
 		return false;

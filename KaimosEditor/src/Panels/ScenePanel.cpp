@@ -146,7 +146,7 @@ namespace Kaimos {
 			if (entity.HasComponent<SpriteRendererComponent>())
 			{
 				SpriteRendererComponent& comp = entity.GetComponent<SpriteRendererComponent>();
-				if(m_KMEPanel->IsModifyingMaterialGraph(comp.SpriteMaterial.get()))
+				if(m_KMEPanel->IsModifyingMaterialGraph(Renderer::GetMaterial(comp.SpriteMaterialID).get()))
 					m_KMEPanel->UnsetGraphToModify();
 			}
 
@@ -217,7 +217,7 @@ namespace Kaimos {
 				if (std::is_same<T, SpriteRendererComponent>::value)
 				{
 					SpriteRendererComponent& comp = entity.GetComponent<SpriteRendererComponent>();
-					if (m_KMEPanel->IsModifyingMaterialGraph(comp.SpriteMaterial.get()))
+					if (m_KMEPanel->IsModifyingMaterialGraph(Renderer::GetMaterial(comp.SpriteMaterialID).get()))
 						m_KMEPanel->UnsetGraphToModify();
 				}
 
@@ -374,13 +374,20 @@ namespace Kaimos {
 				bool open = ImGui::TreeNodeEx("###mattreenode", flags, "Material");
 				if (open)
 				{
+					Ref<Material> material = Renderer::GetMaterial(component.SpriteMaterialID);
+					if (!material)
+					{
+						return;
+						ImGui::TreePop();
+					}
+
 					// Texture Info
 					ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[1]);
-					ImGui::Text("Name: %s", component.SpriteMaterial->GetName().c_str());
+					ImGui::Text("Name: %s", material->GetName().c_str());
 
-					if (const Ref<Texture2D>& texture = component.SpriteMaterial->GetTexture())
+					if (const Ref<Texture2D>& texture = material->GetTexture())
 					{
-						std::string tex_path = component.SpriteMaterial->GetTexturePath();
+						std::string tex_path = material->GetTexturePath();
 						std::string tex_name = tex_path;
 						if (!tex_path.empty())
 							tex_name = tex_path.substr(tex_path.find_last_of("/\\" + 1, tex_path.size() - 1) + 1);
@@ -389,12 +396,12 @@ namespace Kaimos {
 					}
 
 					// Tiling & UV Offset Info
-					glm::ivec4 col = component.SpriteMaterial->Color * 255.0f;
+					glm::ivec4 col = material->Color * 255.0f;
 					ImGui::Text("Color:\t\t\t\t\t\tRGBA(%i, %i, %i, %i)", col.r, col.g, col.b, col.a);
-					ImGui::Text("Texture Tiling:\t\t%.2f", component.SpriteMaterial->TextureTiling);
-					ImGui::Text("Texture Offset:\t   XY(%.1f, %.1f)", component.SpriteMaterial->TextureUVOffset.x, component.SpriteMaterial->TextureUVOffset.y);
-					ImGui::Text("Material ID:\t\t\t %i", component.SpriteMaterial->GetID());
-					ImGui::Text("Material Graph ID: %i", component.SpriteMaterial->GetAttachedGraphID());
+					ImGui::Text("Texture Tiling:\t\t%.2f", material->TextureTiling);
+					ImGui::Text("Texture Offset:\t   XY(%.1f, %.1f)", material->TextureUVOffset.x, material->TextureUVOffset.y);
+					ImGui::Text("Material ID:\t\t\t %i", material->GetID());
+					ImGui::Text("Material Graph ID: %i", material->GetAttachedGraphID());
 
 					ImGui::PopFont();
 
@@ -403,7 +410,7 @@ namespace Kaimos {
 					ImGui::NewLine(); ImGui::NewLine();
 					ImGui::SameLine(ImGui::GetWindowContentRegionWidth() * 0.5f - btn_width * 0.5f);
 					if (ImGui::Button("Open in Material Editor", ImVec2(btn_width, 25.0f)))
-						m_KMEPanel->SetGraphToModifyFromMaterial(component.SpriteMaterial->GetID());
+						m_KMEPanel->SetGraphToModifyFromMaterial(material->GetID());
 
 					ImGui::TreePop();
 				}

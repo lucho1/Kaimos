@@ -38,6 +38,16 @@ Entities:
       Scale: [1, 1, 1]
     SpriteRendererComponent:
       Material: 1703891235
+  - Entity: 244040104
+    TagComponent:
+      Tag: GreenSprite1
+    TransformComponent:
+      EntityActive: true
+      Translation: [-0.400000006, 2, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    SpriteRendererComponent:
+      Material: 676505225
   - Entity: 476626698
     TagComponent:
       Tag: TopSquare
@@ -48,6 +58,16 @@ Entities:
       Scale: [1, 1, 1]
     SpriteRendererComponent:
       Material: 1165219968
+  - Entity: 249924087
+    TagComponent:
+      Tag: GreenSprite2
+    TransformComponent:
+      EntityActive: true
+      Translation: [2.0999999, 1.29999995, 0]
+      Rotation: [0, -0.684169054, 0]
+      Scale: [1, 1, 1]
+    SpriteRendererComponent:
+      Material: 676505225
   - Entity: 1924290077
     TagComponent:
       Tag: RightSquare

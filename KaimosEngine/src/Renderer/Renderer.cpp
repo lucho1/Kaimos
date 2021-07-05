@@ -92,6 +92,15 @@ namespace Kaimos {
 		return nullptr;
 	}
 
+	uint Renderer::GetMaterialIfExists(uint material_id)
+	{
+		Ref<Material> mat = GetMaterial(material_id);
+		if (mat && mat.get())
+			return mat->GetID();
+		
+		return 0;
+	}
+
 	Kaimos::Ref<Kaimos::Material> Renderer::GetMaterialFromIndex(uint index)
 	{
 		if (s_SceneData && index < s_SceneData->Materials.size())
@@ -218,14 +227,6 @@ namespace Kaimos {
 
 
 	// ----------------------- Getters -----------------------------------------------------------------------
-	Kaimos::Ref<Kaimos::Material> Renderer::GetDefaultMaterial()
-	{
-		if (s_SceneData->Materials.size() > 1)
-			return s_SceneData->Materials[0];
-		
-		return nullptr;
-	}
-
 	bool Renderer::IsDefaultMaterial(uint material_id)
 	{
 		if (s_SceneData->Materials.size() > 1)
@@ -234,4 +235,11 @@ namespace Kaimos {
 		return false;
 	}
 
+	uint Renderer::GetDefaultMaterialID()
+	{
+		if (s_SceneData->Materials.size() > 1)
+			return s_SceneData->Materials[0]->GetID();
+
+		return 0;
+	}
 }

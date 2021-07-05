@@ -51,7 +51,7 @@ namespace Kaimos::Importers
 			// -- Create Root Mesh & Process its Node --
 			Ref<Resources::ResourceModel> model = CreateRef<Resources::ResourceModel>(new Resources::ResourceModel(fpath.string(), 0, root_mesh));
 			root_mesh->SetParentModel(model.get());
-			model->m_RootMesh->m_MaterialID = first_mesh->mMaterialIndex == 0 ? 0 : materials[first_mesh->mMaterialIndex - 1];
+			model->m_RootMesh->m_MaterialID = first_mesh->mMaterialIndex == 0 ? Renderer::GetDefaultMaterialID() : materials[first_mesh->mMaterialIndex - 1];
 			ProcessAssimpNode(scene, scene->mRootNode, model->m_RootMesh.get(), materials);
 
 			// -- Return Model --
@@ -80,6 +80,8 @@ namespace Kaimos::Importers
 				node_meshes.push_back(ProcessAssimpMesh(ai_scene, ai_mesh));
 				if (ai_mesh->mMaterialIndex != 0)
 					node_meshes[i]->m_MaterialID = loaded_materials[ai_mesh->mMaterialIndex - 1]; // -1 Because we are not loading assimp's default material
+				else
+					node_meshes[i]->m_MaterialID = Renderer::GetDefaultMaterialID();
 			}
 		}
 

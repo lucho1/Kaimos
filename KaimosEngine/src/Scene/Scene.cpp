@@ -205,6 +205,7 @@ namespace Kaimos {
 	template<>
 	void Scene::OnComponentAdded<SpriteRendererComponent>(Entity entity, SpriteRendererComponent& component) const
 	{
+		component.SetMaterial(Renderer::GetDefaultMaterialID());
 	}
 
 	template<>

@@ -26,6 +26,7 @@ namespace Kaimos {
 		static void CreateDefaultMaterial();
 		static Ref<Material> CreateMaterial(const std::string& name);
 		static Ref<Material> GetMaterial(uint material_id);
+		static uint GetMaterialIfExists(uint material_id);
 		static uint GetMaterialsQuantity();
 		static Ref<Material> GetMaterialFromIndex(uint index);
 
@@ -41,7 +42,7 @@ namespace Kaimos {
 		// --- Getters ---
 		inline static const RendererAPI::API GetRendererAPI() { return RendererAPI::GetAPI(); }
 
-		static Ref<Material> GetDefaultMaterial();
+		static uint GetDefaultMaterialID();
 		static bool IsDefaultMaterial(uint material_id);
 
 	private:

@@ -233,9 +233,13 @@ namespace Kaimos {
 	
 	// ----------------------- Drawing Methods ------------------------------------------------------------
 	void Renderer2D::DrawSprite(const glm::mat4& transform, const SpriteRendererComponent& sprite, int entity_id)
-	{		
+	{
 		// -- Get Texture index if Sprite has Texture --
-		uint texture_index = GetTextureIndex(sprite.SpriteMaterial->GetTexture());
+		Ref<Material> material = Renderer::GetMaterial(sprite.SpriteMaterialID);
+		if (!material)
+			KS_ENGINE_ASSERT(false, "Tried to Render with a null Material!")
+
+		uint texture_index = GetTextureIndex(material->GetTexture());
 
 		// -- New Batch if Needed --
 		if (s_Data->QuadIndicesDrawCount >= s_Data->MaxIndices)
@@ -246,23 +250,23 @@ namespace Kaimos {
 		for (size_t i = 0; i < quad_vertex_count; ++i)
 		{
 			// Update the Nodes with vertex parameters on each vertex
-			sprite.SpriteMaterial->UpdateVertexParameter(MaterialEditor::VertexParameterNodeType::POSITION, glm::value_ptr(s_Data->VerticesPositions[i]));
-			sprite.SpriteMaterial->UpdateVertexParameter(MaterialEditor::VertexParameterNodeType::NORMAL, glm::value_ptr(s_Data->VerticesNormals[i]));
-			sprite.SpriteMaterial->UpdateVertexParameter(MaterialEditor::VertexParameterNodeType::TEX_COORDS, glm::value_ptr(s_Data->VerticesTCoords[i]));
+			material->UpdateVertexParameter(MaterialEditor::VertexParameterNodeType::POSITION, glm::value_ptr(s_Data->VerticesPositions[i]));
+			material->UpdateVertexParameter(MaterialEditor::VertexParameterNodeType::NORMAL, glm::value_ptr(s_Data->VerticesNormals[i]));
+			material->UpdateVertexParameter(MaterialEditor::VertexParameterNodeType::TEX_COORDS, glm::value_ptr(s_Data->VerticesTCoords[i]));
 
 			// Get the vertex parameters in the main node once updated the nodes
-			glm::vec3 vpos = sprite.SpriteMaterial->GetVertexAttributeResult<glm::vec3>(MaterialEditor::VertexParameterNodeType::POSITION);
-			glm::vec3 vnorm = sprite.SpriteMaterial->GetVertexAttributeResult<glm::vec3>(MaterialEditor::VertexParameterNodeType::NORMAL);
-			glm::vec2 tcoords = sprite.SpriteMaterial->GetVertexAttributeResult<glm::vec2>(MaterialEditor::VertexParameterNodeType::TEX_COORDS);
+			glm::vec3 vpos = material->GetVertexAttributeResult<glm::vec3>(MaterialEditor::VertexParameterNodeType::POSITION);
+			glm::vec3 vnorm = material->GetVertexAttributeResult<glm::vec3>(MaterialEditor::VertexParameterNodeType::NORMAL);
+			glm::vec2 tcoords = material->GetVertexAttributeResult<glm::vec2>(MaterialEditor::VertexParameterNodeType::TEX_COORDS);
 
 			// Set the vertex data
 			s_Data->QuadVBufferPtr->Pos = transform * glm::vec4(vpos, 1.0f);
 			s_Data->QuadVBufferPtr->Normal = vnorm;
-			s_Data->QuadVBufferPtr->TexCoord = tcoords - sprite.SpriteMaterial->TextureUVOffset;
+			s_Data->QuadVBufferPtr->TexCoord = tcoords - material->TextureUVOffset;
 
-			s_Data->QuadVBufferPtr->Color = sprite.SpriteMaterial->Color;
+			s_Data->QuadVBufferPtr->Color = material->Color;
 			s_Data->QuadVBufferPtr->TexIndex = texture_index;
-			s_Data->QuadVBufferPtr->TilingFactor = sprite.SpriteMaterial->TextureTiling;
+			s_Data->QuadVBufferPtr->TilingFactor = material->TextureTiling;
 			s_Data->QuadVBufferPtr->EntityID = entity_id;
 
 			++s_Data->QuadVBufferPtr;
