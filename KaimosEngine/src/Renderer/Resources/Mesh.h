@@ -16,7 +16,7 @@ namespace Kaimos {
 
 		// --- Public Class Methods ---
 		Mesh(const Ref<VertexArray>& vertex_array, const std::string& name = "Unnamed", uint id = 0, uint material_index = 0)
-			: m_VertexArray(vertex_array), m_Name(name), m_MaterialIndex(material_index), m_ID(id == 0 ? (uint)Kaimos::Random::GetRandomInt() : id)
+			: m_VertexArray(vertex_array), m_Name(name), m_MaterialID(material_index), m_ID(id == 0 ? (uint)Kaimos::Random::GetRandomInt() : id)
 		{
 		}
 
@@ -37,13 +37,13 @@ namespace Kaimos {
 
 		// --- Setters ---
 		void SetName(const std::string& name) { m_Name = name; }
-		void SetMaterial(uint material_index) { m_MaterialIndex = material_index; }
+		void SetMaterial(uint material_index) { m_MaterialID = material_index; }
 
 		// --- Getters ---
 		const std::vector<Ref<Mesh>>& GetSubmeshes() const { return m_Submeshes; }
 
 		uint GetID()					const { return m_ID; }
-		uint GetMaterialIndex()			const { return m_MaterialIndex; }
+		uint GetMaterialIndex()			const { return m_MaterialID; }
 		const std::string& GetName()	const { return m_Name; }
 
 		// --- Public Mesh Methods ---
@@ -83,7 +83,7 @@ namespace Kaimos {
 	public:
 
 		// --- Private Variables ---
-		uint m_ID = 0, m_MaterialIndex = 0;
+		uint m_ID = 0, m_MaterialID = 0;
 		std::string m_Name = "Unnamed";
 
 		std::vector<Ref<Mesh>> m_Submeshes;

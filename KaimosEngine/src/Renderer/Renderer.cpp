@@ -59,16 +59,24 @@ namespace Kaimos {
 
 
 	// ----------------------- Public Renderer Materials Methods ---------------------------------------------
-	Ref<Material> Renderer::CreateMaterial()
+	void Renderer::CreateDefaultMaterial()
 	{
-		Ref<Material> material = CreateRef<Material>(new Material());
+		if (s_SceneData->Materials.size() == 0)
+			s_SceneData->Materials.push_back(CreateRef<Material>(new Material("DefaultMaterial")));
+		else if (s_SceneData->Materials[0]->GetName() != "DefaultMaterial")
+			s_SceneData->Materials.emplace(s_SceneData->Materials.begin(), CreateRef<Material>(new Material("DefaultMaterial")));
+	}
+
+	Ref<Material> Renderer::CreateMaterial(const std::string& name)
+	{
+		Ref<Material> material = CreateRef<Material>(new Material(name));
 		s_SceneData->Materials.push_back(material);
 		return material;
 	}
 
-	Ref<Material> Renderer::CreateMaterialWithID(uint id)
+	Ref<Material> Renderer::CreateMaterialWithID(uint material_id, const std::string& name)
 	{
-		Ref<Material> material = CreateRef<Material>(new Material(id));
+		Ref<Material> material = CreateRef<Material>(new Material(material_id, name));
 		s_SceneData->Materials.push_back(material);
 		return material;
 	}
@@ -118,6 +126,7 @@ namespace Kaimos {
 		{
 			output << YAML::BeginMap;
 			output << YAML::Key << "Material" << YAML::Value << mat->GetID();
+			output << YAML::Key << "Name" << YAML::Value << mat->GetName();
 			output << YAML::Key << "AttachedGraph";
 			mat->m_AttachedGraph->SerializeGraph(output);
 			output << YAML::EndMap;
@@ -173,9 +182,11 @@ namespace Kaimos {
 					// Get or Create Material with ID
 					uint mat_id = material_subnode["Material"].as<uint>();
 					Ref<Material> material = GetMaterial(mat_id);
-
-					if(!material)
-						material = CreateMaterialWithID(mat_id);
+					if (!material)
+					{
+						const std::string mat_name = material_subnode["Name"] ? material_subnode["Name"].as<std::string>() : "MAT_NONAME_ONLOAD";
+						material = CreateMaterialWithID(mat_id, mat_name);
+					}
 
 					// Remove the Graph (if exists)
 					material->RemoveGraph();
@@ -203,4 +214,24 @@ namespace Kaimos {
 	{
 		RenderCommand::SetViewport(0, 0, width, height);
 	}
+
+
+
+	// ----------------------- Getters -----------------------------------------------------------------------
+	Kaimos::Ref<Kaimos::Material> Renderer::GetDefaultMaterial()
+	{
+		if (s_SceneData->Materials.size() > 1)
+			return s_SceneData->Materials[0];
+		
+		return nullptr;
+	}
+
+	bool Renderer::IsDefaultMaterial(uint material_id)
+	{
+		if (s_SceneData->Materials.size() > 1)
+			return material_id == s_SceneData->Materials[0]->GetID();
+
+		return false;
+	}
+
 }

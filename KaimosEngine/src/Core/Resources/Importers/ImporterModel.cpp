@@ -2,11 +2,11 @@
 #include "ImporterModel.h"
 
 #include "Core/Resources/ResourceModel.h"
+#include "Renderer/Renderer.h"
 #include "Renderer/Resources/Material.h"
 #include "Renderer/Resources/Buffer.h"
 
 #include <glm/gtc/type_ptr.hpp>
-
 
 
 
@@ -34,12 +34,12 @@ namespace Kaimos::Importers
 		}
 
 		// -- Load Materials --
-		std::vector<Ref<Material>> materials;
+		std::vector<uint> materials;
 		for (uint i = 0; i < scene->mNumMaterials; ++i)
 		{
-			Ref<Material> mat = ProcessAssimpMaterial(scene->mMaterials[i], fpath.parent_path().string());
-			if (mat != nullptr)
-				materials.push_back(mat);
+			uint mat_id = ProcessAssimpMaterial(scene->mMaterials[i], fpath.parent_path().string());
+			if (mat_id != 0)
+				materials.push_back(mat_id);
 		}
 
 		// -- Load Meshes --
@@ -48,10 +48,10 @@ namespace Kaimos::Importers
 
 		if (root_mesh)
 		{
+			// -- Create Root Mesh & Process its Node --
 			Ref<Resources::ResourceModel> model = CreateRef<Resources::ResourceModel>(new Resources::ResourceModel(fpath.string(), 0, root_mesh));
 			root_mesh->SetParentModel(model.get());
-
-			//model->m_RootMesh->m_MaterialIndex = first_mesh->mMaterialIndex == 0 ? 0 : materials[first_mesh->mMaterialIndex - 1];
+			model->m_RootMesh->m_MaterialID = first_mesh->mMaterialIndex == 0 ? 0 : materials[first_mesh->mMaterialIndex - 1];
 			ProcessAssimpNode(scene, scene->mRootNode, model->m_RootMesh.get(), materials);
 
 			// -- Return Model --
@@ -68,7 +68,7 @@ namespace Kaimos::Importers
 
 	
 	// ----------------------- Private Importer Methods ---------------------------------------------------
-	void ImporterModel::ProcessAssimpNode(const aiScene* ai_scene, aiNode* ai_node, Kaimos::Mesh* mesh, const std::vector<Ref<Material>> loaded_materials)
+	void ImporterModel::ProcessAssimpNode(const aiScene* ai_scene, aiNode* ai_node, Kaimos::Mesh* mesh, const std::vector<uint> loaded_materials)
 	{
 		// -- Process Node Meshes --
 		std::vector<Ref<Kaimos::Mesh>> node_meshes;
@@ -78,9 +78,8 @@ namespace Kaimos::Importers
 			{
 				aiMesh* ai_mesh = ai_scene->mMeshes[ai_node->mMeshes[i]];
 				node_meshes.push_back(ProcessAssimpMesh(ai_scene, ai_mesh));
-
-				//if (ai_mesh->mMaterialIndex != 0)
-				//	node_meshes[i]->m_MaterialIndex = loaded_materials[ai_mesh->mMaterialIndex - 1]; // -1 Because we are not loading assimp's default material
+				if (ai_mesh->mMaterialIndex != 0)
+					node_meshes[i]->m_MaterialID = loaded_materials[ai_mesh->mMaterialIndex - 1]; // -1 Because we are not loading assimp's default material
 			}
 		}
 
@@ -169,13 +168,13 @@ namespace Kaimos::Importers
 	}
 
 
-	const Ref<Material> ImporterModel::ProcessAssimpMaterial(aiMaterial* ai_material, const std::string& directory)
+	uint ImporterModel::ProcessAssimpMaterial(aiMaterial* ai_material, const std::string& directory)
 	{
 		// -- Ignore Assimp Default Material --
 		aiString name = aiString("unnamed");
 		ai_material->Get(AI_MATKEY_NAME, name);
 		if (name.C_Str() == std::string(AI_DEFAULT_MATERIAL_NAME))
-			return nullptr;
+			return 0;
 
 		// -- Load Material Variables --
 		aiColor3D diffuse = aiColor3D(1.0);
@@ -190,7 +189,7 @@ namespace Kaimos::Importers
 		// AI_MATKEY_REFLECTIVITY (? -> Also a reflectivity color, wtf), AI_MATKEY_SHININESS_STRENGTH (?)
 
 		// -- Create Material & Set Variables --
-		const Ref<Material>& mat = CreateRef<Material>();
+		const Ref<Material>& mat = Renderer::CreateMaterial(name.C_Str());
 		mat->Color = glm::vec4(diffuse.r, diffuse.g, diffuse.b, opacity);
 
 		if (ai_material->GetTextureCount(aiTextureType_DIFFUSE) > 0)
@@ -200,7 +199,7 @@ namespace Kaimos::Importers
 		// aiTextureType_EMISSIVE, aiTextureType_SPECULAR, aiTextureType_NORMALS, aiTextureType_HEIGHT, aiTextureType_DISPLACEMENT
 
 		// -- Return Material --
-		return mat;
+		return mat->GetID();
 	}
 	
 
@@ -208,9 +207,6 @@ namespace Kaimos::Importers
 	{
 		aiString texture_filename;
 		ai_material->GetTexture(texture_type, 0, &texture_filename);
-
-		std::string n = std::string(directory + "/" + texture_filename.C_Str());
-
 		return std::string(directory + "/" + texture_filename.C_Str());
 	}
 }

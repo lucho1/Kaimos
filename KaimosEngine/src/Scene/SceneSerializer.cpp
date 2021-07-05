@@ -203,8 +203,13 @@ namespace Kaimos {
 				{
 					uint mat_node = sprite_node["Material"].as<uint>();
 					Ref<Material>* mat = &Renderer::GetMaterial(mat_node);
-					if(!mat || !mat->get())
-						mat = &Renderer::CreateMaterial();
+					if (!mat || !mat->get())
+					{
+						if (Ref<Material>* def_mat = &Renderer::GetDefaultMaterial())
+							mat = def_mat;
+						else
+							mat = &Renderer::CreateMaterial("Unnamed");
+					}
 					
 					SpriteRendererComponent& sprite_comp = deserialized_entity.AddComponent<SpriteRendererComponent>();
 					sprite_comp.SetMaterial(*mat);

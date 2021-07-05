@@ -376,16 +376,16 @@ namespace Kaimos {
 				{
 					// Texture Info
 					ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[1]);
+					ImGui::Text("Name: %s", component.SpriteMaterial->GetName().c_str());
 
-					if (component.SpriteMaterial->GetTexture())
+					if (const Ref<Texture2D>& texture = component.SpriteMaterial->GetTexture())
 					{
 						std::string tex_path = component.SpriteMaterial->GetTexturePath();
 						std::string tex_name = tex_path;
 						if (!tex_path.empty())
 							tex_name = tex_path.substr(tex_path.find_last_of("/\\" + 1, tex_path.size() - 1) + 1);
-					
-						ImGui::Text("Texture (ID %i):\t%s (%ix%i)", component.SpriteMaterial->GetTexture()->GetTextureID(), tex_name.c_str(),
-							component.SpriteMaterial->GetTexture()->GetWidth(), component.SpriteMaterial->GetTexture()->GetHeight());
+
+						ImGui::Text("Texture (ID %i):\t%s (%ix%i)", texture->GetTextureID(), tex_name.c_str(), texture->GetWidth(), texture->GetHeight());
 					}
 
 					// Tiling & UV Offset Info

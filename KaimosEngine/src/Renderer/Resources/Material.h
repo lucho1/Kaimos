@@ -17,15 +17,25 @@ namespace Kaimos {
 	public:
 
 		// --- Public Class Methods ---
-		Material()	{ m_ID = (uint)Kaimos::Random::GetRandomInt(); m_AttachedGraph = CreateScopePtr<MaterialEditor::MaterialGraph>(this); }
-		~Material()	{ RemoveTexture(); if (m_AttachedGraph) m_AttachedGraph.reset(); }
+		Material(const std::string& name) : m_Name(name)
+		{
+			m_ID = (uint)Kaimos::Random::GetRandomInt();
+			m_AttachedGraph = CreateScopePtr<MaterialEditor::MaterialGraph>(this);
+		}
+
+		~Material()
+		{
+			RemoveTexture();
+			if (m_AttachedGraph)
+				m_AttachedGraph.reset();
+		}
 
 	protected:
 
 		// This constructor requires its attached graph to be created and assigned just after this material
 		// As is a bit "unsecure" is protected so only renderer (and other friends tho) can access.
 		// It is thought to deserialize a material
-		Material(uint id) { m_ID = id; }
+		Material(uint id, const std::string& name) : m_Name(name) { m_ID = id; }
 
 	public:
 
@@ -98,6 +108,7 @@ namespace Kaimos {
 
 		uint GetID()						const { return m_ID; }
 		uint GetAttachedGraphID()			const { return m_AttachedGraph->GetID(); }
+		const std::string& GetName()		const { return m_Name; }
 
 		
 	public:
@@ -115,6 +126,7 @@ namespace Kaimos {
 
 		Ref<Texture2D> m_Texture = nullptr;
 		std::string m_TextureFilepath = "";
+		std::string m_Name = "Unnamed";
 	};
 }
 

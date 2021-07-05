@@ -3,6 +3,7 @@
 
 #include "ECS/Entity.h"
 #include "ECS/Components.h"
+#include "Renderer/Renderer.h"
 #include "Renderer/Renderer2D.h"
 
 #include "Core/Utils/Maths/RandomGenerator.h"
@@ -32,6 +33,7 @@ namespace Kaimos {
 	Scene::Scene()
 	{
 		m_PrimaryCamera = {};
+		Renderer::CreateDefaultMaterial();
 	}
 
 	Scene::Scene(const std::string& name) : m_Name(name)

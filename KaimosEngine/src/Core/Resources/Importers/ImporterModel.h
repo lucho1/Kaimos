@@ -5,7 +5,7 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
-//class aiScene;
+//class aiScene; // TODO: Solve this
 //class aiMesh;
 //class aiMaterial;
 //struct aiNode;
@@ -29,9 +29,9 @@ namespace Kaimos {
 		private:
 
 			// --- Private Importer Methods ---
-			static void ProcessAssimpNode(const aiScene* ai_scene, aiNode* ai_node, Kaimos::Mesh* mesh, const std::vector<Ref<Material>> loaded_materials);
+			static void ProcessAssimpNode(const aiScene* ai_scene, aiNode* ai_node, Kaimos::Mesh* mesh, const std::vector<uint> loaded_materials);
 			static Ref<Kaimos::Mesh> ProcessAssimpMesh(const aiScene* ai_scene, aiMesh* ai_mesh);
-			static const Ref<Material> ProcessAssimpMaterial(aiMaterial* ai_material, const std::string& directory);
+			static uint ProcessAssimpMaterial(aiMaterial* ai_material, const std::string& directory);
 
 			static const std::string LoadMaterialTexture(aiMaterial* ai_material, aiTextureType texture_type, const std::string& directory);
 		};
