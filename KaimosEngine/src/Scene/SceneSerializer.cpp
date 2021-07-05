@@ -202,7 +202,6 @@ namespace Kaimos {
 				if (sprite_node)
 				{
 					uint mat_node = sprite_node["Material"].as<uint>();
-
 					uint mat_id = Renderer::GetMaterialIfExists(mat_node);					
 					if (mat_id == 0)
 					{

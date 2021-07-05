@@ -90,7 +90,7 @@ Materials:
             []
           VParamNodeType: 1
   - Material: 676505225
-    Name: DefaultMaterial
+    Name: GreenCheckeredMaterial
     AttachedGraph:
       MaterialGraph: 321416116
       MainRootNode:
@@ -175,95 +175,6 @@ Materials:
             IsVertexParam: true
             InputPinsLinkedIDs:
               - 1301937836
-          InputPins:
-            []
-          VParamNodeType: 1
-  - Material: 1065702136
-    Name: DefaultMaterial
-    AttachedGraph:
-      MaterialGraph: 600545660
-      MainRootNode:
-        TextureFile: ""
-        Node: 551854642
-        Name: Main Node
-        Type: 1
-        InputPins:
-          - Pin: 1735240756
-            Name: Vertex Position (Vec3)
-            DataType: 4
-            Value: [0, 0, 0, 0]
-            AllowsMultipleTypes: false
-            DefValue: [0, 0, 0, 0]
-          - Pin: 1405622553
-            Name: Vertex Normal (Vec3)
-            DataType: 4
-            Value: [0, 0, 0, 0]
-            AllowsMultipleTypes: false
-            DefValue: [0, 0, 0, 0]
-          - Pin: 447041132
-            Name: Texture Coordinates (Vec2)
-            DataType: 3
-            Value: [0, 0, 0, 0]
-            AllowsMultipleTypes: false
-            DefValue: [0, 0, 0, 0]
-          - Pin: 331892225
-            Name: Texture Tiling (float)
-            DataType: 1
-            Value: [1, 1, 1, 1]
-            AllowsMultipleTypes: false
-            DefValue: [1, 1, 1, 1]
-          - Pin: 1213369929
-            Name: Texture Offset (Vec2)
-            DataType: 3
-            Value: [0, 0, 0, 0]
-            AllowsMultipleTypes: false
-            DefValue: [0, 0, 0, 0]
-          - Pin: 40559560
-            Name: Color (Vec4)
-            DataType: 5
-            Value: [1, 1, 1, 1]
-            AllowsMultipleTypes: false
-            DefValue: [1, 1, 1, 1]
-      Nodes:
-        - Node: 1162817071
-          Name: VertexPos
-          Type: 2
-          OutputPin:
-            Pin: 1291805952
-            Name: XYZ (Vec3)
-            DataType: 4
-            Value: [0, 0, 0, 0]
-            IsVertexParam: true
-            InputPinsLinkedIDs:
-              - 1735240756
-          InputPins:
-            []
-          VParamNodeType: 2
-        - Node: 1254998301
-          Name: VertexNorm
-          Type: 2
-          OutputPin:
-            Pin: 1162994414
-            Name: XYZ  (Vec3)
-            DataType: 4
-            Value: [0, 0, 0, 0]
-            IsVertexParam: true
-            InputPinsLinkedIDs:
-              - 1405622553
-          InputPins:
-            []
-          VParamNodeType: 3
-        - Node: 237858181
-          Name: TCoords
-          Type: 2
-          OutputPin:
-            Pin: 190923174
-            Name: XY (Vec2)
-            DataType: 3
-            Value: [0, 0, 0, 0]
-            IsVertexParam: true
-            InputPinsLinkedIDs:
-              - 447041132
           InputPins:
             []
           VParamNodeType: 1

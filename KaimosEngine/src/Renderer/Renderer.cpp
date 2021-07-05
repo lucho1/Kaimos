@@ -76,6 +76,9 @@ namespace Kaimos {
 
 	Ref<Material> Renderer::CreateMaterialWithID(uint material_id, const std::string& name)
 	{
+		if (name == "DefaultMaterial" && s_SceneData->Materials.size() > 0)
+			return s_SceneData->Materials[0];
+
 		Ref<Material> material = CreateRef<Material>(new Material(material_id, name));
 		s_SceneData->Materials.push_back(material);
 		return material;

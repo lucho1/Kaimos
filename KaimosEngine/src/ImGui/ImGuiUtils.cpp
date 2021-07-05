@@ -102,20 +102,20 @@ namespace Kaimos::KaimosUI {
 	}
 
 
-	bool UIFunctionalities::DrawDropDown(const char* label, const char* options[], uint options_size, const char* selected_option, uint& selected_index, float width, float spacing)
+	bool UIFunctionalities::DrawDropDown(const char* label, const std::vector<std::string>& options, uint options_size, std::string& selected_option, uint& selected_index, float width, float spacing)
 	{
 		// - Set Combo Settings -
 		bool ret = false;
 		SetTextCursorAndWidth(label, width, spacing);
 		std::string widget_label = "###" + std::string(label);
 
-		if (ImGui::BeginCombo(widget_label.c_str(), selected_option))
+		if (ImGui::BeginCombo(widget_label.c_str(), selected_option.c_str()))
 		{
 			// - Loop options & set selected option -
 			for (uint i = 0; i < options_size; ++i)
 			{
 				bool selected = selected_option == options[i];
-				if (ImGui::Selectable(options[i], selected))
+				if (ImGui::Selectable(options[i].c_str(), selected))
 				{
 					selected_option = options[i];
 					selected_index = i;

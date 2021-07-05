@@ -317,8 +317,8 @@ namespace Kaimos {
 
 				// Projection Type Dropdown
 				uint current_proj_type = (uint)camera.GetProjectionType();
-				const char* projection_options[] = { "Perspective", "Orthographic" };				
-				const char* current_projection = projection_options[current_proj_type];
+				const std::vector<std::string> projection_options = { "Perspective", "Orthographic" };
+				std::string current_projection = projection_options[current_proj_type];
 
 				if (KaimosUI::UIFunctionalities::DrawDropDown("Projection", projection_options, 2, current_projection, current_proj_type, ImGui::CalcItemWidth() / 4.0f))
 				{
@@ -381,10 +381,37 @@ namespace Kaimos {
 						ImGui::TreePop();
 					}
 
-					// Texture Info
 					ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[1]);
-					ImGui::Text("Name: %s", material->GetName().c_str());
+					
+					// Materials Dropdown
+					uint current_material_index = 0;
+					std::string current_material_name = material->GetName();
+					std::vector<std::string> material_names;
+					uint mats_size = Renderer::GetMaterialsQuantity();
 
+					for (uint i = 0; i < mats_size; ++i)
+					{
+						Ref<Material> mat = Renderer::GetMaterialFromIndex(i);
+						if (mat)
+						{
+							material_names.push_back(mat->GetName());
+							if (mat->GetID() == material->GetID())
+								current_material_index = i;
+						}
+					}
+					
+					if (KaimosUI::UIFunctionalities::DrawDropDown("Material", material_names, material_names.size(), current_material_name, current_material_index, 135.5f, 1.45f))
+					{
+						// Set Material
+						Ref<Material> selected_material = Renderer::GetMaterialFromIndex(current_material_index);
+						if (selected_material)
+						{
+							component.SetMaterial(selected_material->GetID());
+							material = selected_material;
+						}
+					}
+
+					// Texture Info
 					if (const Ref<Texture2D>& texture = material->GetTexture())
 					{
 						std::string tex_path = material->GetTexturePath();

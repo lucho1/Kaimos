@@ -52,7 +52,7 @@ namespace Kaimos::KaimosUI {
 		// - Others -
 		// Draw Dropdown: options = array of options (needs a size specification), selected_option = name of current selected opt. (needs its index in options[])
 		// the width is the width that the dropdown will occupy, if left to 0 will be the half of its imgui-calculated width
-		static bool DrawDropDown(const char* label, const char* options[], uint options_size, const char* selected_option, uint& selected_index, float width = 0.0f, float spacing = 2.0f);
+		static bool DrawDropDown(const char* label, const std::vector<std::string>& options, uint options_size, std::string& selected_option, uint& selected_index, float width = 0.0f, float spacing = 2.0f);
 
 		// Draw controller of vec3 (ue4-like): name = label ("position"), value = ref to vec3, xyz colors = vec3 axis colors,
 		// reset value = reset on pressing axis button, labels = names for axis (xyz, rgb...), column width = width of controller elements
