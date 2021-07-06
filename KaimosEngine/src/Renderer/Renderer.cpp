@@ -63,7 +63,30 @@ namespace Kaimos {
 
 
 
-	// ----------------------- Public Renderer Materials Methods ---------------------------------------------
+	// ----------------------- Public Renderer Mesh Methods --------------------------------------------------
+	Ref<Mesh> Renderer::GetMesh(uint mesh_id)
+	{
+		if (CheckIfMeshExists(mesh_id))
+			return s_SceneData->Meshes[mesh_id];
+
+		return nullptr;
+	}
+
+	Ref<Mesh> Renderer::GetMeshFromIndex(uint index)
+	{
+		if (index < s_SceneData->Meshes.size())
+		{
+			uint i = 0;
+			for (auto& mesh : s_SceneData->Meshes)
+			{
+				if (i == index)
+					return mesh.second;
+			}
+		}
+
+		return nullptr;
+	}
+
 	void Renderer::CreateMesh(const Ref<Mesh>& mesh)
 	{
 		uint mesh_id = mesh->GetID();
@@ -71,6 +94,17 @@ namespace Kaimos {
 			s_SceneData->Meshes.insert({ mesh_id, mesh });
 	}
 
+	bool Renderer::CheckIfMeshExists(uint mesh_id)
+	{
+		if (s_SceneData->Meshes.find(mesh_id) != s_SceneData->Meshes.end())
+			return true;
+
+		return false;
+	}
+
+
+
+	// ----------------------- Public Renderer Materials Methods ---------------------------------------------
 	void Renderer::CreateDefaultMaterial()
 	{
 		if (s_SceneData->Materials.size() == 0)

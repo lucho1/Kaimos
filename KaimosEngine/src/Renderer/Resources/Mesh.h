@@ -3,12 +3,13 @@
 
 #include "Core/Core.h"
 #include "Core/Utils/Maths/RandomGenerator.h"
-#include "Core/Resources/ResourceModel.h"
 #include "Buffer.h"
 
 namespace Kaimos {
 
+	namespace Resources { class ResourceModel; }
 	namespace Importers { class ImporterModel; }
+
 	class Mesh
 	{
 		friend class Importers::ImporterModel;
@@ -20,65 +21,32 @@ namespace Kaimos {
 		{
 		}
 
-		~Mesh()
-		{
-			for (int i = m_Submeshes.size() - 1; i >= 0; --i)
-				m_Submeshes[i].reset();
-
-			if (m_ParentMesh)
-				m_ParentMesh->DeleteSubmesh(this);
-
-			m_Submeshes.clear();
-			m_VertexArray.reset();
-			m_ParentMesh = nullptr;
-		}
+		~Mesh();
 
 	public:
 
 		// --- Setters ---
-		void SetName(const std::string& name) { m_Name = name; }
-		void SetMaterial(uint material_id) { m_MaterialID = material_id; }
+		void SetName(const std::string& name)	{ m_Name = name; }
+		void SetMaterial(uint material_id)		{ m_MaterialID = material_id; }
 
 		// --- Getters ---
-		const std::vector<Ref<Mesh>>& GetSubmeshes() const { return m_Submeshes; }
-
 		uint GetID()					const { return m_ID; }
 		uint GetMaterialIndex()			const { return m_MaterialID; }
 		const std::string& GetName()	const { return m_Name; }
 
-		// --- Public Mesh Methods ---
-		void AddSubmesh(const Ref<Mesh>& mesh)
-		{
-			if (!mesh || !mesh.get())
-				return;
+		const std::string& GetParentMeshName()			const;
+		const std::string& GetParentModelName()			const;
+		const std::vector<Ref<Mesh>>& GetSubmeshes()	const { return m_Submeshes; }
 
-			m_Submeshes.push_back(mesh);
-			mesh->m_ParentMesh = this;
-			mesh->m_ParentModel = m_ParentModel;
-		}
+		// --- Public Mesh Methods ---
+		void AddSubmesh(const Ref<Mesh>& mesh);
 		
 
 	private:
 
 		// --- Private Mesh Methods ---
-		void DeleteSubmesh(Mesh* submesh_to_delete)
-		{
-			for (auto& it = m_Submeshes.begin(); it != m_Submeshes.end(); ++it)
-			{
-				if ((*it)->m_ID == submesh_to_delete->m_ID)
-					m_Submeshes.erase(it);
-			}
-		}
-
-		void SetParentModel(Resources::ResourceModel* model)
-		{
-			if (model)
-			{
-				m_ParentModel = model;
-				for (Ref<Mesh>& mesh : m_Submeshes)
-					mesh->m_ParentModel = model;
-			}
-		}
+		void DeleteSubmesh(Mesh* submesh_to_delete);
+		void SetParentModel(Resources::ResourceModel* model);
 
 	public:
 

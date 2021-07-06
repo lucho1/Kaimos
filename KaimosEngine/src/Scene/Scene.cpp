@@ -209,6 +209,12 @@ namespace Kaimos {
 	}
 
 	template<>
+	void Scene::OnComponentAdded<MeshRendererComponent>(Entity entity, MeshRendererComponent& component) const
+	{
+		component.SetMaterial(Renderer::GetDefaultMaterialID()); 
+	}
+
+	template<>
 	void Scene::OnComponentAdded<NativeScriptComponent>(Entity entity, NativeScriptComponent& component) const
 	{
 	}

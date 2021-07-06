@@ -24,7 +24,11 @@ namespace Kaimos {
 		static void Submit(const Ref<Shader>& shader, const Ref<VertexArray>& vertex_array, const glm::mat4& transformation = glm::mat4(1.0f));
 
 		// --- Public Renderer Mesh Methods ---
+		static const std::unordered_map<uint, Ref<Mesh>>& GetMeshesMap() { return s_SceneData->Meshes; }
+		static Ref<Mesh> GetMesh(uint mesh_id);
+		static Ref<Mesh> GetMeshFromIndex(uint index);
 		static void CreateMesh(const Ref<Mesh>& mesh);
+		static bool CheckIfMeshExists(uint mesh_id);
 
 		// --- Public Renderer Materials Methods ---
 		static void CreateDefaultMaterial();

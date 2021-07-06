@@ -59,9 +59,6 @@ namespace Kaimos {
 		{
 			if (material_id == SpriteMaterialID || Renderer::GetMaterialIfExists(material_id) == 0)
 				return;
-
-			if (SpriteMaterialID != 0)
-				RemoveMaterial();
 		
 			SpriteMaterialID = material_id;
 		}
@@ -73,6 +70,40 @@ namespace Kaimos {
 
 		SpriteRendererComponent()								= default;
 		SpriteRendererComponent(const SpriteRendererComponent&)	= default;
+	};
+
+	struct MeshRendererComponent
+	{
+		uint SpriteMaterialID = 0, MeshID = 0;
+
+		inline void SetMesh(uint mesh_id)
+		{
+			if (mesh_id == MeshID || !Renderer::CheckIfMeshExists(mesh_id))
+				return;
+
+			MeshID = mesh_id;
+		}
+
+		inline void RemoveMesh()
+		{
+			MeshID = 0;
+		}
+
+		inline void SetMaterial(uint material_id)
+		{
+			if (material_id == SpriteMaterialID || Renderer::GetMaterialIfExists(material_id) == 0)
+				return;
+
+			SpriteMaterialID = material_id;
+		}
+
+		inline void RemoveMaterial()
+		{
+			SpriteMaterialID = Renderer::GetDefaultMaterialID();
+		}
+
+		MeshRendererComponent() = default;
+		MeshRendererComponent(const MeshRendererComponent&) = default;
 	};
 
 	struct CameraComponent

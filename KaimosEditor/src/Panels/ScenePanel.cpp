@@ -3,6 +3,8 @@
 #include "Core/Utils/PlatformUtils.h"
 #include "ImGui/ImGuiUtils.h"
 
+#include "Renderer/Resources/Mesh.h"
+
 #include <ImGui/imgui.h>
 #include <ImGui/imgui_internal.h>
 #include <glm/gtc/type_ptr.hpp>
@@ -143,13 +145,6 @@ namespace Kaimos {
 		// -- Delete Entity --
 		if (entity_deleted)
 		{
-			if (entity.HasComponent<SpriteRendererComponent>())
-			{
-				SpriteRendererComponent& comp = entity.GetComponent<SpriteRendererComponent>();
-				if(m_KMEPanel->IsModifyingMaterialGraph(Renderer::GetMaterial(comp.SpriteMaterialID).get()))
-					m_KMEPanel->UnsetGraphToModify();
-			}
-
 			if (m_SelectedEntity == entity)
 				m_SelectedEntity = {};
 
@@ -213,16 +208,8 @@ namespace Kaimos {
 
 			// -- Remove Component --
 			if (remove_component)
-			{
-				if (std::is_same<T, SpriteRendererComponent>::value)
-				{
-					SpriteRendererComponent& comp = entity.GetComponent<SpriteRendererComponent>();
-					if (m_KMEPanel->IsModifyingMaterialGraph(Renderer::GetMaterial(comp.SpriteMaterialID).get()))
-						m_KMEPanel->UnsetGraphToModify();
-				}
 
 				entity.RemoveComponent<T>();
-			}
 		}
 	}
 
@@ -377,8 +364,8 @@ namespace Kaimos {
 					Ref<Material> material = Renderer::GetMaterial(component.SpriteMaterialID);
 					if (!material)
 					{
-						return;
 						ImGui::TreePop();
+						return;
 					}
 
 					ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[1]);
@@ -400,6 +387,133 @@ namespace Kaimos {
 						}
 					}
 					
+					if (KaimosUI::UIFunctionalities::DrawDropDown("Material", material_names, material_names.size(), current_material_name, current_material_index, 135.5f, 1.45f))
+					{
+						// Set Material
+						Ref<Material> selected_material = Renderer::GetMaterialFromIndex(current_material_index);
+						if (selected_material)
+						{
+							component.SetMaterial(selected_material->GetID());
+							material = selected_material;
+						}
+					}
+
+					// Texture Info
+					if (const Ref<Texture2D>& texture = material->GetTexture())
+					{
+						std::string tex_path = material->GetTexturePath();
+						std::string tex_name = tex_path;
+						if (!tex_path.empty())
+							tex_name = tex_path.substr(tex_path.find_last_of("/\\" + 1, tex_path.size() - 1) + 1);
+
+						ImGui::Text("Texture (ID %i):\t%s (%ix%i)", texture->GetTextureID(), tex_name.c_str(), texture->GetWidth(), texture->GetHeight());
+					}
+
+					// Tiling & UV Offset Info
+					glm::ivec4 col = material->Color * 255.0f;
+					ImGui::Text("Color:\t\t\t\t\t\tRGBA(%i, %i, %i, %i)", col.r, col.g, col.b, col.a);
+					ImGui::Text("Texture Tiling:\t\t%.2f", material->TextureTiling);
+					ImGui::Text("Texture Offset:\t   XY(%.1f, %.1f)", material->TextureUVOffset.x, material->TextureUVOffset.y);
+					ImGui::Text("Material ID:\t\t\t %i", material->GetID());
+					ImGui::Text("Material Graph ID: %i", material->GetAttachedGraphID());
+
+					ImGui::PopFont();
+
+					// Open in Material Editor Button
+					float btn_width = 196.0f;
+					ImGui::NewLine(); ImGui::NewLine();
+					ImGui::SameLine(ImGui::GetWindowContentRegionWidth() * 0.5f - btn_width * 0.5f);
+					if (ImGui::Button("Open in Material Editor", ImVec2(btn_width, 25.0f)))
+						m_KMEPanel->SetGraphToModifyFromMaterial(material->GetID());
+
+					ImGui::TreePop();
+				}
+			});
+
+
+		// -- Sprite Renderer Component --
+		DrawComponentUI<MeshRendererComponent>("Mesh Renderer", entity, [&](auto& component)
+			{
+				ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_FramePadding
+					| ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_SpanAvailWidth;
+
+				bool open = ImGui::TreeNodeEx("###mattreenode", flags, "Material");
+				if (open)
+				{
+					// Mesh
+					Ref<Mesh> mesh = Renderer::GetMesh(component.MeshID);
+					if (!mesh)
+					{
+						ImGui::TreePop();
+						return;
+					}
+
+					// Meshes Dropdown
+					const std::unordered_map<uint, Ref<Mesh>> meshes = Renderer::GetMeshesMap();
+
+					uint current_mesh_index = 0;
+					std::string current_mesh_name = mesh->GetName();
+					std::vector<std::string> meshes_names;
+
+					uint ind = 0;
+					for (auto& m : meshes)
+					{
+						meshes_names.push_back(m.second->GetName());
+						if (m.second->GetID() == mesh->GetID())
+							current_mesh_index = ind;
+
+						++ind;
+					}
+
+					if (KaimosUI::UIFunctionalities::DrawDropDown("Mesh", meshes_names, meshes_names.size(), current_mesh_name, current_mesh_index, 135.5f, 1.45f))
+					{
+						// Set Mesh
+						Ref<Mesh> selected_mesh = Renderer::GetMeshFromIndex(current_mesh_index);
+						if (selected_mesh)
+						{
+							component.SetMesh(selected_mesh->GetID());
+							mesh = selected_mesh;
+						}
+					}
+
+					// Mesh Info.
+					//ImGui::Text("Mesh:\t\t\t %s", mesh->GetName().c_str());
+					//ImGui::Text("Mesh ID:\t\t\t%i", mesh->GetID());
+					//ImGui::Text("Parent Mesh:\t\t%s", mesh->GetParentMeshName().c_str());
+					//ImGui::Text("Parent Model:\t\t%s", mesh->GetParentModelName().c_str());
+					ImGui::Text("Mesh:\t\t\t MESH NAME");
+					ImGui::Text("Mesh ID:\t\t\tMESH ID");
+					ImGui::Text("Parent Mesh:\t\tPARENT MESH NAME");
+					ImGui::Text("Parent Model:\t\tPARENT MODEL NAME");
+
+
+					// Material
+					Ref<Material> material = Renderer::GetMaterial(component.SpriteMaterialID);
+					if (!material)
+					{
+						ImGui::TreePop();
+						return;
+					}
+
+					ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[1]);
+
+					// Materials Dropdown
+					uint current_material_index = 0;
+					std::string current_material_name = material->GetName();
+					std::vector<std::string> material_names;
+					uint mats_size = Renderer::GetMaterialsQuantity();
+
+					for (uint i = 0; i < mats_size; ++i)
+					{
+						Ref<Material> mat = Renderer::GetMaterialFromIndex(i);
+						if (mat)
+						{
+							material_names.push_back(mat->GetName());
+							if (mat->GetID() == material->GetID())
+								current_material_index = i;
+						}
+					}
+
 					if (KaimosUI::UIFunctionalities::DrawDropDown("Material", material_names, material_names.size(), current_material_name, current_material_index, 135.5f, 1.45f))
 					{
 						// Set Material

@@ -80,6 +80,16 @@ namespace Kaimos {
 			output << YAML::Key << "Material" << YAML::Value << sprite_comp.SpriteMaterialID;
 			output << YAML::EndMap;
 		}
+
+		if (entity.HasComponent<MeshRendererComponent>())
+		{
+			MeshRendererComponent& mesh_comp = entity.GetComponent<MeshRendererComponent>();
+			output << YAML::Key << "MeshRendererComponent";
+			output << YAML::BeginMap;
+			output << YAML::Key << "Material" << YAML::Value << mesh_comp.SpriteMaterialID;
+			output << YAML::Key << "Mesh" << YAML::Value << mesh_comp.MeshID;
+			output << YAML::EndMap;
+		}
 		
 		
 		// -- End Entity Map --
@@ -214,6 +224,29 @@ namespace Kaimos {
 					
 					SpriteRendererComponent& sprite_comp = deserialized_entity.AddComponent<SpriteRendererComponent>();
 					sprite_comp.SetMaterial(mat_id);
+				}
+
+				YAML::Node mesh_node = entity["MeshRendererComponent"];
+				if (mesh_node)
+				{
+					uint mat_node = mesh_node["Material"].as<uint>();
+					uint mesh_id_node = mesh_node["Mesh"].as<uint>();
+					if (!Renderer::CheckIfMeshExists(mesh_id_node))
+						mesh_id_node = 0;
+
+					uint mat_id = Renderer::GetMaterialIfExists(mat_node);
+					if (mat_id == 0)
+					{
+						uint def_mat_id = Renderer::GetDefaultMaterialID();
+						if (def_mat_id != 0)
+							mat_id = def_mat_id;
+						else
+							mat_id = Renderer::CreateMaterial("Unnamed")->GetID();
+					}
+
+					MeshRendererComponent& mesh_comp = deserialized_entity.AddComponent<MeshRendererComponent>();
+					mesh_comp.SetMesh(mesh_id_node);
+					mesh_comp.SetMaterial(mat_id);
 				}
 			}
 		}
