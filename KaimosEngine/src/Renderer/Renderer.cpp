@@ -1,7 +1,8 @@
 #include "kspch.h"
 #include "Renderer.h"
 
-#include "Renderer/OpenGL/Resources/OGLShader.h"
+#include "OpenGL/Resources/OGLShader.h"
+#include "Resources/Mesh.h"
 #include "Renderer2D.h"
 
 #include <yaml-cpp/yaml.h>
@@ -27,6 +28,10 @@ namespace Kaimos {
 		for (Ref<Material>& mat : s_SceneData->Materials)
 			mat.reset();
 
+		for (auto& mesh : s_SceneData->Meshes)
+			mesh.second.reset();
+
+		s_SceneData->Meshes.clear();
 		s_SceneData->Materials.clear();
 		s_SceneData.reset();
 	}
@@ -59,6 +64,13 @@ namespace Kaimos {
 
 
 	// ----------------------- Public Renderer Materials Methods ---------------------------------------------
+	void Renderer::CreateMesh(const Ref<Mesh>& mesh)
+	{
+		uint mesh_id = mesh->GetID();
+		if (s_SceneData->Meshes.find(mesh_id) == s_SceneData->Meshes.end())
+			s_SceneData->Meshes.insert({ mesh_id, mesh });
+	}
+
 	void Renderer::CreateDefaultMaterial()
 	{
 		if (s_SceneData->Materials.size() == 0)

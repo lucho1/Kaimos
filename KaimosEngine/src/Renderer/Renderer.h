@@ -8,6 +8,7 @@
 
 namespace Kaimos {
 
+	class Mesh;
 	class Renderer // TODO: I should review what does this does and see how it is used, because is very similar to Renderer2D
 	{
 	public:
@@ -21,6 +22,9 @@ namespace Kaimos {
 		static void EndScene();
 
 		static void Submit(const Ref<Shader>& shader, const Ref<VertexArray>& vertex_array, const glm::mat4& transformation = glm::mat4(1.0f));
+
+		// --- Public Renderer Mesh Methods ---
+		static void CreateMesh(const Ref<Mesh>& mesh);
 
 		// --- Public Renderer Materials Methods ---
 		static void CreateDefaultMaterial();
@@ -56,6 +60,7 @@ namespace Kaimos {
 		{
 			glm::mat4 ViewProjectionMatrix = glm::mat4(1.0f);
 			std::vector<Ref<Material>> Materials;
+			std::unordered_map<uint, Ref<Mesh>> Meshes;
 		};
 
 		static ScopePtr<SceneData> s_SceneData;

@@ -166,6 +166,7 @@ namespace Kaimos::Importers
 		// -- Create & Return Mesh --
 		std::string mesh_name = ai_mesh->mName.length > 0 ? ai_mesh->mName.C_Str() : "unnamed";
 		Ref<Mesh> mesh = CreateRef<Mesh>(vao, mesh_name);
+		Renderer::CreateMesh(mesh);
 		return mesh;
 	}
 
