@@ -8,6 +8,7 @@
 
 #include "Imgui/ImGuiUtils.h"
 #include "Core/Utils/PlatformUtils.h"
+#include "Renderer/Resources/Texture.h"
 
 #include <imgui.h>
 #include <imnodes.h>
