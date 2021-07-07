@@ -477,15 +477,10 @@ namespace Kaimos {
 					}
 
 					// Mesh Info.
-					//ImGui::Text("Mesh:\t\t\t %s", mesh->GetName().c_str());
-					//ImGui::Text("Mesh ID:\t\t\t%i", mesh->GetID());
-					//ImGui::Text("Parent Mesh:\t\t%s", mesh->GetParentMeshName().c_str());
-					//ImGui::Text("Parent Model:\t\t%s", mesh->GetParentModelName().c_str());
-					ImGui::Text("Mesh:\t\t\t MESH NAME");
-					ImGui::Text("Mesh ID:\t\t\tMESH ID");
-					ImGui::Text("Parent Mesh:\t\tPARENT MESH NAME");
-					ImGui::Text("Parent Model:\t\tPARENT MODEL NAME");
-
+					ImGui::Text("Mesh:\t\t\t\t\t  %s", mesh->GetName().c_str());
+					ImGui::Text("Mesh ID:\t\t\t\t %i", mesh->GetID());
+					ImGui::Text("Parent Mesh:\t\t%s", mesh->GetParentMeshName().c_str());
+					ImGui::Text("Parent Model:\t  %s", mesh->GetParentModelName().c_str());
 
 					// Material
 					Ref<Material> material = Renderer::GetMaterial(component.SpriteMaterialID);
@@ -533,7 +528,7 @@ namespace Kaimos {
 						if (!tex_path.empty())
 							tex_name = tex_path.substr(tex_path.find_last_of("/\\" + 1, tex_path.size() - 1) + 1);
 
-						ImGui::Text("Texture (ID %i):\t%s (%ix%i)", texture->GetTextureID(), tex_name.c_str(), texture->GetWidth(), texture->GetHeight());
+						ImGui::Text("Texture (ID %i):\t  %s (%ix%i)", texture->GetTextureID(), tex_name.c_str(), texture->GetWidth(), texture->GetHeight());
 					}
 
 					// Tiling & UV Offset Info
