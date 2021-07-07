@@ -149,6 +149,13 @@ namespace Kaimos {
 				data.EventCallback(event);
 			});
 
+		glfwSetDropCallback(m_Window, [](GLFWwindow* window, int drop_count, const char* paths[])
+			{
+				WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
+				WindowDragDropEvent event((uint)drop_count, paths);
+				data.EventCallback(event);
+			});
+
 
 		// Key Events
 		glfwSetKeyCallback(m_Window, [](GLFWwindow* window, int key, int scancode, int action, int mods)

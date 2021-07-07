@@ -39,6 +39,33 @@ namespace Kaimos {
 		EVENT_CLASS_CATEGORY(EVENT_CATEGORY::APPLICATION)
 	};
 
+	class WindowDragDropEvent : public Event
+	{
+	public:
+		WindowDragDropEvent(uint drop_count, const char* const paths[])
+		{
+			for (uint i = 0; i < drop_count; ++i)
+				m_PathsDropped.push_back(paths[i]);
+		}
+
+		inline const std::vector<const char*>& GetPaths()	const { return m_PathsDropped; }
+		std::string ToString() const override
+		{
+			std::stringstream ss;
+			ss << "WindowDragDropEvent: " << m_PathsDropped.size() << " - Paths Dropped:";
+			for (uint i = 0; i < m_PathsDropped.size(); ++i)
+				ss << "\n\t" << m_PathsDropped[i];
+
+			return ss.str();
+		}
+
+		EVENT_CLASS_TYPE(WINDOW_DRAGDROP)
+		EVENT_CLASS_CATEGORY(EVENT_CATEGORY::APPLICATION)
+
+	private:
+		std::vector<const char*> m_PathsDropped;
+	};
+
 
 	class AppTickEvent : public Event
 	{

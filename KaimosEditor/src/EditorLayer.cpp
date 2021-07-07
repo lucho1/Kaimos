@@ -10,6 +10,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "Scene/SceneSerializer.h"
+#include "Core/Resources/ResourceManager.h"
 #include "Core/Utils/PlatformUtils.h"
 
 namespace Kaimos {
@@ -344,7 +345,6 @@ namespace Kaimos {
 			m_ViewportSize = glm::vec2(viewportpanel_size.x, viewportpanel_size.y);
 			ImGui::Image(reinterpret_cast<void*>(m_Framebuffer->GetFBOTextureID()), viewportpanel_size, ImVec2(0, 1), ImVec2(1, 0));
 
-
 			// -- Primary Camera Mini-Screen --
 			if (ImGui::IsItemVisible())
 			{
@@ -379,6 +379,7 @@ namespace Kaimos {
 		dispatcher.Dispatch<KeyReleasedEvent>(KS_BIND_EVENT_FN(EditorLayer::OnKeyReleased));
 		dispatcher.Dispatch<MouseButtonPressedEvent>(KS_BIND_EVENT_FN(EditorLayer::OnMouseButtonPressed));
 		dispatcher.Dispatch<MouseScrolledEvent>(KS_BIND_EVENT_FN(EditorLayer::OnMouseScrolled));
+		dispatcher.Dispatch<WindowDragDropEvent>(KS_BIND_EVENT_FN(EditorLayer::OnWindowDragAndDrop));
 	}
 
 
@@ -528,6 +529,21 @@ namespace Kaimos {
 
 	
 	// ----------------------- Event Methods --------------------------------------------------------------
+	bool EditorLayer::OnWindowDragAndDrop(WindowDragDropEvent& ev)
+	{
+		const std::vector<const char*>& paths = ev.GetPaths();
+		KS_ENGINE_TRACE(ev.ToString().c_str());
+
+		for (uint i = 0; i < paths.size(); ++i)
+		{
+			std::filesystem::path filepath = ev.GetPaths()[i];
+			if(Kaimos::Resources::IsExtensionValid(filepath.extension().string()))
+				m_CurrentScene->ConvertModelIntoEntities(Kaimos::Resources::ResourceManager::CreateModel(filepath.string()));
+		}		
+
+		return false;
+	}
+
 	bool EditorLayer::OnMouseButtonPressed(MouseButtonPressedEvent& ev)
 	{
 		if (ev.GetMouseButton() == MOUSE::BUTTON_LEFT && m_ViewportHovered && !ImGuizmo::IsUsing() && !ImGuizmo::IsOver() && !Input::IsKeyPressed(KEY::LEFT_ALT))

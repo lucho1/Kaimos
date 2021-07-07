@@ -16,7 +16,10 @@ namespace Kaimos::Importers
 	// ----------------------- Protected Importer Methods -------------------------------------------------
 	Ref<Resources::ResourceModel> ImporterModel::LoadModel(const std::string& filepath)
 	{
-		std::filesystem::path fpath = std::filesystem::current_path().string() + "/" + filepath;
+		std::filesystem::path fpath = filepath;
+		if (!fpath.is_absolute())
+			fpath = std::filesystem::current_path().string() + "/" + filepath;
+
 		if (!std::filesystem::exists(fpath))
 		{
 			KS_ENGINE_WARN("Tried to load an unexisting file!");

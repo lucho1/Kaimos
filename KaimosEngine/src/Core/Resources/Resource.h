@@ -17,9 +17,14 @@ namespace Kaimos::Resources {
 			return RESOURCES_FORMATS::OBJ;
 		else
 		{
-			KS_ENGINE_ASSERT(false, "Invalid Extension Passed! ({0})", extension.c_str());
+			KS_ENGINE_WARN("Invalid Extension Passed! ({0})", extension.c_str());
 			return RESOURCES_FORMATS::NONE;
 		}
+	}
+
+	static bool IsExtensionValid(const std::string& extension)
+	{
+		return GetFormatFromExtension(extension) != RESOURCES_FORMATS::NONE;
 	}
 
 

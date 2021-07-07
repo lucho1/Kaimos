@@ -77,5 +77,4 @@ namespace Kaimos::Resources {
 
 		return false;
 	}
-
 }

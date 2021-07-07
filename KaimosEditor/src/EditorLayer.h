@@ -35,6 +35,7 @@ namespace Kaimos {
 		void ShowGuizmo();
 
 		// --- Event Methods ---
+		bool OnWindowDragAndDrop(WindowDragDropEvent& ev);
 		bool OnKeyPressed(KeyPressedEvent& ev);
 		bool OnMouseButtonPressed(MouseButtonPressedEvent& ev);
 		bool OnKeyReleased(KeyReleasedEvent& ev);
