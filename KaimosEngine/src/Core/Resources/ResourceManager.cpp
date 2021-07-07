@@ -66,4 +66,16 @@ namespace Kaimos::Resources {
 
 		return 0;
 	}
+
+	bool ResourceManager::CheckIfModelExists(uint model_id)
+	{
+		for (auto& model : m_ModelResources)
+		{
+			if (model.second->GetID() == model_id)
+				return true;
+		}
+
+		return false;
+	}
+
 }

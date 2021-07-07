@@ -8,6 +8,8 @@
 
 namespace Kaimos {
 
+	namespace Resources { class ResourceModel; }
+	class Mesh;
 	class Entity;
 
 	class Scene
@@ -27,6 +29,7 @@ namespace Kaimos {
 		void OnUpdateRuntime(Timestep dt);
 		void RenderFromCamera(Timestep dt, const Entity& camera_entity);
 		void SetViewportSize(uint width, uint height);
+		void ConvertModelIntoEntities(const Ref<Resources::ResourceModel>& model);
 
 		// --- Public Entities Methods ---
 		Entity CreateEntity(const std::string& name = "unnamed", uint entity_id = 0);
@@ -48,6 +51,7 @@ namespace Kaimos {
 
 		// --- Private Scene Methods ---
 		void RenderScene();
+		void ConvertMeshIntoEntities(const Ref<Mesh>& mesh);
 
 		// --- Private Entities Methods ---
 		template<typename T>

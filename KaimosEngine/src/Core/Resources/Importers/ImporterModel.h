@@ -2,28 +2,30 @@
 #define _IMPORTERMODEL_H_
 
 #include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
 
-//class aiScene; // TODO: Solve this
-//class aiMesh;
-//class aiMaterial;
-//struct aiNode;
-//enum aiTextureType;
+class aiScene;
+class aiMesh;
+class aiMaterial;
+struct aiNode;
+enum aiTextureType;
 
 namespace Kaimos {
 
-	namespace Resources { class ResourceModel; }
 	class Mesh;
 	class Material;
+	namespace Resources {
+		class ResourceManager;
+		class ResourceModel;
+	}
 
 	namespace Importers {
 
 		class ImporterModel
 		{
-		public:
+			friend class Kaimos::Resources::ResourceManager;
+		protected:
 
-			// --- Public Importer Methods ---
+			// --- Protected Importer Methods ---
 			static Ref<Resources::ResourceModel> LoadModel(const std::string& filepath);
 
 		private:

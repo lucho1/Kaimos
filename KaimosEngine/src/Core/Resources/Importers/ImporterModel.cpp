@@ -7,12 +7,13 @@
 #include "Renderer/Resources/Buffer.h"
 
 #include <glm/gtc/type_ptr.hpp>
-
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
 
 
 namespace Kaimos::Importers
 {
-	// ----------------------- Public Importer Methods ----------------------------------------------------
+	// ----------------------- Protected Importer Methods -------------------------------------------------
 	Ref<Resources::ResourceModel> ImporterModel::LoadModel(const std::string& filepath)
 	{
 		std::filesystem::path fpath = std::filesystem::current_path().string() + "/" + filepath;

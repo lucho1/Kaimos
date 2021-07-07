@@ -5,9 +5,15 @@
 #include "ECS/Components.h"
 #include "Renderer/Renderer.h"
 #include "Renderer/Renderer2D.h"
+#include "Renderer/Resources/Mesh.h"
 
+#include "Core/Resources/ResourceManager.h"
+#include "Core/Resources/Resource.h"
+#include "Core/Resources/ResourceModel.h"
 #include "Core/Utils/Maths/RandomGenerator.h"
+
 #include <glm/glm.hpp>
+
 
 namespace Kaimos {
 
@@ -64,7 +70,6 @@ namespace Kaimos {
 		RenderScene();
 		Renderer2D::EndScene();
 	}
-
 
 	void Scene::OnUpdateRuntime(Timestep dt)
 	{
@@ -126,6 +131,26 @@ namespace Kaimos {
 		//}
 	}
 
+	void Scene::ConvertModelIntoEntities(const Ref<Resources::ResourceModel>& model)
+	{
+		if (model && Resources::ResourceManager::CheckIfModelExists(model->GetID()))
+			ConvertMeshIntoEntities(model->GetMesh());
+	}
+
+	void Scene::ConvertMeshIntoEntities(const Ref<Mesh>& mesh)
+	{
+		if (!mesh || !Renderer::CheckIfMeshExists(mesh->GetID()))
+			return;
+
+		MeshRendererComponent& mesh_comp = CreateEntity(mesh->GetName()).AddComponent<MeshRendererComponent>();
+		mesh_comp.SetMesh(mesh->GetID());
+		mesh_comp.SetMaterial(mesh->GetMaterialID());
+
+		const std::vector<Ref<Mesh>>& sub_meshes = mesh->GetSubmeshes();
+		for (const Ref<Mesh>& m : sub_meshes)
+			ConvertMeshIntoEntities(m);
+	}
+
 
 	
 	// ----------------------- Public Entities Methods ---------------------------------------------------
@@ -146,6 +171,9 @@ namespace Kaimos {
 		m_Registry.destroy((entt::entity)entity.GetID());
 	}
 
+
+
+	// ----------------------- Getters/Setters -----------------------------------------------------------
 	Entity Scene::GetPrimaryCamera()
 	{
 		if(m_PrimaryCamera && m_PrimaryCamera.GetComponent<TransformComponent>().EntityActive)

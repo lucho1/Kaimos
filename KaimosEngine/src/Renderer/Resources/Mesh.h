@@ -31,7 +31,7 @@ namespace Kaimos {
 
 		// --- Getters ---
 		uint GetID()					const { return m_ID; }
-		uint GetMaterialIndex()			const { return m_MaterialID; }
+		uint GetMaterialID()			const { return m_MaterialID; }
 		const std::string& GetName()	const { return m_Name; }
 
 		const std::string& GetParentMeshName()			const;

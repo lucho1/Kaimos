@@ -17,6 +17,7 @@ namespace Kaimos::Resources {
 
 		// --- Getters ---
 		static uint GetModelResourceReferences(uint resource_id);
+		static bool CheckIfModelExists(uint model_id);
 
 	private:
 

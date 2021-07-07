@@ -12,7 +12,7 @@ namespace Kaimos::Resources {
 		friend class Kaimos::Importers::ImporterModel;
 	public:
 		~ResourceModel() = default;
-		Ref<Kaimos::Mesh> GetMesh() const { return m_RootMesh; }
+		const Ref<Kaimos::Mesh>& GetMesh() const { return m_RootMesh; }
 
 	protected:
 		ResourceModel(const std::string& filepath, uint id = 0, Ref<Kaimos::Mesh> root_mesh = nullptr)
