@@ -74,7 +74,7 @@ namespace Kaimos {
 
 	struct MeshRendererComponent
 	{
-		uint SpriteMaterialID = 0, MeshID = 0;
+		uint MaterialID = 0, MeshID = 0;
 
 		inline void SetMesh(uint mesh_id)
 		{
@@ -91,15 +91,15 @@ namespace Kaimos {
 
 		inline void SetMaterial(uint material_id)
 		{
-			if (material_id == SpriteMaterialID || Renderer::GetMaterialIfExists(material_id) == 0)
+			if (material_id == MaterialID || Renderer::GetMaterialIfExists(material_id) == 0)
 				return;
 
-			SpriteMaterialID = material_id;
+			MaterialID = material_id;
 		}
 
 		inline void RemoveMaterial()
 		{
-			SpriteMaterialID = Renderer::GetDefaultMaterialID();
+			MaterialID = Renderer::GetDefaultMaterialID();
 		}
 
 		MeshRendererComponent() = default;

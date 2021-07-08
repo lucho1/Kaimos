@@ -86,7 +86,7 @@ namespace Kaimos {
 			MeshRendererComponent& mesh_comp = entity.GetComponent<MeshRendererComponent>();
 			output << YAML::Key << "MeshRendererComponent";
 			output << YAML::BeginMap;
-			output << YAML::Key << "Material" << YAML::Value << mesh_comp.SpriteMaterialID;
+			output << YAML::Key << "Material" << YAML::Value << mesh_comp.MaterialID;
 			output << YAML::Key << "Mesh" << YAML::Value << mesh_comp.MeshID;
 			output << YAML::EndMap;
 		}

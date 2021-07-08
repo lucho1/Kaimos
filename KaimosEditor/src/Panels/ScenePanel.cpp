@@ -483,7 +483,7 @@ namespace Kaimos {
 					ImGui::Text("Parent Model:\t  %s", mesh->GetParentModelName().c_str());
 
 					// Material
-					Ref<Material> material = Renderer::GetMaterial(component.SpriteMaterialID);
+					Ref<Material> material = Renderer::GetMaterial(component.MaterialID);
 					if (!material)
 					{
 						ImGui::TreePop();
