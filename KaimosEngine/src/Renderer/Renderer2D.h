@@ -50,6 +50,7 @@ namespace Kaimos {
 
 		// --- Private Drawing Methods ---
 		static uint GetTextureIndex(const Ref<Texture2D>& texture);
+		static void SetupVertexBuffer(const glm::mat4& transform, int entity_id, const Ref<Material>& material, uint texture_index, std::vector<QuadVertex> vertices_vector);
 		
 		// --- Private Renderer Methods ---
 		static void StartBatch();
@@ -58,17 +59,15 @@ namespace Kaimos {
 		// --- Renderer Statistics ---
 		struct Statistics
 		{
-			uint DrawCalls = 0, QuadCount = 0;
-
-			uint GetTotalVerticesCount()	const { return QuadCount * 4; }
-			uint GetTotalIndicesCount()		const { return QuadCount * 6; }
-			uint GetTotalTrianglesCount()	const { return QuadCount * 2; }
+			uint DrawCalls = 0, QuadCount = 0, VerticesCount = 0, IndicesCount = 0;
+			uint GetTotalTrianglesCount()	const { return IndicesCount/3; }
 		};
 
 	public:
 
 		// --- Renderer Statistics Methods ---
 		static void ResetStats();
+		static void IncrementIndicesDrawn(uint indices_increment);
 		static const Statistics GetStats();
 		static const uint GetMaxQuads();
 	};

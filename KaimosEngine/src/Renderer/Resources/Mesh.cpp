@@ -56,7 +56,7 @@ namespace Kaimos {
 	// ----------------------- Private Mesh Methods ------------------------------------------------------
 	void Mesh::DeleteSubmesh(Mesh* submesh_to_delete)
 	{
-		for (auto& it = m_Submeshes.begin(); it != m_Submeshes.end(); ++it) //URGENT TODO: Change this to a reverse iteratior, it's crashing
+		for (auto& it = m_Submeshes.begin(); it != m_Submeshes.end(); ++it) //URGENT TODO: Change this to a reverse iterator, it's crashing
 		{
 			if ((*it)->m_ID == submesh_to_delete->m_ID)
 				m_Submeshes.erase(it);

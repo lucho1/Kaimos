@@ -3,6 +3,7 @@
 
 #include "Core/Resources/ResourceModel.h"
 #include "Renderer/Renderer.h"
+#include "Renderer/Renderer2D.h"
 #include "Renderer/Resources/Material.h"
 #include "Renderer/Resources/Buffer.h"
 
@@ -106,7 +107,9 @@ namespace Kaimos::Importers
 			return nullptr;
 
 		// -- Process Vertices --
-		std::vector<float> vertices;
+		std::vector<float> vertices_data;
+		std::vector<QuadVertex> mesh_vertices;
+
 		for (uint i = 0; i < ai_mesh->mNumVertices; ++i)
 		{
 			// Positions & Normals
@@ -122,9 +125,15 @@ namespace Kaimos::Importers
 			if (ai_mesh->mTextureCoords[0])
 				texture_coords = { ai_mesh->mTextureCoords[0][i].x, ai_mesh->mTextureCoords[0][i].y };
 
-			vertices.insert(vertices.end(), 3, *glm::value_ptr(positions));
-			vertices.insert(vertices.end(), 3, *glm::value_ptr(normals));
-			vertices.insert(vertices.end(), 2, *glm::value_ptr(texture_coords));
+			vertices_data.insert(vertices_data.end(), 3, *glm::value_ptr(positions));
+			vertices_data.insert(vertices_data.end(), 3, *glm::value_ptr(normals));
+			vertices_data.insert(vertices_data.end(), 2, *glm::value_ptr(texture_coords));
+
+			Kaimos::QuadVertex vertex;
+			vertex.Pos = positions;
+			vertex.Normal = normals;
+			vertex.TexCoord = texture_coords;
+			mesh_vertices.push_back(vertex);
 
 			// Tangents & Bitangents
 			//glm::vec3 tangents = glm::vec3(0.0f), bitangents = glm::vec3(0.0f); // TODO: Flipped?
@@ -158,7 +167,7 @@ namespace Kaimos::Importers
 			{ SHADER_DATATYPE::INT ,	"a_EntityID" }
 		};
 
-		Ref<VertexBuffer> vbo = VertexBuffer::Create(vertices.data(), vertices.size() * sizeof(float));
+		Ref<VertexBuffer> vbo = VertexBuffer::Create(vertices_data.data(), vertices_data.size() * sizeof(float));
 		Ref<IndexBuffer> ibo = IndexBuffer::Create(indices.data(), indices.size());
 		Ref<VertexArray> vao = VertexArray::Create();
 
@@ -171,6 +180,7 @@ namespace Kaimos::Importers
 		std::string mesh_name = ai_mesh->mName.length > 0 ? ai_mesh->mName.C_Str() : "unnamed";
 		Ref<Mesh> mesh = CreateRef<Mesh>(vao, mesh_name);
 		Renderer::CreateMesh(mesh);
+		mesh->SetMeshVertices(mesh_vertices);
 		return mesh;
 	}
 

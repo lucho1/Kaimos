@@ -32,9 +32,7 @@ namespace Kaimos {
 		std::array<Ref<Texture2D>, MaxTextureSlots> TextureSlots;
 		uint TextureSlotIndex = 1;									// Slot 0 is for White Texture 
 
-		glm::vec3 VerticesPositions[4] = {};
-		glm::vec3 VerticesNormals[4] = {};
-		glm::vec2 VerticesTCoords[4] = {};
+		std::vector<QuadVertex> VerticesVector = std::vector<QuadVertex>(4);
 	};
 	
 	static Renderer2DData* s_Data = nullptr;	// On shutdown, this is deleted, and ~VertexArray() called, freeing GPU Memory too
@@ -45,6 +43,12 @@ namespace Kaimos {
 	void Renderer2D::ResetStats()
 	{
 		memset(&s_Data->RendererStats, 0, sizeof(Statistics));
+	}
+
+	void Renderer2D::IncrementIndicesDrawn(uint indices_increment)
+	{
+		s_Data->QuadIndicesDrawCount += indices_increment;
+		s_Data->RendererStats.IndicesCount += indices_increment;
 	}
 	
 	const Renderer2D::Statistics Renderer2D::GetStats()
@@ -66,20 +70,20 @@ namespace Kaimos {
 		s_Data = new Renderer2DData();
 
 		// -- Vertices Positions & TCoords Definition --
-		s_Data->VerticesPositions[0] = { -0.5f, -0.5f, 0.0f };
-		s_Data->VerticesPositions[1] = {  0.5f, -0.5f, 0.0f };
-		s_Data->VerticesPositions[2] = {  0.5f,  0.5f, 0.0f };
-		s_Data->VerticesPositions[3] = { -0.5f,  0.5f, 0.0f };
+		s_Data->VerticesVector[0].Pos = { -0.5f, -0.5f, 0.0f };
+		s_Data->VerticesVector[1].Pos = {  0.5f, -0.5f, 0.0f };
+		s_Data->VerticesVector[2].Pos = {  0.5f,  0.5f, 0.0f };
+		s_Data->VerticesVector[3].Pos = { -0.5f,  0.5f, 0.0f };
 
-		s_Data->VerticesNormals[0] = { 0.0f,  0.0f, -1.0f };
-		s_Data->VerticesNormals[1] = { 0.0f,  0.0f, -1.0f };
-		s_Data->VerticesNormals[2] = { 0.0f,  0.0f, -1.0f };
-		s_Data->VerticesNormals[3] = { 0.0f,  0.0f, -1.0f };
+		s_Data->VerticesVector[0].Normal = { 0.0f,  0.0f, -1.0f };
+		s_Data->VerticesVector[1].Normal = { 0.0f,  0.0f, -1.0f };
+		s_Data->VerticesVector[2].Normal = { 0.0f,  0.0f, -1.0f };
+		s_Data->VerticesVector[3].Normal = { 0.0f,  0.0f, -1.0f };
 
-		s_Data->VerticesTCoords[0] = { 0.0f, 0.0f };
-		s_Data->VerticesTCoords[1] = { 1.0f, 0.0f};
-		s_Data->VerticesTCoords[2] = { 1.0f, 1.0f};
-		s_Data->VerticesTCoords[3] = { 0.0f, 1.0f};
+		s_Data->VerticesVector[0].TexCoord = { 0.0f, 0.0f };
+		s_Data->VerticesVector[1].TexCoord = { 1.0f, 0.0f};
+		s_Data->VerticesVector[2].TexCoord = { 1.0f, 1.0f};
+		s_Data->VerticesVector[3].TexCoord = { 0.0f, 1.0f};
 
 		// -- Index Buffer --
 		Ref<IndexBuffer> index_buffer;
@@ -196,7 +200,7 @@ namespace Kaimos {
 		if (s_Data->QuadIndicesDrawCount == 0)
 			return;
 
-		// -- Cast (uint8_t is 1 byte large, the substraction give us elements in terms of bytes) --
+		// -- Cast (uint8_t is 1 byte large, the subtraction give us elements in terms of bytes) --
 		uint data_size = (uint)((uint8_t*)s_Data->QuadVBufferPtr - (uint8_t*)s_Data->QuadVBufferBase);
 
 		// -- Set Vertex Buffer Data --
@@ -246,36 +250,11 @@ namespace Kaimos {
 			NextBatch();
 
 		// -- Setup Vertex Array & Vertex Attributes --
-		constexpr size_t quad_vertex_count = 4;
-		for (size_t i = 0; i < quad_vertex_count; ++i)
-		{
-			// Update the Nodes with vertex parameters on each vertex
-			material->UpdateVertexParameter(MaterialEditor::VertexParameterNodeType::POSITION, glm::value_ptr(s_Data->VerticesPositions[i]));
-			material->UpdateVertexParameter(MaterialEditor::VertexParameterNodeType::NORMAL, glm::value_ptr(s_Data->VerticesNormals[i]));
-			material->UpdateVertexParameter(MaterialEditor::VertexParameterNodeType::TEX_COORDS, glm::value_ptr(s_Data->VerticesTCoords[i]));
-
-			// Get the vertex parameters in the main node once updated the nodes
-			glm::vec3 vpos = material->GetVertexAttributeResult<glm::vec3>(MaterialEditor::VertexParameterNodeType::POSITION);
-			glm::vec3 vnorm = material->GetVertexAttributeResult<glm::vec3>(MaterialEditor::VertexParameterNodeType::NORMAL);
-			glm::vec2 tcoords = material->GetVertexAttributeResult<glm::vec2>(MaterialEditor::VertexParameterNodeType::TEX_COORDS);
-
-			// Set the vertex data
-			s_Data->QuadVBufferPtr->Pos = transform * glm::vec4(vpos, 1.0f);
-			s_Data->QuadVBufferPtr->Normal = vnorm;
-			s_Data->QuadVBufferPtr->TexCoord = tcoords - material->TextureUVOffset;
-
-			s_Data->QuadVBufferPtr->Color = material->Color;
-			s_Data->QuadVBufferPtr->TexIndex = texture_index;
-			s_Data->QuadVBufferPtr->TilingFactor = material->TextureTiling;
-			s_Data->QuadVBufferPtr->EntityID = entity_id;
-
-			++s_Data->QuadVBufferPtr;
-		}
-
+		SetupVertexBuffer(transform, entity_id, material, texture_index, s_Data->VerticesVector);
+		IncrementIndicesDrawn(6); // A quad has 6 indices (2 triangles)
 		s_Data->QuadIndicesDrawCount += 6;
 		++s_Data->RendererStats.QuadCount;
 	}
-
 
 	uint Renderer2D::GetTextureIndex(const Ref<Texture2D>& texture)
 	{
@@ -307,5 +286,34 @@ namespace Kaimos {
 		}
 
 		return ret;
+	}
+
+	void Renderer2D::SetupVertexBuffer(const glm::mat4& transform, int entity_id, const Ref<Material>& material, uint texture_index, std::vector<QuadVertex> vertices_vector)
+	{
+		for (size_t i = 0; i < vertices_vector.size(); ++i)
+		{
+			// Update the Nodes with vertex parameters on each vertex
+			material->UpdateVertexParameter(MaterialEditor::VertexParameterNodeType::POSITION, glm::value_ptr(vertices_vector[i].Pos));
+			material->UpdateVertexParameter(MaterialEditor::VertexParameterNodeType::NORMAL, glm::value_ptr(vertices_vector[i].Normal));
+			material->UpdateVertexParameter(MaterialEditor::VertexParameterNodeType::TEX_COORDS, glm::value_ptr(vertices_vector[i].TexCoord));
+
+			// Get the vertex parameters in the main node once updated the nodes
+			glm::vec3 vpos = material->GetVertexAttributeResult<glm::vec3>(MaterialEditor::VertexParameterNodeType::POSITION);
+			glm::vec3 vnorm = material->GetVertexAttributeResult<glm::vec3>(MaterialEditor::VertexParameterNodeType::NORMAL);
+			glm::vec2 tcoords = material->GetVertexAttributeResult<glm::vec2>(MaterialEditor::VertexParameterNodeType::TEX_COORDS);
+
+			// Set the vertex data
+			s_Data->QuadVBufferPtr->Pos = transform * glm::vec4(vpos, 1.0f);
+			s_Data->QuadVBufferPtr->Normal = vnorm;
+			s_Data->QuadVBufferPtr->TexCoord = tcoords - material->TextureUVOffset;
+
+			s_Data->QuadVBufferPtr->Color = material->Color;
+			s_Data->QuadVBufferPtr->TexIndex = texture_index;
+			s_Data->QuadVBufferPtr->TilingFactor = material->TextureTiling;
+			s_Data->QuadVBufferPtr->EntityID = entity_id;
+
+			++s_Data->QuadVBufferPtr;
+			++s_Data->RendererStats.VerticesCount;
+		}
 	}
 }

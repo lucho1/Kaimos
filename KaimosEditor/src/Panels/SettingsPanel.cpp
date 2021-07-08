@@ -170,6 +170,6 @@ namespace Kaimos {
 		
 		ImGui::SameLine(icons_indent);
 		ImGui::Text("Vertices Drawn"); ImGui::SameLine(text_separation);
-		ImGui::Text("%i	(%i Indices)", stats.GetTotalVerticesCount(), stats.GetTotalIndicesCount());
+		ImGui::Text("%i	(%i Indices)", stats.VerticesCount, stats.IndicesCount);
 	}
 }

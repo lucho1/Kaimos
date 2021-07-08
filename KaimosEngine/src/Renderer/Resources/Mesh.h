@@ -3,6 +3,7 @@
 
 #include "Core/Core.h"
 #include "Core/Utils/Maths/RandomGenerator.h"
+#include "Renderer/Renderer2D.h"
 #include "Buffer.h"
 
 namespace Kaimos {
@@ -47,13 +48,15 @@ namespace Kaimos {
 		// --- Private Mesh Methods ---
 		void DeleteSubmesh(Mesh* submesh_to_delete);
 		void SetParentModel(Resources::ResourceModel* model);
+		void SetMeshVertices(const std::vector<QuadVertex>& mesh_vertices) { m_Vertices = mesh_vertices; }
 
-	public:
+	private:
 
 		// --- Private Variables ---
 		uint m_ID = 0, m_MaterialID = 0;
 		std::string m_Name = "Unnamed";
 
+		std::vector<QuadVertex> m_Vertices;
 		std::vector<Ref<Mesh>> m_Submeshes;
 		Ref<VertexArray> m_VertexArray = nullptr;
 		
