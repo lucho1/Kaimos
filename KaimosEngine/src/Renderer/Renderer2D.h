@@ -18,7 +18,6 @@ namespace Kaimos {
 		glm::vec2 TexCoord	= glm::vec2(0.0f);
 		glm::vec4 Color		= glm::vec4(1.0f);
 		float TexIndex		= 0.0f;
-		float TilingFactor	= 1.0f;
 
 		// --- Editor Variables ---
 		int EntityID		= 0;
@@ -27,7 +26,7 @@ namespace Kaimos {
 
 
 	//A renderer is a high-level class, a full-on renderer: doesn't deals with commands such as ClearScene, deals with high-level constructs (scenes, meshes...)
-	//RenderCommands should NOT do multiple things, they are just commands (unless specifically suposed-to)
+	//RenderCommands should NOT do multiple things, they are just commands (unless specifically supposed-to)
 	class Renderer2D // Won't deal with Storage (will have 0 storage), no static stuff, just render commands
 	{
 		friend struct Renderer2DData;

@@ -412,8 +412,6 @@ namespace Kaimos {
 					// Tiling & UV Offset Info
 					glm::ivec4 col = material->Color * 255.0f;
 					ImGui::Text("Color:\t\t\t\t\t\tRGBA(%i, %i, %i, %i)", col.r, col.g, col.b, col.a);
-					ImGui::Text("Texture Tiling:\t\t%.2f", material->TextureTiling);
-					ImGui::Text("Texture Offset:\t   XY(%.1f, %.1f)", material->TextureUVOffset.x, material->TextureUVOffset.y);
 					ImGui::Text("Material ID:\t\t\t %i", material->GetID());
 					ImGui::Text("Material Graph ID: %i", material->GetAttachedGraphID());
 
@@ -534,8 +532,6 @@ namespace Kaimos {
 					// Tiling & UV Offset Info
 					glm::ivec4 col = material->Color * 255.0f;
 					ImGui::Text("Color:\t\t\t\t\t\tRGBA(%i, %i, %i, %i)", col.r, col.g, col.b, col.a);
-					ImGui::Text("Texture Tiling:\t\t%.2f", material->TextureTiling);
-					ImGui::Text("Texture Offset:\t   XY(%.1f, %.1f)", material->TextureUVOffset.x, material->TextureUVOffset.y);
 					ImGui::Text("Material ID:\t\t\t %i", material->GetID());
 					ImGui::Text("Material Graph ID: %i", material->GetAttachedGraphID());
 

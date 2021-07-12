@@ -60,8 +60,6 @@ namespace Kaimos {
 
 		// --- Public Variables ---
 		glm::vec4 Color = glm::vec4(1.0f);
-		float TextureTiling = 1.0f;
-		glm::vec2 TextureUVOffset = glm::vec2(0.0f);
 
 	private:
 

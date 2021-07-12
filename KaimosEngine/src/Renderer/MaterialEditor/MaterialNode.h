@@ -137,9 +137,6 @@ namespace Kaimos::MaterialEditor {
 		Ref<NodeInputPin> m_VertexPositionPin = nullptr;
 		Ref<NodeInputPin> m_VertexNormalPin = nullptr;
 		Ref<NodeInputPin> m_TextureCoordinatesPin = nullptr;
-
-		Ref<NodeInputPin> m_TextureTilingPin = nullptr;
-		Ref<NodeInputPin> m_TextureOffsetPin = nullptr;
 		Ref<NodeInputPin> m_ColorPin = nullptr;
 	};
 

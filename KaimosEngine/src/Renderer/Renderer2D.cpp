@@ -112,7 +112,6 @@ namespace Kaimos {
 			{ SHADER_DATATYPE::FLOAT2,	"a_TexCoord" },
 			{ SHADER_DATATYPE::FLOAT4,	"a_Color" },
 			{ SHADER_DATATYPE::FLOAT ,	"a_TexIndex" },
-			{ SHADER_DATATYPE::FLOAT ,	"a_TilingFactor" },
 			{ SHADER_DATATYPE::INT ,	"a_EntityID" }
 		};
 
@@ -262,11 +261,10 @@ namespace Kaimos {
 			// Set the vertex data
 			s_Data->QuadVBufferPtr->Pos = transform * glm::vec4(vpos, 1.0f);
 			s_Data->QuadVBufferPtr->Normal = vnorm;
-			s_Data->QuadVBufferPtr->TexCoord = tcoords - material->TextureUVOffset;
+			s_Data->QuadVBufferPtr->TexCoord = tcoords;
 
 			s_Data->QuadVBufferPtr->Color = material->Color;
 			s_Data->QuadVBufferPtr->TexIndex = texture_index;
-			s_Data->QuadVBufferPtr->TilingFactor = material->TextureTiling;
 			s_Data->QuadVBufferPtr->EntityID = entity_id;
 
 			++s_Data->QuadVBufferPtr;
