@@ -27,7 +27,6 @@ namespace Kaimos {
 	public:
 
 		// --- Setters ---
-		void SetName(const std::string& name)	{ m_Name = name; }
 		void SetMaterial(uint material_id)		{ m_MaterialID = material_id; }
 
 		// --- Getters ---
@@ -35,9 +34,10 @@ namespace Kaimos {
 		uint GetMaterialID()			const { return m_MaterialID; }
 		const std::string& GetName()	const { return m_Name; }
 
-		const std::string& GetParentMeshName()			const;
-		const std::string& GetParentModelName()			const;
-		const std::vector<Ref<Mesh>>& GetSubmeshes()	const { return m_Submeshes; }
+		const std::string& GetParentMeshName()				const;
+		const std::string& GetParentModelName()				const;
+		const std::vector<Ref<Mesh>>& GetSubmeshes()		const { return m_Submeshes; }
+		const Ref<VertexArray>& GetVertexArray()			const { return m_VertexArray; }
 
 		// --- Public Mesh Methods ---
 		void AddSubmesh(const Ref<Mesh>& mesh);

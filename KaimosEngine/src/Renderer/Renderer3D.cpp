@@ -107,6 +107,8 @@ namespace Kaimos {
 			//	glm::vec3 vpos = material->GetVertexAttributeResult<glm::vec3>(MaterialEditor::VertexParameterNodeType::POSITION);
 			//	glm::vec3 vnorm = material->GetVertexAttributeResult<glm::vec3>(MaterialEditor::VertexParameterNodeType::NORMAL);
 			//	glm::vec2 tcoords = material->GetVertexAttributeResult<glm::vec2>(MaterialEditor::VertexParameterNodeType::TEX_COORDS);
+			// 
+			// ++s_3DData->RendererStats.VerticesCount;
 			//}
 
 			// -- Get Texture & Send Uniforms --
@@ -120,13 +122,13 @@ namespace Kaimos {
 			s_3DData->CurrentShader->SetUFloat4("u_Color", material->Color);
 
 			// -- Draw --
-			mesh->m_VertexArray->Bind();
-			RenderCommand::DrawIndexed(mesh->m_VertexArray);
+			const Ref<VertexArray> v_arr = mesh->GetVertexArray();
+			v_arr->Bind();
+			RenderCommand::DrawIndexed(v_arr);
 
 			// -- Update Statistics --
 			++s_3DData->RendererStats.DrawCalls;
-			//s_3DData->RendererStats.IndicesCount += mesh indices
-			//s_3DData->RendererStats.VerticesCount += mesh vertices
+			s_3DData->RendererStats.IndicesCount += v_arr->GetIndexBuffer()->GetCount();
 
 			// -- Left here in case we batch this too --
 			//uint texture_index = GetTextureIndex(material->GetTexture());
