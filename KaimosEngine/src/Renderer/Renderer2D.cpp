@@ -32,7 +32,9 @@ namespace Kaimos {
 		std::array<Ref<Texture2D>, MaxTextureSlots> TextureSlots;
 		uint TextureSlotIndex = 1;									// Slot 0 is for White Texture 
 
-		std::vector<QuadVertex> VerticesVector = std::vector<QuadVertex>(4);
+		glm::vec3 VerticesPositions[4] = {};
+		glm::vec3 VerticesNormals[4] = {};
+		glm::vec2 VerticesTCoords[4] = {};
 	};
 	
 	static Renderer2DData* s_Data = nullptr;	// On shutdown, this is deleted, and ~VertexArray() called, freeing GPU Memory too
@@ -64,20 +66,20 @@ namespace Kaimos {
 		s_Data = new Renderer2DData();
 
 		// -- Vertices Positions & TCoords Definition --
-		s_Data->VerticesVector[0].Pos = { -0.5f, -0.5f, 0.0f };
-		s_Data->VerticesVector[1].Pos = {  0.5f, -0.5f, 0.0f };
-		s_Data->VerticesVector[2].Pos = {  0.5f,  0.5f, 0.0f };
-		s_Data->VerticesVector[3].Pos = { -0.5f,  0.5f, 0.0f };
+		s_Data->VerticesPositions[0] = { -0.5f, -0.5f, 0.0f };
+		s_Data->VerticesPositions[1] = { 0.5f, -0.5f, 0.0f };
+		s_Data->VerticesPositions[2] = { 0.5f,  0.5f, 0.0f };
+		s_Data->VerticesPositions[3] = { -0.5f,  0.5f, 0.0f };
 
-		s_Data->VerticesVector[0].Normal = { 0.0f,  0.0f, -1.0f };
-		s_Data->VerticesVector[1].Normal = { 0.0f,  0.0f, -1.0f };
-		s_Data->VerticesVector[2].Normal = { 0.0f,  0.0f, -1.0f };
-		s_Data->VerticesVector[3].Normal = { 0.0f,  0.0f, -1.0f };
+		s_Data->VerticesNormals[0] = { 0.0f,  0.0f, -1.0f };
+		s_Data->VerticesNormals[1] = { 0.0f,  0.0f, -1.0f };
+		s_Data->VerticesNormals[2] = { 0.0f,  0.0f, -1.0f };
+		s_Data->VerticesNormals[3] = { 0.0f,  0.0f, -1.0f };
 
-		s_Data->VerticesVector[0].TexCoord = { 0.0f, 0.0f };
-		s_Data->VerticesVector[1].TexCoord = { 1.0f, 0.0f};
-		s_Data->VerticesVector[2].TexCoord = { 1.0f, 1.0f};
-		s_Data->VerticesVector[3].TexCoord = { 0.0f, 1.0f};
+		s_Data->VerticesTCoords[0] = { 0.0f, 0.0f };
+		s_Data->VerticesTCoords[1] = { 1.0f, 0.0f };
+		s_Data->VerticesTCoords[2] = { 1.0f, 1.0f };
+		s_Data->VerticesTCoords[3] = { 0.0f, 1.0f };
 
 		// -- Index Buffer --
 		Ref<IndexBuffer> index_buffer;
@@ -243,13 +245,14 @@ namespace Kaimos {
 		if (s_Data->QuadIndicesDrawCount >= s_Data->MaxIndices)
 			NextBatch();
 
-		// -- Setup Vertex Array & Vertex Attributes --for (size_t i = 0; i < vertices_vector.size(); ++i)
-		for (size_t i = 0; i < s_Data->VerticesVector.size(); ++i)
+		// -- Setup Vertex Array & Vertex Attributes --
+		constexpr size_t quad_vertex_count = 4;
+		for (size_t i = 0; i < quad_vertex_count; ++i)
 		{
 			// Update the Nodes with vertex parameters on each vertex
-			material->UpdateVertexParameter(MaterialEditor::VertexParameterNodeType::POSITION, glm::value_ptr(s_Data->VerticesVector[i].Pos));
-			material->UpdateVertexParameter(MaterialEditor::VertexParameterNodeType::NORMAL, glm::value_ptr(s_Data->VerticesVector[i].Normal));
-			material->UpdateVertexParameter(MaterialEditor::VertexParameterNodeType::TEX_COORDS, glm::value_ptr(s_Data->VerticesVector[i].TexCoord));
+			material->UpdateVertexParameter(MaterialEditor::VertexParameterNodeType::POSITION, glm::value_ptr(s_Data->VerticesPositions[i]));
+			material->UpdateVertexParameter(MaterialEditor::VertexParameterNodeType::NORMAL, glm::value_ptr(s_Data->VerticesNormals[i]));
+			material->UpdateVertexParameter(MaterialEditor::VertexParameterNodeType::TEX_COORDS, glm::value_ptr(s_Data->VerticesTCoords[i]));
 
 			// Get the vertex parameters in the main node once updated the nodes
 			glm::vec3 vpos = material->GetVertexAttributeResult<glm::vec3>(MaterialEditor::VertexParameterNodeType::POSITION);
@@ -271,8 +274,6 @@ namespace Kaimos {
 
 		// -- Update Stats (Quad = 2 Triangles = 6 Indices) --
 		s_Data->QuadIndicesDrawCount += 6;
-		s_Data->RendererStats.IndicesCount += 6;
-		s_Data->RendererStats.VerticesCount += s_Data->VerticesVector.size();
 		++s_Data->RendererStats.QuadCount;
 	}
 

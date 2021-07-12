@@ -20,7 +20,7 @@ namespace Kaimos {
 		// --- Private Scene Methods ---
 		void SetMemoryMetrics();
 		void DisplayMemoryMetrics();
-		void DisplayRenderingMetrics();
+		void DisplayRenderingMetrics(bool display_3Dmetrics);
 
 	public:
 

@@ -58,8 +58,10 @@ namespace Kaimos {
 		// --- Renderer Statistics ---
 		struct Statistics
 		{
-			uint DrawCalls = 0, QuadCount = 0, VerticesCount = 0, IndicesCount = 0;
-			uint GetTotalTrianglesCount()	const { return IndicesCount/3; }
+			uint DrawCalls = 0, QuadCount = 0;
+			uint GetTotalVerticesCount()	const { return QuadCount * 4; }
+			uint GetTotalIndicesCount()		const { return QuadCount * 6; }
+			uint GetTotalTrianglesCount()	const { return QuadCount * 2; }
 		};
 
 	public:

@@ -91,6 +91,7 @@ namespace Kaimos {
 
 		// -- Render --
 		Renderer2D::ResetStats();
+		Renderer3D::ResetStats();
 
 		m_Framebuffer->Bind();
 		RenderCommand::SetClearColor(glm::vec4(0.15f, 0.15f, 0.15f, 1.0f));
@@ -125,6 +126,8 @@ namespace Kaimos {
 		{
 			// -- Render --
 			Renderer2D::ResetStats();
+			Renderer3D::ResetStats();
+
 			m_GameFramebuffer->Bind();
 			RenderCommand::SetClearColor(glm::vec4(0.15f, 0.15f, 0.15f, 1.0f));
 			RenderCommand::Clear();
@@ -148,6 +151,8 @@ namespace Kaimos {
 			if (camera)
 			{
 				Renderer2D::ResetStats();
+				Renderer3D::ResetStats();
+
 				m_PrimaryCameraFramebuffer->Bind();
 				RenderCommand::SetClearColor(glm::vec4(0.08f, 0.08f, 0.08f, 1.0f));
 				RenderCommand::Clear();

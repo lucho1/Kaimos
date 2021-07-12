@@ -54,8 +54,12 @@ namespace Kaimos {
 
 			// Rendering
 			ImGui::NewLine();
-			if (ImGui::CollapsingHeader("Rendering", flags))
-				DisplayRenderingMetrics();
+			if (ImGui::CollapsingHeader("2D Rendering", flags))
+				DisplayRenderingMetrics(false);
+
+			ImGui::NewLine();
+			if (ImGui::CollapsingHeader("3D Rendering", flags))
+				DisplayRenderingMetrics(true);
 
 			// -- End Panel --
 			ImGui::End();
@@ -123,17 +127,42 @@ namespace Kaimos {
 	}
 
 
-	void SettingsPanel::DisplayRenderingMetrics()
+	void SettingsPanel::DisplayRenderingMetrics(bool display_3Dmetrics)
 	{
-		auto stats = Renderer2D::GetStats();
+		// -- Get Metrics --
+		uint draw_calls = 0, quad_count = 0, tris_count = 0, vertices_count = 0, indices_count = 0;
 		float text_separation = ImGui::GetContentRegionAvailWidth() / 3.0f + 25.0f;
+
+		if (display_3Dmetrics)
+		{
+			auto stats = Renderer3D::GetStats();
+
+			tris_count = stats.GetTotalTrianglesCount();
+			vertices_count = stats.VerticesCount;
+			indices_count = stats.IndicesCount;
+			draw_calls = stats.DrawCalls;
+
+			//ImGui::Text("Max Quads x Draw Call"); ImGui::SameLine(text_separation);
+			//ImGui::Text("%i", Renderer2D::GetMaxQuads());
+		}
+		else
+		{
+			auto stats = Renderer2D::GetStats();
+
+			quad_count = stats.QuadCount;
+			tris_count = stats.GetTotalTrianglesCount();
+			vertices_count = stats.GetTotalVerticesCount();
+			indices_count = stats.GetTotalIndicesCount();
+			draw_calls = stats.DrawCalls;
+
+			ImGui::Text("Max Quads x Draw Call"); ImGui::SameLine(text_separation);
+			ImGui::Text("%i", Renderer2D::GetMaxQuads());
+		}
+
 
 		// -- Draw Calls --
 		ImGui::Text("Draw Calls"); ImGui::SameLine(text_separation);
-		ImGui::Text("%i", stats.DrawCalls);
-
-		ImGui::Text("Max Quads x Draw Call"); ImGui::SameLine(text_separation);
-		ImGui::Text("%i", Renderer2D::GetMaxQuads());
+		ImGui::Text("%i", draw_calls);
 
 
 		// -- Geometry --
@@ -148,20 +177,23 @@ namespace Kaimos {
 		glm::vec2 position = KaimosUI::ConvertToVec2(ImGui::GetCursorScreenPos()) - glm::vec2(0.0f, 20.0f);
 		
 		// Quads
-		draw_list->AddRectFilled(KaimosUI::ConvertToImVec2(position), KaimosUI::ConvertToImVec2(position + glm::vec2(icons_size)), icons_color);
-		
-		ImGui::SameLine(icons_indent);
-		ImGui::Text("Quads Drawn"); ImGui::SameLine(text_separation);
-		ImGui::Text("%i", stats.QuadCount);
-		
+		if (!display_3Dmetrics)
+		{
+			draw_list->AddRectFilled(KaimosUI::ConvertToImVec2(position), KaimosUI::ConvertToImVec2(position + glm::vec2(icons_size)), icons_color);
+
+			ImGui::SameLine(icons_indent);
+			ImGui::Text("Quads Drawn"); ImGui::SameLine(text_separation);
+			ImGui::Text("%i", quad_count);
+			ImGui::NewLine();
+		}
+
 		// Triangles
-		ImGui::NewLine();
 		position = KaimosUI::ConvertToVec2(ImGui::GetCursorScreenPos()) + glm::vec2(icons_size/2.0f, -20.0f);
 		draw_list->AddTriangleFilled(KaimosUI::ConvertToImVec2(position), KaimosUI::ConvertToImVec2(position + glm::vec2(-icons_size/2.0f, icons_size)), KaimosUI::ConvertToImVec2(position + glm::vec2(icons_size/2.0f, icons_size)), icons_color);
 				
 		ImGui::SameLine(icons_indent);
 		ImGui::Text("Triangles Drawn"); ImGui::SameLine(text_separation);
-		ImGui::Text("%i", stats.GetTotalTrianglesCount());
+		ImGui::Text("%i", tris_count);
 
 		// Circle
 		ImGui::NewLine();
@@ -170,6 +202,6 @@ namespace Kaimos {
 		
 		ImGui::SameLine(icons_indent);
 		ImGui::Text("Vertices Drawn"); ImGui::SameLine(text_separation);
-		ImGui::Text("%i	(%i Indices)", stats.VerticesCount, stats.IndicesCount);
+		ImGui::Text("%i	(%i Indices)", vertices_count, indices_count);
 	}
 }
