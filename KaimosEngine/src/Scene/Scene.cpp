@@ -5,6 +5,7 @@
 #include "ECS/Components.h"
 #include "Renderer/Renderer.h"
 #include "Renderer/Renderer2D.h"
+#include "Renderer/Renderer3D.h"
 #include "Renderer/Resources/Mesh.h"
 
 #include "Core/Resources/ResourceManager.h"
@@ -50,14 +51,27 @@ namespace Kaimos {
 
 
 	// ----------------------- Public/Private Scene Methods -----------------------------------------------
-	void Scene::RenderScene()
+	void Scene::RenderSprites()
 	{
-		auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
-		for (auto ent : group)
+		KS_PROFILE_FUNCTION();
+		auto sprite_group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
+		for (auto ent : sprite_group)
 		{
-			auto& [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(ent);
+			auto& [transform, sprite] = sprite_group.get<TransformComponent, SpriteRendererComponent>(ent);
 			if (transform.EntityActive)
 				Renderer2D::DrawSprite(transform.GetTransform(), sprite, (int)ent);
+		}
+	}
+
+	void Scene::RenderMeshes()
+	{
+		KS_PROFILE_FUNCTION();
+		auto mesh_view = m_Registry.view<TransformComponent, MeshRendererComponent>();
+		for (auto ent : mesh_view)
+		{
+			auto& [transform, mesh] = mesh_view.get<TransformComponent, MeshRendererComponent>(ent);
+			if (transform.EntityActive)
+				Renderer3D::DrawMesh(transform.GetTransform(), mesh, (int)ent);
 		}
 	}
 
@@ -65,9 +79,14 @@ namespace Kaimos {
 	{
 		KS_PROFILE_FUNCTION();
 
-		// -- Render --
+		// -- Render Meshes --
+		Renderer3D::BeginScene(camera);
+		RenderMeshes();
+		Renderer3D::EndScene();
+
+		// -- Render Sprites --
 		Renderer2D::BeginScene(camera);
-		RenderScene();
+		RenderSprites();
 		Renderer2D::EndScene();
 	}
 
@@ -93,8 +112,12 @@ namespace Kaimos {
 		static bool primary_camera_warn = false;
 		if (m_PrimaryCamera)
 		{
+			Renderer3D::BeginScene(m_PrimaryCamera.GetComponent<CameraComponent>(), m_PrimaryCamera.GetComponent<TransformComponent>());
+			RenderMeshes();
+			Renderer3D::EndScene();
+
 			Renderer2D::BeginScene(m_PrimaryCamera.GetComponent<CameraComponent>(), m_PrimaryCamera.GetComponent<TransformComponent>());
-			RenderScene();
+			RenderSprites();
 			Renderer2D::EndScene();
 			primary_camera_warn = false;
 		}
@@ -110,8 +133,12 @@ namespace Kaimos {
 		// -- Render --
 		if (camera_entity && camera_entity.HasComponent<CameraComponent>())
 		{
+			Renderer3D::BeginScene(m_PrimaryCamera.GetComponent<CameraComponent>(), m_PrimaryCamera.GetComponent<TransformComponent>());
+			RenderMeshes();
+			Renderer3D::EndScene();
+
 			Renderer2D::BeginScene(camera_entity.GetComponent<CameraComponent>(), camera_entity.GetComponent<TransformComponent>());
-			RenderScene();
+			RenderSprites();
 			Renderer2D::EndScene();
 		}
 	}

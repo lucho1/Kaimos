@@ -44,13 +44,12 @@ namespace Kaimos {
 		static void Flush();
 
 		// --- Public Drawing Methods ---
-		static void DrawSprite(const glm::mat4& transform, const SpriteRendererComponent& sprite, int entity_id);
+		static void DrawSprite(const glm::mat4& transform, const SpriteRendererComponent& sprite_component, int entity_id);
 
 	private:
 
 		// --- Private Drawing Methods ---
 		static uint GetTextureIndex(const Ref<Texture2D>& texture);
-		static void SetupVertexBuffer(const glm::mat4& transform, int entity_id, const Ref<Material>& material, uint texture_index, std::vector<QuadVertex> vertices_vector);
 		
 		// --- Private Renderer Methods ---
 		static void StartBatch();
@@ -67,7 +66,6 @@ namespace Kaimos {
 
 		// --- Renderer Statistics Methods ---
 		static void ResetStats();
-		static void IncrementIndicesDrawn(uint indices_increment);
 		static const Statistics GetStats();
 		static const uint GetMaxQuads();
 	};

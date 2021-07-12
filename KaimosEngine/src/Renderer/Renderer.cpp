@@ -4,6 +4,7 @@
 #include "OpenGL/Resources/OGLShader.h"
 #include "Resources/Mesh.h"
 #include "Renderer2D.h"
+#include "Renderer3D.h"
 
 #include <yaml-cpp/yaml.h>
 
@@ -19,11 +20,13 @@ namespace Kaimos {
 		KS_PROFILE_FUNCTION();
 		RenderCommand::Init();
 		Renderer2D::Init();
+		Renderer3D::Init();
 	}
 
 	void Renderer::Shutdown()
 	{
 		Renderer2D::Shutdown();
+		Renderer3D::Shutdown();
 
 		for (Ref<Material>& mat : s_SceneData->Materials)
 			mat.reset();

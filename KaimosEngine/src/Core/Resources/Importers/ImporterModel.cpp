@@ -125,9 +125,13 @@ namespace Kaimos::Importers
 			if (ai_mesh->mTextureCoords[0])
 				texture_coords = { ai_mesh->mTextureCoords[0][i].x, ai_mesh->mTextureCoords[0][i].y };
 
-			vertices_data.insert(vertices_data.end(), 3, *glm::value_ptr(positions));
-			vertices_data.insert(vertices_data.end(), 3, *glm::value_ptr(normals));
-			vertices_data.insert(vertices_data.end(), 2, *glm::value_ptr(texture_coords));
+			// Insert Vertices Data
+			vertices_data.insert(vertices_data.end(), {	positions.x, positions.y, positions.z,
+														normals.x, normals.y, normals.z,
+														texture_coords.x, texture_coords.y,
+														//1.0f, 1.0f, 1.0f, 1.0f,				// Color
+														//0.0f, 1.0f, 0						// TexIndex, Tiling Factor & EntityID
+														});
 
 			Kaimos::QuadVertex vertex;
 			vertex.Pos = positions;
@@ -161,12 +165,12 @@ namespace Kaimos::Importers
 			{ SHADER_DATATYPE::FLOAT3,	"a_Position" },
 			{ SHADER_DATATYPE::FLOAT3,	"a_Normal" },
 			{ SHADER_DATATYPE::FLOAT2,	"a_TexCoord" },
-			{ SHADER_DATATYPE::FLOAT4,	"a_Color" },
-			{ SHADER_DATATYPE::FLOAT ,	"a_TexIndex" },
-			{ SHADER_DATATYPE::FLOAT ,	"a_TilingFactor" },
-			{ SHADER_DATATYPE::INT ,	"a_EntityID" }
+			//{ SHADER_DATATYPE::FLOAT4,	"a_Color" },
+			//{ SHADER_DATATYPE::FLOAT ,	"a_TexIndex" },
+			//{ SHADER_DATATYPE::FLOAT ,	"a_TilingFactor" },
+			//{ SHADER_DATATYPE::INT ,	"a_EntityID" }
 		};
-
+		
 		Ref<VertexBuffer> vbo = VertexBuffer::Create(vertices_data.data(), vertices_data.size() * sizeof(float));
 		Ref<IndexBuffer> ibo = IndexBuffer::Create(indices.data(), indices.size());
 		Ref<VertexArray> vao = VertexArray::Create();
