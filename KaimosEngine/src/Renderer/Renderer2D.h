@@ -40,7 +40,6 @@ namespace Kaimos {
 		static void BeginScene(const CameraComponent& camera_component, const TransformComponent& transform_component);
 		static void BeginScene(const Camera& camera);
 		static void EndScene();
-		static void Flush();
 
 		// --- Public Drawing Methods ---
 		static void DrawSprite(const glm::mat4& transform, const SpriteRendererComponent& sprite_component, int entity_id);
@@ -51,6 +50,7 @@ namespace Kaimos {
 		static uint GetTextureIndex(const Ref<Texture2D>& texture);
 		
 		// --- Private Renderer Methods ---
+		static void Flush();
 		static void StartBatch();
 		static void NextBatch();
 

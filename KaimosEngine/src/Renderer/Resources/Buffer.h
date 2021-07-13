@@ -154,9 +154,11 @@ namespace Kaimos {
 		virtual void Unbind() const = 0;
 
 		static Ref <IndexBuffer> Create(uint* vertices, uint count);
+		static Ref <IndexBuffer> Create(uint count);
 		
 		// -- Getters --
 		virtual uint GetCount() const = 0;
+		virtual void SetData(const void* data, uint count) = 0;
 	};
 
 

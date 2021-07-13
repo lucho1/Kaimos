@@ -187,6 +187,9 @@ namespace Kaimos {
 		Flush();
 	}
 
+
+
+	// ----------------------- Private Renderer Methods ---------------------------------------------------
 	void Renderer2D::Flush()
 	{
 		KS_PROFILE_FUNCTION();
@@ -209,10 +212,7 @@ namespace Kaimos {
 		RenderCommand::DrawIndexed(s_Data->QuadVArray, s_Data->QuadIndicesDrawCount);
 		++s_Data->RendererStats.DrawCalls;
 	}
-
-
 	
-	// ----------------------- Private Renderer Methods ---------------------------------------------------
 	void Renderer2D::StartBatch()
 	{
 		KS_PROFILE_FUNCTION();

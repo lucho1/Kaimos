@@ -3,7 +3,7 @@
 
 #include "Core/Core.h"
 #include "Core/Utils/Maths/RandomGenerator.h"
-#include "Renderer/Renderer2D.h"
+#include "Renderer/Renderer3D.h"
 #include "Buffer.h"
 
 namespace Kaimos {
@@ -14,6 +14,7 @@ namespace Kaimos {
 	class Mesh
 	{
 		friend class Importers::ImporterModel;
+		friend class Renderer3D;
 	public:
 
 		// --- Public Class Methods ---
@@ -38,6 +39,7 @@ namespace Kaimos {
 		const std::string& GetParentModelName()				const;
 		const std::vector<Ref<Mesh>>& GetSubmeshes()		const { return m_Submeshes; }
 		const Ref<VertexArray>& GetVertexArray()			const { return m_VertexArray; }
+		const std::vector<Vertex>& GetVertices()			const { return m_Vertices; }
 
 		// --- Public Mesh Methods ---
 		void AddSubmesh(const Ref<Mesh>& mesh);
@@ -48,7 +50,8 @@ namespace Kaimos {
 		// --- Private Mesh Methods ---
 		void DeleteSubmesh(Mesh* submesh_to_delete);
 		void SetParentModel(Resources::ResourceModel* model);
-		void SetMeshVertices(const std::vector<QuadVertex>& mesh_vertices) { m_Vertices = mesh_vertices; }
+		void SetMeshVertices(const std::vector<Vertex>& mesh_vertices) { m_Vertices = mesh_vertices; }
+		void SetMeshIndices(const std::vector<uint>& mesh_indices) { m_Indices = mesh_indices; }
 
 	private:
 
@@ -56,7 +59,10 @@ namespace Kaimos {
 		uint m_ID = 0, m_MaterialID = 0;
 		std::string m_Name = "Unnamed";
 
-		std::vector<QuadVertex> m_Vertices;
+		std::vector<Vertex> m_Vertices;
+		std::vector<uint> m_Indices;
+		uint m_MaxIndex = 0;
+
 		std::vector<Ref<Mesh>> m_Submeshes;
 		Ref<VertexArray> m_VertexArray = nullptr;
 		

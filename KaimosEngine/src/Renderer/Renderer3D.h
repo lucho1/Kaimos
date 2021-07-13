@@ -16,6 +16,8 @@ namespace Kaimos {
 		glm::vec3 Pos = glm::vec3(0.0f);
 		glm::vec3 Normal = glm::vec3(0.0f);
 		glm::vec2 TexCoord = glm::vec2(0.0f);
+		glm::vec4 Color = glm::vec4(1.0f);
+		float TexIndex = 0.0f;
 
 		// --- Editor Variables ---
 		int EntityID = 0;
@@ -42,6 +44,16 @@ namespace Kaimos {
 
 	private:
 
+		// --- Private Drawing Methods ---
+		static uint GetTextureIndex(const Ref<Texture2D>& texture);
+
+		// --- Private Renderer Methods ---
+		static void Flush();
+		static void StartBatch();
+		static void NextBatch();
+
+	private:
+
 		// --- Renderer Statistics ---
 		struct Statistics
 		{
@@ -54,6 +66,7 @@ namespace Kaimos {
 		// --- Renderer Statistics Methods ---
 		static void ResetStats();
 		static const Statistics GetStats();
+		static const uint GetMaxFaces();
 	};
 }
 

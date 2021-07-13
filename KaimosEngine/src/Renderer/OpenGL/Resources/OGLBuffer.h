@@ -39,15 +39,17 @@ namespace Kaimos {
 	public:
 
 		// --- Public Class Methods ---
-		OGLIndexBuffer(uint* vertices, uint count);
+		OGLIndexBuffer(uint* indices, uint count);
+		OGLIndexBuffer(uint count);
 		virtual ~OGLIndexBuffer();
 
 		// --- Public Index Buffer Methods ---
 		virtual void Bind() const override;
 		virtual void Unbind() const override;
 		
-		// -- Getters --
+		// -- Getters/Setters --
 		virtual uint GetCount() const { return m_Count; }
+		virtual void SetData(const void* data, uint count) override;
 
 	private:
 

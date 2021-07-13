@@ -3,7 +3,7 @@
 
 #include "Core/Resources/ResourceModel.h"
 #include "Renderer/Renderer.h"
-#include "Renderer/Renderer2D.h"
+#include "Renderer/Renderer3D.h"
 #include "Renderer/Resources/Material.h"
 #include "Renderer/Resources/Buffer.h"
 
@@ -108,7 +108,7 @@ namespace Kaimos::Importers
 
 		// -- Process Vertices --
 		std::vector<float> vertices_data;
-		std::vector<QuadVertex> mesh_vertices;
+		std::vector<Vertex> mesh_vertices;
 
 		for (uint i = 0; i < ai_mesh->mNumVertices; ++i)
 		{
@@ -129,11 +129,11 @@ namespace Kaimos::Importers
 			vertices_data.insert(vertices_data.end(), {	positions.x, positions.y, positions.z,
 														normals.x, normals.y, normals.z,
 														texture_coords.x, texture_coords.y,
-														//1.0f, 1.0f, 1.0f, 1.0f,				// Color
-														//0.0f, 1.0f, 0						// TexIndex, Tiling Factor & EntityID
+														1.0f, 1.0f, 1.0f, 1.0f,				// Color
+														0.0f, 0								// TexIndex & EntityID
 														});
 
-			Kaimos::QuadVertex vertex;
+			Kaimos::Vertex vertex;
 			vertex.Pos = positions;
 			vertex.Normal = normals;
 			vertex.TexCoord = texture_coords;
@@ -152,12 +152,18 @@ namespace Kaimos::Importers
 		}
 
 		// -- Process Indices --
+		uint max_index = 0;
 		std::vector<uint> indices;
 		for (uint i = 0; i < ai_mesh->mNumFaces; ++i)
 		{
 			aiFace face = ai_mesh->mFaces[i];
 			for (uint j = 0; j < face.mNumIndices; ++j)
-				indices.push_back(face.mIndices[j]);
+			{
+				uint index = face.mIndices[j];
+				indices.push_back(index);
+				if (index > max_index)
+					max_index = index;
+			}
 		}
 
 		// -- Create Buffers --
@@ -165,10 +171,9 @@ namespace Kaimos::Importers
 			{ SHADER_DATATYPE::FLOAT3,	"a_Position" },
 			{ SHADER_DATATYPE::FLOAT3,	"a_Normal" },
 			{ SHADER_DATATYPE::FLOAT2,	"a_TexCoord" },
-			//{ SHADER_DATATYPE::FLOAT4,	"a_Color" },
-			//{ SHADER_DATATYPE::FLOAT ,	"a_TexIndex" },
-			//{ SHADER_DATATYPE::FLOAT ,	"a_TilingFactor" },
-			//{ SHADER_DATATYPE::INT ,	"a_EntityID" }
+			{ SHADER_DATATYPE::FLOAT4,	"a_Color" },
+			{ SHADER_DATATYPE::FLOAT ,	"a_TexIndex" },
+			{ SHADER_DATATYPE::INT ,	"a_EntityID" }
 		};
 		
 		Ref<VertexBuffer> vbo = VertexBuffer::Create(vertices_data.data(), vertices_data.size() * sizeof(float));
@@ -185,6 +190,8 @@ namespace Kaimos::Importers
 		Ref<Mesh> mesh = CreateRef<Mesh>(vao, mesh_name);
 		Renderer::CreateMesh(mesh);
 		mesh->SetMeshVertices(mesh_vertices);
+		mesh->SetMeshIndices(indices);
+		mesh->m_MaxIndex = max_index + 1;
 		return mesh;
 	}
 

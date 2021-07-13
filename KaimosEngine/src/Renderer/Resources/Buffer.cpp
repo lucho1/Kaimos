@@ -48,6 +48,18 @@ namespace Kaimos {
 		return nullptr;
 	}
 
+	Ref<IndexBuffer> IndexBuffer::Create(uint count)
+	{
+		switch (Renderer::GetRendererAPI())
+		{
+			case RendererAPI::API::OPENGL:		return CreateRef<OGLIndexBuffer>(count);
+			case RendererAPI::API::NONE:		KS_ENGINE_ASSERT(false, "RendererAPI is set to NONE (unsupported)!"); return nullptr;
+		}
+
+		KS_ENGINE_ASSERT(false, "RendererAPI is unknown, not selected or failed!");
+		return nullptr;
+	}
+
 
 	
 	// ----------------------- Vertex Array Creation ------------------------------------------------------

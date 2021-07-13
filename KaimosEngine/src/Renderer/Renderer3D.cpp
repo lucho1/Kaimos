@@ -16,8 +16,26 @@ namespace Kaimos {
 	{
 		Renderer3D::Statistics RendererStats;
 
-		Ref<Shader> CurrentShader = nullptr;
-		Ref<Texture2D> WhiteTexture = nullptr; // TODO: Put this in the Renderer, don't have duplicates in Renderer2D & 3D
+		static const uint MaxFaces = 20000;
+		static const uint MaxVertices = MaxFaces * 4;
+		static const uint MaxIndices = MaxFaces * 6;
+		static const uint MaxTextureSlots = 32;						// TODO: RenderCapabilities - Variables based on what the hardware can do
+
+		uint TextureSlotIndex = 1;									// Slot 0 is for White Texture 
+		Ref<Texture2D> WhiteTexture = nullptr;						// TODO: Put this in the Renderer, don't have duplicates in Renderer2D & 3D
+		std::array<Ref<Texture2D>, MaxTextureSlots> TextureSlots;
+
+		uint IndicesDrawCount = 0;
+		uint IndicesCurrentOffset = 0;
+		Vertex* VBufferBase			= nullptr;
+		Vertex* VBufferPtr			= nullptr;
+		std::vector<uint> Indices;
+
+		Ref<VertexArray> VArray		= nullptr;
+		Ref<IndexBuffer> IBuffer	= nullptr;
+		Ref<VertexBuffer> VBuffer	= nullptr;
+
+		Ref<Shader> CurrentShader	= nullptr;
 	};
 
 	static Renderer3DData* s_3DData = nullptr;	// On shutdown, this is deleted, and ~VertexArray() called, freeing GPU Memory too
@@ -35,6 +53,11 @@ namespace Kaimos {
 		return s_3DData->RendererStats;
 	}
 
+	const uint Renderer3D::GetMaxFaces()
+	{
+		return s_3DData->MaxFaces;
+	}
+
 
 
 	// ----------------------- Public Class Methods -------------------------------------------------------
@@ -43,6 +66,32 @@ namespace Kaimos {
 		KS_PROFILE_FUNCTION();
 		s_3DData = new Renderer3DData();
 
+		// -- Vertex Buffer & Array --
+		s_3DData->VBufferBase = new Vertex[s_3DData->MaxVertices];
+		s_3DData->VArray = VertexArray::Create();
+		s_3DData->VBuffer = VertexBuffer::Create(s_3DData->MaxVertices * sizeof(Vertex));
+
+		// -- Vertex Layout & Index Buffer Creation --
+		s_3DData->IBuffer = IndexBuffer::Create(s_3DData->MaxIndices);
+		BufferLayout layout = {
+			{ SHADER_DATATYPE::FLOAT3,	"a_Position" },
+			{ SHADER_DATATYPE::FLOAT3,	"a_Normal" },
+			{ SHADER_DATATYPE::FLOAT2,	"a_TexCoord" },
+			{ SHADER_DATATYPE::FLOAT4,	"a_Color" },
+			{ SHADER_DATATYPE::FLOAT ,	"a_TexIndex" },
+			{ SHADER_DATATYPE::INT ,	"a_EntityID" }
+		};
+
+		// -- Vertex Array Filling --
+		s_3DData->VBuffer->SetLayout(layout);
+		s_3DData->VArray->AddVertexBuffer(s_3DData->VBuffer);
+		s_3DData->VArray->SetIndexBuffer(s_3DData->IBuffer);
+
+		// -- Arrays Unbinding & Indices Deletion --
+		s_3DData->VArray->Unbind();
+		s_3DData->VBuffer->Unbind();
+		s_3DData->IBuffer->Unbind();
+
 		// -- Shader Creation --
 		s_3DData->CurrentShader = Shader::Create("assets/shaders/3DTextureShader.glsl");
 
@@ -50,11 +99,27 @@ namespace Kaimos {
 		uint whiteTextData = 0xffffffff; // Full Fs for every channel there (2x4 channels - rgba -)
 		s_3DData->WhiteTexture = Texture2D::Create(1, 1);
 		s_3DData->WhiteTexture->SetData(&whiteTextData, sizeof(whiteTextData)); // or sizeof(uint)
+
+		// -- Texture Slots Filling --
+		s_3DData->TextureSlots[0] = s_3DData->WhiteTexture;
+		int texture_samplers[s_3DData->MaxTextureSlots];
+
+		for (uint i = 0; i < s_3DData->MaxTextureSlots; ++i)
+			texture_samplers[i] = i;
+
+		// -- Shader Uniform of Texture Slots --
+		s_3DData->CurrentShader->Bind();
+		s_3DData->CurrentShader->SetUIntArray("u_Textures", texture_samplers, s_3DData->MaxTextureSlots);
+		s_3DData->CurrentShader->Unbind();
 	}
 
 	void Renderer3D::Shutdown()
 	{
 		KS_PROFILE_FUNCTION();
+
+		// This is deleted here (manually), and not treated as smart pointer, waiting for the end of the program lifetime
+		// because there is still some code of the graphics (OpenGL) that it has to run to free VRAM (for ex. deleting VArrays, Shaders...)
+		delete[] s_3DData->VBufferBase;
 		delete s_3DData;
 	}
 
@@ -66,20 +131,69 @@ namespace Kaimos {
 		KS_PROFILE_FUNCTION();
 		glm::mat4 view_proj = camera_component.Camera.GetProjection() * glm::inverse(transform_component.GetTransform());
 
+		s_3DData->VArray->Bind();
 		s_3DData->CurrentShader->Bind();
 		s_3DData->CurrentShader->SetUMat4("u_ViewProjection", view_proj);
+		StartBatch();
 	}
 
 	void Renderer3D::BeginScene(const Camera& camera)
 	{
 		KS_PROFILE_FUNCTION();
+		s_3DData->VArray->Bind();
 		s_3DData->CurrentShader->Bind();
 		s_3DData->CurrentShader->SetUMat4("u_ViewProjection", camera.GetViewProjection());
+		StartBatch();
 	}
 
 	void Renderer3D::EndScene()
 	{
 		KS_PROFILE_FUNCTION();
+		Flush();
+	}
+
+
+
+	// ----------------------- Private Renderer Methods ---------------------------------------------------
+	void Renderer3D::Flush()
+	{
+		KS_PROFILE_FUNCTION();
+
+		// -- Check if something to draw --
+		if (s_3DData->IndicesDrawCount == 0)
+			return;
+
+		// -- Cast (uint8_t is 1 byte large, the subtraction give us elements in terms of bytes) --
+		uint v_data_size = (uint)((uint8_t*)s_3DData->VBufferPtr - (uint8_t*)s_3DData->VBufferBase);
+
+		// -- Set Vertex Buffer Data --
+		s_3DData->VBuffer->SetData(s_3DData->VBufferBase, v_data_size);
+		s_3DData->IBuffer->SetData(s_3DData->Indices.data(), s_3DData->Indices.size());
+
+		// -- Bind all Textures --
+		for (uint i = 0; i < s_3DData->TextureSlotIndex; ++i)
+			s_3DData->TextureSlots[i]->Bind(i);
+
+		// -- Draw Vertex Array --
+		RenderCommand::DrawIndexed(s_3DData->VArray, s_3DData->IndicesDrawCount);
+		++s_3DData->RendererStats.DrawCalls;
+	}
+
+	void Renderer3D::StartBatch()
+	{
+		KS_PROFILE_FUNCTION();
+		s_3DData->IndicesDrawCount = 0;
+		s_3DData->IndicesCurrentOffset = 0;
+		s_3DData->TextureSlotIndex = 1; // 0 is white texture
+		s_3DData->VBufferPtr = s_3DData->VBufferBase;
+		s_3DData->Indices.clear();
+	}
+
+	void Renderer3D::NextBatch()
+	{
+		KS_PROFILE_FUNCTION();
+		Flush();
+		StartBatch();
 	}
 
 
@@ -96,59 +210,83 @@ namespace Kaimos {
 			if (!material)
 				KS_ENGINE_ASSERT(false, "Tried to Render a Mesh with a null Material!");
 
-			//for (uint i = 0; i < mesh->m_Vertices.size(); ++i)
-			//{
-			//	// Update the Nodes with vertex parameters on each vertex
-			//	material->UpdateVertexParameter(MaterialEditor::VertexParameterNodeType::POSITION, glm::value_ptr(mesh->m_Vertices[i].Pos));
-			//	material->UpdateVertexParameter(MaterialEditor::VertexParameterNodeType::NORMAL, glm::value_ptr(mesh->m_Vertices[i].Normal));
-			//	material->UpdateVertexParameter(MaterialEditor::VertexParameterNodeType::TEX_COORDS, glm::value_ptr(mesh->m_Vertices[i].TexCoord));
-			//
-			//	// Get the vertex parameters in the main node once updated the nodes
-			//	glm::vec3 vpos = material->GetVertexAttributeResult<glm::vec3>(MaterialEditor::VertexParameterNodeType::POSITION);
-			//	glm::vec3 vnorm = material->GetVertexAttributeResult<glm::vec3>(MaterialEditor::VertexParameterNodeType::NORMAL);
-			//	glm::vec2 tcoords = material->GetVertexAttributeResult<glm::vec2>(MaterialEditor::VertexParameterNodeType::TEX_COORDS);
-			// 
-			// ++s_3DData->RendererStats.VerticesCount;
-			//}
+			uint texture_index = GetTextureIndex(material->GetTexture());
 
-			// -- Get Texture & Send Uniforms --
-			if (material->GetTexture())
-				material->GetTexture()->Bind();
-			else
-				s_3DData->WhiteTexture->Bind();
+			// -- New Batch if Needed --
+			if (s_3DData->IndicesDrawCount >= s_3DData->MaxIndices)
+				NextBatch();
 
-			s_3DData->CurrentShader->SetUInt("u_Texture", 0);
-			s_3DData->CurrentShader->SetUMat4("u_Model", transform);
-			s_3DData->CurrentShader->SetUFloat4("u_Color", material->Color);
+			// -- Setup Vertex Array & Vertex Attributes --
+			for (uint i = 0; i < mesh->m_Vertices.size(); ++i)
+			{
+				// Update the Nodes with vertex parameters on each vertex
+				material->UpdateVertexParameter(MaterialEditor::VertexParameterNodeType::POSITION, glm::value_ptr(mesh->m_Vertices[i].Pos));
+				material->UpdateVertexParameter(MaterialEditor::VertexParameterNodeType::NORMAL, glm::value_ptr(mesh->m_Vertices[i].Normal));
+				material->UpdateVertexParameter(MaterialEditor::VertexParameterNodeType::TEX_COORDS, glm::value_ptr(mesh->m_Vertices[i].TexCoord));
+			
+				// Get the vertex parameters in the main node once updated the nodes
+				glm::vec3 vpos = material->GetVertexAttributeResult<glm::vec3>(MaterialEditor::VertexParameterNodeType::POSITION);
+				glm::vec3 vnorm = material->GetVertexAttributeResult<glm::vec3>(MaterialEditor::VertexParameterNodeType::NORMAL);
+				glm::vec2 tcoords = material->GetVertexAttributeResult<glm::vec2>(MaterialEditor::VertexParameterNodeType::TEX_COORDS);
+			 
+				// Set the vertex data
+				s_3DData->VBufferPtr->Pos = transform * glm::vec4(vpos, 1.0f);
+				s_3DData->VBufferPtr->Normal = vnorm;
+				s_3DData->VBufferPtr->TexCoord = tcoords;
 
-			// -- Draw --
-			const Ref<VertexArray> v_arr = mesh->GetVertexArray();
-			v_arr->Bind();
-			RenderCommand::DrawIndexed(v_arr);
+				s_3DData->VBufferPtr->Color = material->Color;
+				s_3DData->VBufferPtr->TexIndex = texture_index;
+				s_3DData->VBufferPtr->EntityID = entity_id;
 
-			// -- Update Statistics --
-			++s_3DData->RendererStats.DrawCalls;
-			s_3DData->RendererStats.IndicesCount += v_arr->GetIndexBuffer()->GetCount();
+				++s_3DData->VBufferPtr;
+				++s_3DData->RendererStats.VerticesCount;
+			}
 
-			// -- Left here in case we batch this too --
-			//uint texture_index = GetTextureIndex(material->GetTexture());
-			//
-			//// -- New Batch if Needed --
-			//if (s_Data->QuadIndicesDrawCount >= s_Data->MaxIndices)
-			//	NextBatch();
-			//
-			//// -- Setup Vertex Array & Vertex Attributes --
-			//// Get Mesh: with mesh.MeshID
-			//Ref<Mesh> mesh = Renderer::GetMesh(mesh_component.MeshID);
-			//if (mesh)
-			//{
-			//	SetupVertexBuffer(transform, entity_id, material, texture_index, mesh->GetMeshVertices());
-			//	IncrementIndicesDrawn(mesh->GetMeshIndices());
-			//}
-			//else
-			//{
-			//	KS_ENGINE_ERROR("Tried to render a non-existing mesh!");
-			//}
+			// -- Setup Index Buffer --
+			std::vector<uint> indices = mesh->m_Indices;
+			for (uint i = 0; i < indices.size(); ++i)
+			{
+				s_3DData->Indices.push_back(s_3DData->IndicesCurrentOffset + indices[i]);				
+				++s_3DData->IndicesDrawCount;
+				++s_3DData->RendererStats.IndicesCount;
+			}
+
+			s_3DData->IndicesCurrentOffset += mesh->m_MaxIndex;
 		}
+	}
+	
+		
+
+	// ----------------------- Private Drawing Methods ----------------------------------------------------
+	uint Renderer3D::GetTextureIndex(const Ref<Texture2D>& texture)
+	{
+		uint ret = 0;
+		if (texture)
+		{
+			// -- Find Texture if Exists --
+			for (uint i = 1; i < s_3DData->TextureSlotIndex; ++i)
+			{
+				if (*s_3DData->TextureSlots[i] == *texture)
+				{
+					ret = i;
+					break;
+				}
+			}
+
+			// -- If it doesn't exists, add it to batch data --
+			if (ret == 0)
+			{
+				// - New Batch if Needed -
+				if (s_3DData->TextureSlotIndex >= s_3DData->MaxTextureSlots)
+					NextBatch();
+
+				// - Set Texture -
+				ret = s_3DData->TextureSlotIndex;
+				s_3DData->TextureSlots[s_3DData->TextureSlotIndex] = texture;
+				++s_3DData->TextureSlotIndex;
+			}
+		}
+
+		return ret;
 	}
 }

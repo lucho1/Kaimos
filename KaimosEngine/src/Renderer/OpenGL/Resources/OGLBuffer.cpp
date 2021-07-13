@@ -83,7 +83,7 @@ namespace Kaimos {
 
 	// ---------------------------- INDEX BUFFER ----------------------------------------------------------
 	// ----------------------- Public Class Methods -------------------------------------------------------
-	OGLIndexBuffer::OGLIndexBuffer(uint* vertices, uint count)
+	OGLIndexBuffer::OGLIndexBuffer(uint* indices, uint count)
 		: m_Count(count)
 	{
 		KS_PROFILE_FUNCTION();
@@ -91,9 +91,17 @@ namespace Kaimos {
 		glCreateBuffers(1, &m_BufferID);
 		
 		// GL_ELEMENT_ARRAY_BUFFER is not valid without an actively bound VAO
-		// Binding with GL_ARRAY_BUFFER allows the data to be loaded regardless of VAO state. 
+		// Binding with GL_ARRAY_BUFFER allows the data to be loaded regardless of VAO state.
 		glBindBuffer(GL_ARRAY_BUFFER, m_BufferID);
-		glBufferData(GL_ARRAY_BUFFER, count * sizeof(uint), vertices, GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, count * sizeof(uint), indices, GL_STATIC_DRAW);
+	}
+
+	OGLIndexBuffer::OGLIndexBuffer(uint count)
+	{
+		KS_PROFILE_FUNCTION();
+		glCreateBuffers(1, &m_BufferID);
+		glBindBuffer(GL_ARRAY_BUFFER, m_BufferID);
+		glBufferData(GL_ARRAY_BUFFER, count * sizeof(uint), nullptr, GL_DYNAMIC_DRAW);
 	}
 
 	OGLIndexBuffer::~OGLIndexBuffer()
@@ -115,6 +123,16 @@ namespace Kaimos {
 	{
 		KS_PROFILE_FUNCTION();
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	}
+
+
+
+	// ----------------------- Getters/Setters ------------------------------------------------------------
+	void OGLIndexBuffer::SetData(const void* data, uint count)
+	{
+		KS_PROFILE_FUNCTION();
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_BufferID);
+		glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, count * sizeof(uint), data);
 	}
 
 

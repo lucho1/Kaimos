@@ -142,8 +142,8 @@ namespace Kaimos {
 			indices_count = stats.IndicesCount;
 			draw_calls = stats.DrawCalls;
 
-			//ImGui::Text("Max Quads x Draw Call"); ImGui::SameLine(text_separation);
-			//ImGui::Text("%i", Renderer2D::GetMaxQuads());
+			ImGui::Text("Max Faces x Draw Call"); ImGui::SameLine(text_separation);
+			ImGui::Text("%i", Renderer3D::GetMaxFaces());
 		}
 		else
 		{
