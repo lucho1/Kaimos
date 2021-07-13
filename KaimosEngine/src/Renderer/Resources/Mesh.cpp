@@ -15,7 +15,6 @@ namespace Kaimos {
 			m_ParentMesh->DeleteSubmesh(this);
 
 		m_Submeshes.clear();
-		m_VertexArray.reset();
 		m_ParentMesh = nullptr;
 	}
 

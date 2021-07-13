@@ -18,8 +18,8 @@ namespace Kaimos {
 	public:
 
 		// --- Public Class Methods ---
-		Mesh(const Ref<VertexArray>& vertex_array, const std::string& name = "Unnamed", uint id = 0, uint material_id = 0)
-			: m_VertexArray(vertex_array), m_Name(name), m_MaterialID(material_id), m_ID(id == 0 ? (uint)Kaimos::Random::GetRandomInt() : id)
+		Mesh(const std::string& name = "Unnamed", uint id = 0, uint material_id = 0)
+			: m_Name(name), m_MaterialID(material_id), m_ID(id == 0 ? (uint)Kaimos::Random::GetRandomInt() : id)
 		{
 		}
 
@@ -38,7 +38,6 @@ namespace Kaimos {
 		const std::string& GetParentMeshName()				const;
 		const std::string& GetParentModelName()				const;
 		const std::vector<Ref<Mesh>>& GetSubmeshes()		const { return m_Submeshes; }
-		const Ref<VertexArray>& GetVertexArray()			const { return m_VertexArray; }
 		const std::vector<Vertex>& GetVertices()			const { return m_Vertices; }
 
 		// --- Public Mesh Methods ---
@@ -52,6 +51,7 @@ namespace Kaimos {
 		void SetParentModel(Resources::ResourceModel* model);
 		void SetMeshVertices(const std::vector<Vertex>& mesh_vertices) { m_Vertices = mesh_vertices; }
 		void SetMeshIndices(const std::vector<uint>& mesh_indices) { m_Indices = mesh_indices; }
+		void SetMaxIndex(uint max_index) { m_MaxIndex = max_index; }
 
 	private:
 
@@ -63,10 +63,8 @@ namespace Kaimos {
 		std::vector<uint> m_Indices;
 		uint m_MaxIndex = 0;
 
-		std::vector<Ref<Mesh>> m_Submeshes;
-		Ref<VertexArray> m_VertexArray = nullptr;
-		
 		Mesh* m_ParentMesh = nullptr;
+		std::vector<Ref<Mesh>> m_Submeshes;		
 		Resources::ResourceModel* m_ParentModel = nullptr;
 	};
 }

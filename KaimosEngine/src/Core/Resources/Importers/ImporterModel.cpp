@@ -53,12 +53,17 @@ namespace Kaimos::Importers
 
 		if (root_mesh)
 		{
-			// -- Create Root Mesh & Process its Node --
+			// -- Create Root Mesh --
 			Ref<Resources::ResourceModel> model = CreateRef<Resources::ResourceModel>(new Resources::ResourceModel(fpath.string(), 0, root_mesh));
 			root_mesh->SetParentModel(model.get());
-			model->m_RootMesh->m_MaterialID = first_mesh->mMaterialIndex == 0 ? Renderer::GetDefaultMaterialID() : materials[first_mesh->mMaterialIndex - 1];
-			ProcessAssimpNode(scene, scene->mRootNode, model->m_RootMesh.get(), materials);
 
+			// -- Set Root Mesh Material --
+			uint mat_id = first_mesh->mMaterialIndex == 0 ? Renderer::GetDefaultMaterialID() : materials[first_mesh->mMaterialIndex - 1];
+			model->m_RootMesh->SetMaterial(mat_id);
+			
+			// -- Process Nodes From Root Mesh --
+			ProcessAssimpNode(scene, scene->mRootNode, model->m_RootMesh.get(), materials);
+			
 			// -- Return Model --
 			return model;
 		}
@@ -83,10 +88,12 @@ namespace Kaimos::Importers
 			{
 				aiMesh* ai_mesh = ai_scene->mMeshes[ai_node->mMeshes[i]];
 				node_meshes.push_back(ProcessAssimpMesh(ai_scene, ai_mesh));
+
+				// Set Material
 				if (ai_mesh->mMaterialIndex != 0)
-					node_meshes[i]->m_MaterialID = loaded_materials[ai_mesh->mMaterialIndex - 1]; // -1 Because we are not loading assimp's default material
+					node_meshes[i]->SetMaterial(loaded_materials[ai_mesh->mMaterialIndex - 1]);		// -1 Because we are not loading assimp's default material
 				else
-					node_meshes[i]->m_MaterialID = Renderer::GetDefaultMaterialID();
+					node_meshes[i]->SetMaterial(Renderer::GetDefaultMaterialID());
 			}
 		}
 
@@ -107,9 +114,7 @@ namespace Kaimos::Importers
 			return nullptr;
 
 		// -- Process Vertices --
-		std::vector<float> vertices_data;
 		std::vector<Vertex> mesh_vertices;
-
 		for (uint i = 0; i < ai_mesh->mNumVertices; ++i)
 		{
 			// Positions & Normals
@@ -125,18 +130,12 @@ namespace Kaimos::Importers
 			if (ai_mesh->mTextureCoords[0])
 				texture_coords = { ai_mesh->mTextureCoords[0][i].x, ai_mesh->mTextureCoords[0][i].y };
 
-			// Insert Vertices Data
-			vertices_data.insert(vertices_data.end(), {	positions.x, positions.y, positions.z,
-														normals.x, normals.y, normals.z,
-														texture_coords.x, texture_coords.y,
-														1.0f, 1.0f, 1.0f, 1.0f,				// Color
-														0.0f, 0								// TexIndex & EntityID
-														});
-
+			// Set Vertices Data
 			Kaimos::Vertex vertex;
 			vertex.Pos = positions;
 			vertex.Normal = normals;
 			vertex.TexCoord = texture_coords;
+
 			mesh_vertices.push_back(vertex);
 
 			// Tangents & Bitangents
@@ -166,32 +165,18 @@ namespace Kaimos::Importers
 			}
 		}
 
-		// -- Create Buffers --
-		BufferLayout layout = {
-			{ SHADER_DATATYPE::FLOAT3,	"a_Position" },
-			{ SHADER_DATATYPE::FLOAT3,	"a_Normal" },
-			{ SHADER_DATATYPE::FLOAT2,	"a_TexCoord" },
-			{ SHADER_DATATYPE::FLOAT4,	"a_Color" },
-			{ SHADER_DATATYPE::FLOAT ,	"a_TexIndex" },
-			{ SHADER_DATATYPE::INT ,	"a_EntityID" }
-		};
-		
-		Ref<VertexBuffer> vbo = VertexBuffer::Create(vertices_data.data(), vertices_data.size() * sizeof(float));
-		Ref<IndexBuffer> ibo = IndexBuffer::Create(indices.data(), indices.size());
-		Ref<VertexArray> vao = VertexArray::Create();
 
-		vbo->SetLayout(layout);
-		vao->AddVertexBuffer(vbo);
-		vao->SetIndexBuffer(ibo);
-		vao->Unbind(); vbo->Unbind(); ibo->Unbind();
-
-		// -- Create & Return Mesh --
+		// -- Create Mesh --
 		std::string mesh_name = ai_mesh->mName.length > 0 ? ai_mesh->mName.C_Str() : "unnamed";
-		Ref<Mesh> mesh = CreateRef<Mesh>(vao, mesh_name);
+		Ref<Mesh> mesh = CreateRef<Mesh>(mesh_name);
 		Renderer::CreateMesh(mesh);
+
+		// -- Set Mesh Data --
 		mesh->SetMeshVertices(mesh_vertices);
 		mesh->SetMeshIndices(indices);
-		mesh->m_MaxIndex = max_index + 1;
+		mesh->SetMaxIndex(max_index + 1);
+
+		// -- Return Created Mesh --
 		return mesh;
 	}
 
