@@ -31,10 +31,6 @@ namespace Kaimos {
 		for (Ref<Material>& mat : s_SceneData->Materials)
 			mat.reset();
 
-		for (auto& mesh : s_SceneData->Meshes)
-			mesh.second.reset();
-
-		s_SceneData->Meshes.clear();
 		s_SceneData->Materials.clear();
 		s_SceneData.reset();
 	}
@@ -62,47 +58,6 @@ namespace Kaimos {
 		vertex_array->Bind();
 		RenderCommand::DrawIndexed(vertex_array);
 		//vertexArray->Unbind(); //TODO: ?
-	}
-
-
-
-	// ----------------------- Public Renderer Mesh Methods --------------------------------------------------
-	Ref<Mesh> Renderer::GetMesh(uint mesh_id)
-	{
-		if (CheckIfMeshExists(mesh_id))
-			return s_SceneData->Meshes[mesh_id];
-
-		return nullptr;
-	}
-
-	Ref<Mesh> Renderer::GetMeshFromIndex(uint index)
-	{
-		if (index < s_SceneData->Meshes.size())
-		{
-			uint i = 0;
-			for (auto& mesh : s_SceneData->Meshes)
-			{
-				if (i == index)
-					return mesh.second;
-			}
-		}
-
-		return nullptr;
-	}
-
-	void Renderer::CreateMesh(const Ref<Mesh>& mesh)
-	{
-		uint mesh_id = mesh->GetID();
-		if (s_SceneData->Meshes.find(mesh_id) == s_SceneData->Meshes.end())
-			s_SceneData->Meshes.insert({ mesh_id, mesh });
-	}
-
-	bool Renderer::CheckIfMeshExists(uint mesh_id)
-	{
-		if (s_SceneData->Meshes.find(mesh_id) != s_SceneData->Meshes.end())
-			return true;
-
-		return false;
 	}
 
 
@@ -213,7 +168,7 @@ namespace Kaimos {
 
 		if (!f.good())
 		{
-			KS_ENGINE_WARN("Error Loading Renderer, filepath invalid");
+			KS_ENGINE_WARN("Error Deserializing Renderer, invalid filepath");
 			return;
 		}
 
@@ -230,7 +185,7 @@ namespace Kaimos {
 			return;
 		}
 
-		// -- Scene Setup --
+		// -- Setup --
 		KS_ENGINE_TRACE("Deserializing KaimosRenderer");
 		YAML::Node materials_node = data["Materials"];
 		if (materials_node)

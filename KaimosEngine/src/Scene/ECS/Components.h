@@ -1,6 +1,7 @@
 #ifndef _COMPONENTS_H_
 #define _COMPONENTS_H_
 
+#include "Core/Resources/ResourceManager.h"
 #include "Renderer/Renderer.h"
 #include "Renderer/Resources/Material.h"
 #include "Renderer/Cameras/Camera.h"
@@ -78,7 +79,7 @@ namespace Kaimos {
 
 		inline void SetMesh(uint mesh_id)
 		{
-			if (mesh_id == MeshID || !Renderer::CheckIfMeshExists(mesh_id))
+			if (mesh_id == MeshID || !Resources::ResourceManager::MeshExists(mesh_id))
 				return;
 
 			MeshID = mesh_id;

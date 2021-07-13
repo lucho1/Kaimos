@@ -1,6 +1,7 @@
 #include "kspch.h"
 #include "ImporterModel.h"
 
+#include "Core/Resources/ResourceManager.h"
 #include "Core/Resources/ResourceModel.h"
 #include "Renderer/Renderer.h"
 #include "Renderer/Renderer3D.h"
@@ -59,10 +60,10 @@ namespace Kaimos::Importers
 
 			// -- Set Root Mesh Material --
 			uint mat_id = first_mesh->mMaterialIndex == 0 ? Renderer::GetDefaultMaterialID() : materials[first_mesh->mMaterialIndex - 1];
-			model->m_RootMesh->SetMaterial(mat_id);
+			root_mesh->SetMaterial(mat_id);
 			
 			// -- Process Nodes From Root Mesh --
-			ProcessAssimpNode(scene, scene->mRootNode, model->m_RootMesh.get(), materials);
+			ProcessAssimpNode(scene, scene->mRootNode, root_mesh.get(), materials);
 			
 			// -- Return Model --
 			return model;
@@ -165,11 +166,20 @@ namespace Kaimos::Importers
 			}
 		}
 
-
 		// -- Create Mesh --
-		std::string mesh_name = ai_mesh->mName.length > 0 ? ai_mesh->mName.C_Str() : "unnamed";
-		Ref<Mesh> mesh = CreateRef<Mesh>(mesh_name);
-		Renderer::CreateMesh(mesh);
+		Ref<Mesh> mesh = nullptr;
+		//if (!deserializing_mesh)
+		//{
+			std::string mesh_name = ai_mesh->mName.length > 0 ? ai_mesh->mName.C_Str() : "unnamed";
+			mesh = CreateRef<Mesh>(mesh_name);
+			Kaimos::Resources::ResourceManager::AddMesh(mesh);
+		//}
+		//else
+		//{
+		//	KS_ENGINE_ASSERT((mesh_id == 0), "Tried to Deserialize a mesh with ID = 0");
+		//	mesh = Renderer::GetMesh(mesh_id);
+		//	KS_ENGINE_ASSERT((mesh == nullptr), "Tried to Deserialize a null mesh!");
+		//}
 
 		// -- Set Mesh Data --
 		mesh->SetMeshVertices(mesh_vertices);

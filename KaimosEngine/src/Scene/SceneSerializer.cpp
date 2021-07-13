@@ -1,6 +1,7 @@
 #include "kspch.h"
 #include "SceneSerializer.h"
 
+#include "Core/Resources/ResourceManager.h"
 #include "Renderer/Renderer.h"
 
 #include "ECS/Entity.h"
@@ -102,6 +103,7 @@ namespace Kaimos {
 	void SceneSerializer::Serialize(const std::string& filepath) const
 	{
 		KS_PROFILE_FUNCTION();
+		//Resources::ResourceManager::SerializeResources();
 		Renderer::SerializeRenderer();
 		
 		YAML::Emitter output;
@@ -132,6 +134,7 @@ namespace Kaimos {
 	bool SceneSerializer::Deserialize(const std::string& filepath) const
 	{
 		KS_PROFILE_FUNCTION();
+		//Resources::ResourceManager::DeserializeResources();
 		Renderer::DeserializeRenderer();
 
 		// -- File Load --
@@ -231,7 +234,7 @@ namespace Kaimos {
 				{
 					uint mat_node = mesh_node["Material"].as<uint>();
 					uint mesh_id_node = mesh_node["Mesh"].as<uint>();
-					if (!Renderer::CheckIfMeshExists(mesh_id_node))
+					if (!Resources::ResourceManager::MeshExists(mesh_id_node))
 						mesh_id_node = 0;
 
 					uint mat_id = Renderer::GetMaterialIfExists(mat_node);

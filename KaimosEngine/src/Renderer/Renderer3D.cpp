@@ -1,6 +1,8 @@
 #include "kspch.h"
 #include "Renderer3D.h"
 
+#include "Core/Resources/ResourceManager.h"
+
 #include "Foundations/RenderCommand.h"
 #include "Resources/Buffer.h"
 #include "Resources/Shader.h"
@@ -202,7 +204,7 @@ namespace Kaimos {
 	void Renderer3D::DrawMesh(const glm::mat4& transform, const MeshRendererComponent& mesh_component, int entity_id)
 	{
 		// -- Get Mesh --
-		Ref<Mesh> mesh = Renderer::GetMesh(mesh_component.MeshID);
+		Ref<Mesh> mesh = Resources::ResourceManager::GetMesh(mesh_component.MeshID);
 		if (mesh)
 		{
 			// -- Get Material --

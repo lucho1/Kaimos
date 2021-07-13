@@ -1,6 +1,7 @@
 #include "ScenePanel.h"
 
 #include "Core/Utils/PlatformUtils.h"
+#include "Core/Resources/ResourceManager.h"
 #include "ImGui/ImGuiUtils.h"
 
 #include "Renderer/Resources/Mesh.h"
@@ -439,7 +440,7 @@ namespace Kaimos {
 				if (open)
 				{
 					// Mesh
-					Ref<Mesh> mesh = Renderer::GetMesh(component.MeshID);
+					Ref<Mesh> mesh = Resources::ResourceManager::GetMesh(component.MeshID);
 					if (!mesh)
 					{
 						ImGui::TreePop();
@@ -447,7 +448,7 @@ namespace Kaimos {
 					}
 
 					// Meshes Dropdown
-					const std::unordered_map<uint, Ref<Mesh>> meshes = Renderer::GetMeshesMap();
+					const std::unordered_map<uint, Ref<Mesh>> meshes = Resources::ResourceManager::GetMeshesMap();
 
 					uint current_mesh_index = 0;
 					std::string current_mesh_name = mesh->GetName();
@@ -466,7 +467,7 @@ namespace Kaimos {
 					if (KaimosUI::UIFunctionalities::DrawDropDown("Mesh", meshes_names, meshes_names.size(), current_mesh_name, current_mesh_index, 135.5f, 1.45f))
 					{
 						// Set Mesh
-						Ref<Mesh> selected_mesh = Renderer::GetMeshFromIndex(current_mesh_index);
+						Ref<Mesh> selected_mesh = Resources::ResourceManager::GetMeshFromIndex(current_mesh_index);
 						if (selected_mesh)
 						{
 							component.SetMesh(selected_mesh->GetID());

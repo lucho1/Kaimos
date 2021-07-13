@@ -37,6 +37,7 @@ namespace Kaimos::Resources {
 		{
 			m_ID = (id == 0 ? (uint)Kaimos::Random::GetRandomInt() : id);
 
+			// -- Check if it's within project folders --
 			size_t assets_pos = filepath.find("assets");
 			if (assets_pos != std::string::npos)
 				m_Filepath = filepath.substr(assets_pos, filepath.size());
@@ -45,20 +46,26 @@ namespace Kaimos::Resources {
 				KS_ENGINE_ERROR("Loading an out-of-project Resource!");
 			}
 
-			std::filesystem::path path = m_AbsolutFilepath = filepath;
+			// -- Set Paths --
+			std::filesystem::path path = filepath;
 			if (std::filesystem::exists(path))
 			{
 				if (path.has_filename())
 					m_Filename = path.filename().string();
+
+				if (path.has_stem())
+					m_Name = path.stem().string();
+
+				if (path.is_absolute())
+					m_AbsolutFilepath = path.string();
+				else
+					m_AbsolutFilepath = std::filesystem::current_path().string() + path.string();
 
 				if (path.has_extension())
 				{
 					m_Extension = path.extension().string();
 					m_Format = GetFormatFromExtension(m_Extension);
 				}
-
-				if (path.has_stem())
-					m_Name = path.stem().string();
 			}
 			else
 			{

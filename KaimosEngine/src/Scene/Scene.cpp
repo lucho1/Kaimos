@@ -160,13 +160,13 @@ namespace Kaimos {
 
 	void Scene::ConvertModelIntoEntities(const Ref<Resources::ResourceModel>& model)
 	{
-		if (model && Resources::ResourceManager::CheckIfModelExists(model->GetID()))
-			ConvertMeshIntoEntities(model->GetMesh());
+		if (model && Resources::ResourceManager::ModelExists(model->GetID()))
+			ConvertMeshIntoEntities(model->GetRootMesh());
 	}
 
 	void Scene::ConvertMeshIntoEntities(const Ref<Mesh>& mesh)
 	{
-		if (!mesh || !Renderer::CheckIfMeshExists(mesh->GetID()))
+		if (!mesh || !Resources::ResourceManager::MeshExists(mesh->GetID()))
 			return;
 
 		MeshRendererComponent& mesh_comp = CreateEntity(mesh->GetName()).AddComponent<MeshRendererComponent>();
