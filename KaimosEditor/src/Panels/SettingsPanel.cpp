@@ -15,11 +15,10 @@ namespace Kaimos {
 			ImGui::Begin("World Settings", &closing_settings);
 
 			// Show Hovered Entity
-			std::string entity_name = "None";
-			if (hovered_entity)
-				entity_name = hovered_entity.GetComponent<TagComponent>().Tag;
-
-			ImGui::Text("Hovered Entity: %s", entity_name.c_str());
+			//std::string entity_name = "None";
+			//if (hovered_entity)
+			//	entity_name = hovered_entity.GetComponent<TagComponent>().Tag;
+			//ImGui::Text("Hovered Entity: %s", entity_name.c_str());
 
 			// Camera Display Options
 			ImGui::NewLine(); ImGui::Separator();
