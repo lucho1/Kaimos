@@ -46,9 +46,11 @@ namespace Kaimos::Resources {
 	// ----------------------- Public Resources Methods ---------------------------------------------------
 	Ref<ResourceModel> ResourceManager::CreateModel(const std::string& filepath)
 	{
-		if (filepath.find("assets") != std::string::npos)
+		size_t rel_pos = filepath.find("assets");
+		if (rel_pos != std::string::npos)
 		{
-			auto& it = m_ModelResources.find(filepath);
+			const std::string relative_path = filepath.substr(rel_pos, filepath.size());
+			auto& it = m_ModelResources.find(relative_path);
 			if(it != m_ModelResources.end())
 				return (*it).second;
 		
@@ -61,7 +63,7 @@ namespace Kaimos::Resources {
 		}
 		else
 		{
-			KS_ENGINE_ERROR("Filepath is not within project folders");
+			KS_ENGINE_ERROR("Error Creating model: Filepath not within project folders\nFilepath: {0}", filepath.c_str());
 		}
 
 		return nullptr;
@@ -215,12 +217,14 @@ namespace Kaimos::Resources {
 					uint model_id = model_subnode["Model"].as<uint>();
 					const std::string model_path = model_subnode["Path"].as<std::string>();
 
-					if (model_subnode["RootMesh"])
+					if (m_ModelResources.find(model_path) == m_ModelResources.end())
 					{
-						DeserializeMesh(model_subnode["RootMesh"]);
+						if (model_subnode["RootMesh"])
+						{
+							Ref<Mesh> root_mesh = DeserializeMesh(model_subnode["RootMesh"]);
+							DeserializeModel(model_path, model_id, root_mesh);
+						}
 					}
-
-					//CreateModel(model_path, model_id);
 				}
 			}
 		}
@@ -251,26 +255,46 @@ namespace Kaimos::Resources {
 		output_emitter << YAML::EndMap;
 	}
 
-	void ResourceManager::DeserializeMesh(YAML::Node& yaml_node)
+
+	const Ref<Mesh> ResourceManager::DeserializeMesh(YAML::Node& yaml_node)
 	{
+		// -- Get Mesh Data --
 		uint mesh_id = yaml_node["Mesh"].as<uint>();
 		uint mat_id = yaml_node["Material"].as<uint>();
-		std::string mesh_name = yaml_node["Name"].as<std::string>();
-
-		// -- Create Mesh & Set Material --
-		Ref<Mesh> mesh = CreateRef<Mesh>(mesh_name, mesh_id);
 
 		uint mesh_material = Renderer::GetMaterialIfExists(mat_id);
 		if (mesh_material == 0)
 			mesh_material = Renderer::GetDefaultMaterialID();
 
-		mesh->SetMaterial(mesh_material);
-
 		// -- Add Mesh to Resources --
+		std::string mesh_name = yaml_node["Name"] ? yaml_node["Name"].as<std::string>() : "MESH_NONAME_ONLOAD";
+		Ref<Mesh> mesh = CreateRef<Mesh>(mesh_name, mesh_id, mesh_material);
 		AddMesh(mesh);
 
 		// -- Deserialize Submeshes --
 		for (auto submesh_node : yaml_node["Submeshes"])
-			DeserializeMesh(submesh_node);
+			mesh->AddSubmesh(DeserializeMesh(submesh_node));
+
+		// -- Return Root Mesh --
+		return mesh;
+	}
+
+
+	void ResourceManager::DeserializeModel(const std::string& model_path, uint model_id, Ref<Mesh>& root_mesh)
+	{
+		if (model_path.find("assets") != std::string::npos)
+		{
+			Ref<ResourceModel> model = Kaimos::Importers::ImporterModel::LoadDeserializedModel(model_path, model_id, root_mesh);
+			if (model)
+				m_ModelResources.insert({ model->GetFilepath(), model });
+			else
+			{
+				KS_ENGINE_ERROR("Error Deserializing model: Couldn't Import Model");
+			}
+		}
+		else
+		{
+			KS_ENGINE_ERROR("Error Deserializing model: Filepath not within project folders\nFilepath: {0}", model_path.c_str());
+		}
 	}
 }

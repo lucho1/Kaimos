@@ -36,7 +36,8 @@ namespace Kaimos::Resources {
 
 		// --- Public Resources Serialization Methods ---
 		static void SerializeMesh(const Ref<Mesh>& mesh, YAML::Emitter& output_emitter);
-		static void DeserializeMesh(YAML::Node& yaml_node);
+		static const Ref<Mesh> DeserializeMesh(YAML::Node& yaml_node);
+		static void DeserializeModel(const std::string& model_path, uint model_id, Ref<Mesh>& root_mesh);
 
 	private:
 

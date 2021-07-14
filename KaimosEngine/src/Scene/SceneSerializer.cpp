@@ -103,7 +103,7 @@ namespace Kaimos {
 	void SceneSerializer::Serialize(const std::string& filepath) const
 	{
 		KS_PROFILE_FUNCTION();
-		//Resources::ResourceManager::SerializeResources();
+		Resources::ResourceManager::SerializeResources();
 		Renderer::SerializeRenderer();
 		
 		YAML::Emitter output;
@@ -134,7 +134,7 @@ namespace Kaimos {
 	bool SceneSerializer::Deserialize(const std::string& filepath) const
 	{
 		KS_PROFILE_FUNCTION();
-		//Resources::ResourceManager::DeserializeResources();
+		Resources::ResourceManager::DeserializeResources();
 		Renderer::DeserializeRenderer();
 
 		// -- File Load --

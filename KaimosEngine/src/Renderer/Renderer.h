@@ -30,6 +30,7 @@ namespace Kaimos {
 		static uint GetMaterialIfExists(uint material_id);
 		static uint GetMaterialsQuantity();
 		static Ref<Material> GetMaterialFromIndex(uint index);
+		static uint GetMaterialIDFromName(const std::string& name);
 
 		// --- Public Renderer Serialization Methods ---
 		static void SerializeRenderer();

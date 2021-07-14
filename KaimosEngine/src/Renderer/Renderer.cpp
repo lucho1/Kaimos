@@ -108,12 +108,22 @@ namespace Kaimos {
 		return 0;
 	}
 
-	Kaimos::Ref<Kaimos::Material> Renderer::GetMaterialFromIndex(uint index)
+	Ref<Material> Renderer::GetMaterialFromIndex(uint index)
 	{
 		if (s_SceneData && index < s_SceneData->Materials.size())
 			return s_SceneData->Materials[index];
 
 		return nullptr;
+	}
+
+
+	uint Renderer::GetMaterialIDFromName(const std::string& name)
+	{
+		for (Ref<Material>& mat : s_SceneData->Materials)
+			if (mat->GetName() == name)
+				return mat->GetID();
+
+		return 0;
 	}
 
 	uint Renderer::GetMaterialsQuantity()
