@@ -18,6 +18,7 @@ namespace Kaimos {
 	void Renderer::Init()
 	{
 		KS_PROFILE_FUNCTION();
+		KS_ENGINE_INFO("\n\n--- INITIALIZING KAIMOS RENDERER ---");
 		RenderCommand::Init();
 		Renderer2D::Init();
 		Renderer3D::Init();
@@ -25,6 +26,7 @@ namespace Kaimos {
 
 	void Renderer::Shutdown()
 	{
+		KS_ENGINE_INFO("\n\n--- SHUTTING DOWN KAIMOS RENDERER ---");
 		Renderer2D::Shutdown();
 		Renderer3D::Shutdown();
 
@@ -140,6 +142,7 @@ namespace Kaimos {
 	void Renderer::SerializeRenderer()
 	{
 		KS_PROFILE_FUNCTION();
+		KS_ENGINE_TRACE("Serializing Kaimos Renderer");
 
 		// -- Begin Renderer Map --
 		YAML::Emitter output;
@@ -170,6 +173,9 @@ namespace Kaimos {
 
 	void Renderer::DeserializeRenderer()
 	{
+		KS_PROFILE_FUNCTION();
+		KS_ENGINE_TRACE("Deserializing Kaimos Renderer");
+
 		// -- File Load --
 		YAML::Node data;
 

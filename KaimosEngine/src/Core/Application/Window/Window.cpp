@@ -9,6 +9,7 @@ namespace Kaimos {
 
 	ScopePtr<Window> Window::Create(const WindowProps& props)
 	{
+		KS_ENGINE_INFO("\n\n--- CREATING APPLICATION WINDOW ---");
 		#ifdef KS_PLATFORM_WINDOWS
 			return CreateScopePtr<WindowsWindow>(props);
 		#else
