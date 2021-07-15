@@ -235,19 +235,19 @@ namespace Kaimos {
 	// ----------------------- Drawing Methods ------------------------------------------------------------
 	void Renderer2D::DrawSprite(const glm::mat4& transform, const SpriteRendererComponent& sprite_component, int entity_id)
 	{
-		// -- Get Texture index if Sprite has Texture --
-		Ref<Material> material = Renderer::GetMaterial(sprite_component.SpriteMaterialID);
-		if (!material)
-			KS_ENGINE_ASSERT(false, "Tried to Render a Sprite with a null Material!")
-
-		uint texture_index = GetTextureIndex(material->GetTexture());
-
 		// -- New Batch if Needed --
 		if (s_Data->QuadIndicesDrawCount >= s_Data->MaxIndices)
 			NextBatch();
 
+		// -- Get Texture index if Sprite has Texture --
+		Ref<Material> material = Renderer::GetMaterial(sprite_component.SpriteMaterialID);
+		if (!material)
+			KS_ENGINE_ASSERT(false, "Tried to Render a Sprite with a null Material!");
+
 		// -- Setup Vertex Array & Vertex Attributes --
+		uint texture_index = GetTextureIndex(material->GetTexture());
 		constexpr size_t quad_vertex_count = 4;
+
 		for (size_t i = 0; i < quad_vertex_count; ++i)
 		{
 			// Update the Nodes with vertex parameters on each vertex

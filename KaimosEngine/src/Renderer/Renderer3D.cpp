@@ -203,6 +203,10 @@ namespace Kaimos {
 	// ----------------------- Public Drawing Methods -----------------------------------------------------
 	void Renderer3D::DrawMesh(const glm::mat4& transform, const MeshRendererComponent& mesh_component, int entity_id)
 	{
+		// -- New Batch if Needed --
+		if (s_3DData->IndicesDrawCount >= s_3DData->MaxIndices)
+			NextBatch();
+
 		// -- Get Mesh --
 		Ref<Mesh> mesh = Resources::ResourceManager::GetMesh(mesh_component.MeshID);
 		if (mesh)
@@ -212,13 +216,8 @@ namespace Kaimos {
 			if (!material)
 				KS_ENGINE_ASSERT(false, "Tried to Render a Mesh with a null Material!");
 
-			uint texture_index = GetTextureIndex(material->GetTexture());
-
-			// -- New Batch if Needed --
-			if (s_3DData->IndicesDrawCount >= s_3DData->MaxIndices)
-				NextBatch();
-
 			// -- Setup Vertex Array & Vertex Attributes --
+			uint texture_index = GetTextureIndex(material->GetTexture());
 			for (uint i = 0; i < mesh->m_Vertices.size(); ++i)
 			{
 				// Update the Nodes with vertex parameters on each vertex
