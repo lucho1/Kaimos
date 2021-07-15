@@ -63,12 +63,12 @@ In terms of art (icons, images, ...), we have used the next resources, all with 
 
 ## ICONS
 Toolbar Icons
-   · 3D shape by mynamepong from the Noun Project
-   · 3D by pictohaven from the Noun Project
-   · 3D by mardjoe from the Noun Project
-   · Cursor by Johan Cato from the Noun Project
-   · Home by Michael Senkow from the Noun Project
-   · World by Lorenzo Baldini from the Noun Project
-   · Magnet by Ralf Schmitzer from the Noun Project
-   · Grid by Andrea Severgnini from the Noun Project
-   · Camera by Hakim Fadhlullah from the Noun Project
+  - 3D shape by mynamepong from the Noun Project
+  - 3D by pictohaven from the Noun Project
+  - 3D by mardjoe from the Noun Project
+  - Cursor by Johan Cato from the Noun Project
+  - Home by Michael Senkow from the Noun Project
+  - World by Lorenzo Baldini from the Noun Project
+  - Magnet by Ralf Schmitzer from the Noun Project
+  - Grid by Andrea Severgnini from the Noun Project
+  - Camera by Hakim Fadhlullah from the Noun Project
