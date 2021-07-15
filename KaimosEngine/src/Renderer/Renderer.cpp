@@ -202,7 +202,6 @@ namespace Kaimos {
 		}
 
 		// -- Setup --
-		KS_ENGINE_TRACE("Deserializing KaimosRenderer");
 		YAML::Node materials_node = data["Materials"];
 		if (materials_node)
 		{

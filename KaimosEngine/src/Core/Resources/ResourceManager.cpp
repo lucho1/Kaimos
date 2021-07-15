@@ -148,6 +148,7 @@ namespace Kaimos::Resources {
 	void ResourceManager::SerializeResources()
 	{
 		KS_PROFILE_FUNCTION();
+		KS_ENGINE_TRACE("Serializing Kaimos Resources");
 
 		// -- Begin Serialization Map --
 		YAML::Emitter output;
@@ -179,6 +180,9 @@ namespace Kaimos::Resources {
 
 	void ResourceManager::DeserializeResources()
 	{
+		KS_PROFILE_FUNCTION();
+		KS_ENGINE_TRACE("Deserializing Kaimos Resources");
+
 		// -- File Load --
 		YAML::Node data;
 
@@ -187,7 +191,7 @@ namespace Kaimos::Resources {
 
 		if (!f.good())
 		{
-			KS_ENGINE_WARN("Error Deserializing Resources, invalid filepath");
+			KS_ENGINE_WARN("Couldn't Deserialize Resources, invalid or inexisting filepath (if it's the first time, the file might not exist yet)");
 			return;
 		}
 
@@ -205,7 +209,6 @@ namespace Kaimos::Resources {
 		}
 
 		// -- Setup --
-		KS_ENGINE_TRACE("Deserializing Kaimos Resources");
 		YAML::Node models_node = data["Models"];
 
 		if (models_node)
