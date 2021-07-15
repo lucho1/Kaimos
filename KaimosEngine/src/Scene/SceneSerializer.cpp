@@ -134,8 +134,8 @@ namespace Kaimos {
 	bool SceneSerializer::Deserialize(const std::string& filepath) const
 	{
 		KS_PROFILE_FUNCTION();
-		Resources::ResourceManager::DeserializeResources();
 		Renderer::DeserializeRenderer();
+		Resources::ResourceManager::DeserializeResources();
 
 		// -- File Load --
 		YAML::Node data;

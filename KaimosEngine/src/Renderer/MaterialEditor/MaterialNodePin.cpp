@@ -239,7 +239,6 @@ namespace Kaimos::MaterialEditor {
 		: NodePin(owner, pin_data_type, name, id, value), m_AllowsMultipleTypes(allows_multi_type)
 	{
 		m_DefaultValue = CreateRef<float>(new float[4]{ default_value[0], default_value[1], default_value[2], default_value[3] });
-		ResetToDefault();
 	}
 
 
