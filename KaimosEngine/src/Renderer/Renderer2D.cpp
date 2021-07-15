@@ -63,6 +63,7 @@ namespace Kaimos {
 	void Renderer2D::Init()
 	{
 		KS_PROFILE_FUNCTION();
+		KS_ENGINE_TRACE("Initializing 2D Renderer");
 		s_Data = new Renderer2DData();
 
 		// -- Vertices Positions & TCoords Definition --
@@ -152,6 +153,7 @@ namespace Kaimos {
 	void Renderer2D::Shutdown()
 	{
 		KS_PROFILE_FUNCTION();
+		KS_ENGINE_TRACE("Shutting Down 2D Renderer");
 
 		// This is deleted here (manually), and not treated as smart pointer, waiting for the end of the program lifetime
 		// because there is still some code of the graphics (OpenGL) that it has to run to free VRAM (for ex. deleting VArrays, Shaders...)

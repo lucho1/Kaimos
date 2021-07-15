@@ -16,6 +16,7 @@ namespace Kaimos {
 	void OGLContext::Init()
 	{
 		KS_PROFILE_FUNCTION();
+		KS_ENGINE_TRACE("Initializing Glad");
 
 		// -- Communicating to GLFW which is the Current Context --
 		glfwMakeContextCurrent(m_WindowHandle);
@@ -23,7 +24,6 @@ namespace Kaimos {
 		// -- Glad Initialization --
 		int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 		KS_ENGINE_ASSERT(status, "Couldn't Initialize Glad!");
-		KS_ENGINE_TRACE("OpenGL Renderer Info: {0} {1} {2}", glGetString(GL_VENDOR), glGetString(GL_RENDERER), glGetString(GL_VERSION));
 
 		int v_maj, v_min;
 		glGetIntegerv(GL_MAJOR_VERSION, &v_maj);
