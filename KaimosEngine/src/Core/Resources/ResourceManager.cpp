@@ -20,9 +20,7 @@ namespace Kaimos::Resources {
 		for (auto& model : m_ModelResources)
 		{
 			if (model.second.use_count() > 1)
-			{
 				KS_ENGINE_WARN("Deleting a reference with +1 references loaded!");
-			}
 		
 			model.second.reset();
 		}
@@ -30,9 +28,7 @@ namespace Kaimos::Resources {
 		for (auto& mesh : m_MeshesResources)
 		{
 			if (mesh.second.use_count() > 1)
-			{
 				KS_ENGINE_WARN("Deleting a reference with +1 references loaded!");
-			}
 
 			mesh.second.reset();
 		}
@@ -62,9 +58,7 @@ namespace Kaimos::Resources {
 			}
 		}
 		else
-		{
-			KS_ENGINE_ERROR("Error Creating model: Filepath not within project folders\nFilepath: {0}", filepath.c_str());
-		}
+			KS_ERROR("Error Creating model: Cannot load an out-of-project resource, try moving it inside 'assets/' folder.\nCurrent Filepath: {0}", filepath);
 
 		return nullptr;
 	}
@@ -148,7 +142,7 @@ namespace Kaimos::Resources {
 	void ResourceManager::SerializeResources()
 	{
 		KS_PROFILE_FUNCTION();
-		KS_ENGINE_TRACE("Serializing Kaimos Resources");
+		KS_TRACE("Serializing Kaimos Resources");
 
 		// -- Begin Serialization Map --
 		YAML::Emitter output;
@@ -181,7 +175,7 @@ namespace Kaimos::Resources {
 	void ResourceManager::DeserializeResources()
 	{
 		KS_PROFILE_FUNCTION();
-		KS_ENGINE_TRACE("Deserializing Kaimos Resources");
+		KS_TRACE("Deserializing Kaimos Resources");
 
 		// -- File Load --
 		YAML::Node data;
@@ -191,20 +185,20 @@ namespace Kaimos::Resources {
 
 		if (!f.good())
 		{
-			KS_ENGINE_WARN("Couldn't Deserialize Resources, invalid or inexisting filepath (if it's the first time, the file might not exist yet)");
+			KS_WARN("Couldn't Deserialize Resources, invalid or non-existent filepath (if it's the first time, the file might not exist yet)");
 			return;
 		}
 
 		try { data = YAML::LoadFile(filename); }
 		catch (const YAML::ParserException& exception)
 		{
-			KS_ENGINE_ERROR("Error Deserializing Resources\nError: {0}", exception.what());
+			KS_ERROR("Error Deserializing Resources\nError: {0}", exception.what());
 			return;
 		}
 
 		if (!data["KaimosSaveFile"]) //TODO: This "KaimosSaveFile" should be something global... In general, serialization/deserialization should be carried by a resources mgr
 		{
-			KS_ENGINE_ERROR("Error Deserializing Resources\nError: Wrong File, it has no 'KaimosSaveFile' node");
+			KS_ERROR("Error Deserializing Resources\nError: Wrong File (no 'KaimosSaveFile' node within save file)");
 			return;
 		}
 
@@ -291,13 +285,9 @@ namespace Kaimos::Resources {
 			if (model)
 				m_ModelResources.insert({ model->GetFilepath(), model });
 			else
-			{
-				KS_ENGINE_ERROR("Error Deserializing model: Couldn't Import Model");
-			}
+				KS_ERROR("Error Deserializing model: Couldn't Import Model");
 		}
 		else
-		{
-			KS_ENGINE_ERROR("Error Deserializing model: Filepath not within project folders\nFilepath: {0}", model_path.c_str());
-		}
+			KS_ERROR("Error Deserializing model: Cannot load an out-of-project resource, try moving it inside 'assets/' folder.\nCurrent Filepath: {0}", model_path);
 	}
 }

@@ -214,7 +214,7 @@ namespace Kaimos {
 			// -- Get Material --
 			Ref<Material> material = Renderer::GetMaterial(mesh_component.MaterialID);
 			if (!material)
-				KS_ENGINE_ASSERT(false, "Tried to Render a Mesh with a null Material!");
+				KS_FATAL_ERROR("Tried to Render a Mesh with a null Material!");
 
 			// -- Setup Vertex Array & Vertex Attributes --
 			uint texture_index = GetTextureIndex(material->GetTexture());

@@ -23,14 +23,14 @@ namespace Kaimos {
 
 		switch (msg_severity)
 		{
-			case GL_DEBUG_SEVERITY_HIGH:			KS_ENGINE_CRITICAL((error_message + " - High Sev. -" + msg).c_str());	return;
-			case GL_DEBUG_SEVERITY_MEDIUM:			KS_ENGINE_ERROR((error_message + " - Mid Sev. -" + msg).c_str());		return;
-			case GL_DEBUG_SEVERITY_LOW:				KS_ENGINE_WARN((error_message + " - Low Sev. -" + msg).c_str());		return;
-			case GL_DEBUG_SEVERITY_NOTIFICATION:	KS_ENGINE_TRACE((error_message + " - Notification -" + msg).c_str());	return;
+			case GL_DEBUG_SEVERITY_HIGH:			KS_CRITICAL(error_message + " - High Sev. -" + msg);	return;
+			case GL_DEBUG_SEVERITY_MEDIUM:			KS_ERROR(error_message + " - Mid Sev. -" + msg);		return;
+			case GL_DEBUG_SEVERITY_LOW:				KS_WARN(error_message + " - Low Sev. -" + msg);			return;
+			case GL_DEBUG_SEVERITY_NOTIFICATION:	KS_TRACE(error_message + " - Notification -" + msg);	return;
 		}
 
-		KS_ENGINE_CRITICAL((error_message + " - UNKNOWN SEVERITY -" + msg).c_str());
-		KS_ENGINE_ASSERT(false, "Error of Unknown Severity Level!");
+		KS_CRITICAL(error_message + " - UNKNOWN SEVERITY -" + msg);
+		KS_FATAL_ERROR("Error of Unknown Severity Level!");
 	}
 
 
@@ -39,17 +39,17 @@ namespace Kaimos {
 	void OGLRendererAPI::Init()
 	{
 		KS_PROFILE_FUNCTION();
-		KS_ENGINE_TRACE("Initializing OpenGL");
+		KS_TRACE("Initializing OpenGL");
 
 		#ifdef KS_DEBUG
-			KS_ENGINE_TRACE("Setting OpenGL Debug Environment");
+			KS_TRACE("Setting OpenGL Debug Environment");
 			glEnable(GL_DEBUG_OUTPUT);
 			glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 			glDebugMessageCallback(OpenGLMessageCallback, nullptr);
 			glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_NOTIFICATION, 0, NULL, GL_FALSE);
 		#endif
 
-		KS_ENGINE_TRACE("OpenGL Renderer Info: {0} {1} {2}", glGetString(GL_VENDOR), glGetString(GL_RENDERER), glGetString(GL_VERSION));
+		KS_TRACE("OpenGL Renderer Info: {0} {1} {2}", glGetString(GL_VENDOR), glGetString(GL_RENDERER), glGetString(GL_VERSION));
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

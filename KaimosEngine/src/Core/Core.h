@@ -32,14 +32,14 @@
 #if KS_DEBUG || KS_RELEASE
 	#define KS_ACTIVATE_PROFILE 1
 	#if defined(KS_PLATFORM_WINDOWS)
-		#define KS_DEBUGBREAK() DebugBreak();
+		#define KS_DEBUGBREAK() DebugBreak()
 	#elif defined(KS_PLATFORM_LINUX)
 		#include <signal.h>
 		#define KS_DEBUGBREAK() raise(SIGTRAP)
 	#else
 		#error "Kaimos does't support DEBUGBREAK for this platform!"
 	#endif
-#else
+#else // KS_DIST
 	#define KS_ACTIVATE_PROFILE 0
 	#define KS_DEBUGBREAK()
 #endif
@@ -48,13 +48,11 @@
 
 // --- ASSERTIONS ---
 #if KS_ENABLE_ASSERTS
-	#define KS_EDITOR_ASSERT(x, ...) { if(!(x)) { KS_EDITOR_CRITICAL("KAIMOS ASSERION: {0}", __VA_ARGS__); KS_DEBUGBREAK(); }} // Client/Editor Assert
-	#define KS_ENGINE_ASSERT(x, ...) { if(!(x)) { KS_ENGINE_CRITICAL("KAIMOS ASSERION: {0}", __VA_ARGS__); KS_DEBUGBREAK(); }} // Core/Engine Assert
-	#define KS_ERROR_AND_ASSERT(msg) { KS_ENGINE_ERROR(msg); KS_ENGINE_ASSERT(false, msg); }
+	#define KS_ENGINE_ASSERT(x, ...) { if(!(x)) { KS_CRITICAL("KAIMOS ASSERTION: "##__VA_ARGS__); KS_DEBUGBREAK(); }}
+	#define KS_FATAL_ERROR(...) { KS_CRITICAL("KAIMOS FATAL ERROR: "##__VA_ARGS__); KS_DEBUGBREAK(); }
 #else
-	#define KS_EDITOR_ASSERT(x, ...)
-	#define KS_ENGINE_ASSERT(x, ...)
-	#define KS_ERROR_AND_ASSERT(msg) { KS_ENGINE_ERROR(msg); }
+	#define KS_ENGINE_ASSERT(x, ...) {}
+	#define KS_FATAL_ERROR(...) { KS_CRITICAL("KAIMOS FATAL ERROR: "##__VA_ARGS__); }
 #endif
 
 

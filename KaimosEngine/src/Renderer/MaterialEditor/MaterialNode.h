@@ -110,8 +110,8 @@ namespace Kaimos::MaterialEditor {
 					return NodeUtils::GetDataFromType<T>(m_VertexPositionPin->CalculateInputValue().get(), PinDataType::VEC3);
 				case VertexParameterNodeType::NORMAL:
 					return NodeUtils::GetDataFromType<T>(m_VertexNormalPin->CalculateInputValue().get(), PinDataType::VEC3);
-				
-				default: { KS_ERROR_AND_ASSERT("Tried to retrieve an invalid Vertex Attribute Input from Main Node!"); }
+				default:
+					KS_FATAL_ERROR("Tried to retrieve an invalid Vertex Attribute Input from Main Node!");
 			}
 		}
 

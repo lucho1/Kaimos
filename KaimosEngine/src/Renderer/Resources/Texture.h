@@ -31,7 +31,7 @@ namespace Kaimos {
 	{
 	public:
 		// --- Public Texture2D Methods ---
-		static Ref<Texture2D> Create(const std::string& path);	//TODO/OJU: We might want to create textures from other things (colors, gradients...)
+		static Ref<Texture2D> Create(const std::string& filepath);	//TODO/OJU: We might want to create textures from other things (colors, gradients...)
 		static Ref<Texture2D> Create(uint width, uint height);
 	};
 }

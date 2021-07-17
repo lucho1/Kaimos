@@ -14,11 +14,11 @@ namespace Kaimos {
 
 		// --- Public Serialization Methods ---
 		void Serialize(const std::string& filepath) const;
-		void SerializeRuntime(const std::string& filepath)		const { KS_ENGINE_ASSERT(false, "Method Not Implemented"); }
+		void SerializeRuntime(const std::string& filepath)		const { KS_FATAL_ERROR("Method Not Implemented"); }
 
 		// --- Public Deserialization Methods ---
 		bool Deserialize(const std::string& filepath) const;
-		bool DeserializeRuntime(const std::string& filepath)	const { KS_ENGINE_ASSERT(false, "Method Not Implemented"); }
+		bool DeserializeRuntime(const std::string& filepath)	const { KS_FATAL_ERROR("Method Not Implemented"); }
 
 	private:
 		Ref<Scene> m_Scene;

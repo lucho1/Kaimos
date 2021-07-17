@@ -103,7 +103,7 @@ namespace Kaimos {
 	void SceneSerializer::Serialize(const std::string& filepath) const
 	{
 		KS_PROFILE_FUNCTION();
-		KS_ENGINE_INFO("\n\n--- SERIALIZING KAIMOS ENGINE ---");
+		KS_INFO("\n\n--- SERIALIZING KAIMOS ENGINE ---");
 		Resources::ResourceManager::SerializeResources();
 		Renderer::SerializeRenderer();
 		
@@ -135,7 +135,7 @@ namespace Kaimos {
 	bool SceneSerializer::Deserialize(const std::string& filepath) const
 	{
 		KS_PROFILE_FUNCTION();
-		KS_ENGINE_INFO("\n\n--- DESERIALIZING KAIMOS ENGINE ---");
+		KS_INFO("\n\n--- DESERIALIZING KAIMOS ENGINE ---");
 		Renderer::DeserializeRenderer();
 		Resources::ResourceManager::DeserializeResources();
 
@@ -144,28 +144,30 @@ namespace Kaimos {
 		try { data = YAML::LoadFile(filepath); }
 		catch (const YAML::ParserException& exception)
 		{
-			KS_ENGINE_ERROR("Error Loading '{0}' scene file\nError: {1}", filepath.c_str(), exception.what());
+			KS_ERROR("Error Loading '{0}' scene file\nError: {1}", filepath, exception.what());
 			return false;
 		}
 
 		if (!data["KaimosScene"])
 		{
-			KS_ENGINE_ERROR("Error Loading '{0}' scene file\nError: Wrong File, it has no 'KaimosScene' node", filepath.c_str());
+			KS_ERROR("Error Loading '{0}' scene file\nError: Wrong File, it has no 'KaimosScene' node", filepath);
 			return false;
 		}
 
 		// -- Scene Setup --
 		std::string scene_name = data["KaimosScene"].as<std::string>();
-		KS_ENGINE_TRACE("Deserializing scene '{0}'", scene_name);
+		KS_TRACE("Deserializing scene '{0}'", scene_name);
 		m_Scene->SetName(scene_name);
 		m_Scene->SetPath(filepath);
 
 		// -- Entities Load --
+		uint entities_deserialized = 0;
 		YAML::Node entities = data["Entities"];
 		if (entities)
 		{
 			for (auto entity : entities)
 			{
+				++entities_deserialized;
 				uint entity_id = entity["Entity"].as<uint>();
 				
 				std::string name;
@@ -173,7 +175,7 @@ namespace Kaimos {
 				if (tag_component)
 					name = tag_component["Tag"].as<std::string>();
 
-				KS_ENGINE_TRACE("Deserialized Entity '{0}' (ID: {1})", name.c_str(), entity_id);
+				KS_TRACE("Deserialized Entity '{0}' (ID: {1})", name, entity_id);
 				Entity deserialized_entity = m_Scene->CreateEntity(name, entity_id);
 
 				YAML::Node transform_node = entity["TransformComponent"];
@@ -256,6 +258,7 @@ namespace Kaimos {
 			}
 		}
 
+		KS_TRACE("Finished Deserializing {0} Entities", entities_deserialized);
 		return true;
 	}
 }

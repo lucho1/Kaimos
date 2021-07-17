@@ -50,7 +50,7 @@ namespace Kaimos::MaterialEditor {
 	{
 		if (vertexparam_type == VertexParameterNodeType::NONE)
 		{
-			KS_ERROR_AND_ASSERT("Tried to create an invalid Vertex Parameter Node");
+			KS_FATAL_ERROR("Tried to create an invalid Vertex Parameter Node");
 			return nullptr;
 		}
 
@@ -64,7 +64,7 @@ namespace Kaimos::MaterialEditor {
 	{
 		if (constant_type == ConstantNodeType::NONE)
 		{
-			KS_ERROR_AND_ASSERT("Tried to create an invalid Constant Node");
+			KS_FATAL_ERROR("Tried to create an invalid Constant Node");
 			return nullptr;
 		}
 
@@ -78,7 +78,7 @@ namespace Kaimos::MaterialEditor {
 	{
 		if (operation_type == OperationNodeType::NONE || operation_data_type == PinDataType::NONE)
 		{
-			KS_ERROR_AND_ASSERT("Tried to create an invalid Operation Node");
+			KS_FATAL_ERROR("Tried to create an invalid Operation Node");
 			return nullptr;
 		}
 

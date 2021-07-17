@@ -20,7 +20,7 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 			case PinDataType::VEC4:		return (size_t)16;		// 4 bytes * 4 values
 		}
 
-		KS_ERROR_AND_ASSERT("Tried to get the size of a non-supported data type (NodeUtils::GetDataSizeFromType())!");
+		KS_FATAL_ERROR("Tried to get the size of a non-supported data type (NodeUtils::GetDataSizeFromType())!");
 		return 0;
 	}
 
@@ -28,7 +28,7 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 	template<typename T>
 	T GetDataFromType(const float* ptr, PinDataType pin_data_type)
 	{
-		KS_ERROR_AND_ASSERT("Invalid Data Type passed to cast!");
+		KS_FATAL_ERROR("Invalid Data Type passed to cast!");
 		static_assert(false);
 	}
 
@@ -93,7 +93,7 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 			}
 		}
 
-		KS_ERROR_AND_ASSERT("Tried to perform a non-supported addition operation!");
+		KS_FATAL_ERROR("Tried to perform a non-supported addition operation!");
 		return nullptr;
 	}
 
@@ -135,7 +135,7 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 			}
 		}
 
-		KS_ERROR_AND_ASSERT("Tried to perform a non-supported multiply operation!");
+		KS_FATAL_ERROR("Tried to perform a non-supported multiply operation!");
 		return nullptr;
 	}
 
@@ -163,7 +163,7 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 			}
 		}
 
-		KS_ERROR_AND_ASSERT("Tried to perform a non-supported float-vec multiplication operation!");
+		KS_FATAL_ERROR("Tried to perform a non-supported float-vec multiplication operation!");
 		return nullptr;
 	}
 
@@ -179,7 +179,7 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 		else if (b_data_type == PinDataType::FLOAT)
 			return ProcessFloatAndVecMultiplication(b[0], a, a_data_type);
 
-		KS_ERROR_AND_ASSERT("Tried to perform a non-supported vec2 multiple-type multiplication operation!");
+		KS_FATAL_ERROR("Tried to perform a non-supported vec2 multiple-type multiplication operation!");
 		return nullptr;
 	}
 
@@ -195,7 +195,7 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 		else if (b_data_type == PinDataType::FLOAT)
 			return ProcessFloatAndVecMultiplication(b[0], a, a_data_type);
 
-		KS_ERROR_AND_ASSERT("Tried to perform a non-supported vec2 multiple-type multiplication operation!");
+		KS_FATAL_ERROR("Tried to perform a non-supported vec2 multiple-type multiplication operation!");
 		return nullptr;
 	}
 
@@ -211,7 +211,7 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 		else if (b_data_type == PinDataType::FLOAT)
 			return ProcessFloatAndVecMultiplication(b[0], a, a_data_type);
 
-		KS_ERROR_AND_ASSERT("Tried to perform a non-supported vec2 multiple-type multiplication operation!");
+		KS_FATAL_ERROR("Tried to perform a non-supported vec2 multiple-type multiplication operation!");
 		return nullptr;
 	}
 
@@ -252,6 +252,6 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 			}
 		}
 
-		KS_ERROR_AND_ASSERT("Tried to draw a non-supported PinType!");
+		KS_FATAL_ERROR("Tried to draw a non-supported PinType!");
 	}
 }

@@ -14,10 +14,10 @@ namespace Kaimos {
 		switch (Renderer::GetRendererAPI())
 		{
 			case RendererAPI::API::OPENGL:		return CreateRef<OGLShader>(filepath);
-			case RendererAPI::API::NONE:		KS_ENGINE_ASSERT(false, "RendererAPI is set to NONE (unsupported)!"); return nullptr;
+			case RendererAPI::API::NONE:		KS_FATAL_ERROR("RendererAPI is set to NONE (unsupported)!"); return nullptr;
 		}
 
-		KS_ENGINE_ASSERT(false, "RendererAPI is unknown, not selected, or failed!");
+		KS_FATAL_ERROR("RendererAPI is unknown, not selected, or failed!");
 		return nullptr;
 	}
 
@@ -27,10 +27,10 @@ namespace Kaimos {
 		switch (Renderer::GetRendererAPI())
 		{
 			case RendererAPI::API::OPENGL:		return CreateRef<OGLShader>(name, vertex_src, fragment_src);
-			case RendererAPI::API::NONE:		KS_ENGINE_ASSERT(false, "RendererAPI is set to NONE (unsupported)!"); return nullptr;
+			case RendererAPI::API::NONE:		KS_FATAL_ERROR("RendererAPI is set to NONE (unsupported)!"); return nullptr;
 		}
 
-		KS_ENGINE_ASSERT(false, "RendererAPI is unknown, not selected, or failed!");
+		KS_FATAL_ERROR("RendererAPI is unknown, not selected, or failed!");
 		return nullptr;
 	}
 

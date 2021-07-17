@@ -9,11 +9,11 @@ namespace Kaimos {
 
 	ScopePtr<Window> Window::Create(const WindowProps& props)
 	{
-		KS_ENGINE_INFO("\n\n--- CREATING APPLICATION WINDOW ---");
+		KS_INFO("\n\n--- CREATING APPLICATION WINDOW ---");
 		#ifdef KS_PLATFORM_WINDOWS
 			return CreateScopePtr<WindowsWindow>(props);
 		#else
-			HZ_CORE_ASSERT(false, "Unknown platform!");
+			KS_FATAL_ERROR("Error Creating Window: Unknown platform!");
 			return nullptr;
 		#endif
 	}

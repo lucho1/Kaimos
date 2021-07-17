@@ -15,18 +15,19 @@ namespace Kaimos {
 		if (shader_type == "FRAGMENT_SHADER" || shader_type == "PIXEL_SHADER")
 			return GL_FRAGMENT_SHADER;
 
-		KS_ENGINE_ASSERT(false, "Unknown Shader Type '{0}'", shader_type.c_str());
+		KS_FATAL_ERROR("Unknown Shader Type '{0}'", shader_type);
 		return 0;
 	}
 
 	static char* StringFromShaderType(const GLenum& shader_type)
 	{
-		if (shader_type == GL_VERTEX_SHADER)
-			return "Vertex";
-		if (shader_type == GL_FRAGMENT_SHADER)
-			return "Fragment/Pixel";
+		switch (shader_type)
+		{
+			case GL_VERTEX_SHADER:		return "Vertex";
+			case GL_FRAGMENT_SHADER:	return "Fragment/Pixel";
+		}
 
-		KS_ENGINE_ASSERT(false, "Unknown Shader Type '{0}'", shader_type);
+		KS_FATAL_ERROR("Unknown Shader Type '{0}'", shader_type);
 		return 0;
 	}
 
@@ -126,13 +127,11 @@ namespace Kaimos {
 				//file.close();							// Actually not needed, ifstream closes itself due to RAII
 				return ret;
 			}
-			else { // Sorry for this {, it's needed because of the next define call
-				KS_ENGINE_ERROR("Couldn't read Shader file at path '{0}'", filepath);
-			}
+			else
+				KS_ERROR("Couldn't read Shader file at path '{0}'", filepath);
 		}
-		else {
-			KS_ENGINE_ERROR("Couldn't open Shader file at path '{0}'", filepath);
-		}
+		else
+			KS_ERROR("Couldn't open Shader file at path '{0}'", filepath);
 
 		return ret;
 	}
@@ -163,7 +162,7 @@ namespace Kaimos {
 			KS_ENGINE_ASSERT(eol != std::string::npos, "Syntax Error");
 			if (eol == std::string::npos)
 			{
-				KS_ENGINE_ERROR("Shader Syntax Error - Shader End Of Line is null");
+				KS_ERROR("Shader Syntax Error - Shader End of Line is null");
 				return {};
 			}
 			
@@ -183,7 +182,7 @@ namespace Kaimos {
 			KS_ENGINE_ASSERT(gl_shader_type, "Invalid ShaderType specification or not supported");
 			if (gl_shader_type == 0)
 			{
-				KS_ENGINE_ERROR("Shader Syntax Error - Invalid Shader Type specification or not supported");
+				KS_ERROR("Shader Syntax Error - Invalid Shader Type specification or not supported");
 				return {};
 			}
 			
@@ -195,7 +194,7 @@ namespace Kaimos {
 			KS_ENGINE_ASSERT(next_line_pos != std::string::npos, "Syntax Error");
 			if (next_line_pos == std::string::npos)
 			{
-				KS_ENGINE_ERROR("Shader Syntax Error - The keyword #type (or the following lines), specificating the Shader Type, could not be found or was wrong");
+				KS_ERROR("Shader Syntax Error - The keyword #type (or the following lines), specificating the Shader Type, could not be found or was wrong");
 				return {};
 			}
 
@@ -264,8 +263,8 @@ namespace Kaimos {
 				glDeleteShader(shader);
 
 				// -- InfoLog to print error & assert --
-				KS_ENGINE_CRITICAL("{0} Shader Compilation Error: {1}", StringFromShaderType(type), info_log.data());
-				KS_ENGINE_ASSERT(false, "Shader Compilation Failure!");
+				KS_CRITICAL("{0} Shader Compilation Error: {1}", StringFromShaderType(type), info_log.data());
+				KS_FATAL_ERROR("Shader Compilation Failure!");
 				break;
 			}
 
@@ -298,8 +297,8 @@ namespace Kaimos {
 				glDeleteShader(id);
 
 			// -- Print error & assert --
-			KS_ENGINE_CRITICAL("Shader Linking Error: {0}", info_log.data());
-			KS_ENGINE_ASSERT(false, "Shader Program Link Failure!");
+			KS_CRITICAL("Shader Linking Error: {0}", info_log.data());
+			KS_FATAL_ERROR("Shader Program Link Failure!");
 			return;
 		}
 

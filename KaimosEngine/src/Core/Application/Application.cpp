@@ -122,10 +122,6 @@ namespace Kaimos {
 				m_ImGuiLayer->End();
 			}
 
-			// -- Input Test --
-			//auto [x, y] = Input::GetMousePos();
-			//KS_ENGINE_TRACE(" {0}, {1}", x, y);
-
 			// -- Window & Input Update --
 			{
 				KS_PROFILE_SCOPE("Window & Input Update");
@@ -145,7 +141,6 @@ namespace Kaimos {
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<WindowCloseEvent>(KS_BIND_EVENT_FN(Application::OnWindowClose)); // If there's a WindowCloseEvent (checked in Dispatch()), dispatcher will call OnWindowClose function (same than a Lambda)
 		dispatcher.Dispatch<WindowResizeEvent>(KS_BIND_EVENT_FN(Application::OnWindowResize));
-		//KS_ENGINE_TRACE("{0}", e);
 
 		// -- Layers Events Handling --
 		for (auto it = m_LayerStack.rbegin(); it != m_LayerStack.rend(); ++it)

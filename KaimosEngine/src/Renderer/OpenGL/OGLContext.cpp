@@ -16,7 +16,7 @@ namespace Kaimos {
 	void OGLContext::Init()
 	{
 		KS_PROFILE_FUNCTION();
-		KS_ENGINE_TRACE("Initializing Glad");
+		KS_TRACE("Initializing Glad");
 
 		// -- Communicating to GLFW which is the Current Context --
 		glfwMakeContextCurrent(m_WindowHandle);

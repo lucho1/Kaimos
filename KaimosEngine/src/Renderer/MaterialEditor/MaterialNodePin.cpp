@@ -122,7 +122,7 @@ namespace Kaimos::MaterialEditor {
 			}
 		}
 
-		KS_ERROR_AND_ASSERT("Tried to draw a non-supported PinType!");
+		KS_FATAL_ERROR("Tried to draw a non-supported PinType!");
 	}
 
 

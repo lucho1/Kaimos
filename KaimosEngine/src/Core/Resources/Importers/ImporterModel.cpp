@@ -54,13 +54,16 @@ namespace Kaimos::Importers
 
 			// -- Pick Material for Root Mesh --
 			uint mat_id = Renderer::GetDefaultMaterialID();
-			if (first_mesh->mMaterialIndex == 0)
+			if (materials.size() > 0)
 			{
-				if (materials[0] != mat_id)
-					mat_id = materials[0];
+				if (first_mesh->mMaterialIndex == 0)
+				{
+					if (materials[0] != mat_id)
+						mat_id = materials[0];
+				}
+				else
+					mat_id = materials[first_mesh->mMaterialIndex - 1];
 			}
-			else
-				mat_id = materials[first_mesh->mMaterialIndex - 1];
 			
 			// -- Set Root Mesh Material & Process Nodes From Root Mesh --
 			root_mesh->SetMaterial(mat_id);			
@@ -70,9 +73,7 @@ namespace Kaimos::Importers
 			return model;
 		}
 		else
-		{
-			KS_ENGINE_ERROR("Failed to load Root Mesh with AssimpLoader");
-		}
+			KS_ERROR("Failed to load Root Mesh with AssimpLoader");
 		
 		return nullptr;
 	}
@@ -257,7 +258,7 @@ namespace Kaimos::Importers
 
 		if (!std::filesystem::exists(fpath))
 		{
-			KS_ENGINE_WARN("Tried to load an unexisting file!");
+			KS_WARN("Tried to load an unexisting file!");
 			return false;
 		}
 
@@ -269,7 +270,7 @@ namespace Kaimos::Importers
 	{
 		if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode || scene->mNumMeshes == 0)
 		{
-			KS_ENGINE_WARN("Error importing model with AssimpLoader: {0}", importer.GetErrorString());
+			KS_WARN("Error importing model with AssimpLoader: {0}", importer.GetErrorString());
 			return false;
 		}
 

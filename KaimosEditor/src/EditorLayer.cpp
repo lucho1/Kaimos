@@ -537,7 +537,7 @@ namespace Kaimos {
 	bool EditorLayer::OnWindowDragAndDrop(WindowDragDropEvent& ev)
 	{
 		const std::vector<const char*>& paths = ev.GetPaths();
-		KS_ENGINE_TRACE(ev.ToString().c_str());
+		KS_TRACE(ev.ToString());
 
 		for (uint i = 0; i < paths.size(); ++i)
 		{

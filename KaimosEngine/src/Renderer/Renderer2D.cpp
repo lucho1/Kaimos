@@ -63,7 +63,7 @@ namespace Kaimos {
 	void Renderer2D::Init()
 	{
 		KS_PROFILE_FUNCTION();
-		KS_ENGINE_TRACE("Initializing 2D Renderer");
+		KS_TRACE("Initializing 2D Renderer");
 		s_Data = new Renderer2DData();
 
 		// -- Vertices Positions & TCoords Definition --
@@ -152,7 +152,7 @@ namespace Kaimos {
 	void Renderer2D::Shutdown()
 	{
 		KS_PROFILE_FUNCTION();
-		KS_ENGINE_TRACE("Shutting Down 2D Renderer");
+		KS_TRACE("Shutting Down 2D Renderer");
 
 		// This is deleted here (manually), and not treated as smart pointer, waiting for the end of the program lifetime
 		// because there is still some code of the graphics (OpenGL) that it has to run to free VRAM (for ex. deleting VArrays, Shaders...)
@@ -242,7 +242,7 @@ namespace Kaimos {
 		// -- Get Texture index if Sprite has Texture --
 		Ref<Material> material = Renderer::GetMaterial(sprite_component.SpriteMaterialID);
 		if (!material)
-			KS_ENGINE_ASSERT(false, "Tried to Render a Sprite with a null Material!");
+			KS_FATAL_ERROR("Tried to Render a Sprite with a null Material!");
 
 		// -- Setup Vertex Array & Vertex Attributes --
 		uint texture_index = GetTextureIndex(material->GetTexture());

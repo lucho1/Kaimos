@@ -34,7 +34,7 @@ namespace Kaimos {
 			m_TextureFilepath = filepath.substr(filepath.find("assets"), filepath.size());
 		}
 		else
-			KS_EDITOR_WARN("Couldn't Load Texture from '{0}'", filepath.c_str());
+			KS_EDITOR_WARN("Couldn't Load Texture from '{0}'", filepath);
 	}
 
 	void Material::RemoveTexture()

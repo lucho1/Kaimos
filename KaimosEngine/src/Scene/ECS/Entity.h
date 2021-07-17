@@ -55,7 +55,7 @@ namespace Kaimos {
 				return comp;
 			}
 			else
-				KS_ERROR_AND_ASSERT("Entity already has the Component to Add");
+				KS_FATAL_ERROR("Entity already has the Component to Add");
 		}
 
 		template<typename T>
@@ -64,7 +64,7 @@ namespace Kaimos {
 			if (HasComponent<T>())
 				return m_Scene->m_Registry.get<T>(m_EntityID);
 			else
-				KS_ERROR_AND_ASSERT("Entity does not has the Component to Get");
+				KS_FATAL_ERROR("Entity does not has the Component to Get");
 		}
 
 		template<typename T>
@@ -73,7 +73,7 @@ namespace Kaimos {
 			if (HasComponent<T>())
 				m_Scene->m_Registry.remove<T>(m_EntityID);
 			else
-				KS_ERROR_AND_ASSERT("Entity does not has the Component to Remove");
+				KS_FATAL_ERROR("Entity does not has the Component to Remove");
 		}
 	};
 }

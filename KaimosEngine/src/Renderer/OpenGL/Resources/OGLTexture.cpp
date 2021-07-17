@@ -27,8 +27,23 @@ namespace Kaimos {
 	}
 
 
-	OGLTexture2D::OGLTexture2D(const std::string& path) : m_Path(path)
+	OGLTexture2D::OGLTexture2D(const std::string& filepath) : m_Filepath(filepath)
 	{
+		// -- Check Paths --
+		// In this case we check "assets" for textures and "internal" for icons
+		if (filepath.find("assets") == std::string::npos && filepath.find("internal") == std::string::npos)
+		{
+			KS_ERROR("Cannot load an out-of-project texture! Try moving it inside 'assets/' folder.\nCurrent Filepath: {0}", filepath);
+			return;
+		}
+		
+		std::filesystem::path path = filepath;
+		if (!std::filesystem::exists(path))
+		{
+			KS_ERROR("Unexisting Path Loading Texture: {0}", filepath);
+			return;
+		}
+
 		// -- Texture Load --
 		KS_PROFILE_FUNCTION();
 		int w, h, channels;
@@ -36,15 +51,14 @@ namespace Kaimos {
 		stbi_uc* texture_data = nullptr;
 
 		{
-			KS_PROFILE_SCOPE("TEXTURE STBI LOAD - OGLTexture2D::OGLTexture2D(const std::string & path)");
-			texture_data = stbi_load(path.c_str(), &w, &h, &channels, 0);
+			KS_PROFILE_SCOPE("TEXTURE STBI LOAD - OGLTexture2D::OGLTexture2D(const std::string& path)");
+			texture_data = stbi_load(filepath.c_str(), &w, &h, &channels, 0);
 		}
 
 		// -- Check for Failure --
-		KS_ENGINE_ASSERT(texture_data, "Failed to load texture data from path: {0}", path.c_str());
-		if (texture_data == nullptr)
+		if (!texture_data)
 		{
-			KS_ENGINE_ERROR("Failed to load texture data from path: {0}", path.c_str());
+			KS_ERROR("Failed to load texture data from path: {0}", filepath);
 			return;
 		}
 

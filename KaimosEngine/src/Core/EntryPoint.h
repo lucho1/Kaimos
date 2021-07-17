@@ -53,14 +53,14 @@
 
 		// -- Initialization --
 		Kaimos::Log::Init();
-		KS_ENGINE_INFO("\n\n--- KAIMOS ENGINE STARTED ---");
-		KS_ENGINE_TRACE("Initialized Logger");
+		KS_INFO("\n\n--- KAIMOS ENGINE STARTED ---");
+		KS_TRACE("Initialized Logger");
 		
 
 		// -- Application Creation --
 		KS_PROFILE_BEGIN_SESSION(SESSION_NAME("Startup"), SESSION_FILENAME("Startup.json"));
 
-		KS_ENGINE_INFO("\n\n--- CREATING KAIMOS APPLICATION ---");
+		KS_INFO("\n\n--- CREATING KAIMOS APPLICATION ---");
 		Kaimos::Application* app = Kaimos::CreateApplication();
 		
 		KS_PROFILE_END_SESSION();
@@ -68,7 +68,7 @@
 		// -- Application Update --
 		KS_PROFILE_BEGIN_SESSION(SESSION_NAME("Runtime"), SESSION_FILENAME("Runtime.json"));
 
-		KS_ENGINE_INFO("\n\n--- RUNNING KAIMOS APPLICATION ---");
+		KS_INFO("\n\n--- RUNNING KAIMOS APPLICATION ---");
 		app->Run();
 
 		KS_PROFILE_END_SESSION();
@@ -76,7 +76,7 @@
 		// -- Application Shutdown --
 		KS_PROFILE_BEGIN_SESSION(SESSION_NAME("Shutdown"), SESSION_FILENAME("Shutdown.json"));
 
-		KS_ENGINE_INFO("\n\n--- TERMINATING KAIMOS APPLICATION ---");
+		KS_INFO("\n\n--- TERMINATING KAIMOS APPLICATION ---");
 		delete app;
 		
 		KS_PROFILE_END_SESSION();

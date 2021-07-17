@@ -12,7 +12,7 @@ namespace Kaimos {
 
 		// --- Public Class Methods ---
 		OGLTexture2D(uint width, uint height);
-		OGLTexture2D(const std::string& path);
+		OGLTexture2D(const std::string& filepath);
 		virtual ~OGLTexture2D();
 
 		// --- Public Texture Methods ---
@@ -29,7 +29,7 @@ namespace Kaimos {
 
 	private:
 
-		std::string m_Path = ""; // TODO: This is not 100% necessary, but OK for debugging... However shouldn't be here, there should be an "AssetManager" with a map storing [resource, path]
+		std::string m_Filepath = ""; // TODO: This is not 100% necessary, but OK for debugging... However shouldn't be here, there should be an "AssetManager" with a map storing [resource, path]
 		uint m_Height = 0, m_Width = 0;
 		uint m_ID = 0;
 

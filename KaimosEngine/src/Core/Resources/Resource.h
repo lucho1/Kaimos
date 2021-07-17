@@ -17,7 +17,7 @@ namespace Kaimos::Resources {
 			return RESOURCES_FORMATS::OBJ;
 		else
 		{
-			KS_ENGINE_WARN("Invalid Extension Passed! ({0})", extension.c_str());
+			KS_ERROR("Invalid Extension: '{0}'\nCurrent allowed extensions: OBJ, FBX", extension);
 			return RESOURCES_FORMATS::NONE;
 		}
 	}
@@ -42,9 +42,7 @@ namespace Kaimos::Resources {
 			if (assets_pos != std::string::npos)
 				m_Filepath = filepath.substr(assets_pos, filepath.size());
 			else
-			{
-				KS_ENGINE_ERROR("Loading an out-of-project Resource!");
-			}
+				KS_ERROR("Cannot load an out-of-project resource! Try moving it inside 'assets/' folder.\nCurrent Filepath: {0}", filepath);
 
 			// -- Set Paths --
 			std::filesystem::path path = filepath;
@@ -68,9 +66,7 @@ namespace Kaimos::Resources {
 				}
 			}
 			else
-			{
-				KS_ENGINE_ERROR("Unexisting Path Loading Resource: {0}", filepath.c_str());
-			}
+				KS_ERROR("Unexisting Path Loading Resource: {0}", filepath);
 		}
 
 		~Resource() = default;

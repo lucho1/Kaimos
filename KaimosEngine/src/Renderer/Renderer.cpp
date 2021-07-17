@@ -18,7 +18,7 @@ namespace Kaimos {
 	void Renderer::Init()
 	{
 		KS_PROFILE_FUNCTION();
-		KS_ENGINE_INFO("\n\n--- INITIALIZING KAIMOS RENDERER ---");
+		KS_INFO("\n\n--- INITIALIZING KAIMOS RENDERER ---");
 		RenderCommand::Init();
 		Renderer2D::Init();
 		Renderer3D::Init();
@@ -26,7 +26,7 @@ namespace Kaimos {
 
 	void Renderer::Shutdown()
 	{
-		KS_ENGINE_INFO("\n\n--- SHUTTING DOWN KAIMOS RENDERER ---");
+		KS_INFO("\n\n--- SHUTTING DOWN KAIMOS RENDERER ---");
 		Renderer2D::Shutdown();
 		Renderer3D::Shutdown();
 
@@ -142,7 +142,7 @@ namespace Kaimos {
 	void Renderer::SerializeRenderer()
 	{
 		KS_PROFILE_FUNCTION();
-		KS_ENGINE_TRACE("Serializing Kaimos Renderer");
+		KS_TRACE("Serializing Kaimos Renderer");
 
 		// -- Begin Renderer Map --
 		YAML::Emitter output;
@@ -174,7 +174,7 @@ namespace Kaimos {
 	void Renderer::DeserializeRenderer()
 	{
 		KS_PROFILE_FUNCTION();
-		KS_ENGINE_TRACE("Deserializing Kaimos Renderer");
+		KS_TRACE("Deserializing Kaimos Renderer");
 
 		// -- File Load --
 		YAML::Node data;
@@ -184,20 +184,20 @@ namespace Kaimos {
 
 		if (!f.good())
 		{
-			KS_ENGINE_WARN("Error Deserializing Renderer, invalid filepath");
+			KS_WARN("Couldn't Deserialize Renderer, invalid or non-existent filepath (if it's the first time, the file might not exist yet)");
 			return;
 		}
 
 		try { data = YAML::LoadFile(filename); }
 		catch (const YAML::ParserException& exception)
 		{
-			KS_ENGINE_ERROR("Error Loading Renderer\nError: {0}", exception.what());
+			KS_ERROR("Error Loading Renderer\nError: {0}", exception.what());
 			return;
 		}
 
 		if (!data["KaimosSaveFile"])
 		{
-			KS_ENGINE_ERROR("Error Loading Renderer\nError: Wrong File, it has no 'KaimosSaveFile' node");
+			KS_ERROR("Error Deserializing Renderer\nError: Wrong File (no 'KaimosSaveFile' node within save file)");
 			return;
 		}
 

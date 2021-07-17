@@ -107,7 +107,6 @@ namespace Kaimos {
 				component.EntityInstance->OnUpdate(dt);
 			});*/
 
-
 		// -- Render --
 		static bool primary_camera_warn = false;
 		if (m_PrimaryCamera)

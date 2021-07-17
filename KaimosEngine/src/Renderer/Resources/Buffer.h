@@ -26,7 +26,7 @@ namespace Kaimos {
 			case SHADER_DATATYPE::BOOL:		return 1;			// sizeof(bool)
 		}
 
-		KS_ENGINE_ASSERT(false, "Unknown ShaderDataType passed!");
+		KS_FATAL_ERROR("Unknown ShaderDataType passed!");
 		return 0;
 	}
 
@@ -67,7 +67,7 @@ namespace Kaimos {
 				case SHADER_DATATYPE::BOOL:		return 1;
 			}
 
-			KS_ENGINE_ASSERT(false, "The element has an unknown ShaderDataType!");
+			KS_FATAL_ERROR("The element has an unknown ShaderDataType!");
 			return 0;
 		}
 	};

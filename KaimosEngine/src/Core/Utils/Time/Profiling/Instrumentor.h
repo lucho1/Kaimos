@@ -66,11 +66,10 @@ namespace Kaimos {
 				// Subsequent profiling output meant for the original session will end up in the
 				// newly opened session instead.  That's better than having badly formatted
 				// profiling output.
+				
+				// EDGE CASE: BeginSession() might be before Log::Init()
 				if (Log::GetEngineLogger())
-				{
-					// Edge case: BeginSession() might be before Log::Init()
 					KS_ENGINE_ERROR("Instrumentor::BeginSession('{0}') when session '{1}' already open.", name, m_CurrentSession->Name);
-				}
 
 				InternalEndSession();
 			}
@@ -83,11 +82,9 @@ namespace Kaimos {
 			}
 			else
 			{
-				// Edge case: BeginSession() might be before Log::Init()
+				// EDGE CASE: BeginSession() might be before Log::Init()
 				if (Log::GetEngineLogger())
-				{
 					KS_ENGINE_ERROR("Instrumentor could not open results file '{0}'.", filepath);
-				}
 			}
 		}
 

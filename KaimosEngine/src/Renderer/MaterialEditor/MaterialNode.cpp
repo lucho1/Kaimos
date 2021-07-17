@@ -117,7 +117,7 @@ namespace Kaimos::MaterialEditor {
 		if (input_index < m_NodeInputPins.size())
 			return m_NodeInputPins[input_index]->CalculateInputValue();
 
-		KS_ERROR_AND_ASSERT("Tried to access an out-of-bounds input!");
+		KS_FATAL_ERROR("Tried to access an out-of-bounds input!");
 		return nullptr;
 	}
 
@@ -305,22 +305,20 @@ namespace Kaimos::MaterialEditor {
 				AddOutputPin(PinDataType::VEC2, "XY (Vec2)");
 				break;
 			}
-
 			case VertexParameterNodeType::POSITION:
 			{
 				m_Name = "VertexPos";
 				AddOutputPin(PinDataType::VEC3, "XYZ (Vec3)");
 				break;
 			}
-
 			case VertexParameterNodeType::NORMAL:
 			{
 				m_Name = "VertexNorm";
 				AddOutputPin(PinDataType::VEC3, "XYZ  (Vec3)");
 				break;
 			}
-
-			default: { KS_ERROR_AND_ASSERT("Attempted to create a non-supported Vertex parameter Node"); }
+			default:
+				KS_FATAL_ERROR("Attempted to create a non-supported Vertex parameter Node");
 		}
 	}
 
@@ -404,9 +402,8 @@ namespace Kaimos::MaterialEditor {
 				AddOutputPin(PinDataType::VEC4, "Value (Vec4)");
 				break;
 			}
-
-
-			default: { KS_ERROR_AND_ASSERT("Attempted to create a non-supported Constant Node"); }
+			default:
+				KS_FATAL_ERROR("Attempted to create a non-supported Constant Node");
 		}
 	}
 
@@ -448,8 +445,8 @@ namespace Kaimos::MaterialEditor {
 				ret[2] = GetInputValue(2).get()[0];
 				break;
 			}
-
-			default: { KS_ERROR_AND_ASSERT("Invalid Constant Node Type"); break; }
+			default:
+				KS_FATAL_ERROR("Invalid Constant Node Type");
 		}
 
 		m_NodeOutputPin->SetOutputValue(ret);
@@ -479,7 +476,7 @@ namespace Kaimos::MaterialEditor {
 			case OperationNodeType::FLOATVEC2_MULTIPLY:	{ m_Name = "Float-Vec2 Multiply Node"; multi_type_pin = true; op_datatype = PinDataType::FLOAT; break; }
 			case OperationNodeType::FLOATVEC3_MULTIPLY:	{ m_Name = "Float-Vec3 Multiply Node"; multi_type_pin = true; op_datatype = PinDataType::FLOAT; break; }
 			case OperationNodeType::FLOATVEC4_MULTIPLY:	{ m_Name = "Float-Vec4 Multiply Node"; multi_type_pin = true; op_datatype = PinDataType::FLOAT; break; }
-			default:									{ KS_ERROR_AND_ASSERT("Attempted to create a non-supported Operation Node"); }
+			default: KS_FATAL_ERROR("Attempted to create a non-supported Operation Node");
 		}
 
 		AddInputPin(op_datatype, multi_type_pin, "Value 1");
@@ -517,7 +514,7 @@ namespace Kaimos::MaterialEditor {
 			case OperationNodeType::FLOATVEC4_MULTIPLY:	return NodeUtils::MultiplyFloatAndVec4(a, b, a_data_type, b_data_type);
 		}
 
-		KS_ERROR_AND_ASSERT("Attempted to perform a non-supported operation in OperationNode!");
+		KS_FATAL_ERROR("Attempted to perform a non-supported operation in OperationNode!");
 		return nullptr;
 	}
 

@@ -478,8 +478,8 @@ namespace Kaimos {
 					// Mesh Info.
 					ImGui::Text("Mesh:\t\t\t\t\t  %s", mesh->GetName().c_str());
 					ImGui::Text("Mesh ID:\t\t\t\t %i", mesh->GetID());
-					ImGui::Text("Parent Mesh:\t\t%s", mesh->GetParentMeshName().c_str());
 					ImGui::Text("Parent Model:\t  %s", mesh->GetParentModelName().c_str());
+					ImGui::Text("Parent Mesh:\t\t%s", mesh->GetParentMeshName().c_str());
 
 					// Material
 					Ref<Material> material = Renderer::GetMaterial(component.MaterialID);

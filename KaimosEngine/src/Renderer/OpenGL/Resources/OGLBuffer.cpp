@@ -24,7 +24,7 @@ namespace Kaimos {
 			case SHADER_DATATYPE::BOOL:			return GL_BOOL;
 		}
 
-		KS_ENGINE_ASSERT(false, "ShaderDataType passed Unknown or Incorrect!");
+		KS_FATAL_ERROR("ShaderDataType passed Unknown or Incorrect!");
 		return (GLenum)0;
 	}
 
