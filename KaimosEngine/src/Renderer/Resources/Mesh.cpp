@@ -21,7 +21,7 @@ namespace Kaimos {
 
 
 	// ----------------------- Getters -------------------------------------------------------------------
-	const std::string& Mesh::GetParentMeshName()	const
+	const std::string Mesh::GetParentMeshName()	const
 	{
 		if (m_ParentMesh)
 			return m_ParentMesh->GetName();
@@ -29,7 +29,7 @@ namespace Kaimos {
 		return "None";
 	}
 
-	const std::string& Mesh::GetParentModelName()	const
+	const std::string Mesh::GetParentModelName() const
 	{
 		if (m_ParentModel)
 			return m_ParentModel->GetName();

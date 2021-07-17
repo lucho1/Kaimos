@@ -35,10 +35,10 @@ namespace Kaimos {
 		uint GetMaterialID()			const { return m_MaterialID; }
 		const std::string& GetName()	const { return m_Name; }
 
-		const std::string& GetParentMeshName()				const;
-		const std::string& GetParentModelName()				const;
-		const std::vector<Ref<Mesh>>& GetSubmeshes()		const { return m_Submeshes; }
-		const std::vector<Vertex>& GetVertices()			const { return m_Vertices; }
+		const std::string GetParentMeshName()			const;
+		const std::string GetParentModelName()			const;
+		const std::vector<Ref<Mesh>>& GetSubmeshes()	const { return m_Submeshes; }
+		const std::vector<Vertex>& GetVertices()		const { return m_Vertices; }
 
 		// --- Public Mesh Methods ---
 		void AddSubmesh(const Ref<Mesh>& mesh);

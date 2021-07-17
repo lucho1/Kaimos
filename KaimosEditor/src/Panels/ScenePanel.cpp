@@ -209,7 +209,6 @@ namespace Kaimos {
 
 			// -- Remove Component --
 			if (remove_component)
-
 				entity.RemoveComponent<T>();
 		}
 	}

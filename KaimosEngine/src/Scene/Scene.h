@@ -42,8 +42,8 @@ namespace Kaimos {
 		void SetPrimaryCamera(Entity new_camera_entity);
 		void UnsetPrimaryCamera();
 
-		const inline std::string GetName()				const { return m_Name; }
-		const inline std::string GetPath()				const { return m_Path; }
+		inline const std::string GetName()				const { return m_Name; }
+		inline const std::string GetPath()				const { return m_Path; }
 		inline void SetName(const std::string& name)	{ m_Name = name; }
 		inline void SetPath(const std::string& path)	{ m_Path = path; }
 
