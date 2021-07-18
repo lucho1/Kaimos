@@ -55,7 +55,10 @@ namespace Kaimos {
 				return comp;
 			}
 			else
+			{
 				KS_FATAL_ERROR("Entity already has the Component to Add");
+				return T();
+			}
 		}
 
 		template<typename T>
@@ -64,7 +67,10 @@ namespace Kaimos {
 			if (HasComponent<T>())
 				return m_Scene->m_Registry.get<T>(m_EntityID);
 			else
+			{
 				KS_FATAL_ERROR("Entity does not has the Component to Get");
+				return T();
+			}
 		}
 
 		template<typename T>
