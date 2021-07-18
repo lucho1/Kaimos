@@ -17,3 +17,5 @@ bin-int/
 *.log
 *.json
 *.psd
+*.kaimos
+*.kaimossave
