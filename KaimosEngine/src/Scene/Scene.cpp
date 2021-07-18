@@ -12,6 +12,7 @@
 #include "Core/Resources/Resource.h"
 #include "Core/Resources/ResourceModel.h"
 #include "Core/Utils/Maths/RandomGenerator.h"
+#include "Core/Utils/Time/Timer.h"
 
 #include <glm/glm.hpp>
 
@@ -74,14 +75,20 @@ namespace Kaimos {
 		}
 	}
 
+	static Timer rend_timer;
 	void Scene::OnUpdateEditor(Timestep dt, const Camera& camera)
 	{
 		KS_PROFILE_FUNCTION();
 
 		// -- Render Meshes --
+		rend_timer.Start();
 		Renderer3D::BeginScene(camera);
 		RenderMeshes();
 		Renderer3D::EndScene();
+
+		float ms = rend_timer.GetMilliseconds();
+		KS_TRACE("Rendering Lasted: {0} ms", ms);
+
 
 		// -- Render Sprites --
 		Renderer2D::BeginScene(camera);
@@ -194,6 +201,19 @@ namespace Kaimos {
 	void Scene::DestroyEntity(Entity entity)
 	{
 		m_Registry.destroy((entt::entity)entity.GetID());
+	}
+
+	void Scene::UpdateMeshComponentsVertices(uint material_id)
+	{
+		KS_PROFILE_FUNCTION();
+
+		auto mesh_view = m_Registry.view<MeshRendererComponent>();
+		for (auto ent : mesh_view)
+		{
+			MeshRendererComponent& mesh_comp = mesh_view.get<MeshRendererComponent>(ent);
+			if(mesh_comp.MaterialID == material_id)
+				mesh_comp.UpdateModifiedVertices();
+		}
 	}
 
 

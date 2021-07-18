@@ -2,6 +2,7 @@
 #include "ResourceManager.h"
 #include "ResourceModel.h"
 #include "Importers/ImporterModel.h"
+#include "Renderer/Renderer.h"
 
 #include <yaml-cpp/yaml.h>
 

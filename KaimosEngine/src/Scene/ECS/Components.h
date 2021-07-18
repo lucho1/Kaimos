@@ -3,12 +3,14 @@
 
 #include "Core/Resources/ResourceManager.h"
 #include "Renderer/Renderer.h"
-#include "Renderer/Resources/Material.h"
+#include "Renderer/Renderer3D.h"
 #include "Renderer/Cameras/Camera.h"
+#include "Renderer/Resources/Mesh.h"
 #include "ScriptableEntity.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/quaternion.hpp>
@@ -25,6 +27,8 @@ namespace Kaimos {
 		TagComponent(const TagComponent&) = default;
 		TagComponent(const std::string& tag) : Tag(tag) {}
 	};
+
+
 
 	struct TransformComponent
 	{
@@ -52,6 +56,8 @@ namespace Kaimos {
 		const glm::vec3 GetForwardVector()			const { return glm::rotate(glm::quat(Rotation), glm::vec3(0.0f, 0.0f, -1.0f)); }
 	};
 
+
+
 	struct SpriteRendererComponent
 	{
 		uint SpriteMaterialID = 0;
@@ -73,9 +79,38 @@ namespace Kaimos {
 		SpriteRendererComponent(const SpriteRendererComponent&)	= default;
 	};
 
+
+
 	struct MeshRendererComponent
 	{
 		uint MaterialID = 0, MeshID = 0;
+		std::vector<Vertex> ModifiedVertices;
+
+		void UpdateModifiedVertices()
+		{
+			// Get Mesh & Mat
+			Ref<Material> material = Renderer::GetMaterial(MaterialID);
+			Ref<Mesh> mesh = Resources::ResourceManager::GetMesh(MeshID);
+
+			if (!material || !mesh)
+			{
+				ModifiedVertices.clear();
+				return;
+			}
+
+			//ModifiedVertices.clear();
+			ModifiedVertices = mesh->GetVertices();
+			for (Vertex& vertex : ModifiedVertices)
+			{
+				material->UpdateVertexParameter(MaterialEditor::VertexParameterNodeType::POSITION, glm::value_ptr(vertex.Pos));
+				material->UpdateVertexParameter(MaterialEditor::VertexParameterNodeType::NORMAL, glm::value_ptr(vertex.Normal));
+				material->UpdateVertexParameter(MaterialEditor::VertexParameterNodeType::TEX_COORDS, glm::value_ptr(vertex.TexCoord));
+
+				vertex.Pos = material->GetVertexAttributeResult<glm::vec3>(MaterialEditor::VertexParameterNodeType::POSITION);
+				vertex.Normal = material->GetVertexAttributeResult<glm::vec3>(MaterialEditor::VertexParameterNodeType::NORMAL);
+				vertex.TexCoord = material->GetVertexAttributeResult<glm::vec2>(MaterialEditor::VertexParameterNodeType::TEX_COORDS);
+			}
+		}
 
 		inline void SetMesh(uint mesh_id)
 		{
@@ -83,11 +118,13 @@ namespace Kaimos {
 				return;
 
 			MeshID = mesh_id;
+			UpdateModifiedVertices();
 		}
 
 		inline void RemoveMesh()
 		{
 			MeshID = 0;
+			ModifiedVertices.clear();
 		}
 
 		inline void SetMaterial(uint material_id)
@@ -96,16 +133,20 @@ namespace Kaimos {
 				return;
 
 			MaterialID = material_id;
+			UpdateModifiedVertices();
 		}
 
 		inline void RemoveMaterial()
 		{
 			MaterialID = Renderer::GetDefaultMaterialID();
+			UpdateModifiedVertices();
 		}
 
 		MeshRendererComponent() = default;
 		MeshRendererComponent(const MeshRendererComponent&) = default;
 	};
+
+
 
 	struct CameraComponent
 	{
@@ -116,6 +157,8 @@ namespace Kaimos {
 		CameraComponent() = default;
 		CameraComponent(const CameraComponent&) = default;
 	};
+
+
 
 	struct NativeScriptComponent
 	{

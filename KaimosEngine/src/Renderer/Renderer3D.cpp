@@ -2,11 +2,11 @@
 #include "Renderer3D.h"
 
 #include "Core/Resources/ResourceManager.h"
-
 #include "Foundations/RenderCommand.h"
 #include "Resources/Buffer.h"
 #include "Resources/Shader.h"
 #include "Resources/Mesh.h"
+#include "Scene/ECS/Components.h"
 
 #include <glm/gtc/type_ptr.hpp>
 
@@ -208,8 +208,9 @@ namespace Kaimos {
 			NextBatch();
 
 		// -- Get Mesh --
+		// if mesh_comp.modverts.size != mesh ones
 		Ref<Mesh> mesh = Resources::ResourceManager::GetMesh(mesh_component.MeshID);
-		if (mesh)
+		if (mesh && mesh->GetVertices().size() == mesh_component.ModifiedVertices.size())
 		{
 			// -- Get Material --
 			Ref<Material> material = Renderer::GetMaterial(mesh_component.MaterialID);
@@ -220,16 +221,10 @@ namespace Kaimos {
 			uint texture_index = GetTextureIndex(material->GetTexture());
 			for (uint i = 0; i < mesh->m_Vertices.size(); ++i)
 			{
-				// Update the Nodes with vertex parameters on each vertex
-				material->UpdateVertexParameter(MaterialEditor::VertexParameterNodeType::POSITION, glm::value_ptr(mesh->m_Vertices[i].Pos));
-				material->UpdateVertexParameter(MaterialEditor::VertexParameterNodeType::NORMAL, glm::value_ptr(mesh->m_Vertices[i].Normal));
-				material->UpdateVertexParameter(MaterialEditor::VertexParameterNodeType::TEX_COORDS, glm::value_ptr(mesh->m_Vertices[i].TexCoord));
-			
-				// Get the vertex parameters in the main node once updated the nodes
-				glm::vec3 vpos = material->GetVertexAttributeResult<glm::vec3>(MaterialEditor::VertexParameterNodeType::POSITION);
-				glm::vec3 vnorm = material->GetVertexAttributeResult<glm::vec3>(MaterialEditor::VertexParameterNodeType::NORMAL);
-				glm::vec2 tcoords = material->GetVertexAttributeResult<glm::vec2>(MaterialEditor::VertexParameterNodeType::TEX_COORDS);
-			 
+				glm::vec3 vpos = mesh_component.ModifiedVertices[i].Pos;
+				glm::vec3 vnorm = mesh_component.ModifiedVertices[i].Normal;
+				glm::vec2 tcoords = mesh_component.ModifiedVertices[i].TexCoord;
+
 				// Set the vertex data
 				s_3DData->VBufferPtr->Pos = transform * glm::vec4(vpos, 1.0f);
 				s_3DData->VBufferPtr->Normal = vnorm;

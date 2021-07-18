@@ -13,9 +13,10 @@ namespace Kaimos {
 
 		// --- Public Class Methods ---
 		MaterialEditorPanel() = default;
+		MaterialEditorPanel(const Ref<Scene>& scene_context) : m_SceneContext(scene_context) {}
 		~MaterialEditorPanel() = default;
 
-		void OnUIRender();		
+		void OnUIRender();
 
 	public:
 
@@ -44,6 +45,7 @@ namespace Kaimos {
 
 		// --- Private Variables ---
 		MaterialEditor::MaterialGraph* m_CurrentGraph = nullptr;
+		Ref<Scene> m_SceneContext = nullptr;
 	};
 }
 

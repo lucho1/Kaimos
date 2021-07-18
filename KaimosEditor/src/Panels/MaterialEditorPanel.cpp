@@ -19,6 +19,9 @@ namespace Kaimos {
 			return;
 		}
 
+		if (ImGui::Button("Compile"))
+			m_SceneContext->UpdateMeshComponentsVertices(m_CurrentGraph->GetMaterialAttachedID());
+
 		// -- Begin Editor --
 		ImNodes::BeginNodeEditor();
 

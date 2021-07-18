@@ -2,13 +2,15 @@
 #define _RENDERER_3D_
 
 #include "Cameras/Camera.h"
-
 #include "Resources/Texture.h"
-#include "Scene/ECS/Components.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 
 namespace Kaimos {
+
+	struct TransformComponent;
+	struct CameraComponent;
+	struct MeshRendererComponent;
 
 	struct Vertex
 	{

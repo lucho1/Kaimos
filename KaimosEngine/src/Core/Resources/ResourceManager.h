@@ -3,6 +3,7 @@
 
 namespace YAML { class Emitter; class Node; }
 namespace Kaimos { class Mesh; }
+
 namespace Kaimos::Resources {
 
 	class ResourceModel;
