@@ -639,6 +639,10 @@ namespace Kaimos {
 
 	void EditorLayer::SaveScene()
 	{
+		// -- App Serialization --
+		Application::Get().Serialize();
+
+		// -- Scene Serialization --
 		m_KMEPanel.SerializeGraphs();
 		SceneSerializer m_Serializer(m_CurrentScene);
 
@@ -654,6 +658,10 @@ namespace Kaimos {
 
 	void EditorLayer::SaveSceneAs()
 	{
+		// -- App Serialization --
+		Application::Get().Serialize();
+
+		// -- Scene Serialization --
 		// "filter" arg is divided in 2 by the null-terminated string (\0). The 1st is the filter name to show and the 2nd is the actual filter to use
 		// So this will be shown in the filters tab as "Kaimos Scene (*.kaimos) and will filter all the .kaimos files
 		std::string filepath = FileDialogs::SaveFile("Kaimos Scene (*.kaimos)\0*.kaimos\0", m_CurrentScene->GetName().c_str());

@@ -1,4 +1,5 @@
 KaimosSaveFile: KaimosRenderer
+DefaultMaterialID: 1049825518
 Materials:
   - Material: 1049825518
     Name: DefaultMaterial

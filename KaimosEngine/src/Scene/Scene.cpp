@@ -40,7 +40,6 @@ namespace Kaimos {
 	Scene::Scene()
 	{
 		m_PrimaryCamera = {};
-		Renderer::CreateDefaultMaterial();
 	}
 
 	Scene::Scene(const std::string& name) : m_Name(name)

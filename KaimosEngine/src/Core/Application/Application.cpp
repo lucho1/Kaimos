@@ -4,9 +4,8 @@
 // Temporary Includes (DELETE THEM!)
 #include "Input/Input.h"
 #include "Renderer/Renderer.h"
+#include "Core/Resources/ResourceManager.h"
 #include <GLFW/glfw3.h>
-
-#include "Core/Utils/Maths/RandomGenerator.h"
 
 
 // ----------------------- Memory Usage ---------------------------------------------------------------
@@ -45,6 +44,8 @@ namespace Kaimos {
 		s_Instance = this;
 		
 		m_Window = Window::Create(WindowProps(name));
+
+		Deserialize();
 		Renderer::Init();
 
 		m_ImGuiLayer = new ImGuiLayer(); // It will be deleted with all the other layers in the ~LayerStack()
@@ -59,7 +60,25 @@ namespace Kaimos {
 	Application::~Application()
 	{
 		KS_PROFILE_FUNCTION();
+		Serialize();
 		Renderer::Shutdown();
+	}
+
+
+
+	// ----------------------- Public Application Methods -------------------------------------------------
+	void Application::Serialize()
+	{
+		KS_INFO("\n\n--- SERIALIZING KAIMOS ENGINE ---");
+		Renderer::SerializeRenderer();
+		Resources::ResourceManager::SerializeResources();
+	}
+
+	void Application::Deserialize()
+	{
+		KS_INFO("\n\n--- DESERIALIZING KAIMOS ENGINE ---");
+		Renderer::DeserializeRenderer();
+		Resources::ResourceManager::DeserializeResources();
 	}
 
 

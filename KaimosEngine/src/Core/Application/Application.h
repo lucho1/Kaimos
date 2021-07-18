@@ -54,7 +54,9 @@ namespace Kaimos {
 		virtual ~Application();
 
 		// --- Public Application Methods ---
-		void CloseApp()							  { m_Running = false; }
+		void CloseApp() { m_Running = false; }
+		void Serialize();
+		void Deserialize();
 
 		// --- Layer Methods ---
 		void PushLayer(Layer* layer);

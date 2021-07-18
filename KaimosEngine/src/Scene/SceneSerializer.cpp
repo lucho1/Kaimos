@@ -103,9 +103,7 @@ namespace Kaimos {
 	void SceneSerializer::Serialize(const std::string& filepath) const
 	{
 		KS_PROFILE_FUNCTION();
-		KS_INFO("\n\n--- SERIALIZING KAIMOS ENGINE ---");
-		Resources::ResourceManager::SerializeResources();
-		Renderer::SerializeRenderer();
+		KS_INFO("\n\n--- SERIALIZING KAIMOS SCENE ---");
 		
 		YAML::Emitter output;
 		output << YAML::BeginMap;
@@ -135,9 +133,7 @@ namespace Kaimos {
 	bool SceneSerializer::Deserialize(const std::string& filepath) const
 	{
 		KS_PROFILE_FUNCTION();
-		KS_INFO("\n\n--- DESERIALIZING KAIMOS ENGINE ---");
-		Renderer::DeserializeRenderer();
-		Resources::ResourceManager::DeserializeResources();
+		KS_INFO("\n\n--- DESERIALIZING KAIMOS SCENE ---");
 
 		// -- File Load --
 		YAML::Node data;

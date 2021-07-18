@@ -11,7 +11,7 @@
 
 namespace Kaimos {
 
-	ScopePtr<Renderer::SceneData> Renderer::s_SceneData = CreateScopePtr<Renderer::SceneData>();
+	ScopePtr<Renderer::RendererData> Renderer::s_RendererData = CreateScopePtr<Renderer::RendererData>();
 
 
 	// ----------------------- Public Class Methods -------------------------------------------------------
@@ -19,6 +19,8 @@ namespace Kaimos {
 	{
 		KS_PROFILE_FUNCTION();
 		KS_INFO("\n\n--- INITIALIZING KAIMOS RENDERER ---");
+
+		CreateDefaultMaterial(); // Make sure we create it (in case we didn't deserialized)
 		RenderCommand::Init();
 		Renderer2D::Init();
 		Renderer3D::Init();
@@ -30,11 +32,11 @@ namespace Kaimos {
 		Renderer2D::Shutdown();
 		Renderer3D::Shutdown();
 
-		for (Ref<Material>& mat : s_SceneData->Materials)
-			mat.reset();
+		for (auto& mat : s_RendererData->Materials)
+			mat.second.reset();
 
-		s_SceneData->Materials.clear();
-		s_SceneData.reset();
+		s_RendererData->Materials.clear();
+		s_RendererData.reset();
 	}
 
 
@@ -43,7 +45,7 @@ namespace Kaimos {
 	// Takes all scene parameters & makes sure shaders we use get the right uniforms
 	void Renderer::BeginScene(const Camera& camera)
 	{
-		s_SceneData->ViewProjectionMatrix = camera.GetViewProjection();
+		s_RendererData->ViewProjectionMatrix = camera.GetViewProjection();
 	}
 
 	void Renderer::EndScene()
@@ -53,87 +55,13 @@ namespace Kaimos {
 	void Renderer::Submit(const Ref<Shader>& shader, const Ref<VertexArray>& vertex_array, const glm::mat4& transformation)
 	{
 		shader->Bind();
-		shader->SetUMat4("u_ViewProjection", s_SceneData->ViewProjectionMatrix);
+		shader->SetUMat4("u_ViewProjection", s_RendererData->ViewProjectionMatrix);
 		shader->SetUMat4("u_Model", transformation);
 
 		// -- Vertex Array bound here since RenderCommands should NOT do multiple things, they are just commands (unless specifically supposed-to) --
 		vertex_array->Bind();
 		RenderCommand::DrawIndexed(vertex_array);
 		//vertexArray->Unbind(); //TODO: ?
-	}
-
-
-
-	// ----------------------- Public Renderer Materials Methods ---------------------------------------------
-	void Renderer::CreateDefaultMaterial()
-	{
-		if (s_SceneData->Materials.size() == 0)
-			s_SceneData->Materials.push_back(CreateRef<Material>(new Material("DefaultMaterial")));
-		else if (s_SceneData->Materials[0]->GetName() != "DefaultMaterial")
-			s_SceneData->Materials.emplace(s_SceneData->Materials.begin(), CreateRef<Material>(new Material("DefaultMaterial")));
-	}
-
-	Ref<Material> Renderer::CreateMaterial(const std::string& name)
-	{
-		Ref<Material> material = CreateRef<Material>(new Material(name));
-		s_SceneData->Materials.push_back(material);
-		return material;
-	}
-
-	Ref<Material> Renderer::CreateMaterialWithID(uint material_id, const std::string& name)
-	{
-		if (name == "DefaultMaterial" && s_SceneData->Materials.size() > 0)
-			return s_SceneData->Materials[0];
-
-		Ref<Material> material = CreateRef<Material>(new Material(material_id, name));
-		s_SceneData->Materials.push_back(material);
-		return material;
-	}
-
-	Ref<Material> Renderer::GetMaterial(uint material_id)
-	{
-		for (Ref<Material>& mat : s_SceneData->Materials)
-		{
-			if (mat->GetID() == material_id)
-				return mat;
-		}
-
-		return nullptr;
-	}
-
-	uint Renderer::GetMaterialIfExists(uint material_id)
-	{
-		Ref<Material> mat = GetMaterial(material_id);
-		if (mat && mat.get())
-			return mat->GetID();
-		
-		return 0;
-	}
-
-	Ref<Material> Renderer::GetMaterialFromIndex(uint index)
-	{
-		if (s_SceneData && index < s_SceneData->Materials.size())
-			return s_SceneData->Materials[index];
-
-		return nullptr;
-	}
-
-
-	uint Renderer::GetMaterialIDFromName(const std::string& name)
-	{
-		for (Ref<Material>& mat : s_SceneData->Materials)
-			if (mat->GetName() == name)
-				return mat->GetID();
-
-		return 0;
-	}
-
-	uint Renderer::GetMaterialsQuantity()
-	{
-		if (s_SceneData)
-			return s_SceneData->Materials.size();
-
-		return 0;
 	}
 
 
@@ -150,14 +78,15 @@ namespace Kaimos {
 		output << YAML::Key << "KaimosSaveFile" << YAML::Value << "KaimosRenderer";
 		
 		// -- Serialize Materials (as Sequence) --
+		output << YAML::Key << "DefaultMaterialID" << YAML::Value << s_RendererData->DefaultMaterialID;
 		output << YAML::Key << "Materials" << YAML::Value << YAML::BeginSeq;
-		for (Ref<Material>& mat : s_SceneData->Materials)
+		for (auto& mat : s_RendererData->Materials)
 		{
 			output << YAML::BeginMap;
-			output << YAML::Key << "Material" << YAML::Value << mat->GetID();
-			output << YAML::Key << "Name" << YAML::Value << mat->GetName();
+			output << YAML::Key << "Material" << YAML::Value << mat.second->GetID();
+			output << YAML::Key << "Name" << YAML::Value << mat.second->GetName();
 			output << YAML::Key << "AttachedGraph";
-			mat->m_AttachedGraph->SerializeGraph(output);
+			mat.second->m_AttachedGraph->SerializeGraph(output);
 			output << YAML::EndMap;
 		}
 
@@ -202,6 +131,12 @@ namespace Kaimos {
 		}
 
 		// -- Setup --
+		if (data["DefaultMaterialID"])
+			CreateDefaultMaterial(data["DefaultMaterialID"].as<uint>());
+		else
+			CreateDefaultMaterial();
+
+		//s_RendererData->DefaultMaterialID = data["DefaultMaterialID"] ? data["DefaultMaterialID"].as<uint>() : Kaimos::Random::GetRandomInt();
 		YAML::Node materials_node = data["Materials"];
 		if (materials_node)
 		{
@@ -239,7 +174,7 @@ namespace Kaimos {
 	}
 
 
-	
+
 	// ----------------------- Event Methods -----------------------------------------------------------------
 	void Renderer::OnWindowResize(uint width, uint height)
 	{
@@ -248,19 +183,105 @@ namespace Kaimos {
 
 
 
-	// ----------------------- Getters -----------------------------------------------------------------------
+	// ----------------------- Public Renderer Materials Methods ---------------------------------------------
+	Ref<Material> Renderer::CreateMaterial(const std::string& name)
+	{
+		Ref<Material> material = CreateRef<Material>(name);
+		s_RendererData->Materials.insert({ material->GetID(), material });
+		return material;
+	}
+
 	bool Renderer::IsDefaultMaterial(uint material_id)
 	{
-		if (s_SceneData->Materials.size() > 1)
-			return material_id == s_SceneData->Materials[0]->GetID();
+		return material_id == s_RendererData->DefaultMaterialID;
+	}
 
-		return false;
+	
+
+	// ----------------------- Private Renderer Materials Methods --------------------------------------------
+	bool Renderer::MaterialExists(uint material_id)
+	{
+		return s_RendererData->Materials.find(material_id) != s_RendererData->Materials.end();
+	}
+
+	void Renderer::CreateDefaultMaterial(uint default_mat_id)
+	{
+		if (!MaterialExists(s_RendererData->DefaultMaterialID))
+		{
+			if (default_mat_id == 0)
+			{
+				Ref<Material> material = CreateRef<Material>("DefaultMaterial");
+				s_RendererData->Materials.insert({ material->GetID(), material });
+				s_RendererData->DefaultMaterialID = material->GetID();
+			}
+			else
+			{
+				s_RendererData->Materials.insert({ default_mat_id, CreateRef<Material>(new Material(default_mat_id, "DefaultMaterial")) });
+				s_RendererData->DefaultMaterialID = default_mat_id;
+			}
+		}
+	}
+
+	Ref<Material> Renderer::CreateMaterialWithID(uint material_id, const std::string& name)
+	{
+		if (material_id == s_RendererData->DefaultMaterialID)
+		{
+			if (!MaterialExists(s_RendererData->DefaultMaterialID))
+				KS_FATAL_ERROR("Tried to get default material but does not exists");
+
+			return s_RendererData->Materials[s_RendererData->DefaultMaterialID];
+		}
+
+		Ref<Material> mat = CreateRef<Material>(new Material(material_id, name));
+		s_RendererData->Materials.insert({ material_id, mat });
+		return mat;
+	}
+
+
+
+	// ----------------------- Public Renderer Materials Getters ---------------------------------------------
+	Ref<Material> Renderer::GetMaterial(uint material_id)
+	{
+		if (MaterialExists(material_id))
+			return s_RendererData->Materials[material_id];
+
+		return nullptr;
+	}
+
+	Ref<Material> Renderer::GetMaterialFromIndex(uint index)
+	{
+		if (index < s_RendererData->Materials.size())
+		{
+			uint i = 0;
+			for (auto& mat : s_RendererData->Materials)
+			{
+				if (i == index)
+					return mat.second;
+
+				++i;
+			}
+		}
+
+		return nullptr;
+	}
+
+	uint Renderer::GetMaterialIfExists(uint material_id)
+	{
+		if (MaterialExists(material_id))
+			return material_id;
+
+		return 0;
 	}
 
 	uint Renderer::GetDefaultMaterialID()
 	{
-		if (s_SceneData->Materials.size() > 1)
-			return s_SceneData->Materials[0]->GetID();
+		return s_RendererData->DefaultMaterialID;
+	}
+
+	uint Renderer::GetMaterialsQuantity()
+	{
+		if (s_RendererData)
+			return s_RendererData->Materials.size();
 
 		return 0;
 	}
