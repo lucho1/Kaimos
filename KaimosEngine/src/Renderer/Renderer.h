@@ -39,7 +39,7 @@ namespace Kaimos {
 
 		// --- Public Renderer Materials Methods ---
 		static Ref<Material> CreateMaterial(const std::string& name);
-		inline static bool IsDefaultMaterial(uint material_id);
+		static bool IsDefaultMaterial(uint material_id);
 		
 		// --- Public Renderer Materials Getters ---
 		static Ref<Material> GetMaterial(uint material_id);

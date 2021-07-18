@@ -422,8 +422,10 @@ namespace Kaimos {
 						if (!tex_path.empty())
 							tex_name = tex_path.substr(tex_path.find_last_of("/\\" + 1, tex_path.size() - 1) + 1);
 
-						ImGui::Text("Texture (ID %i):\t%s (%ix%i)", texture->GetTextureID(), tex_name.c_str(), texture->GetWidth(), texture->GetHeight());
+						ImGui::Text("Texture (ID %i):\t\t %s (%ix%i)", texture->GetTextureID(), tex_name.c_str(), texture->GetWidth(), texture->GetHeight());
 					}
+					else
+						ImGui::Text("Texture:\t\t\t\t\tNone");
 
 					// Tiling & UV Offset Info
 					glm::ivec4 col = material->Color * 255.0f;
@@ -434,11 +436,24 @@ namespace Kaimos {
 					ImGui::PopFont();
 
 					// Open in Material Editor Button
-					float btn_width = 196.0f;
 					ImGui::NewLine(); ImGui::NewLine();
-					ImGui::SameLine(ImGui::GetWindowContentRegionWidth() * 0.5f - btn_width * 0.5f);
-					if (ImGui::Button("Open in Material Editor", ImVec2(btn_width, 25.0f)))
-						m_KMEPanel->SetGraphToModifyFromMaterial(material->GetID());
+					if (Renderer::IsDefaultMaterial(material->GetID()))
+					{
+						std::string no_def_mat_str = "Cannot Modify Default Material!";
+						float text_size_x = ImGui::CalcTextSize(no_def_mat_str.c_str()).x;
+
+						ImGui::SameLine(ImGui::GetWindowSize().x * 0.5f - text_size_x * 0.5f);
+						ImGui::TextColored({ 0.8f, 0.8f, 0.2f, 1.0f }, no_def_mat_str.c_str());
+					}
+					else
+					{
+						float btn_width = 196.0f;
+						ImGui::SameLine(ImGui::GetWindowContentRegionWidth() * 0.5f - btn_width * 0.5f);
+						if (ImGui::Button("Open in Material Editor", ImVec2(btn_width, 25.0f)))
+							m_KMEPanel->SetGraphToModifyFromMaterial(material->GetID());
+					}
+
+					ImGui::NewLine();
 
 					ImGui::TreePop();
 				}
@@ -548,8 +563,10 @@ namespace Kaimos {
 					if (!tex_path.empty())
 						tex_name = tex_path.substr(tex_path.find_last_of("/\\" + 1, tex_path.size() - 1) + 1);
 
-					ImGui::Text("Texture (ID %i):\t  %s (%ix%i)", texture->GetTextureID(), tex_name.c_str(), texture->GetWidth(), texture->GetHeight());
+					ImGui::Text("Texture (ID %i):\t\t %s (%ix%i)", texture->GetTextureID(), tex_name.c_str(), texture->GetWidth(), texture->GetHeight());
 				}
+				else
+					ImGui::Text("Texture:\t\t\t\t\tNone");
 
 				// General Info
 				glm::ivec4 col = material->Color * 255.0f;
@@ -560,11 +577,24 @@ namespace Kaimos {
 				ImGui::PopFont();
 
 				// Open in Material Editor Button
-				float btn_width = 196.0f;
 				ImGui::NewLine(); ImGui::NewLine();
-				ImGui::SameLine(ImGui::GetWindowContentRegionWidth() * 0.5f - btn_width * 0.5f);
-				if (ImGui::Button("Open in Material Editor", ImVec2(btn_width, 25.0f)))
-					m_KMEPanel->SetGraphToModifyFromMaterial(material->GetID());
+				if (Renderer::IsDefaultMaterial(material->GetID()))
+				{
+					std::string no_def_mat_str = "Cannot Modify Default Material!";
+					float text_size_x = ImGui::CalcTextSize(no_def_mat_str.c_str()).x;
+
+					ImGui::SameLine(ImGui::GetWindowSize().x * 0.5f - text_size_x * 0.5f);
+					ImGui::TextColored({ 0.8f, 0.8f, 0.2f, 1.0f }, no_def_mat_str.c_str());
+				}
+				else
+				{
+					float btn_width = 196.0f;
+					ImGui::SameLine(ImGui::GetWindowContentRegionWidth() * 0.5f - btn_width * 0.5f);
+					if (ImGui::Button("Open in Material Editor", ImVec2(btn_width, 25.0f)))
+						m_KMEPanel->SetGraphToModifyFromMaterial(material->GetID());
+				}
+
+				ImGui::NewLine();
 			});
 	}
 }
