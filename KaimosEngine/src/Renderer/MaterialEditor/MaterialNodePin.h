@@ -120,12 +120,13 @@ namespace Kaimos::MaterialEditor {
 
 		void DisconnectOutputPin(bool is_destroying = false);
 		Ref<float> CalculateInputValue();
+		
+		bool IsTimed() const;
 
 		void SetInputValue(float* value)				  { SetValue(value); }
 		void ResetToDefault()							  { memcpy(m_Value.get(), m_DefaultValue.get(), 16); }
 		bool IsConnected()							const { return m_OutputLinked != nullptr; }
 		int GetOutputLinkedID()						const { return m_OutputLinked->GetID(); }
-
 
 	private:
 

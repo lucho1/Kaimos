@@ -48,6 +48,11 @@ namespace Kaimos {
 
 	
 	// ----------------------- Public Graph Methods -------------------------------------------------------
+	bool Material::IsVertexAttributeTimed(MaterialEditor::VertexParameterNodeType vtxpm_node_type) const
+	{
+		return m_AttachedGraph->IsVertexAttributeTimed(vtxpm_node_type);
+	}
+
 	void Material::UpdateVertexParameter(MaterialEditor::VertexParameterNodeType vtxpm_node_type, float* value) const
 	{
 		m_AttachedGraph->SyncVertexParameterNodes(vtxpm_node_type, value);

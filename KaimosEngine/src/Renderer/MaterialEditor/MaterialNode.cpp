@@ -139,6 +139,17 @@ namespace Kaimos::MaterialEditor {
 		output_emitter << YAML::EndSeq;
 	}
 
+	bool MaterialNode::IsNodeTimeDependant() const
+	{
+		for (uint i = 0; i < m_NodeInputPins.size(); ++i)
+		{
+			if (m_NodeInputPins[i]->IsTimed())
+				return true;
+		}
+
+		return false;
+	}
+
 
 
 
@@ -191,6 +202,23 @@ namespace Kaimos::MaterialEditor {
 			else if (pin_name == "Color (Vec4)")
 				m_ColorPin = pin;
 		}
+	}
+
+	bool MainMaterialNode::IsVertexAttributeTimed(VertexParameterNodeType vtxpm_node_type) const
+	{
+		switch (vtxpm_node_type)
+		{
+			case VertexParameterNodeType::TEX_COORDS:
+				return m_TextureCoordinatesPin->IsTimed();
+			case VertexParameterNodeType::POSITION:
+				return m_VertexPositionPin->IsTimed();
+			case VertexParameterNodeType::NORMAL:
+				return m_VertexNormalPin->IsTimed();
+			default:
+				KS_FATAL_ERROR("Tried to retrieve an invalid Vertex Attribute Input from Main Node!");
+		}
+
+		return false;
 	}
 
 

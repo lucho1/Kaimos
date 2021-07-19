@@ -382,6 +382,23 @@ namespace Kaimos::MaterialEditor {
 		return m_Value;
 	}
 
+	bool NodeInputPin::IsTimed() const
+	{
+		if (m_OwnerNode->GetType() == MaterialNodeType::CONSTANT && static_cast<ConstantMaterialNode*>(m_OwnerNode)->IsTimeNode())
+				return true;
+
+		if (m_OutputLinked)
+		{
+			MaterialNode* connected_node = m_OutputLinked->m_OwnerNode;
+			if (connected_node->GetType() == MaterialNodeType::CONSTANT && static_cast<ConstantMaterialNode*>(connected_node)->IsTimeNode())
+					return true;
+
+			return connected_node->IsNodeTimeDependant();
+		}
+
+		return false;
+	}
+
 
 	void NodeInputPin::SerializePin(YAML::Emitter& output_emitter) const
 	{

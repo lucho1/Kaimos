@@ -121,6 +121,11 @@ namespace Kaimos::MaterialEditor {
 			pin->DeleteLink(pinID);
 	}
 
+	bool MaterialGraph::IsVertexAttributeTimed(VertexParameterNodeType vtxpm_node_type) const
+	{
+		return m_MainMatNode->IsVertexAttributeTimed(vtxpm_node_type);
+	}
+
 
 
 	// ----------------------- Private/Public Material Graph Methods -------------------------------------
@@ -146,7 +151,7 @@ namespace Kaimos::MaterialEditor {
 		{
 			if ((*it)->GetType() == MaterialNodeType::VERTEX_PARAMETER)
 			{
-				VertexParameterMaterialNode* vpm_node = (VertexParameterMaterialNode*)(*it).get();
+				VertexParameterMaterialNode* vpm_node = static_cast<VertexParameterMaterialNode*>((*it).get());
 				if (vpm_node->GetParameterType() == vtxpm_node_type)
 					vpm_node->SetNodeOutputResult(value);
 			}

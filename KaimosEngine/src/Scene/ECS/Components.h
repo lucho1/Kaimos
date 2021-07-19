@@ -85,6 +85,7 @@ namespace Kaimos {
 	{
 		uint MaterialID = 0, MeshID = 0;
 		std::vector<Vertex> ModifiedVertices;
+		bool PositionTimed = false, NormalsTimed = false, TexCoordsTimed = false;
 
 		void UpdateModifiedVertices()
 		{
@@ -109,6 +110,10 @@ namespace Kaimos {
 				vertex.Pos = material->GetVertexAttributeResult<glm::vec3>(MaterialEditor::VertexParameterNodeType::POSITION);
 				vertex.Normal = material->GetVertexAttributeResult<glm::vec3>(MaterialEditor::VertexParameterNodeType::NORMAL);
 				vertex.TexCoord = material->GetVertexAttributeResult<glm::vec2>(MaterialEditor::VertexParameterNodeType::TEX_COORDS);
+
+				PositionTimed = material->IsVertexAttributeTimed(MaterialEditor::VertexParameterNodeType::POSITION);
+				NormalsTimed = material->IsVertexAttributeTimed(MaterialEditor::VertexParameterNodeType::NORMAL);
+				TexCoordsTimed = material->IsVertexAttributeTimed(MaterialEditor::VertexParameterNodeType::TEX_COORDS);
 			}
 		}
 
@@ -125,6 +130,7 @@ namespace Kaimos {
 		{
 			MeshID = 0;
 			ModifiedVertices.clear();
+			PositionTimed = NormalsTimed = TexCoordsTimed = false;
 		}
 
 		inline void SetMaterial(uint material_id)

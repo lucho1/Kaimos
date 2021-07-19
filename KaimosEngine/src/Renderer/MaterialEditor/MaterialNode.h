@@ -59,6 +59,7 @@ namespace Kaimos::MaterialEditor {
 	public:
 
 		// --- Getters ---
+		bool IsNodeTimeDependant()						const;
 		uint GetID()									const { return m_ID; }
 		MaterialNodeType GetType()						const { return m_Type; }
 		const std::string& GetName()					const { return m_Name; }
@@ -98,6 +99,7 @@ namespace Kaimos::MaterialEditor {
 
 		virtual void DrawNodeUI() override;
 		void DeserializeMainNode(const YAML::Node& inputs_nodes);
+		bool IsVertexAttributeTimed(VertexParameterNodeType vtxpm_node_type) const;
 		
 		template<typename T>
 		T& GetVertexAttributeInput(VertexParameterNodeType vtxpm_node_type)
@@ -111,7 +113,10 @@ namespace Kaimos::MaterialEditor {
 				case VertexParameterNodeType::NORMAL:
 					return NodeUtils::GetDataFromType<T>(m_VertexNormalPin->CalculateInputValue().get(), PinDataType::VEC3);
 				default:
+				{
 					KS_FATAL_ERROR("Tried to retrieve an invalid Vertex Attribute Input from Main Node!");
+					return T();
+				}
 			}
 		}
 
@@ -176,6 +181,8 @@ namespace Kaimos::MaterialEditor {
 		ConstantMaterialNode(ConstantNodeType constant_type);
 		ConstantMaterialNode(const std::string& name, ConstantNodeType constant_type, uint id)
 			: MaterialNode(name, MaterialNodeType::CONSTANT, id), m_ConstantType(constant_type) {}
+
+		bool IsTimeNode() const { return m_ConstantType == ConstantNodeType::DELTATIME; }
 
 	private:
 

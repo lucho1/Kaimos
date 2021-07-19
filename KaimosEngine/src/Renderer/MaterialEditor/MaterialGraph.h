@@ -53,6 +53,8 @@ namespace Kaimos::MaterialEditor {
 		void LoadEditorSettings() const;
 
 		// --- Public Material Graph Methods ---
+		bool IsVertexAttributeTimed(VertexParameterNodeType vtxpm_node_type) const;
+
 		uint GetMaterialAttachedID();
 		void SyncMainNodeValuesWithMaterial();
 		void SyncMaterialValuesWithGraph();
