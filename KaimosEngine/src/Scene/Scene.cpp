@@ -63,7 +63,7 @@ namespace Kaimos {
 		}
 	}
 
-	void Scene::RenderMeshes()
+	void Scene::RenderMeshes(Timestep dt)
 	{
 		KS_PROFILE_FUNCTION();
 		auto mesh_view = m_Registry.view<TransformComponent, MeshRendererComponent>();
@@ -71,7 +71,7 @@ namespace Kaimos {
 		{
 			auto& [transform, mesh] = mesh_view.get<TransformComponent, MeshRendererComponent>(ent);
 			if (transform.EntityActive)
-				Renderer3D::DrawMesh(transform.GetTransform(), mesh, (int)ent);
+				Renderer3D::DrawMesh(dt, transform.GetTransform(), mesh, (int)ent);
 		}
 	}
 
@@ -83,7 +83,7 @@ namespace Kaimos {
 		// -- Render Meshes --
 		rend_timer.Start();
 		Renderer3D::BeginScene(camera);
-		RenderMeshes();
+		RenderMeshes(dt);
 		Renderer3D::EndScene();
 
 		float ms = rend_timer.GetMilliseconds();
@@ -118,7 +118,7 @@ namespace Kaimos {
 		if (m_PrimaryCamera)
 		{
 			Renderer3D::BeginScene(m_PrimaryCamera.GetComponent<CameraComponent>(), m_PrimaryCamera.GetComponent<TransformComponent>());
-			RenderMeshes();
+			RenderMeshes(dt);
 			Renderer3D::EndScene();
 
 			Renderer2D::BeginScene(m_PrimaryCamera.GetComponent<CameraComponent>(), m_PrimaryCamera.GetComponent<TransformComponent>());
@@ -139,7 +139,7 @@ namespace Kaimos {
 		if (camera_entity && camera_entity.HasComponent<CameraComponent>())
 		{
 			Renderer3D::BeginScene(m_PrimaryCamera.GetComponent<CameraComponent>(), m_PrimaryCamera.GetComponent<TransformComponent>());
-			RenderMeshes();
+			RenderMeshes(dt);
 			Renderer3D::EndScene();
 
 			Renderer2D::BeginScene(camera_entity.GetComponent<CameraComponent>(), camera_entity.GetComponent<TransformComponent>());

@@ -52,7 +52,7 @@ namespace Kaimos {
 
 		// --- Private Scene Methods ---
 		void RenderSprites();
-		void RenderMeshes();
+		void RenderMeshes(Timestep dt);
 		void ConvertMeshIntoEntities(const Ref<Mesh>& mesh);
 
 		// --- Private Entities Methods ---

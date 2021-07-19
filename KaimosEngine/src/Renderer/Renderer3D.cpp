@@ -201,7 +201,7 @@ namespace Kaimos {
 
 
 	// ----------------------- Public Drawing Methods -----------------------------------------------------
-	void Renderer3D::DrawMesh(const glm::mat4& transform, const MeshRendererComponent& mesh_component, int entity_id)
+	void Renderer3D::DrawMesh(Timestep dt, const glm::mat4& transform, MeshRendererComponent& mesh_component, int entity_id)
 	{
 		// -- New Batch if Needed --
 		if (s_3DData->IndicesDrawCount >= s_3DData->MaxIndices)
@@ -217,30 +217,22 @@ namespace Kaimos {
 			if (!material)
 				KS_FATAL_ERROR("Tried to Render a Mesh with a null Material!");
 
+			static float accumulated_dt = 0.0f;
+			accumulated_dt += dt.GetMilliseconds();
+			if (accumulated_dt > 200.0f)
+			{
+				mesh_component.UpdateTimedVertices();
+				accumulated_dt = 0.0f;
+			}
+
+
 			// -- Setup Vertex Array & Vertex Attributes --
 			uint texture_index = GetTextureIndex(material->GetTexture());
 			for (uint i = 0; i < mesh->m_Vertices.size(); ++i)
 			{
 				glm::vec3 vpos = mesh_component.ModifiedVertices[i].Pos;
-				if (mesh_component.PositionTimed)
-				{
-					material->UpdateVertexParameter(MaterialEditor::VertexParameterNodeType::POSITION, glm::value_ptr(vpos));
-					vpos = material->GetVertexAttributeResult<glm::vec3>(MaterialEditor::VertexParameterNodeType::POSITION);
-				}
-
 				glm::vec3 vnorm = mesh_component.ModifiedVertices[i].Normal;
-				if (mesh_component.NormalsTimed)
-				{
-					material->UpdateVertexParameter(MaterialEditor::VertexParameterNodeType::NORMAL, glm::value_ptr(vnorm));
-					vnorm = material->GetVertexAttributeResult<glm::vec3>(MaterialEditor::VertexParameterNodeType::NORMAL);
-				}
-
 				glm::vec2 tcoords = mesh_component.ModifiedVertices[i].TexCoord;
-				if (mesh_component.TexCoordsTimed)
-				{
-					material->UpdateVertexParameter(MaterialEditor::VertexParameterNodeType::TEX_COORDS, glm::value_ptr(tcoords));
-					tcoords = material->GetVertexAttributeResult<glm::vec3>(MaterialEditor::VertexParameterNodeType::TEX_COORDS);
-				}
 
 				// Set the vertex data
 				s_3DData->VBufferPtr->Pos = transform * glm::vec4(vpos, 1.0f);

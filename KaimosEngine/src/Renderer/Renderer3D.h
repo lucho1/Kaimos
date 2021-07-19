@@ -1,6 +1,7 @@
 #ifndef _RENDERER_3D_
 #define _RENDERER_3D_
 
+#include "Core/Utils/Time/Timestep.h"
 #include "Cameras/Camera.h"
 #include "Resources/Texture.h"
 
@@ -42,7 +43,7 @@ namespace Kaimos {
 		static void EndScene();
 
 		// --- Public Drawing Methods ---
-		static void DrawMesh(const glm::mat4& transform, const MeshRendererComponent& mesh_component, int entity_id);
+		static void DrawMesh(Timestep dt, const glm::mat4& transform, MeshRendererComponent& mesh_component, int entity_id);
 
 	private:
 

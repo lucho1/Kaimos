@@ -117,6 +117,42 @@ namespace Kaimos {
 			}
 		}
 
+		void UpdateTimedVertices()
+		{
+			// Get Mesh & Mat
+			Ref<Material> material = Renderer::GetMaterial(MaterialID);
+			Ref<Mesh> mesh = Resources::ResourceManager::GetMesh(MeshID);
+
+			if (!material || !mesh)
+			{
+				ModifiedVertices.clear();
+				return;
+			}
+
+			//ModifiedVertices.clear();
+			ModifiedVertices = mesh->GetVertices();
+			for (Vertex& vertex : ModifiedVertices)
+			{
+				if (PositionTimed)
+				{
+					material->UpdateVertexParameter(MaterialEditor::VertexParameterNodeType::POSITION, glm::value_ptr(vertex.Pos));
+					vertex.Pos = material->GetVertexAttributeResult<glm::vec3>(MaterialEditor::VertexParameterNodeType::POSITION);
+				}
+
+				if (NormalsTimed)
+				{
+					material->UpdateVertexParameter(MaterialEditor::VertexParameterNodeType::NORMAL, glm::value_ptr(vertex.Normal));
+					vertex.Normal = material->GetVertexAttributeResult<glm::vec3>(MaterialEditor::VertexParameterNodeType::NORMAL);
+				}
+
+				if (TexCoordsTimed)
+				{
+					material->UpdateVertexParameter(MaterialEditor::VertexParameterNodeType::TEX_COORDS, glm::value_ptr(vertex.TexCoord));
+					vertex.TexCoord = material->GetVertexAttributeResult<glm::vec2>(MaterialEditor::VertexParameterNodeType::TEX_COORDS);
+				}
+			}
+		}
+
 		inline void SetMesh(uint mesh_id)
 		{
 			if (mesh_id == MeshID || !Resources::ResourceManager::MeshExists(mesh_id))
