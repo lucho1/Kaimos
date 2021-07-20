@@ -75,19 +75,14 @@ namespace Kaimos {
 		}
 	}
 
-	static Timer rend_timer;
 	void Scene::OnUpdateEditor(Timestep dt, const Camera& camera)
 	{
 		KS_PROFILE_FUNCTION();
 
 		// -- Render Meshes --
-		rend_timer.Start();
 		Renderer3D::BeginScene(camera);
 		RenderMeshes(dt);
 		Renderer3D::EndScene();
-
-		float ms = rend_timer.GetMilliseconds();
-		KS_TRACE("Rendering Lasted: {0} ms", ms);
 
 
 		// -- Render Sprites --
