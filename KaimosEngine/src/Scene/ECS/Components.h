@@ -99,7 +99,6 @@ namespace Kaimos {
 				return;
 			}
 
-			//ModifiedVertices.clear();
 			ModifiedVertices = mesh->GetVertices();
 			for (Vertex& vertex : ModifiedVertices)
 			{
@@ -129,7 +128,6 @@ namespace Kaimos {
 				return;
 			}
 
-			//ModifiedVertices.clear();
 			ModifiedVertices = mesh->GetVertices();
 			for (Vertex& vertex : ModifiedVertices)
 			{
