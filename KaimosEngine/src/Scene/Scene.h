@@ -34,7 +34,7 @@ namespace Kaimos {
 		// --- Public Entities Methods ---
 		Entity CreateEntity(const std::string& name = "unnamed", uint entity_id = 0);
 		void DestroyEntity(Entity entity);
-		void UpdateMeshComponentsVertices(uint material_id);
+		void UpdateMeshAndSpriteComponentsVertices(uint material_id);
 
 	public:
 
@@ -51,7 +51,7 @@ namespace Kaimos {
 	private:
 
 		// --- Private Scene Methods ---
-		void RenderSprites();
+		void RenderSprites(Timestep dt);
 		void RenderMeshes(Timestep dt);
 		void ConvertMeshIntoEntities(const Ref<Mesh>& mesh);
 

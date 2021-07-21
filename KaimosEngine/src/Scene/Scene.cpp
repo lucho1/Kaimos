@@ -12,7 +12,6 @@
 #include "Core/Resources/Resource.h"
 #include "Core/Resources/ResourceModel.h"
 #include "Core/Utils/Maths/RandomGenerator.h"
-#include "Core/Utils/Time/Timer.h"
 
 #include <glm/glm.hpp>
 
@@ -51,7 +50,7 @@ namespace Kaimos {
 
 
 	// ----------------------- Public/Private Scene Methods -----------------------------------------------
-	void Scene::RenderSprites()
+	void Scene::RenderSprites(Timestep dt)
 	{
 		KS_PROFILE_FUNCTION();
 		auto sprite_group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
@@ -59,7 +58,7 @@ namespace Kaimos {
 		{
 			auto& [transform, sprite] = sprite_group.get<TransformComponent, SpriteRendererComponent>(ent);
 			if (transform.EntityActive)
-				Renderer2D::DrawSprite(transform.GetTransform(), sprite, (int)ent);
+				Renderer2D::DrawSprite(dt, transform.GetTransform(), sprite, (int)ent);
 		}
 	}
 
@@ -84,10 +83,9 @@ namespace Kaimos {
 		RenderMeshes(dt);
 		Renderer3D::EndScene();
 
-
 		// -- Render Sprites --
 		Renderer2D::BeginScene(camera);
-		RenderSprites();
+		RenderSprites(dt);
 		Renderer2D::EndScene();
 	}
 
@@ -117,7 +115,7 @@ namespace Kaimos {
 			Renderer3D::EndScene();
 
 			Renderer2D::BeginScene(m_PrimaryCamera.GetComponent<CameraComponent>(), m_PrimaryCamera.GetComponent<TransformComponent>());
-			RenderSprites();
+			RenderSprites(dt);
 			Renderer2D::EndScene();
 			primary_camera_warn = false;
 		}
@@ -138,7 +136,7 @@ namespace Kaimos {
 			Renderer3D::EndScene();
 
 			Renderer2D::BeginScene(camera_entity.GetComponent<CameraComponent>(), camera_entity.GetComponent<TransformComponent>());
-			RenderSprites();
+			RenderSprites(dt);
 			Renderer2D::EndScene();
 		}
 	}
@@ -198,16 +196,23 @@ namespace Kaimos {
 		m_Registry.destroy((entt::entity)entity.GetID());
 	}
 
-	void Scene::UpdateMeshComponentsVertices(uint material_id)
+	void Scene::UpdateMeshAndSpriteComponentsVertices(uint material_id)
 	{
 		KS_PROFILE_FUNCTION();
-
 		auto mesh_view = m_Registry.view<MeshRendererComponent>();
 		for (auto ent : mesh_view)
 		{
 			MeshRendererComponent& mesh_comp = mesh_view.get<MeshRendererComponent>(ent);
 			if(mesh_comp.MaterialID == material_id)
 				mesh_comp.UpdateModifiedVertices();
+		}
+
+		auto sprite_view = m_Registry.view<SpriteRendererComponent>();
+		for (auto ent : sprite_view)
+		{
+			SpriteRendererComponent& sprite_comp = sprite_view.get<SpriteRendererComponent>(ent);
+			if (sprite_comp.SpriteMaterialID == material_id)
+				sprite_comp.UpdateVertices();
 		}
 	}
 
@@ -273,13 +278,13 @@ namespace Kaimos {
 	template<>
 	void Scene::OnComponentAdded<SpriteRendererComponent>(Entity entity, SpriteRendererComponent& component) const
 	{
-		component.SetMaterial(Renderer::GetDefaultMaterialID());
+		component.RemoveMaterial();
 	}
 
 	template<>
 	void Scene::OnComponentAdded<MeshRendererComponent>(Entity entity, MeshRendererComponent& component) const
 	{
-		component.SetMaterial(Renderer::GetDefaultMaterialID()); 
+		component.RemoveMaterial();
 	}
 
 	template<>

@@ -1,14 +1,17 @@
 #ifndef _RENDERER_2D_
 #define _RENDERER_2D_
 
+#include "Core/Utils/Time/Timestep.h"
 #include "Cameras/Camera.h"
-
 #include "Resources/Texture.h"
-#include "Scene/ECS/Components.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 
 namespace Kaimos {
+
+	struct TransformComponent;
+	struct CameraComponent;
+	struct SpriteRendererComponent;
 
 	struct QuadVertex
 	{
@@ -42,7 +45,7 @@ namespace Kaimos {
 		static void EndScene();
 
 		// --- Public Drawing Methods ---
-		static void DrawSprite(const glm::mat4& transform, const SpriteRendererComponent& sprite_component, int entity_id);
+		static void DrawSprite(Timestep dt, const glm::mat4& transform, SpriteRendererComponent& sprite_component, int entity_id);
 
 	private:
 

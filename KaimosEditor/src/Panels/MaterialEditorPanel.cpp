@@ -20,7 +20,7 @@ namespace Kaimos {
 		}
 
 		if (ImGui::Button("Compile"))
-			m_SceneContext->UpdateMeshComponentsVertices(m_CurrentGraph->GetMaterialAttachedID());
+			m_SceneContext->UpdateMeshAndSpriteComponentsVertices(m_CurrentGraph->GetMaterialAttachedID());
 
 		// -- Begin Editor --
 		ImNodes::BeginNodeEditor();
