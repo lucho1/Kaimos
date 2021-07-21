@@ -4,7 +4,7 @@
 #include "MaterialNode.h"
 #include "MaterialNodePin.h"
 
-
+struct ImVec2;
 namespace YAML { class Emitter; class Node; }
 namespace Kaimos { class Material; class Renderer; }
 
@@ -34,9 +34,9 @@ namespace Kaimos::MaterialEditor {
 	public:
 
 		// --- Creation Methods ---
-		MaterialNode* CreateNode(VertexParameterNodeType constant_type, bool on_mouse_pos = true);
-		MaterialNode* CreateNode(ConstantNodeType constant_type, bool on_mouse_pos = true);
-		MaterialNode* CreateNode(OperationNodeType operation_type, PinDataType operation_data_type, bool on_mouse_pos = true);
+		MaterialNode* CreateNode(VertexParameterNodeType constant_type, const ImVec2& node_pos);
+		MaterialNode* CreateNode(ConstantNodeType constant_type, const ImVec2& node_pos);
+		MaterialNode* CreateNode(OperationNodeType operation_type, PinDataType operation_data_type, const ImVec2& node_posImVec2);
 
 		void CreateLink(uint output_pinID, uint input_pinID);
 
