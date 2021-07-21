@@ -32,7 +32,7 @@ namespace Kaimos {
 
 		// --- Public Graph Methods ---
 		bool IsVertexAttributeTimed(MaterialEditor::VertexParameterNodeType vtxpm_node_type) const;
-		void UpdateVertexParameter(MaterialEditor::VertexParameterNodeType vtxpm_node_type, float* value) const;
+		void UpdateVertexParameter(MaterialEditor::VertexParameterNodeType vtxpm_node_type, const glm::vec4& value) const;
 		void SyncGraphValuesWithMaterial();
 		void RemoveGraph();
 

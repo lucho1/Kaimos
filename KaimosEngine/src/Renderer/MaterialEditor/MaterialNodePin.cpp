@@ -15,13 +15,6 @@ namespace Kaimos::MaterialEditor {
 	NodePin::NodePin(MaterialNode* owner, PinDataType pin_data_type, const std::string& name) : m_OwnerNode(owner), m_PinDataType(pin_data_type), m_Name(name)
 	{
 		m_ID = (uint)Kaimos::Random::GetRandomInt();
-		m_Value = CreateRef<float>(new float[4]);
-		std::fill(m_Value.get(), m_Value.get() + 4, 0.0f);
-	}
-	
-	NodePin::NodePin(MaterialNode* owner, PinDataType pin_data_type, const std::string& name, uint id, const float* value) : m_OwnerNode(owner), m_PinDataType(pin_data_type), m_Name(name), m_ID(id)
-	{
-		m_Value = CreateRef<float>(new float[4]{ value[0], value[1], value[2], value[3] });
 	}
 
 	void NodePin::DeleteLink(int input_pin_id)
@@ -41,8 +34,7 @@ namespace Kaimos::MaterialEditor {
 		output_emitter << YAML::Key << "DataType" << YAML::Value << (int)m_PinDataType;
 
 		// -- Serialize Pin Value --
-		glm::vec4 val = { m_Value.get()[0], m_Value.get()[1], m_Value.get()[2], m_Value.get()[3] };
-		output_emitter << YAML::Key << "Value" << YAML::Value << val;
+		output_emitter << YAML::Key << "Value" << YAML::Value << m_Value;
 	}
 
 
@@ -74,15 +66,11 @@ namespace Kaimos::MaterialEditor {
 			DrawOutputResult(indent);
 
 		ImNodes::EndOutputAttribute();
-
 		if (!m_VertexParameter)
 		{
-			float* new_value = new float[4];
-			Ref<float> node_value = m_OwnerNode->CalculateNodeResult(); // Like this because of my marvelous manner of handling memory... sniff... pathetic...
-
-			memcpy(new_value, node_value.get(), 16);
-			SetValue(new_value); // TODO: Don't calculate this each frame
-			delete[] new_value;
+			// TODO: Don't calculate this each frame
+			glm::vec4 node_value = m_OwnerNode->CalculateNodeResult();
+			SetValue(node_value);
 		}
 	}
 
@@ -95,31 +83,11 @@ namespace Kaimos::MaterialEditor {
 
 		switch (m_PinDataType)
 		{
-			case PinDataType::FLOAT:
-			{
-				float res = NodeUtils::GetDataFromType<float>(m_Value.get(), m_PinDataType);
-				ImGui::Text("Value: %.1f", res); return;
-			}
-			case PinDataType::INT:
-			{
-				int res = NodeUtils::GetDataFromType<int>(m_Value.get(), m_PinDataType);
-				ImGui::Text("Value: %i", res); return;
-			}
-			case PinDataType::VEC2:
-			{
-				glm::vec2 res = NodeUtils::GetDataFromType<glm::vec2>(m_Value.get(), m_PinDataType);
-				ImGui::Text("Value: %.1f, %.1f", res.x, res.y); return;
-			}
-			case PinDataType::VEC3:
-			{
-				glm::vec3 res = NodeUtils::GetDataFromType<glm::vec3>(m_Value.get(), m_PinDataType);
-				ImGui::Text("Value: %.1f, %.1f, %.1f", res.x, res.y, res.z); return;
-			}
-			case PinDataType::VEC4:
-			{
-				glm::vec4 res = NodeUtils::GetDataFromType<glm::vec4>(m_Value.get(), m_PinDataType);
-				ImGui::Text("Value: %.2f, %.2f, %.2f, %.2f", res.x, res.y, res.z, res.w); return;
-			}
+			case PinDataType::FLOAT:	ImGui::Text("Value: %.1f", m_Value.x); return;
+			case PinDataType::INT:		ImGui::Text("Value: %i", static_cast<int>(m_Value.x)); return;
+			case PinDataType::VEC2:		ImGui::Text("Value: %.1f, %.1f", m_Value.x, m_Value.y); return;
+			case PinDataType::VEC3:		ImGui::Text("Value: %.1f, %.1f, %.1f", m_Value.x, m_Value.y, m_Value.z); return;
+			case PinDataType::VEC4:		ImGui::Text("Value: %.2f, %.2f, %.2f, %.2f", m_Value.x, m_Value.y, m_Value.z, m_Value.w); return;
 		}
 
 		KS_FATAL_ERROR("Tried to draw a non-supported PinType!");
@@ -128,19 +96,19 @@ namespace Kaimos::MaterialEditor {
 
 	void NodeOutputPin::SetOutputDataType(PinDataType datatype_to_set)
 	{
-		bool vec2_input_found = false;
+		bool input_found = false;
 
 		for (uint i = 0; i < m_OwnerNode->GetInputsQuantity(); ++i)
 		{
 			if (m_OwnerNode->GetInputPin(i)->GetType() == datatype_to_set)
 			{
-				vec2_input_found = true;
+				input_found = true;
 				break;
 			}
 		}
 
 		bool type_changed = false;
-		if (vec2_input_found)
+		if (input_found)
 		{
 			if (m_PinDataType == PinDataType::FLOAT)
 			{
@@ -211,11 +179,8 @@ namespace Kaimos::MaterialEditor {
 		output_emitter << YAML::Key << "InputPinsLinkedIDs" << YAML::Value << YAML::BeginSeq;
 		for (uint i = 0; i < m_InputsLinked.size(); ++i)
 		{
-			//output_emitter << YAML::BeginMap;
 			std::string input_keyval = "InputPinLinked" + std::to_string(i);
-			//output_emitter << YAML::Key << input_keyval.c_str() << YAML::Value << m_InputsLinked[i]->GetID();
 			output_emitter << YAML::Value << m_InputsLinked[i]->GetID();
-			//output_emitter << YAML::EndMap;
 		}
 
 		// -- End Inputs Sequence & Pin Map --
@@ -230,15 +195,14 @@ namespace Kaimos::MaterialEditor {
 	NodeInputPin::NodeInputPin(MaterialNode* owner, PinDataType pin_data_type, bool allows_multi_type, const std::string& name, float default_value)
 		: NodePin(owner, pin_data_type, name), m_AllowsMultipleTypes(allows_multi_type)
 	{
-		m_DefaultValue = CreateRef<float>(new float[4]);
-		std::fill(m_DefaultValue.get(), m_DefaultValue.get() + 4, default_value);
+		m_DefaultValue = glm::vec4(default_value);
 		ResetToDefault();
 	}
 
-	NodeInputPin::NodeInputPin(MaterialNode* owner, const std::string& name, uint id, PinDataType pin_data_type, const float* value, const float* default_value, bool allows_multi_type)
+	NodeInputPin::NodeInputPin(MaterialNode* owner, const std::string& name, uint id, PinDataType pin_data_type, const glm::vec4& value, const glm::vec4& default_value, bool allows_multi_type)
 		: NodePin(owner, pin_data_type, name, id, value), m_AllowsMultipleTypes(allows_multi_type)
 	{
-		m_DefaultValue = CreateRef<float>(new float[4]{ default_value[0], default_value[1], default_value[2], default_value[3] });
+		m_DefaultValue = glm::vec4(default_value);
 	}
 
 
@@ -246,27 +210,26 @@ namespace Kaimos::MaterialEditor {
 	{
 		DisconnectOutputPin(true);
 		m_OutputLinked = nullptr;
-		m_DefaultValue.reset();
 	}
 
 
-	void NodeInputPin::DrawUI(bool& allow_node_drag, float* value_to_modify, bool is_vtxattribute)
+	void NodeInputPin::DrawUI(bool& allow_node_drag, bool is_vtxattribute, bool modify_value, glm::vec4& value_to_modify)
 	{
 		ImNodes::BeginInputAttribute(m_ID);
 		ImGui::Text(m_Name.c_str());
 		ImNodes::EndInputAttribute();
 
-		if(value_to_modify)
-			memcpy(value_to_modify, m_Value.get(), NodeUtils::GetDataSizeFromType(m_PinDataType));
+		if(modify_value)
+			value_to_modify = m_Value;
 
 		if (m_OutputLinked)
-			SetValue(m_OutputLinked->m_Value.get()); // TODO: Don't calculate this each frame
+			SetValue(m_OutputLinked->m_Value); // TODO: Don't calculate this each frame
 		else if(!is_vtxattribute)
 		{
 			ImGui::PushID(m_ID);
 
-			NodeUtils::DrawPinWidget(m_PinDataType, m_Value.get());
-			SetDefaultValue(m_Value.get());
+			NodeUtils::DrawPinWidget(m_PinDataType, m_Value);
+			SetDefaultValue(m_Value);
 
 			if (ImGui::IsItemHovered() || ImGui::IsItemFocused() || ImGui::IsItemActive() || ImGui::IsItemEdited() || ImGui::IsItemClicked())
 				allow_node_drag = false;
@@ -287,7 +250,7 @@ namespace Kaimos::MaterialEditor {
 		if (m_OwnerNode->GetType() == MaterialNodeType::OPERATION)
 		{
 			bool ret = false;
-			OperationNodeType op_type = ((OperationMaterialNode*)m_OwnerNode)->GetOperationType();
+			OperationNodeType op_type = (static_cast<OperationMaterialNode*>(m_OwnerNode))->GetOperationType();
 			PinDataType datatype_to_check = PinDataType::VEC2;
 			OperationNodeType optype_to_check = OperationNodeType::FLOATVEC2_MULTIPLY;
 
@@ -374,7 +337,7 @@ namespace Kaimos::MaterialEditor {
 	}
 
 
-	Ref<float> NodeInputPin::CalculateInputValue()
+	glm::vec4 NodeInputPin::CalculateInputValue()
 	{
 		if (m_OutputLinked)
 			return m_OutputLinked->m_OwnerNode->CalculateNodeResult();
@@ -410,8 +373,7 @@ namespace Kaimos::MaterialEditor {
 		output_emitter << YAML::Key << "AllowsMultipleTypes" << YAML::Value << m_AllowsMultipleTypes;
 
 		// -- Serialize Pin Default Value --
-		glm::vec4 def_val = { m_DefaultValue.get()[0], m_DefaultValue.get()[1], m_DefaultValue.get()[2], m_DefaultValue.get()[3] };
-		output_emitter << YAML::Key << "DefValue" << YAML::Value << def_val;
+		output_emitter << YAML::Key << "DefValue" << YAML::Value << m_DefaultValue;
 
 		// -- End Pin Map --
 		output_emitter << YAML::EndMap;

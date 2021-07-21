@@ -58,7 +58,7 @@ namespace Kaimos::MaterialEditor {
 		uint GetMaterialAttachedID();
 		void SyncMainNodeValuesWithMaterial();
 		void SyncMaterialValuesWithGraph();
-		void SyncVertexParameterNodes(VertexParameterNodeType vtxpm_node_type, float* value);
+		void SyncVertexParameterNodes(VertexParameterNodeType vtxpm_node_type, const glm::vec4& value);
 
 		template<typename T>
 		T& GetVertexParameterResult(VertexParameterNodeType vtxpm_node_type)

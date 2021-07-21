@@ -144,7 +144,7 @@ namespace Kaimos::MaterialEditor {
 		m_MainMatNode->SyncMaterialValues();
 	}
 
-	void MaterialGraph::SyncVertexParameterNodes(VertexParameterNodeType vtxpm_node_type, float* value)
+	void MaterialGraph::SyncVertexParameterNodes(VertexParameterNodeType vtxpm_node_type, const glm::vec4& value)
 	{
 		std::vector<Ref<MaterialNode>>::const_iterator it = m_Nodes.begin();
 		for (; it != m_Nodes.end(); ++it)

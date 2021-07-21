@@ -80,14 +80,14 @@ namespace Kaimos::MaterialEditor {
 
 	Ref<NodeInputPin> MaterialNode::AddDeserializedInputPin(const std::string& pin_name, uint pin_id, int pin_datatype, const glm::vec4& pin_value, const glm::vec4& pin_defvalue, bool multitype)
 	{
-		Ref<NodeInputPin> in_pin = CreateRef<NodeInputPin>(this, pin_name, pin_id, (PinDataType)pin_datatype, glm::value_ptr(pin_value), glm::value_ptr(pin_defvalue), multitype);
+		Ref<NodeInputPin> in_pin = CreateRef<NodeInputPin>(this, pin_name, pin_id, (PinDataType)pin_datatype, pin_value, pin_defvalue, multitype);
 		m_NodeInputPins.push_back(in_pin);
 		return in_pin;
 	}
 
 	void MaterialNode::AddDeserializedOutputPin(const std::string& pin_name, uint pin_id, int pin_datatype, const glm::vec4& pin_value, bool is_vtxparam)
 	{
-		m_NodeOutputPin = CreateRef<NodeOutputPin>(this, pin_name, pin_id, (PinDataType)pin_datatype, glm::value_ptr(pin_value), is_vtxparam);
+		m_NodeOutputPin = CreateRef<NodeOutputPin>(this, pin_name, pin_id, (PinDataType)pin_datatype, pin_value, is_vtxparam);
 	}
 
 
@@ -112,13 +112,13 @@ namespace Kaimos::MaterialEditor {
 		m_NodeOutputPin = CreateRef<NodeOutputPin>(this, pin_data_type, name);
 	}
 
-	Ref<float> MaterialNode::GetInputValue(uint input_index)
+	glm::vec4 MaterialNode::GetInputValue(uint input_index)
 	{
 		if (input_index < m_NodeInputPins.size())
 			return m_NodeInputPins[input_index]->CalculateInputValue();
 
 		KS_FATAL_ERROR("Tried to access an out-of-bounds input!");
-		return nullptr;
+		return {};
 	}
 
 	void MaterialNode::SerializeBaseNode(YAML::Emitter& output_emitter) const
@@ -157,10 +157,10 @@ namespace Kaimos::MaterialEditor {
 	MainMaterialNode::MainMaterialNode(Material* attached_material)
 		: MaterialNode("Main Node", MaterialNodeType::MAIN), m_AttachedMaterial(attached_material)
 	{
-		m_VertexPositionPin = CreateRef<NodeInputPin>(this, PinDataType::VEC3, false, "Vertex Position (Vec3)", 0.0f);
-		m_VertexNormalPin = CreateRef<NodeInputPin>(this, PinDataType::VEC3, false, "Vertex Normal (Vec3)", 0.0f);
-		m_TextureCoordinatesPin = CreateRef<NodeInputPin>(this, PinDataType::VEC2, false, "Texture Coordinates (Vec2)", 0.0f);
-		m_ColorPin = CreateRef<NodeInputPin>(this, PinDataType::VEC4, false, "Color (Vec4)", 1.0f);
+		m_VertexPositionPin =		CreateRef<NodeInputPin>(this, PinDataType::VEC3, false, "Vertex Position (Vec3)");
+		m_VertexNormalPin =			CreateRef<NodeInputPin>(this, PinDataType::VEC3, false, "Vertex Normal (Vec3)");
+		m_TextureCoordinatesPin =	CreateRef<NodeInputPin>(this, PinDataType::VEC2, false, "Texture Coordinates (Vec2)");
+		m_ColorPin =				CreateRef<NodeInputPin>(this, PinDataType::VEC4, false, "Color (Vec4)", 1.0f);
 
 		m_NodeInputPins.push_back(m_VertexPositionPin);
 		m_NodeInputPins.push_back(m_VertexNormalPin);
@@ -183,12 +183,12 @@ namespace Kaimos::MaterialEditor {
 	{
 		for (auto inputpin_node : inputs_nodes)
 		{
-			uint pin_id = inputpin_node["Pin"].as<uint>();
-			std::string pin_name = inputpin_node["Name"].as<std::string>();
-			int pin_datatype = inputpin_node["DataType"].as<int>();
-			glm::vec4 pin_value = inputpin_node["Value"].as<glm::vec4>();
-			glm::vec4 pin_defvalue = inputpin_node["DefValue"].as<glm::vec4>();
-			bool multitype_pin = inputpin_node["AllowsMultipleTypes"].as<bool>();
+			uint pin_id =				inputpin_node["Pin"].as<uint>();
+			std::string pin_name =		inputpin_node["Name"].as<std::string>();
+			int pin_datatype =			inputpin_node["DataType"].as<int>();
+			glm::vec4 pin_value =		inputpin_node["Value"].as<glm::vec4>();
+			glm::vec4 pin_defvalue =	inputpin_node["DefValue"].as<glm::vec4>();
+			bool multitype_pin =		inputpin_node["AllowsMultipleTypes"].as<bool>();
 
 
 			Ref<NodeInputPin> pin = AddDeserializedInputPin(pin_name, pin_id, pin_datatype, pin_value, pin_defvalue, multitype_pin);
@@ -239,10 +239,10 @@ namespace Kaimos::MaterialEditor {
 		// -- Draw Input Pins --
 		bool set_node_draggable = true;
 
-		m_VertexPositionPin->DrawUI(set_node_draggable, nullptr, true);
-		m_VertexNormalPin->DrawUI(set_node_draggable, nullptr, true);
-		m_TextureCoordinatesPin->DrawUI(set_node_draggable, nullptr, true);
-		m_ColorPin->DrawUI(set_node_draggable, glm::value_ptr(m_AttachedMaterial->Color));
+		m_VertexPositionPin->DrawUI(set_node_draggable, true);
+		m_VertexNormalPin->DrawUI(set_node_draggable, true);
+		m_TextureCoordinatesPin->DrawUI(set_node_draggable, true);
+		m_ColorPin->DrawUI(set_node_draggable, false, true, m_AttachedMaterial->Color);
 
 		ImNodes::SetNodeDraggable(m_ID, set_node_draggable);
 
@@ -300,16 +300,12 @@ namespace Kaimos::MaterialEditor {
 
 	void MainMaterialNode::SyncValuesWithMaterial()
 	{
-		m_ColorPin->SetInputValue(glm::value_ptr(m_AttachedMaterial->Color));
+		m_ColorPin->SetInputValue(m_AttachedMaterial->Color);
 	}
 
 	void MainMaterialNode::SyncMaterialValues()
 	{
-		m_AttachedMaterial->Color = { m_ColorPin->GetValue().get()[0], m_ColorPin->GetValue().get()[1], m_ColorPin->GetValue().get()[2], m_ColorPin->GetValue().get()[3] };
-
-		//m_VertexPositionPin->DrawUI(set_node_draggable, nullptr, true);
-		//m_VertexNormalPin->DrawUI(set_node_draggable, nullptr, true);
-		//m_TextureCoordinatesPin->DrawUI(set_node_draggable, nullptr, true);
+		m_AttachedMaterial->Color = m_ColorPin->GetValue();
 	}
 
 	void MainMaterialNode::SerializeNode(YAML::Emitter& output_emitter) const
@@ -350,14 +346,14 @@ namespace Kaimos::MaterialEditor {
 		}
 	}
 
-	void VertexParameterMaterialNode::SetNodeOutputResult(float* value)
+	void VertexParameterMaterialNode::SetNodeOutputResult(const glm::vec4& value)
 	{
 		m_NodeOutputPin->SetOutputValue(value);
 	}
 
-	Ref<float> VertexParameterMaterialNode::CalculateNodeResult()
+	glm::vec4 VertexParameterMaterialNode::CalculateNodeResult()
 	{
-		return this->m_NodeOutputPin->GetValue();
+		return m_NodeOutputPin->GetValue();
 	}
 
 	void VertexParameterMaterialNode::SerializeNode(YAML::Emitter& output_emitter) const
@@ -436,41 +432,39 @@ namespace Kaimos::MaterialEditor {
 	}
 
 
-	Ref<float> ConstantMaterialNode::CalculateNodeResult()
+	glm::vec4 ConstantMaterialNode::CalculateNodeResult()
 	{
-		float* ret = nullptr;
+		glm::vec4 ret = glm::vec4(0.0f);
 		switch (m_ConstantType)
 		{
 			case ConstantNodeType::DELTATIME:
 			{
-				float val = Application::Get().GetTime();
-				ret = static_cast<float*>(&val);
+				ret.x = Application::Get().GetTime();
 				break;
 			}
 			case ConstantNodeType::PI:
 			{
-				float val = glm::pi<float>();
-				ret = static_cast<float*>(&val);
+				ret.x = glm::pi<float>();
 				break;
 			}
 			case ConstantNodeType::INT:		// Falls into float case
 			case ConstantNodeType::VEC4:	// Falls into float case
 			case ConstantNodeType::FLOAT:
 			{
-				ret = GetInputValue(0).get();
+				ret.x = GetInputValue(0).x;
 				break;
 			}
 			case ConstantNodeType::VEC2:
 			{
-				ret = GetInputValue(0).get();
-				ret[1] = GetInputValue(1).get()[0];
+				ret.x = GetInputValue(0).x;
+				ret.y = GetInputValue(1).x;
 				break;
 			}
 			case ConstantNodeType::VEC3:
 			{
-				ret = GetInputValue(0).get();
-				ret[1] = GetInputValue(1).get()[0];
-				ret[2] = GetInputValue(2).get()[0];
+				ret.x = GetInputValue(0).x;
+				ret.y = GetInputValue(1).x;
+				ret.z = GetInputValue(2).x;
 				break;
 			}
 			default:
@@ -513,25 +507,31 @@ namespace Kaimos::MaterialEditor {
 	}	
 
 
-	Ref<float> OperationMaterialNode::CalculateNodeResult()
+	glm::vec4 OperationMaterialNode::CalculateNodeResult()
 	{
 		PinDataType data_type = m_NodeInputPins[0]->GetType();
-
-		float* op_result = new float[4];
-		memcpy(op_result, GetInputValue(0).get(), 16);
+		glm::vec4 result = GetInputValue(0);
 
 		for (uint i = 1; i < m_NodeInputPins.size(); ++i)
-			memcpy(op_result, ProcessOperation(op_result, GetInputValue(i).get(), data_type, m_NodeInputPins[i]->GetType()), 16);
+			result = ProcessOperation(result, GetInputValue(i), data_type, m_NodeInputPins[i]->GetType());
 
-		Ref<float> ret = CreateRef<float>(static_cast<float*>(malloc(16)));
-		memcpy(ret.get(), op_result, 16);
-		delete[] op_result;
+		return result;
 
-		return ret;
+		//float* op_result = new float[4];
+		//memcpy(op_result, GetInputValue(0).get(), 16);
+
+		//for (uint i = 1; i < m_NodeInputPins.size(); ++i)
+		//	memcpy(op_result, ProcessOperation(op_result, GetInputValue(i).get(), data_type, m_NodeInputPins[i]->GetType()), 16);
+
+		//Ref<float> ret = CreateRef<float>(static_cast<float*>(malloc(16)));
+		//memcpy(ret.get(), op_result, 16);
+		//delete[] op_result;
+		//
+		//return ret;
 	}
 
 
-	float* OperationMaterialNode::ProcessOperation(const float* a, const float* b, PinDataType a_data_type, PinDataType b_data_type) const
+	glm::vec4 OperationMaterialNode::ProcessOperation(const glm::vec4& a, const glm::vec4& b, PinDataType a_data_type, PinDataType b_data_type) const
 	{
 		switch (m_OperationType)
 		{
@@ -543,7 +543,7 @@ namespace Kaimos::MaterialEditor {
 		}
 
 		KS_FATAL_ERROR("Attempted to perform a non-supported operation in OperationNode!");
-		return nullptr;
+		return {};
 	}
 
 

@@ -8,24 +8,20 @@ namespace Kaimos::MaterialEditor {
 	namespace NodeUtils {
 
 		// --- Data Conversions ---
-		size_t GetDataSizeFromType(PinDataType pin_data_type);
-
 		template<typename T>
-		T GetDataFromType(const float* ptr, PinDataType pin_data_type);
-
+		T GetDataFromType(const glm::vec4& data);
 
 		// --- Data Operations ---
-		float* SumValues(PinDataType values_data_type, const float* a, const float* b);
-		float* MultiplyValues(PinDataType values_data_type, const float* a, const float* b);
-		float* MultiplyFloatAndVec2(const float* a, const float* b, PinDataType a_data_type, PinDataType b_data_type);
-		float* MultiplyFloatAndVec3(const float* a, const float* b, PinDataType a_data_type, PinDataType b_data_type);
-		float* MultiplyFloatAndVec4(const float* a, const float* b, PinDataType a_data_type, PinDataType b_data_type);
+		glm::vec4 SumValues(PinDataType values_data_type, const glm::vec4& a, const glm::vec4& b);
+		glm::vec4 MultiplyValues(PinDataType values_data_type, const glm::vec4& a, const glm::vec4& b);
+		glm::vec4 MultiplyFloatAndVec2(const glm::vec4& a, const glm::vec4& b, PinDataType a_data_type, PinDataType b_data_type);
+		glm::vec4 MultiplyFloatAndVec3(const glm::vec4& a, const glm::vec4& b, PinDataType a_data_type, PinDataType b_data_type);
+		glm::vec4 MultiplyFloatAndVec4(const glm::vec4& a, const glm::vec4& b, PinDataType a_data_type, PinDataType b_data_type);
 
-		float* ProcessFloatAndVecMultiplication(const float float_val, const float* vec_val, PinDataType vec_data_type);
-
+		glm::vec4 ProcessFloatAndVecMultiplication(const float float_val, const glm::vec4& vec_val, PinDataType vec_data_type);
 
 		// --- UI Methods ---
-		void DrawPinWidget(PinDataType pin_data_type, float* value);
+		void DrawPinWidget(PinDataType pin_data_type, glm::vec4& value);
 	}
 }
 

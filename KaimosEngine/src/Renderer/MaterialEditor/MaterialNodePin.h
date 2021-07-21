@@ -16,11 +16,12 @@ namespace Kaimos::MaterialEditor {
 
 		// --- Protected Methods (for inheritance to use) ---
 		NodePin(MaterialNode* owner, PinDataType pin_data_type, const std::string& name);
-		NodePin(MaterialNode* owner, PinDataType pin_data_type, const std::string& name, uint id, const float* value);
+		NodePin(MaterialNode* owner, PinDataType pin_data_type, const std::string& name, uint id, const glm::vec4& value)
+			: m_OwnerNode(owner), m_PinDataType(pin_data_type), m_Name(name), m_ID(id), m_Value(value) {}
 
-		~NodePin() { m_OwnerNode = nullptr; m_Value.reset(); }
+		~NodePin() { m_OwnerNode = nullptr; }
 
-		void SetValue(const float* value) { memcpy(m_Value.get(), value, 16); }
+		void SetValue(const glm::vec4& value) { m_Value = value; }
 		void SerializeBasePin(YAML::Emitter& output_emitter) const;
 
 	public:
@@ -35,9 +36,9 @@ namespace Kaimos::MaterialEditor {
 	public:
 
 		// --- Getters ---
-		uint GetID()					const	{ return m_ID; }
-		PinDataType GetType()			const	{ return m_PinDataType; }
-		Ref<float>& GetValue()					{ return m_Value; }		
+		uint GetID()			const	{ return m_ID; }
+		PinDataType GetType()	const	{ return m_PinDataType; }
+		glm::vec4& GetValue()			{ return m_Value; }
 		
 	protected:
 
@@ -46,7 +47,7 @@ namespace Kaimos::MaterialEditor {
 		std::string m_Name = "UnnamedPin";
 		PinDataType m_PinDataType = PinDataType::NONE;
 
-		Ref<float> m_Value = nullptr;
+		glm::vec4 m_Value = glm::vec4(0.0f);
 		MaterialNode* m_OwnerNode = nullptr;
 	};
 
@@ -62,11 +63,11 @@ namespace Kaimos::MaterialEditor {
 		NodeOutputPin(MaterialNode* owner, PinDataType pin_data_type, const std::string& name, bool vertex_parameter = false)
 			: NodePin(owner, pin_data_type, name), m_VertexParameter(vertex_parameter) {}
 
-		NodeOutputPin(MaterialNode* owner, const std::string& name, uint id, PinDataType pin_data_type, const float* value, bool vertex_parameter)
+		NodeOutputPin(MaterialNode* owner, const std::string& name, uint id, PinDataType pin_data_type, const glm::vec4& value, bool vertex_parameter)
 			: NodePin(owner, pin_data_type, name, id, value), m_VertexParameter(vertex_parameter) {}
 
-
 		~NodeOutputPin();
+
 		virtual void DrawUI();
 
 	public:
@@ -76,7 +77,7 @@ namespace Kaimos::MaterialEditor {
 		virtual void LinkPin(NodePin* input_pin)					override;
 		virtual void SerializePin(YAML::Emitter& output_emitter)	const override;
 
-		void SetOutputValue(float* value)							{ SetValue(value); }
+		void SetOutputValue(const glm::vec4& value)					{ SetValue(value); }
 		void SetOutputDataType(PinDataType datatype_to_set);
 		
 		void DisconnectInputPin(uint input_pinID);
@@ -103,41 +104,42 @@ namespace Kaimos::MaterialEditor {
 
 		// --- Public Class Methods ---
 		NodeInputPin(MaterialNode* owner, PinDataType pin_data_type, bool allows_multi_type, const std::string& name, float default_value = 0.0f);
-		NodeInputPin(MaterialNode* owner, const std::string& name, uint id, PinDataType pin_data_type, const float* value, const float* default_value, bool allows_multi_type);
+		NodeInputPin(MaterialNode* owner, const std::string& name, uint id, PinDataType pin_data_type, const glm::vec4& value, const glm::vec4& default_value, bool allows_multi_type);
 
 		~NodeInputPin();
 
-		void DrawUI(bool& allow_node_drag, float* value_to_modify = nullptr, bool is_vtxattribute = false);
+		void DrawUI(bool& allow_node_drag, bool is_vtxattribute = false, bool modify_value = false, glm::vec4& value_to_modify = glm::vec4(0.0f));
 
 
 	public:
 
 		// --- Public Pin Methods ---
-		virtual bool IsInput()						const override	{ return true; }
-		virtual void LinkPin(NodePin* output_pin)	override;
-
-		virtual void SerializePin(YAML::Emitter& output_emitter) const override;
+		virtual bool IsInput()										const override { return true; }
+		virtual void LinkPin(NodePin* output_pin)					override;
+		virtual void SerializePin(YAML::Emitter& output_emitter)	const override;
 
 		void DisconnectOutputPin(bool is_destroying = false);
-		Ref<float> CalculateInputValue();
+		glm::vec4 CalculateInputValue();
 		
-		bool IsTimed() const;
+	public:
 
-		void SetInputValue(float* value)				  { SetValue(value); }
-		void ResetToDefault()							  { memcpy(m_Value.get(), m_DefaultValue.get(), 16); }
-		bool IsConnected()							const { return m_OutputLinked != nullptr; }
-		int GetOutputLinkedID()						const { return m_OutputLinked->GetID(); }
+		void SetInputValue(const glm::vec4& value)	{ SetValue(value); }
+		void ResetToDefault()						{ SetValue(m_DefaultValue); }
+
+		bool IsTimed() const;
+		bool IsConnected() const					{ return m_OutputLinked != nullptr; }
+		int GetOutputLinkedID() const				{ return m_OutputLinked->GetID(); }
 
 	private:
 
 		// --- Private Pin Methods ---
-		void SetDefaultValue(float* value)			{ memcpy(m_DefaultValue.get(), value, 16); }
+		void SetDefaultValue(const glm::vec4& value) { m_DefaultValue = value; }
 		bool CheckLinkage(NodePin* output_pin);
 
 	private:
 
 		// --- Variables ---
-		Ref<float> m_DefaultValue = nullptr;
+		glm::vec4 m_DefaultValue = glm::vec4(0.0f);
 		NodeOutputPin* m_OutputLinked = nullptr;
 
 		bool m_AllowsMultipleTypes = false;

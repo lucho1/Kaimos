@@ -25,7 +25,8 @@ namespace Kaimos::MaterialEditor {
 	protected:
 
 		// --- Protected Class Methods ---
-		MaterialNode(const std::string& name, MaterialNodeType type, uint id = 0) : m_Name(name), m_Type(type) { m_ID = (id == 0 ? (uint)Kaimos::Random::GetRandomInt() : id); }
+		MaterialNode(const std::string& name, MaterialNodeType type, uint id = 0)
+			: m_Name(name), m_Type(type) { m_ID = (id == 0 ? (uint)Kaimos::Random::GetRandomInt() : id); }
 		
 
 	public:
@@ -40,7 +41,7 @@ namespace Kaimos::MaterialEditor {
 		void AddDeserializedOutputPin(const std::string& pin_name, uint pin_id, int pin_datatype, const glm::vec4& pin_value, bool is_vtxparam);
 
 		// Defined in child classes according to what each node type does
-		virtual Ref<float> CalculateNodeResult() = 0;
+		virtual glm::vec4 CalculateNodeResult() = 0;
 		virtual void SerializeNode(YAML::Emitter& output_emitter) const = 0;
 
 	protected:
@@ -51,7 +52,7 @@ namespace Kaimos::MaterialEditor {
 		void AddInputPin(PinDataType pin_data_type, bool multi_type_pin, const std::string& name, float default_value = 1.0f);
 		virtual void AddOutputPin(PinDataType pin_data_type, const std::string& name, float default_value = 1.0f);
 
-		Ref<float> GetInputValue(uint input_index);
+		glm::vec4 GetInputValue(uint input_index);
 
 		void SerializeBaseNode(YAML::Emitter& output_emitter) const;
 
@@ -107,11 +108,11 @@ namespace Kaimos::MaterialEditor {
 			switch (vtxpm_node_type)
 			{
 				case VertexParameterNodeType::TEX_COORDS:
-					return NodeUtils::GetDataFromType<T>(m_TextureCoordinatesPin->CalculateInputValue().get(), PinDataType::VEC2);
+					return NodeUtils::GetDataFromType<T>(m_TextureCoordinatesPin->CalculateInputValue());
 				case VertexParameterNodeType::POSITION:
-					return NodeUtils::GetDataFromType<T>(m_VertexPositionPin->CalculateInputValue().get(), PinDataType::VEC3);
+					return NodeUtils::GetDataFromType<T>(m_VertexPositionPin->CalculateInputValue());
 				case VertexParameterNodeType::NORMAL:
-					return NodeUtils::GetDataFromType<T>(m_VertexNormalPin->CalculateInputValue().get(), PinDataType::VEC3);
+					return NodeUtils::GetDataFromType<T>(m_VertexNormalPin->CalculateInputValue());
 				default:
 				{
 					KS_FATAL_ERROR("Tried to retrieve an invalid Vertex Attribute Input from Main Node!");
@@ -127,7 +128,7 @@ namespace Kaimos::MaterialEditor {
 		void SyncValuesWithMaterial();
 		void SyncMaterialValues();
 
-		virtual Ref<float> CalculateNodeResult() override { return nullptr; }
+		virtual glm::vec4 CalculateNodeResult() override { return {}; }
 		virtual void SerializeNode(YAML::Emitter& output_emitter) const override;
 
 		uint GetVertexPositionPinID()	const { return m_VertexPositionPin->GetID(); }
@@ -156,14 +157,14 @@ namespace Kaimos::MaterialEditor {
 		VertexParameterMaterialNode(const std::string& name, VertexParameterNodeType parameter_type, uint id)
 			: MaterialNode(name, MaterialNodeType::VERTEX_PARAMETER, id), m_ParameterType(parameter_type) {}
 		
-		void SetNodeOutputResult(float* value);
+		void SetNodeOutputResult(const glm::vec4& value);
 		virtual void AddOutputPin(PinDataType pin_data_type, const std::string& name, float default_value = 1.0f) override;
 		
 		VertexParameterNodeType GetParameterType() const { return m_ParameterType; }
 
 	private:
 
-		virtual Ref<float> CalculateNodeResult() override;
+		virtual glm::vec4 CalculateNodeResult() override;
 		virtual void SerializeNode(YAML::Emitter& output_emitter) const override;
 
 		VertexParameterNodeType m_ParameterType = VertexParameterNodeType::NONE;
@@ -186,7 +187,7 @@ namespace Kaimos::MaterialEditor {
 
 	private:
 
-		virtual Ref<float> CalculateNodeResult() override;
+		virtual glm::vec4 CalculateNodeResult() override;
 		virtual void SerializeNode(YAML::Emitter& output_emitter) const override;
 
 		ConstantNodeType m_ConstantType = ConstantNodeType::NONE;
@@ -209,10 +210,10 @@ namespace Kaimos::MaterialEditor {
 
 	private:
 
-		virtual Ref<float> CalculateNodeResult() override;
+		virtual glm::vec4 CalculateNodeResult() override;
 		virtual void SerializeNode(YAML::Emitter& output_emitter) const override;
 
-		float* ProcessOperation(const float* a, const float* b, PinDataType a_data_type, PinDataType b_data_type) const;
+		glm::vec4 ProcessOperation(const glm::vec4& a, const glm::vec4& b, PinDataType a_data_type, PinDataType b_data_type) const;
 
 		OperationNodeType m_OperationType = OperationNodeType::NONE;
 	};

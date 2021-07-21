@@ -103,9 +103,9 @@ namespace Kaimos {
 			ModifiedVertices = mesh->GetVertices();
 			for (Vertex& vertex : ModifiedVertices)
 			{
-				material->UpdateVertexParameter(MaterialEditor::VertexParameterNodeType::POSITION, glm::value_ptr(vertex.Pos));
-				material->UpdateVertexParameter(MaterialEditor::VertexParameterNodeType::NORMAL, glm::value_ptr(vertex.Normal));
-				material->UpdateVertexParameter(MaterialEditor::VertexParameterNodeType::TEX_COORDS, glm::value_ptr(vertex.TexCoord));
+				material->UpdateVertexParameter(MaterialEditor::VertexParameterNodeType::POSITION, glm::vec4(vertex.Pos, 0.0f));
+				material->UpdateVertexParameter(MaterialEditor::VertexParameterNodeType::NORMAL, glm::vec4(vertex.Normal, 0.0f));
+				material->UpdateVertexParameter(MaterialEditor::VertexParameterNodeType::TEX_COORDS, glm::vec4(vertex.TexCoord, 0.0f, 0.0f));
 
 				vertex.Pos = material->GetVertexAttributeResult<glm::vec3>(MaterialEditor::VertexParameterNodeType::POSITION);
 				vertex.Normal = material->GetVertexAttributeResult<glm::vec3>(MaterialEditor::VertexParameterNodeType::NORMAL);
@@ -135,19 +135,19 @@ namespace Kaimos {
 			{
 				if (PositionTimed)
 				{
-					material->UpdateVertexParameter(MaterialEditor::VertexParameterNodeType::POSITION, glm::value_ptr(vertex.Pos));
+					material->UpdateVertexParameter(MaterialEditor::VertexParameterNodeType::POSITION, glm::vec4(vertex.Pos, 0.0f));
 					vertex.Pos = material->GetVertexAttributeResult<glm::vec3>(MaterialEditor::VertexParameterNodeType::POSITION);
 				}
 
 				if (NormalsTimed)
 				{
-					material->UpdateVertexParameter(MaterialEditor::VertexParameterNodeType::NORMAL, glm::value_ptr(vertex.Normal));
+					material->UpdateVertexParameter(MaterialEditor::VertexParameterNodeType::NORMAL, glm::vec4(vertex.Normal, 0.0f));
 					vertex.Normal = material->GetVertexAttributeResult<glm::vec3>(MaterialEditor::VertexParameterNodeType::NORMAL);
 				}
 
 				if (TexCoordsTimed)
 				{
-					material->UpdateVertexParameter(MaterialEditor::VertexParameterNodeType::TEX_COORDS, glm::value_ptr(vertex.TexCoord));
+					material->UpdateVertexParameter(MaterialEditor::VertexParameterNodeType::TEX_COORDS, glm::vec4(vertex.TexCoord, 0.0f, 0.0f));
 					vertex.TexCoord = material->GetVertexAttributeResult<glm::vec2>(MaterialEditor::VertexParameterNodeType::TEX_COORDS);
 				}
 			}

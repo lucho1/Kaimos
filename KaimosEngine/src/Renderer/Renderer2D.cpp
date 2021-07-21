@@ -251,9 +251,9 @@ namespace Kaimos {
 		for (size_t i = 0; i < quad_vertex_count; ++i)
 		{
 			// Update the Nodes with vertex parameters on each vertex
-			material->UpdateVertexParameter(MaterialEditor::VertexParameterNodeType::POSITION, glm::value_ptr(s_Data->VerticesPositions[i]));
-			material->UpdateVertexParameter(MaterialEditor::VertexParameterNodeType::NORMAL, glm::value_ptr(s_Data->VerticesNormals[i]));
-			material->UpdateVertexParameter(MaterialEditor::VertexParameterNodeType::TEX_COORDS, glm::value_ptr(s_Data->VerticesTCoords[i]));
+			material->UpdateVertexParameter(MaterialEditor::VertexParameterNodeType::POSITION, glm::vec4(s_Data->VerticesPositions[i], 0.0f));
+			material->UpdateVertexParameter(MaterialEditor::VertexParameterNodeType::NORMAL, glm::vec4(s_Data->VerticesNormals[i], 0.0f));
+			material->UpdateVertexParameter(MaterialEditor::VertexParameterNodeType::TEX_COORDS, glm::vec4(s_Data->VerticesTCoords[i], 0.0f, 0.0f));
 
 			// Get the vertex parameters in the main node once updated the nodes
 			glm::vec3 vpos = material->GetVertexAttributeResult<glm::vec3>(MaterialEditor::VertexParameterNodeType::POSITION);

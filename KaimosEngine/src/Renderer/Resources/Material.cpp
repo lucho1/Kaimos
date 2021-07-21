@@ -53,7 +53,7 @@ namespace Kaimos {
 		return m_AttachedGraph->IsVertexAttributeTimed(vtxpm_node_type);
 	}
 
-	void Material::UpdateVertexParameter(MaterialEditor::VertexParameterNodeType vtxpm_node_type, float* value) const
+	void Material::UpdateVertexParameter(MaterialEditor::VertexParameterNodeType vtxpm_node_type, const glm::vec4& value) const
 	{
 		m_AttachedGraph->SyncVertexParameterNodes(vtxpm_node_type, value);
 	}
