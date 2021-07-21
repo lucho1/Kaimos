@@ -43,7 +43,8 @@ namespace Kaimos {
 		KS_ENGINE_ASSERT(!s_Instance, "One instance of Application already Exists!");
 		s_Instance = this;
 		
-		m_Window = Window::Create(WindowProps(name));
+		m_Window = Window::Create(name);
+		//m_Window = Window::Create(WindowProps(name));
 
 		Deserialize();
 		Renderer::Init();

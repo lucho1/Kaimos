@@ -206,6 +206,7 @@ namespace Kaimos {
 
 		
 		// -- Show Windows Booleans --
+		static bool fullscreen = Application::Get().GetWindow().IsFullscreen();
 		static bool show_toolbar = true;
 		static bool show_scene_panel = true;
 		static bool show_project_panel = true;
@@ -222,6 +223,9 @@ namespace Kaimos {
 		{
 			if (ImGui::BeginMenu("File"))
 			{
+				if (ImGui::MenuItem("Fullscreen", nullptr, &fullscreen))
+					Application::Get().GetWindow().SetFullscreen(fullscreen);
+
 				if (ImGui::MenuItem("New", "Ctrl+N"))
 					NewScene();
 

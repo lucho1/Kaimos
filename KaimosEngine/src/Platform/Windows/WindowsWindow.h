@@ -12,7 +12,8 @@ namespace Kaimos {
 	public:
 
 		// --- Public Class Methods ---
-		WindowsWindow(const WindowProps& props);
+		WindowsWindow(const std::string& window_name);
+		WindowsWindow(const WindowProps& window_props);
 		virtual ~WindowsWindow();
 
 		void OnUpdate() override;
@@ -27,6 +28,8 @@ namespace Kaimos {
 		inline void* GetNativeWindow()	const override { return m_Window; }
 
 		// --- Setters ---
+		void SetFullscreen(bool fullscreen)								override;
+		bool IsFullscreen()												const override;
 		void SetVSync(bool enabled)										override;
 		inline bool IsVSync()											const override	{ return m_Data.VSync; }
 		inline void SetEventCallback(const EventCallbackFn& callback)	override		{ m_Data.EventCallback = callback; }
@@ -34,6 +37,7 @@ namespace Kaimos {
 	private:
 
 		// --- Private Window Methods ---
+		void InitializeGLFW();
 		virtual void Init(const WindowProps& props);
 		void SetGLFWEventCallbacks() const;
 
@@ -51,6 +55,7 @@ namespace Kaimos {
 		ScopePtr<GraphicsContext> m_Context = nullptr;
 		GLFWwindow* m_Window = nullptr;
 		WindowData m_Data;
+		bool m_GLFWInitialized = false;
 	};
 }
 
