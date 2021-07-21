@@ -208,15 +208,17 @@ namespace Kaimos {
 			NextBatch();
 
 		// -- Get Mesh --
-		// if mesh_comp.modverts.size != mesh ones
 		Ref<Mesh> mesh = Resources::ResourceManager::GetMesh(mesh_component.MeshID);
 		if (mesh && mesh->GetVertices().size() == mesh_component.ModifiedVertices.size())
 		{
-			// -- Get Material --
+			// -- Get Material & Texture Index --
 			Ref<Material> material = Renderer::GetMaterial(mesh_component.MaterialID);
 			if (!material)
 				KS_FATAL_ERROR("Tried to Render a Mesh with a null Material!");
 
+			uint texture_index = GetTextureIndex(material->GetTexture());
+
+			// -- Update Mesh Timed Vertices --
 			static float accumulated_dt = 0.0f;
 			accumulated_dt += dt.GetMilliseconds();
 			if (accumulated_dt > 200.0f)
@@ -225,37 +227,31 @@ namespace Kaimos {
 				accumulated_dt = 0.0f;
 			}
 
-
 			// -- Setup Vertex Array & Vertex Attributes --
-			uint texture_index = GetTextureIndex(material->GetTexture());
 			for (uint i = 0; i < mesh->m_Vertices.size(); ++i)
 			{
-				glm::vec3 vpos = mesh_component.ModifiedVertices[i].Pos;
-				glm::vec3 vnorm = mesh_component.ModifiedVertices[i].Normal;
-				glm::vec2 tcoords = mesh_component.ModifiedVertices[i].TexCoord;
-
 				// Set the vertex data
-				s_3DData->VBufferPtr->Pos = transform * glm::vec4(vpos, 1.0f);
-				s_3DData->VBufferPtr->Normal = vnorm;
-				s_3DData->VBufferPtr->TexCoord = tcoords;
+				Vertex& mesh_vertex = mesh_component.ModifiedVertices[i];
+
+				s_3DData->VBufferPtr->Pos = transform * glm::vec4(mesh_vertex.Pos, 1.0f);
+				s_3DData->VBufferPtr->Normal = mesh_vertex.Normal;
+				s_3DData->VBufferPtr->TexCoord = mesh_vertex.TexCoord;
 
 				s_3DData->VBufferPtr->Color = material->Color;
 				s_3DData->VBufferPtr->TexIndex = texture_index;
 				s_3DData->VBufferPtr->EntityID = entity_id;
 
 				++s_3DData->VBufferPtr;
-				++s_3DData->RendererStats.VerticesCount;
 			}
 
 			// -- Setup Index Buffer --
 			std::vector<uint> indices = mesh->m_Indices;
 			for (uint i = 0; i < indices.size(); ++i)
-			{
-				s_3DData->Indices.push_back(s_3DData->IndicesCurrentOffset + indices[i]);				
-				++s_3DData->IndicesDrawCount;
-				++s_3DData->RendererStats.IndicesCount;
-			}
+				s_3DData->Indices.push_back(s_3DData->IndicesCurrentOffset + indices[i]);
 
+			// -- Update Stats --
+			s_3DData->RendererStats.IndicesCount = s_3DData->IndicesDrawCount += indices.size();
+			s_3DData->RendererStats.VerticesCount += mesh->m_Vertices.size();
 			s_3DData->IndicesCurrentOffset += mesh->m_MaxIndex;
 		}
 	}
