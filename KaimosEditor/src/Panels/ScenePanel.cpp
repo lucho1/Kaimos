@@ -373,7 +373,7 @@ namespace Kaimos {
 			{
 				ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_FramePadding
 					| ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_SpanAvailWidth;
-				
+
 				bool open = ImGui::TreeNodeEx("###mattreenode", flags, "Material");
 				if (open)
 				{
@@ -385,7 +385,7 @@ namespace Kaimos {
 					}
 
 					ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[1]);
-					
+
 					// Materials Dropdown
 					uint current_material_index = 0;
 					std::string current_material_name = material->GetName();
@@ -402,8 +402,8 @@ namespace Kaimos {
 								current_material_index = i;
 						}
 					}
-					
-					if (KaimosUI::UIFunctionalities::DrawDropDown("Material", material_names, material_names.size(), current_material_name, current_material_index, 135.5f, 1.45f))
+
+					if (KaimosUI::UIFunctionalities::DrawDropDown("Material", material_names, material_names.size(), current_material_name, current_material_index, 135.5f, 2.45f))
 					{
 						// Set Material
 						Ref<Material> selected_material = Renderer::GetMaterialFromIndex(current_material_index);
@@ -413,6 +413,61 @@ namespace Kaimos {
 							material = selected_material;
 						}
 					}
+
+					// Create Material Modal Screen
+					ImGui::SameLine();
+					if (ImGui::Button("New Material", ImVec2(100.0f, 28.25f)))
+						ImGui::OpenPopup("Material Creation");
+					if (ImGui::BeginPopupModal("Material Creation", NULL, ImGuiWindowFlags_NoResize))
+					{
+						static char mtl_name[128] = "";
+						ImGui::Text("You are about to create a Material, Choose a Name for it:");						
+						ImGui::PushItemWidth(ImGui::GetContentRegionAvailWidth());
+						ImGui::InputTextWithHint("###MtlNameInputTxt", "Material Name", mtl_name, IM_ARRAYSIZE(mtl_name), ImGuiInputTextFlags_CharsNoBlank | ImGuiInputTextFlags_AutoSelectAll | ImGuiInputTextFlags_EnterReturnsTrue);
+						ImGui::PopItemWidth();
+
+						//static int item = 1;
+						//ImGui::Combo("Combo", &item, "aaaa\0bbbb\0cccc\0dddd\0eeee\0\0");
+
+						ImGui::NewLine();
+						if (ImGui::Button("Create", ImVec2(55.0f, 28.25f)))
+							ImGui::OpenPopup("MaterialCreated");
+
+						bool close_popup = false;
+						if (ImGui::BeginPopupModal("MaterialCreated", NULL, ImGuiWindowFlags_NoResize))
+						{
+							const std::string mtl_name_str = mtl_name;
+							if (mtl_name_str.empty())
+							{
+								ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "A Material without name cannot be created!");
+								ImGui::NewLine();
+								ImGui::SameLine(ImGui::GetWindowSize().x / 2.0f - 47.0f / 2.0f);
+								if (ImGui::Button("Close"))
+									ImGui::CloseCurrentPopup();
+							}
+							else
+							{
+								ImGui::Text("Material '%s' Created!", mtl_name);
+								ImGui::NewLine(); ImGui::NewLine();
+								ImGui::SameLine(ImGui::GetWindowSize().x / 2.0f - 47.0f / 2.0f);
+								if (ImGui::Button("Close"))
+								{
+									close_popup = true;
+									ImGui::CloseCurrentPopup();
+									Renderer::CreateMaterial(mtl_name_str);
+								}
+							}
+
+							ImGui::EndPopup();
+						}
+						
+						ImGui::SameLine(ImGui::GetWindowSize().x - 75.0f);
+						if (ImGui::Button("Cancel") || close_popup)
+							ImGui::CloseCurrentPopup();
+
+						ImGui::EndPopup();
+					}
+
 
 					// Texture Info
 					if (const Ref<Texture2D>& texture = material->GetTexture())
@@ -487,7 +542,7 @@ namespace Kaimos {
 
 				// Draw Meshes Dropdown
 				ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[1]);
-				if (KaimosUI::UIFunctionalities::DrawDropDown("Mesh", meshes_names, meshes_names.size(), current_mesh_name, current_mesh_index, 135.5f, 1.45f))
+				if (KaimosUI::UIFunctionalities::DrawDropDown("Mesh", meshes_names, meshes_names.size(), current_mesh_name, current_mesh_index, 135.5f, 2.45f))
 				{
 					// Set Mesh
 					if (current_mesh_index == (meshes_names.size() - 1))
@@ -544,7 +599,7 @@ namespace Kaimos {
 				}
 
 				// Draw Materials Dropdown
-				if (KaimosUI::UIFunctionalities::DrawDropDown("Material", material_names, material_names.size(), current_material_name, current_material_index, 135.5f, 1.45f))
+				if (KaimosUI::UIFunctionalities::DrawDropDown("Material", material_names, material_names.size(), current_material_name, current_material_index, 135.5f, 2.45f))
 				{
 					// Set Material
 					Ref<Material> selected_material = Renderer::GetMaterialFromIndex(current_material_index);
@@ -553,6 +608,60 @@ namespace Kaimos {
 						component.SetMaterial(selected_material->GetID());
 						material = selected_material;
 					}
+				}
+
+				// Create Material Modal Screen
+				ImGui::SameLine();
+				if (ImGui::Button("New Material", ImVec2(100.0f, 28.25f)))
+					ImGui::OpenPopup("Material Creation");
+				if (ImGui::BeginPopupModal("Material Creation", NULL, ImGuiWindowFlags_NoResize))
+				{
+					static char mtl_name[128] = "";
+					ImGui::Text("You are about to create a Material, Choose a Name for it:");
+					ImGui::PushItemWidth(ImGui::GetContentRegionAvailWidth());
+					ImGui::InputTextWithHint("###MtlNameInputTxt", "Material Name", mtl_name, IM_ARRAYSIZE(mtl_name), ImGuiInputTextFlags_CharsNoBlank | ImGuiInputTextFlags_AutoSelectAll | ImGuiInputTextFlags_EnterReturnsTrue);
+					ImGui::PopItemWidth();
+
+					//static int item = 1;
+					//ImGui::Combo("Combo", &item, "aaaa\0bbbb\0cccc\0dddd\0eeee\0\0");
+
+					ImGui::NewLine();
+					if (ImGui::Button("Create", ImVec2(55.0f, 28.25f)))
+						ImGui::OpenPopup("MaterialCreated");
+
+					bool close_popup = false;
+					if (ImGui::BeginPopupModal("MaterialCreated", NULL, ImGuiWindowFlags_NoResize))
+					{
+						const std::string mtl_name_str = mtl_name;
+						if (mtl_name_str.empty())
+						{
+							ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "A Material without name cannot be created!");
+							ImGui::NewLine(); ImGui::NewLine();
+							ImGui::SameLine(ImGui::GetWindowSize().x / 2.0f - 47.0f / 2.0f);
+							if (ImGui::Button("Close"))
+								ImGui::CloseCurrentPopup();
+						}
+						else
+						{
+							ImGui::Text("Material '%s' Created!", mtl_name);
+							ImGui::NewLine();
+							ImGui::SameLine(ImGui::GetWindowSize().x / 2.0f - 47.0f / 2.0f);
+							if (ImGui::Button("Close"))
+							{
+								close_popup = true;
+								ImGui::CloseCurrentPopup();
+								Renderer::CreateMaterial(mtl_name_str);
+							}
+						}
+
+						ImGui::EndPopup();
+					}
+
+					ImGui::SameLine(ImGui::GetWindowSize().x - 75.0f);
+					if (ImGui::Button("Cancel") || close_popup)
+						ImGui::CloseCurrentPopup();
+
+					ImGui::EndPopup();
 				}
 
 				// Texture Info

@@ -49,7 +49,7 @@ namespace Kaimos {
 		filter.Draw("Filter (\"incl,-excl\") (\"error\")", 180.0f);
 
 		// - Auto Scroll Box -
-		ImGui::SameLine(ImGui::GetContentRegionAvailWidth() - 110.0f);
+		ImGui::SameLine(ImGui::GetContentRegionAvailWidth() - 150.0f);
 		ImGui::Text("Auto Scroll"); ImGui::SameLine();
 		ImGui::Checkbox("###console_autoscroll", &m_Console.AutoScroll);
 
