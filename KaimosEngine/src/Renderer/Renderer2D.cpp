@@ -172,18 +172,13 @@ namespace Kaimos {
 		if (s_Data->QuadIndicesDrawCount == 0)
 			return;
 
-		// -- Cast (uint8_t is 1 byte large, the subtraction give us elements in terms of bytes) --
-		uint data_size = (uint)((uint8_t*)s_Data->QuadVBufferPtr - (uint8_t*)s_Data->QuadVBufferBase);
-
 		// -- Set Vertex Buffer Data --
+		// Data cast: uint8_t = 1 byte large, subtraction give elements in terms of bytes
+		uint data_size = (uint)((uint8_t*)s_Data->QuadVBufferPtr - (uint8_t*)s_Data->QuadVBufferBase);
 		s_Data->QuadVBuffer->SetData(s_Data->QuadVBufferBase, data_size);
 
-		// -- Bind all Textures --
-		//URGENT TODO: Put this on renderer
-		for (uint i = 0; i < Renderer::GetCurrentTextureSlotIndex(); ++i)
-			Renderer::GetTextureFromSlot(i)->Bind(i);
-
-		// -- Draw Vertex Array --
+		// -- Bind Textures & Draw Vertex Array --
+		Renderer::BindTextures();
 		RenderCommand::DrawIndexed(s_Data->QuadVArray, s_Data->QuadIndicesDrawCount);
 		++s_Data->RendererStats.DrawCalls;
 	}

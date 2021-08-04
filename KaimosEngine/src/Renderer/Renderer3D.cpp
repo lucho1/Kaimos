@@ -155,19 +155,14 @@ namespace Kaimos {
 		if (s_3DData->IndicesDrawCount == 0)
 			return;
 
-		// -- Cast (uint8_t is 1 byte large, the subtraction give us elements in terms of bytes) --
-		uint v_data_size = (uint)((uint8_t*)s_3DData->VBufferPtr - (uint8_t*)s_3DData->VBufferBase);
-
 		// -- Set Vertex Buffer Data --
+		// Data cast: uint8_t = 1 byte large, subtraction give elements in terms of bytes
+		uint v_data_size = (uint)((uint8_t*)s_3DData->VBufferPtr - (uint8_t*)s_3DData->VBufferBase);
 		s_3DData->VBuffer->SetData(s_3DData->VBufferBase, v_data_size);
 		s_3DData->IBuffer->SetData(s_3DData->Indices.data(), s_3DData->Indices.size());
 
-		// -- Bind all Textures --
-		//URGENT TODO: Put this on renderer
-		for (uint i = 0; i < Renderer::GetCurrentTextureSlotIndex(); ++i)
-			Renderer::GetTextureFromSlot(i)->Bind(i);
-
-		// -- Draw Vertex Array --
+		// -- Bind Textures & Draw Vertex Array --
+		Renderer::BindTextures();
 		RenderCommand::DrawIndexed(s_3DData->VArray, s_3DData->IndicesDrawCount);
 		++s_3DData->RendererStats.DrawCalls;
 	}

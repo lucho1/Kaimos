@@ -41,9 +41,8 @@ namespace Kaimos {
 	public:
 
 		// --- Public Renderer Textures Methods ---
+		static void BindTextures();
 		static uint GetTextureIndex(const Ref<Texture2D>& texture, std::function<void()> NextBatchFunction);
-		static uint GetCurrentTextureSlotIndex();
-		static Ref<Texture2D> GetTextureFromSlot(uint slot);
 
 		// --- Public Renderer Materials Methods ---
 		static Ref<Material> CreateMaterial(const std::string& name);

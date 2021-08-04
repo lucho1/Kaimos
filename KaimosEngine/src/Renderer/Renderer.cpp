@@ -226,6 +226,12 @@ namespace Kaimos {
 
 
 	// ----------------------- Public Renderer Materials Methods ---------------------------------------------
+	void Renderer::BindTextures()
+	{
+		for (uint i = 0; i < s_RendererData->TextureSlotIndex; ++i)
+			s_RendererData->TextureSlots[i]->Bind(i);
+	}
+
 	uint Renderer::GetTextureIndex(const Ref<Texture2D>& texture, std::function<void()> NextBatchFunction)
 	{
 		uint ret = 0;
@@ -259,20 +265,6 @@ namespace Kaimos {
 		}
 
 		return ret;
-	}
-
-	Ref<Texture2D> Renderer::GetTextureFromSlot(uint slot)
-	{
-		if (slot < s_RendererData->TextureSlotIndex)
-			return s_RendererData->TextureSlots[slot];
-		
-		KS_FATAL_ERROR("Trying to retrieve a texture from a non-existing slot!");
-		return nullptr;
-	}
-
-	uint Renderer::GetCurrentTextureSlotIndex()
-	{
-		return s_RendererData->TextureSlotIndex;
 	}
 
 
