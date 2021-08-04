@@ -2,14 +2,14 @@
 #define _RENDERER_H_
 
 #include "Foundations/RenderCommand.h"
-#include "Resources/Shader.h"
 #include "Cameras/Camera.h"
 
 namespace Kaimos {
 
-	class Material;
-	class Texture2D;
 	class Mesh;
+	class Material;
+	class Shader;
+	class Texture2D;
 
 	class Renderer // TODO: I should review what does this does and see how it is used, because is very similar to Renderer2D
 	{
@@ -39,6 +39,9 @@ namespace Kaimos {
 		static void OnWindowResize(uint width, uint height);
 
 	public:
+
+		// --- Public Renderer Shaders Methods ---
+		static Ref<Shader> GetShader(const std::string& name);
 
 		// --- Public Renderer Textures Methods ---
 		static void BindTextures();

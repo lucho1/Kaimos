@@ -3,8 +3,9 @@
 
 #include "OpenGL/Resources/OGLShader.h"
 #include "Resources/Mesh.h"
-#include "Resources/Texture.h"
 #include "Resources/Material.h"
+#include "Resources/Shader.h"
+#include "Resources/Texture.h"
 
 #include "Renderer2D.h"
 #include "Renderer3D.h"
@@ -17,16 +18,19 @@ namespace Kaimos {
 	struct RendererData
 	{
 		glm::mat4 ViewProjectionMatrix = glm::mat4(1.0f);
-		std::unordered_map<uint, Ref<Material>> Materials;
+		
+		// Shaders & Materials
+		ShaderLibrary Shaders;
 		uint DefaultMaterialID = 0;
+		std::unordered_map<uint, Ref<Material>> Materials;
 
+		// Textures
 		uint TextureSlotIndex = 1;									// Slot 0 -> White Texture 
 		static const uint MaxTextureSlots = 32;						// TODO: RenderCapabilities - Variables based on what the hardware can do
 		std::array<Ref<Texture2D>, MaxTextureSlots> TextureSlots;
 		Ref<Texture2D> WhiteTexture = nullptr;
 	};
 
-	//ScopePtr<Renderer::RendererData> Renderer::s_RendererData = CreateScopePtr<Renderer::RendererData>();
 	static RendererData* s_RendererData = nullptr;
 
 
@@ -48,6 +52,18 @@ namespace Kaimos {
 
 		for (uint i = 0; i < s_RendererData->MaxTextureSlots; ++i)
 			texture_samplers[i] = i;
+
+		// -- Shaders Creation --
+		s_RendererData->Shaders.Load("BatchedShader2D", "assets/shaders/BatchRendering_TextureShader.glsl");
+		s_RendererData->Shaders.Load("BatchedShader3D", "assets/shaders/3DTextureShader.glsl");
+
+		// -- Shaders Uniform of Texture Slots --
+		s_RendererData->Shaders.ForEachShader([&](const Ref<Shader>& shader)
+			{
+				shader->Bind();
+				shader->SetUIntArray("u_Textures", texture_samplers, s_RendererData->MaxTextureSlots);
+				shader->Unbind();
+			});
 	}
 
 	void Renderer::Init()
@@ -221,6 +237,17 @@ namespace Kaimos {
 	void Renderer::OnWindowResize(uint width, uint height)
 	{
 		RenderCommand::SetViewport(0, 0, width, height);
+	}
+
+
+
+	// ----------------------- Public Renderer Shaders Methods -----------------------------------------------
+	Ref<Shader> Renderer::GetShader(const std::string& name)
+	{
+		if (s_RendererData->Shaders.Exists(name))
+			return s_RendererData->Shaders.Get(name);
+
+		return nullptr;
 	}
 
 

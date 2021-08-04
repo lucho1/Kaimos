@@ -51,6 +51,9 @@ namespace Kaimos {
 		// --- Getters ---
 		Ref<Shader> Get(const std::string& name);
 
+		// --- Public Functionality Methods ---
+		void ForEachShader(std::function<void(const Ref<Shader>&)> for_body);
+
 	private:
 
 		std::unordered_map<std::string, Ref<Shader>> m_Shaders; // name & shader reference

@@ -53,7 +53,7 @@ namespace Kaimos {
 	void ShaderLibrary::Add(const std::string name, const Ref<Shader>& shader)
 	{
 		// -- Check name doesn't exists already --
-		KS_ENGINE_ASSERT(Exists(name), "Shader Already Exists!");
+		KS_ENGINE_ASSERT(!Exists(name), "Shader Already Exists!");
 		m_Shaders[name] = shader;
 	}
 
@@ -80,5 +80,11 @@ namespace Kaimos {
 		// -- Check name doesn't exists already --
 		KS_ENGINE_ASSERT(Exists(name), "Shader Not Found!");
 		return m_Shaders[name];
+	}
+
+	void ShaderLibrary::ForEachShader(std::function<void(const Ref<Shader>&)> for_body)
+	{
+		for (auto& shader : m_Shaders)
+			for_body(shader.second);
 	}
 }

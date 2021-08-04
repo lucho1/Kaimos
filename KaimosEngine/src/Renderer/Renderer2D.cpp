@@ -27,7 +27,6 @@ namespace Kaimos {
 
 		Ref<VertexArray> QuadVArray			= nullptr;
 		Ref<VertexBuffer> QuadVBuffer		= nullptr;
-		Ref<Shader> ColoredTextureShader	= nullptr;
 	};
 	
 	static Renderer2DData* s_Data = nullptr;	// On shutdown, this is deleted, and ~VertexArray() called, freeing GPU Memory too
@@ -105,19 +104,6 @@ namespace Kaimos {
 		s_Data->QuadVBuffer->Unbind();
 		index_buffer->Unbind();
 		delete[] quad_indices;
-		
-		// -- Shader Creation --
-		s_Data->ColoredTextureShader = Shader::Create("assets/shaders/BatchRendering_TextureShader.glsl");
-
-		// -- Shader Uniform of Texture Slots --
-		// URGENT TODO: Pass this to renderer (shaders)
-		int texture_samplers[32];
-		for (uint i = 0; i < 32; ++i)
-			texture_samplers[i] = i;
-
-		s_Data->ColoredTextureShader->Bind();
-		s_Data->ColoredTextureShader->SetUIntArray("u_Textures", texture_samplers, 32);
-		s_Data->ColoredTextureShader->Unbind();
 	}
 
 
@@ -139,20 +125,13 @@ namespace Kaimos {
 	{
 		KS_PROFILE_FUNCTION();
 		glm::mat4 view_proj = camera_component.Camera.GetProjection() * glm::inverse(transform_component.GetTransform());
-
-		s_Data->QuadVArray->Bind();
-		s_Data->ColoredTextureShader->Bind();
-		s_Data->ColoredTextureShader->SetUMat4("u_ViewProjection", view_proj);
-		StartBatch();
+		SetupRenderingShader(view_proj);
 	}
 	
 	void Renderer2D::BeginScene(const Camera& camera)
 	{
 		KS_PROFILE_FUNCTION();
-		s_Data->QuadVArray->Bind();
-		s_Data->ColoredTextureShader->Bind();
-		s_Data->ColoredTextureShader->SetUMat4("u_ViewProjection", camera.GetViewProjection());
-		StartBatch();
+		SetupRenderingShader(camera.GetViewProjection());
 	}
 
 	void Renderer2D::EndScene()
@@ -164,6 +143,20 @@ namespace Kaimos {
 
 
 	// ----------------------- Private Renderer Methods ---------------------------------------------------
+	void Renderer2D::SetupRenderingShader(const glm::mat4& vp_matrix)
+	{
+		Ref<Shader> shader = Renderer::GetShader("BatchedShader2D");
+		if (shader)
+		{
+			s_Data->QuadVArray->Bind();
+			shader->Bind();
+			shader->SetUMat4("u_ViewProjection", vp_matrix);
+			StartBatch();
+		}
+		else
+			KS_FATAL_ERROR("Tried to Render with a null Shader!");
+	}
+
 	void Renderer2D::Flush()
 	{
 		KS_PROFILE_FUNCTION();

@@ -50,6 +50,8 @@ namespace Kaimos {
 	private:
 
 		// --- Private Renderer Methods ---
+		static void SetupRenderingShader(const glm::mat4& vp_matrix);
+
 		static void Flush();
 		static void StartBatch();
 		static void NextBatch();
