@@ -20,7 +20,6 @@ namespace Kaimos {
 		Renderer3D::Statistics RendererStats;
 
 		static const uint MaxFaces = 20000;
-		static const uint MaxVertices = MaxFaces * 4;
 		static const uint MaxIndices = MaxFaces * 6;
 
 		uint IndicesDrawCount = 0;
@@ -65,9 +64,11 @@ namespace Kaimos {
 		s_3DData = new Renderer3DData();
 
 		// -- Vertex Buffer & Array --
-		s_3DData->VBufferBase = new Vertex[s_3DData->MaxVertices];
+		const uint max_vertices = s_3DData->MaxFaces * 4;
+
+		s_3DData->VBufferBase = new Vertex[max_vertices];
 		s_3DData->VArray = VertexArray::Create();
-		s_3DData->VBuffer = VertexBuffer::Create(s_3DData->MaxVertices * sizeof(Vertex));
+		s_3DData->VBuffer = VertexBuffer::Create(max_vertices * sizeof(Vertex));
 
 		// -- Vertex Layout & Index Buffer Creation --
 		s_3DData->IBuffer = IndexBuffer::Create(s_3DData->MaxIndices);

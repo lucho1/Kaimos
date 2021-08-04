@@ -19,7 +19,6 @@ namespace Kaimos {
 		Renderer2D::Statistics RendererStats;
 
 		static const uint MaxQuads = 20000;
-		static const uint MaxVertices = MaxQuads * 4;
 		static const uint MaxIndices = MaxQuads * 6;
 
 		uint QuadIndicesDrawCount = 0;
@@ -79,9 +78,11 @@ namespace Kaimos {
 		}
 		
 		// -- Vertex Buffer & Array --
-		s_Data->QuadVBufferBase = new QuadVertex[s_Data->MaxVertices];
+		const uint max_vertices = s_Data->MaxQuads * 4;
+
+		s_Data->QuadVBufferBase = new QuadVertex[max_vertices];
 		s_Data->QuadVArray = VertexArray::Create();
-		s_Data->QuadVBuffer = VertexBuffer::Create(s_Data->MaxVertices * sizeof(QuadVertex));
+		s_Data->QuadVBuffer = VertexBuffer::Create(max_vertices * sizeof(QuadVertex));
 
 		// -- Vertex Layout & Index Buffer Creation --
 		index_buffer = IndexBuffer::Create(quad_indices, s_Data->MaxIndices);
