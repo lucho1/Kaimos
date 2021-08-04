@@ -3,17 +3,20 @@
 
 #include "Foundations/RenderCommand.h"
 #include "Resources/Shader.h"
-#include "Resources/Material.h"
 #include "Cameras/Camera.h"
 
 namespace Kaimos {
 
+	class Material;
+	class Texture2D;
 	class Mesh;
+
 	class Renderer // TODO: I should review what does this does and see how it is used, because is very similar to Renderer2D
 	{
 	public:
 
 		// --- Public Class Methods ---
+		static void CreateRenderer();
 		static void Init();
 		static void Shutdown();
 
@@ -37,6 +40,11 @@ namespace Kaimos {
 
 	public:
 
+		// --- Public Renderer Textures Methods ---
+		static uint GetTextureIndex(const Ref<Texture2D>& texture, std::function<void()> NextBatchFunction);
+		static uint GetCurrentTextureSlotIndex();
+		static Ref<Texture2D> GetTextureFromSlot(uint slot);
+
 		// --- Public Renderer Materials Methods ---
 		static Ref<Material> CreateMaterial(const std::string& name);
 		static bool IsDefaultMaterial(uint material_id);
@@ -55,17 +63,6 @@ namespace Kaimos {
 		inline static bool MaterialExists(uint material_id);
 		static void CreateDefaultMaterial(uint default_mat_id = 0);
 		static Ref<Material> CreateMaterialWithID(uint material_id, const std::string& name);
-
-	private:
-
-		struct RendererData
-		{
-			glm::mat4 ViewProjectionMatrix = glm::mat4(1.0f);
-			std::unordered_map<uint, Ref<Material>> Materials;
-			uint DefaultMaterialID = 0;
-		};
-
-		static ScopePtr<RendererData> s_RendererData;
 	};
 }
 

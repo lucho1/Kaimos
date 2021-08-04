@@ -16,14 +16,14 @@ namespace Kaimos {
 	struct Vertex
 	{
 		// --- Vertex Variables ---
-		glm::vec3 Pos = glm::vec3(0.0f);
-		glm::vec3 Normal = glm::vec3(0.0f);
-		glm::vec2 TexCoord = glm::vec2(0.0f);
-		glm::vec4 Color = glm::vec4(1.0f);
-		float TexIndex = 0.0f;
+		glm::vec3 Pos		= glm::vec3(0.0f);
+		glm::vec3 Normal	= glm::vec3(0.0f);
+		glm::vec2 TexCoord	= glm::vec2(0.0f);
+		glm::vec4 Color		= glm::vec4(1.0f);
+		float TexIndex		= 0.0f;
 
 		// --- Editor Variables ---
-		int EntityID = 0;
+		int EntityID		= 0;
 	};
 
 
@@ -46,9 +46,6 @@ namespace Kaimos {
 		static void DrawMesh(Timestep dt, const glm::mat4& transform, MeshRendererComponent& mesh_component, int entity_id);
 
 	private:
-
-		// --- Private Drawing Methods ---
-		static uint GetTextureIndex(const Ref<Texture2D>& texture);
 
 		// --- Private Renderer Methods ---
 		static void Flush();

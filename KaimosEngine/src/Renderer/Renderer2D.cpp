@@ -1,9 +1,11 @@
 #include "kspch.h"
 #include "Renderer2D.h"
 
+#include "Renderer.h"
 #include "Foundations/RenderCommand.h"
 #include "Resources/Buffer.h"
 #include "Resources/Shader.h"
+#include "Resources/Material.h"
 #include "Scene/ECS/Components.h"
 
 #include <glm/gtc/type_ptr.hpp>
@@ -19,7 +21,6 @@ namespace Kaimos {
 		static const uint MaxQuads = 20000;
 		static const uint MaxVertices = MaxQuads * 4;
 		static const uint MaxIndices = MaxQuads * 6;
-		static const uint MaxTextureSlots = 32; // TODO: RenderCapabilities - Variables based on what the hardware can do
 
 		uint QuadIndicesDrawCount = 0;
 		QuadVertex* QuadVBufferBase			= nullptr;
@@ -28,10 +29,6 @@ namespace Kaimos {
 		Ref<VertexArray> QuadVArray			= nullptr;
 		Ref<VertexBuffer> QuadVBuffer		= nullptr;
 		Ref<Shader> ColoredTextureShader	= nullptr;
-		Ref<Texture2D> WhiteTexture			= nullptr;
-
-		std::array<Ref<Texture2D>, MaxTextureSlots> TextureSlots;
-		uint TextureSlotIndex = 1;									// Slot 0 is for White Texture
 	};
 	
 	static Renderer2DData* s_Data = nullptr;	// On shutdown, this is deleted, and ~VertexArray() called, freeing GPU Memory too
@@ -110,22 +107,15 @@ namespace Kaimos {
 		
 		// -- Shader Creation --
 		s_Data->ColoredTextureShader = Shader::Create("assets/shaders/BatchRendering_TextureShader.glsl");
-		
-		// -- White Texture Creation --
-		uint whiteTextData = 0xffffffff; // Full Fs for every channel there (2x4 channels - rgba -)
-		s_Data->WhiteTexture = Texture2D::Create(1, 1);
-		s_Data->WhiteTexture->SetData(&whiteTextData, sizeof(whiteTextData)); // or sizeof(uint)
-
-		// -- Texture Slots Filling --
-		s_Data->TextureSlots[0] = s_Data->WhiteTexture;
-		int texture_samplers[s_Data->MaxTextureSlots];
-
-		for (uint i = 0; i < s_Data->MaxTextureSlots; ++i)
-			texture_samplers[i] = i;
 
 		// -- Shader Uniform of Texture Slots --
+		// URGENT TODO: Pass this to renderer (shaders)
+		int texture_samplers[32];
+		for (uint i = 0; i < 32; ++i)
+			texture_samplers[i] = i;
+
 		s_Data->ColoredTextureShader->Bind();
-		s_Data->ColoredTextureShader->SetUIntArray("u_Textures", texture_samplers, s_Data->MaxTextureSlots);
+		s_Data->ColoredTextureShader->SetUIntArray("u_Textures", texture_samplers, 32);
 		s_Data->ColoredTextureShader->Unbind();
 	}
 
@@ -188,8 +178,9 @@ namespace Kaimos {
 		s_Data->QuadVBuffer->SetData(s_Data->QuadVBufferBase, data_size);
 
 		// -- Bind all Textures --
-		for (uint i = 0; i < s_Data->TextureSlotIndex; ++i)
-			s_Data->TextureSlots[i]->Bind(i);
+		//URGENT TODO: Put this on renderer
+		for (uint i = 0; i < Renderer::GetCurrentTextureSlotIndex(); ++i)
+			Renderer::GetTextureFromSlot(i)->Bind(i);
 
 		// -- Draw Vertex Array --
 		RenderCommand::DrawIndexed(s_Data->QuadVArray, s_Data->QuadIndicesDrawCount);
@@ -200,9 +191,8 @@ namespace Kaimos {
 	{
 		KS_PROFILE_FUNCTION();
 		s_Data->QuadIndicesDrawCount = 0;
-		s_Data->TextureSlotIndex = 1; // 0 is white texture
 		s_Data->QuadVBufferPtr = s_Data->QuadVBufferBase;
-	}		
+	}
 	
 	void Renderer2D::NextBatch()
 	{
@@ -225,7 +215,8 @@ namespace Kaimos {
 		if (!material)
 			KS_FATAL_ERROR("Tried to Render a Sprite with a null Material!");
 
-		uint texture_index = GetTextureIndex(material->GetTexture());
+
+		uint texture_index = Renderer::GetTextureIndex(material->GetTexture(), &NextBatch);
 
 		// -- Update Sprite Timed Vertices --
 		static float accumulated_dt = 0.0f;
@@ -257,38 +248,5 @@ namespace Kaimos {
 		// -- Update Stats (Quad = 2 Triangles = 6 Indices) --
 		s_Data->QuadIndicesDrawCount += 6;
 		++s_Data->RendererStats.QuadCount;
-	}
-
-
-	uint Renderer2D::GetTextureIndex(const Ref<Texture2D>& texture)
-	{
-		uint ret = 0;
-		if (texture)
-		{
-			// -- Find Texture if Exists --
-			for (uint i = 1; i < s_Data->TextureSlotIndex; ++i)
-			{
-				if (*s_Data->TextureSlots[i] == *texture)
-				{
-					ret = i;
-					break;
-				}
-			}
-
-			// -- If it doesn't exists, add it to batch data --
-			if (ret == 0)
-			{
-				// - New Batch if Needed -
-				if (s_Data->TextureSlotIndex >= s_Data->MaxTextureSlots)
-					NextBatch();
-
-				// - Set Texture -
-				ret = s_Data->TextureSlotIndex;
-				s_Data->TextureSlots[s_Data->TextureSlotIndex] = texture;
-				++s_Data->TextureSlotIndex;
-			}
-		}
-
-		return ret;
 	}
 }

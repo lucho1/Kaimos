@@ -3,6 +3,9 @@
 
 #include "OpenGL/Resources/OGLShader.h"
 #include "Resources/Mesh.h"
+#include "Resources/Texture.h"
+#include "Resources/Material.h"
+
 #include "Renderer2D.h"
 #include "Renderer3D.h"
 
@@ -11,16 +14,51 @@
 
 namespace Kaimos {
 
-	ScopePtr<Renderer::RendererData> Renderer::s_RendererData = CreateScopePtr<Renderer::RendererData>();
+	struct RendererData
+	{
+		glm::mat4 ViewProjectionMatrix = glm::mat4(1.0f);
+		std::unordered_map<uint, Ref<Material>> Materials;
+		uint DefaultMaterialID = 0;
+
+		uint TextureSlotIndex = 1;									// Slot 0 -> White Texture 
+		static const uint MaxTextureSlots = 32;						// TODO: RenderCapabilities - Variables based on what the hardware can do
+		std::array<Ref<Texture2D>, MaxTextureSlots> TextureSlots;
+		Ref<Texture2D> WhiteTexture = nullptr;
+	};
+
+	//ScopePtr<Renderer::RendererData> Renderer::s_RendererData = CreateScopePtr<Renderer::RendererData>();
+	static RendererData* s_RendererData = nullptr;
 
 
 	// ----------------------- Public Class Methods -------------------------------------------------------
+	void Renderer::CreateRenderer()
+	{
+		KS_PROFILE_FUNCTION();
+		KS_INFO("\n\n--- CREATING KAIMOS RENDERER ---");
+		s_RendererData = new RendererData();
+
+		// -- White Texture Creation --
+		uint whiteTextData = 0xffffffff; // Full Fs for every channel there (2x4 channels - rgba -)
+		s_RendererData->WhiteTexture = Texture2D::Create(1, 1);
+		s_RendererData->WhiteTexture->SetData(&whiteTextData, sizeof(whiteTextData)); // or sizeof(uint)
+
+		// -- Texture Slots Filling --
+		s_RendererData->TextureSlots[0] = s_RendererData->WhiteTexture;
+		int texture_samplers[s_RendererData->MaxTextureSlots];
+
+		for (uint i = 0; i < s_RendererData->MaxTextureSlots; ++i)
+			texture_samplers[i] = i;
+	}
+
 	void Renderer::Init()
 	{
 		KS_PROFILE_FUNCTION();
 		KS_INFO("\n\n--- INITIALIZING KAIMOS RENDERER ---");
-
+		
+		// -- Default Material Creation --
 		CreateDefaultMaterial(); // Make sure we create it (in case we didn't deserialized)
+
+		// -- Renderer Initializations --
 		RenderCommand::Init();
 		Renderer2D::Init();
 		Renderer3D::Init();
@@ -32,11 +70,16 @@ namespace Kaimos {
 		Renderer2D::Shutdown();
 		Renderer3D::Shutdown();
 
+		// Not sure if this is necessary since maybe delete s_RendererData is enough
 		for (auto& mat : s_RendererData->Materials)
 			mat.second.reset();
 
+		for (auto& texture : s_RendererData->TextureSlots)
+			texture.reset();
+		
 		s_RendererData->Materials.clear();
-		s_RendererData.reset();
+		s_RendererData->WhiteTexture.reset();
+		delete s_RendererData;
 	}
 
 
@@ -136,7 +179,6 @@ namespace Kaimos {
 		else
 			CreateDefaultMaterial();
 
-		//s_RendererData->DefaultMaterialID = data["DefaultMaterialID"] ? data["DefaultMaterialID"].as<uint>() : Kaimos::Random::GetRandomInt();
 		YAML::Node materials_node = data["Materials"];
 		if (materials_node)
 		{
@@ -179,6 +221,58 @@ namespace Kaimos {
 	void Renderer::OnWindowResize(uint width, uint height)
 	{
 		RenderCommand::SetViewport(0, 0, width, height);
+	}
+
+
+
+	// ----------------------- Public Renderer Materials Methods ---------------------------------------------
+	uint Renderer::GetTextureIndex(const Ref<Texture2D>& texture, std::function<void()> NextBatchFunction)
+	{
+		uint ret = 0;
+		if (texture)
+		{
+			// -- Find Texture if Exists --
+			for (uint i = 1; i < s_RendererData->TextureSlotIndex; ++i)
+			{
+				if (*s_RendererData->TextureSlots[i] == *texture)
+				{
+					ret = i;
+					break;
+				}
+			}
+
+			// -- If it doesn't exists, add it to batch data --
+			if (ret == 0)
+			{
+				// - New Batch if Needed -
+				if (s_RendererData->TextureSlotIndex >= s_RendererData->MaxTextureSlots)
+				{
+					NextBatchFunction();
+					s_RendererData->TextureSlotIndex = 1; // 0 is white texture
+				}
+
+				// - Set Texture -
+				ret = s_RendererData->TextureSlotIndex;
+				s_RendererData->TextureSlots[s_RendererData->TextureSlotIndex] = texture;
+				++s_RendererData->TextureSlotIndex;
+			}
+		}
+
+		return ret;
+	}
+
+	Ref<Texture2D> Renderer::GetTextureFromSlot(uint slot)
+	{
+		if (slot < s_RendererData->TextureSlotIndex)
+			return s_RendererData->TextureSlots[slot];
+		
+		KS_FATAL_ERROR("Trying to retrieve a texture from a non-existing slot!");
+		return nullptr;
+	}
+
+	uint Renderer::GetCurrentTextureSlotIndex()
+	{
+		return s_RendererData->TextureSlotIndex;
 	}
 
 

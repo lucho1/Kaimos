@@ -46,6 +46,7 @@ namespace Kaimos {
 		m_Window = Window::Create(name);
 		//m_Window = Window::Create(WindowProps(name));
 
+		Renderer::CreateRenderer();
 		Deserialize();
 		Renderer::Init();
 

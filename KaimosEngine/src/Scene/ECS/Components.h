@@ -7,6 +7,7 @@
 #include "Renderer/Renderer3D.h"
 #include "Renderer/Cameras/Camera.h"
 #include "Renderer/Resources/Mesh.h"
+#include "Renderer/Resources/Material.h"
 #include "ScriptableEntity.h"
 
 #include <glm/glm.hpp>

@@ -49,9 +49,6 @@ namespace Kaimos {
 
 	private:
 
-		// --- Private Drawing Methods ---
-		static uint GetTextureIndex(const Ref<Texture2D>& texture);
-		
 		// --- Private Renderer Methods ---
 		static void Flush();
 		static void StartBatch();

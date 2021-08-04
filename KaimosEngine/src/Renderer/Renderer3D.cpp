@@ -6,6 +6,7 @@
 #include "Resources/Buffer.h"
 #include "Resources/Shader.h"
 #include "Resources/Mesh.h"
+#include "Resources/Material.h"
 #include "Scene/ECS/Components.h"
 
 #include <glm/gtc/type_ptr.hpp>
@@ -21,11 +22,6 @@ namespace Kaimos {
 		static const uint MaxFaces = 20000;
 		static const uint MaxVertices = MaxFaces * 4;
 		static const uint MaxIndices = MaxFaces * 6;
-		static const uint MaxTextureSlots = 32;						// TODO: RenderCapabilities - Variables based on what the hardware can do
-
-		uint TextureSlotIndex = 1;									// Slot 0 is for White Texture 
-		Ref<Texture2D> WhiteTexture = nullptr;						// TODO: Put this in the Renderer, don't have duplicates in Renderer2D & 3D
-		std::array<Ref<Texture2D>, MaxTextureSlots> TextureSlots;
 
 		uint IndicesDrawCount = 0;
 		uint IndicesCurrentOffset = 0;
@@ -97,21 +93,14 @@ namespace Kaimos {
 		// -- Shader Creation --
 		s_3DData->CurrentShader = Shader::Create("assets/shaders/3DTextureShader.glsl");
 
-		// -- White Texture Creation --
-		uint whiteTextData = 0xffffffff; // Full Fs for every channel there (2x4 channels - rgba -)
-		s_3DData->WhiteTexture = Texture2D::Create(1, 1);
-		s_3DData->WhiteTexture->SetData(&whiteTextData, sizeof(whiteTextData)); // or sizeof(uint)
-
-		// -- Texture Slots Filling --
-		s_3DData->TextureSlots[0] = s_3DData->WhiteTexture;
-		int texture_samplers[s_3DData->MaxTextureSlots];
-
-		for (uint i = 0; i < s_3DData->MaxTextureSlots; ++i)
+		// -- Shader Uniform of Texture Slots --
+		// URGENT TODO: Pass this to renderer (shaders)
+		int texture_samplers[32];
+		for (uint i = 0; i < 32; ++i)
 			texture_samplers[i] = i;
 
-		// -- Shader Uniform of Texture Slots --
 		s_3DData->CurrentShader->Bind();
-		s_3DData->CurrentShader->SetUIntArray("u_Textures", texture_samplers, s_3DData->MaxTextureSlots);
+		s_3DData->CurrentShader->SetUIntArray("u_Textures", texture_samplers, 32);
 		s_3DData->CurrentShader->Unbind();
 	}
 
@@ -173,8 +162,9 @@ namespace Kaimos {
 		s_3DData->IBuffer->SetData(s_3DData->Indices.data(), s_3DData->Indices.size());
 
 		// -- Bind all Textures --
-		for (uint i = 0; i < s_3DData->TextureSlotIndex; ++i)
-			s_3DData->TextureSlots[i]->Bind(i);
+		//URGENT TODO: Put this on renderer
+		for (uint i = 0; i < Renderer::GetCurrentTextureSlotIndex(); ++i)
+			Renderer::GetTextureFromSlot(i)->Bind(i);
 
 		// -- Draw Vertex Array --
 		RenderCommand::DrawIndexed(s_3DData->VArray, s_3DData->IndicesDrawCount);
@@ -186,7 +176,6 @@ namespace Kaimos {
 		KS_PROFILE_FUNCTION();
 		s_3DData->IndicesDrawCount = 0;
 		s_3DData->IndicesCurrentOffset = 0;
-		s_3DData->TextureSlotIndex = 1; // 0 is white texture
 		s_3DData->VBufferPtr = s_3DData->VBufferBase;
 		s_3DData->Indices.clear();
 	}
@@ -216,7 +205,7 @@ namespace Kaimos {
 			if (!material)
 				KS_FATAL_ERROR("Tried to Render a Mesh with a null Material!");
 
-			uint texture_index = GetTextureIndex(material->GetTexture());
+			uint texture_index = Renderer::GetTextureIndex(material->GetTexture(), &NextBatch);
 
 			// -- Update Mesh Timed Vertices --
 			static float accumulated_dt = 0.0f;
@@ -254,40 +243,5 @@ namespace Kaimos {
 			s_3DData->RendererStats.VerticesCount += mesh->m_Vertices.size();
 			s_3DData->IndicesCurrentOffset += mesh->m_MaxIndex;
 		}
-	}
-	
-		
-
-	// ----------------------- Private Drawing Methods ----------------------------------------------------
-	uint Renderer3D::GetTextureIndex(const Ref<Texture2D>& texture)
-	{
-		uint ret = 0;
-		if (texture)
-		{
-			// -- Find Texture if Exists --
-			for (uint i = 1; i < s_3DData->TextureSlotIndex; ++i)
-			{
-				if (*s_3DData->TextureSlots[i] == *texture)
-				{
-					ret = i;
-					break;
-				}
-			}
-
-			// -- If it doesn't exists, add it to batch data --
-			if (ret == 0)
-			{
-				// - New Batch if Needed -
-				if (s_3DData->TextureSlotIndex >= s_3DData->MaxTextureSlots)
-					NextBatch();
-
-				// - Set Texture -
-				ret = s_3DData->TextureSlotIndex;
-				s_3DData->TextureSlots[s_3DData->TextureSlotIndex] = texture;
-				++s_3DData->TextureSlotIndex;
-			}
-		}
-
-		return ret;
 	}
 }
