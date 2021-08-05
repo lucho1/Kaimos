@@ -54,8 +54,7 @@ namespace Kaimos {
 			texture_samplers[i] = i;
 
 		// -- Shaders Creation --
-		s_RendererData->Shaders.Load("BatchedShader2D", "assets/shaders/BatchRendering_TextureShader.glsl");
-		s_RendererData->Shaders.Load("BatchedShader3D", "assets/shaders/3DTextureShader.glsl");
+		s_RendererData->Shaders.Load("BatchedShader", "assets/shaders/BatchRenderingShader.glsl");
 
 		// -- Shaders Uniform of Texture Slots --
 		s_RendererData->Shaders.ForEachShader([&](const Ref<Shader>& shader)

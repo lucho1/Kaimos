@@ -145,7 +145,7 @@ namespace Kaimos {
 	// ----------------------- Private Renderer Methods ---------------------------------------------------
 	void Renderer2D::SetupRenderingShader(const glm::mat4& vp_matrix)
 	{
-		Ref<Shader> shader = Renderer::GetShader("BatchedShader2D");
+		Ref<Shader> shader = Renderer::GetShader("BatchedShader");
 		if (shader)
 		{
 			s_Data->QuadVArray->Bind();

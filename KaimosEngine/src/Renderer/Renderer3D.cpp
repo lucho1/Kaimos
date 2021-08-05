@@ -127,7 +127,7 @@ namespace Kaimos {
 	// ----------------------- Private Renderer Methods ---------------------------------------------------
 	void Renderer3D::SetupRenderingShader(const glm::mat4& vp_matrix)
 	{
-		Ref<Shader> shader = Renderer::GetShader("BatchedShader3D");
+		Ref<Shader> shader = Renderer::GetShader("BatchedShader");
 		if (shader)
 		{
 			s_3DData->VArray->Bind();
