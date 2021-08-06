@@ -103,17 +103,20 @@ namespace Kaimos {
 
 
 	// ----------------------- Public Renderer Methods ----------------------------------------------------
-	void Renderer3D::BeginScene(const CameraComponent& camera_component, const TransformComponent& transform_component)
+	void Renderer3D::BeginScene(const glm::mat4& view_projection_matrix)
 	{
 		KS_PROFILE_FUNCTION();
-		glm::mat4 view_proj = camera_component.Camera.GetProjection() * glm::inverse(transform_component.GetTransform());
-		SetupRenderingShader(view_proj);
-	}
 
-	void Renderer3D::BeginScene(const Camera& camera)
-	{
-		KS_PROFILE_FUNCTION();
-		SetupRenderingShader(camera.GetViewProjection());
+		Ref<Shader> shader = Renderer::GetShader("BatchedShader");
+		if (shader)
+		{
+			s_3DData->VArray->Bind();
+			shader->Bind();
+			shader->SetUMat4("u_ViewProjection", view_projection_matrix);
+			StartBatch();
+		}
+		else
+			KS_FATAL_ERROR("Renderer3D: Tried to Render with a null Shader!");
 	}
 
 	void Renderer3D::EndScene()
@@ -125,20 +128,6 @@ namespace Kaimos {
 
 
 	// ----------------------- Private Renderer Methods ---------------------------------------------------
-	void Renderer3D::SetupRenderingShader(const glm::mat4& vp_matrix)
-	{
-		Ref<Shader> shader = Renderer::GetShader("BatchedShader");
-		if (shader)
-		{
-			s_3DData->VArray->Bind();
-			shader->Bind();
-			shader->SetUMat4("u_ViewProjection", vp_matrix);
-			StartBatch();
-		}
-		else
-			KS_FATAL_ERROR("Tried to Render with a null Shader!");
-	}
-
 	void Renderer3D::Flush()
 	{
 		KS_PROFILE_FUNCTION();

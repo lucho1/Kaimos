@@ -11,6 +11,8 @@ namespace Kaimos {
 	namespace Resources { class ResourceModel; }
 	class Mesh;
 	class Entity;
+	class TransformComponent;
+	class CameraComponent;
 
 	class Scene
 	{
@@ -51,6 +53,9 @@ namespace Kaimos {
 	private:
 
 		// --- Private Scene Methods ---
+		void BeginScene(const Camera& camera, bool scene3D);
+		void BeginScene(const CameraComponent& camera_component, const TransformComponent& transform_component, bool scene3D);
+
 		void RenderSprites(Timestep dt);
 		void RenderMeshes(Timestep dt);
 		void ConvertMeshIntoEntities(const Ref<Mesh>& mesh);

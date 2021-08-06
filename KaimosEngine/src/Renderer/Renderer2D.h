@@ -40,8 +40,7 @@ namespace Kaimos {
 		static void Shutdown();
 
 		// --- Public Renderer Methods ---
-		static void BeginScene(const CameraComponent& camera_component, const TransformComponent& transform_component);
-		static void BeginScene(const Camera& camera);
+		static void BeginScene(const glm::mat4& view_projection_matrix);
 		static void EndScene();
 
 		// --- Public Drawing Methods ---
@@ -50,8 +49,6 @@ namespace Kaimos {
 	private:
 
 		// --- Private Renderer Methods ---
-		static void SetupRenderingShader(const glm::mat4& vp_matrix);
-
 		static void Flush();
 		static void StartBatch();
 		static void NextBatch();
