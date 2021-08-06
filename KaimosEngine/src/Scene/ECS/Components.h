@@ -97,6 +97,19 @@ namespace Kaimos {
 		DirectionalLightComponent(const DirectionalLightComponent&) = default;
 
 		~DirectionalLightComponent() { Light.reset(); }
+
+		// --- Light Functions ---
+		void SetComponentValues(float falloff, float radius)
+		{
+			StoredLightFalloff = falloff;
+			StoredLightRadius = radius;
+		}
+
+		void SetLightValues(float intensity, const glm::vec4& irradiance)
+		{
+			Light->Intensity = intensity;
+			Light->Irradiance = irradiance;
+		}
 	};
 
 	struct PointLightComponent
@@ -111,11 +124,17 @@ namespace Kaimos {
 
 		~PointLightComponent() { Light.reset(); }
 
-		// --- Light Comp. Functions ---
-		void SetValues(float falloff, float radius)
+		// --- Light Functions ---
+		void SetComponentValues(float falloff, float radius)
 		{
 			Light->FalloffMultiplier = falloff;
 			Light->SetRadius(radius);
+		}
+
+		void SetLightValues(float intensity, const glm::vec4& irradiance)
+		{
+			Light->Intensity = intensity;
+			Light->Irradiance = irradiance;
 		}
 	};
 

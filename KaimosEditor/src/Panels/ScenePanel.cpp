@@ -299,20 +299,20 @@ namespace Kaimos {
 
 			if (ImGui::MenuItem("Directional Light"))
 			{
-				if (!m_SelectedEntity.HasComponent<DirectionalLightComponent>())
+				if (!m_SelectedEntity.HasComponent<DirectionalLightComponent>() && !m_SelectedEntity.HasComponent<PointLightComponent>())
 					m_SelectedEntity.AddComponent<DirectionalLightComponent>();
 				else
-					KS_EDITOR_WARN("DirectionalLightComponent already exists in the Entity!");
+					KS_EDITOR_WARN("Entity already has a Light Component!");
 
 				ImGui::CloseCurrentPopup();
 			}
 
 			if (ImGui::MenuItem("Point Light"))
 			{
-				if (!m_SelectedEntity.HasComponent<PointLightComponent>())
+				if (!m_SelectedEntity.HasComponent<PointLightComponent>() && !m_SelectedEntity.HasComponent<DirectionalLightComponent>())
 					m_SelectedEntity.AddComponent<PointLightComponent>();
 				else
-					KS_EDITOR_WARN("PointLightComponent already exists in the Entity!");
+					KS_EDITOR_WARN("Entity already has a Light Component!");
 
 				ImGui::CloseCurrentPopup();
 			}
@@ -341,8 +341,13 @@ namespace Kaimos {
 
 
 		// -- Light Components --
-		DrawComponentUI<DirectionalLightComponent>("Directional Light", entity, [](auto& component)
+		DrawComponentUI<DirectionalLightComponent>("Directional Light", entity, [&](auto& component)
 			{
+				// Light Type Selector
+				int item = 0;
+				ImGui::Text("Light Type"); ImGui::SameLine();
+				ImGui::Combo("###lighttype", &item, "Directional\0Pointlight\0\0");
+
 				// Light Base Stuff
 				Light* light = component.Light.get();
 
@@ -350,10 +355,25 @@ namespace Kaimos {
 				ImGui::ColorEdit4("Irradiance", glm::value_ptr(light->Irradiance), flags);
 				Kaimos::KaimosUI::UIFunctionalities::DrawInlineSlider("Intensity", "###light_intensity", &light->Intensity);
 
+				// Light Switch
+				if (item == 1)
+				{
+					PointLightComponent& plight = entity.AddComponent<PointLightComponent>();
+					plight.SetComponentValues(component.StoredLightFalloff, component.StoredLightRadius);
+					plight.SetLightValues(light->Intensity, light->Irradiance);
+
+					plight.Visible = component.Visible;
+					entity.RemoveComponent<DirectionalLightComponent>();
+				}
 			});
 
-		DrawComponentUI<PointLightComponent>("Light", entity, [](auto& component)
+		DrawComponentUI<PointLightComponent>("Point Light", entity, [&](auto& component)
 			{
+				// Light Type Selector
+				int item = 1;
+				ImGui::Text("Light Type"); ImGui::SameLine();
+				ImGui::Combo("###lighttype", &item, "Directional\0Pointlight\0\0");
+
 				// Light Base Stuff
 				PointLight* light = component.Light.get();
 
@@ -361,14 +381,23 @@ namespace Kaimos {
 				ImGui::ColorEdit4("Irradiance", glm::value_ptr(light->Irradiance), flags);
 				Kaimos::KaimosUI::UIFunctionalities::DrawInlineSlider("Intensity", "###light_intensity", &light->Intensity);
 
-				// Light Type Selector
-
 				// Point Light Stuff
 				float plight_radius = light->GetRadius();
 				if (Kaimos::KaimosUI::UIFunctionalities::DrawInlineDragFloat("Radius", "###plight_radius", &plight_radius))
 					light->SetRadius(plight_radius);
 
 				Kaimos::KaimosUI::UIFunctionalities::DrawInlineDragFloat("Falloff Intensity", "###plight_falloff", &light->FalloffMultiplier);
+
+				// Light Switch
+				if (item == 0)
+				{
+					DirectionalLightComponent& dlight = entity.AddComponent<DirectionalLightComponent>();
+					dlight.SetComponentValues(light->FalloffMultiplier, light->GetRadius());
+					dlight.SetLightValues(light->Intensity, light->Irradiance);
+
+					dlight.Visible = component.Visible;
+					entity.RemoveComponent<PointLightComponent>();
+				}
 			});
 
 
