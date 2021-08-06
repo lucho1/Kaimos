@@ -32,6 +32,7 @@ namespace Kaimos {
 		// --- Public Scene Methods ---
 		void OnUpdateEditor(Timestep dt, const Camera& camera);
 		void OnUpdateRuntime(Timestep dt);
+
 		void RenderFromCamera(Timestep dt, const Entity& camera_entity);
 		void SetViewportSize(uint width, uint height);
 		void ConvertModelIntoEntities(const Ref<Resources::ResourceModel>& model);
@@ -55,18 +56,21 @@ namespace Kaimos {
 
 	private:
 
-		// --- Private Scene Methods ---
+		// --- Private Scene Lights Methods ---
 		std::vector<Ref<Light>> GetSceneDirLights();
 		std::vector<Ref<PointLight>> GetScenePointLights();
 
+		// --- Private Scene Rendering Methods ---
 		void BeginScene(const Camera& camera, bool scene3D);
 		void BeginScene(const CameraComponent& camera_component, const TransformComponent& transform_component, bool scene3D);
 
 		void RenderSprites(Timestep dt);
 		void RenderMeshes(Timestep dt);
+
+		// --- Private Scene Methods ---
 		void ConvertMeshIntoEntities(const Ref<Mesh>& mesh);
 
-		// --- Private Entities Methods ---
+		// --- Private Scene Entities Methods ---
 		template<typename T>
 		void OnComponentAdded(Entity entity, T& component) const;
 

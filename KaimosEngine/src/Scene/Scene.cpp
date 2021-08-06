@@ -50,7 +50,7 @@ namespace Kaimos {
 	
 
 
-	// ----------------------- Public/Private Scene Methods -----------------------------------------------
+	// ----------------------- Private Scene Lights Methods -----------------------------------------------
 	std::vector<Ref<Light>> Scene::GetSceneDirLights()
 	{
 		std::vector<Ref<Light>> dir_lights;
@@ -83,6 +83,8 @@ namespace Kaimos {
 		return point_lights;
 	}
 
+
+	// ----------------------- Private Scene Rendering Methods --------------------------------------------
 	void Scene::BeginScene(const Camera& camera, bool scene3D)
 	{
 		std::vector<Ref<Light>> dir_lights = GetSceneDirLights();
@@ -125,6 +127,9 @@ namespace Kaimos {
 		}
 	}
 
+
+
+	// ----------------------- Public Scene Methods -------------------------------------------------------
 	void Scene::OnUpdateEditor(Timestep dt, const Camera& camera)
 	{
 		KS_PROFILE_FUNCTION();
@@ -139,6 +144,7 @@ namespace Kaimos {
 		RenderSprites(dt);
 		Renderer2D::EndScene();
 	}
+
 
 	void Scene::OnUpdateRuntime(Timestep dt)
 	{
@@ -177,6 +183,7 @@ namespace Kaimos {
 		}
 	}
 
+
 	void Scene::RenderFromCamera(Timestep dt, const Entity& camera_entity)
 	{
 		// -- Render --
@@ -191,6 +198,7 @@ namespace Kaimos {
 			Renderer2D::EndScene();
 		}
 	}
+
 
 	void Scene::SetViewportSize(uint width, uint height)
 	{
@@ -207,12 +215,16 @@ namespace Kaimos {
 		//}
 	}
 
+
 	void Scene::ConvertModelIntoEntities(const Ref<Resources::ResourceModel>& model)
 	{
 		if (model && Resources::ResourceManager::ModelExists(model->GetID()))
 			ConvertMeshIntoEntities(model->GetRootMesh());
 	}
 
+
+
+	// ----------------------- Private Scene Methods ------------------------------------------------------
 	void Scene::ConvertMeshIntoEntities(const Ref<Mesh>& mesh)
 	{
 		if (!mesh || !Resources::ResourceManager::MeshExists(mesh->GetID()))
@@ -303,7 +315,7 @@ namespace Kaimos {
 
 	
 
-	// ----------------------- Private Entities Methods --------------------------------------------------
+	// ----------------------- Private Scene Entities Methods --------------------------------------------
 	// On Component Added
 	template<typename T>
 	void Scene::OnComponentAdded(Entity entity, T& component) const
