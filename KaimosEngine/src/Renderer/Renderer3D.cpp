@@ -1,12 +1,14 @@
 #include "kspch.h"
 #include "Renderer3D.h"
 
-#include "Core/Resources/ResourceManager.h"
 #include "Foundations/RenderCommand.h"
 #include "Resources/Buffer.h"
 #include "Resources/Shader.h"
 #include "Resources/Mesh.h"
 #include "Resources/Material.h"
+#include "Resources/Light.h"
+
+#include "Core/Resources/ResourceManager.h"
 #include "Scene/ECS/Components.h"
 
 #include <glm/gtc/type_ptr.hpp>
@@ -103,7 +105,7 @@ namespace Kaimos {
 
 
 	// ----------------------- Public Renderer Methods ----------------------------------------------------
-	void Renderer3D::BeginScene(const glm::mat4& view_projection_matrix)
+	void Renderer3D::BeginScene(const glm::mat4& view_projection_matrix, const std::vector<Ref<Light>>& dir_lights, const std::vector<Ref<PointLight>>& point_lights)
 	{
 		KS_PROFILE_FUNCTION();
 

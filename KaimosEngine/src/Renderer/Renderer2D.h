@@ -3,12 +3,13 @@
 
 #include "Core/Utils/Time/Timestep.h"
 #include "Cameras/Camera.h"
-#include "Resources/Texture.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 
 namespace Kaimos {
 
+	class Light;
+	class PointLight;
 	struct TransformComponent;
 	struct CameraComponent;
 	struct SpriteRendererComponent;
@@ -40,7 +41,7 @@ namespace Kaimos {
 		static void Shutdown();
 
 		// --- Public Renderer Methods ---
-		static void BeginScene(const glm::mat4& view_projection_matrix);
+		static void BeginScene(const glm::mat4& view_projection_matrix, const std::vector<Ref<Light>>& dir_lights, const std::vector<Ref<PointLight>>& point_lights);
 		static void EndScene();
 
 		// --- Public Drawing Methods ---

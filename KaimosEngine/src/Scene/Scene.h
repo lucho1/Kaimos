@@ -9,6 +9,9 @@
 namespace Kaimos {
 
 	namespace Resources { class ResourceModel; }
+
+	class Light;
+	class PointLight;
 	class Mesh;
 	class Entity;
 	class TransformComponent;
@@ -53,6 +56,9 @@ namespace Kaimos {
 	private:
 
 		// --- Private Scene Methods ---
+		std::vector<Ref<Light>> GetSceneDirLights();
+		std::vector<Ref<PointLight>> GetScenePointLights();
+
 		void BeginScene(const Camera& camera, bool scene3D);
 		void BeginScene(const CameraComponent& camera_component, const TransformComponent& transform_component, bool scene3D);
 

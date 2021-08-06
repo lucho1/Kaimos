@@ -1,11 +1,12 @@
 #include "kspch.h"
 #include "Renderer2D.h"
 
-#include "Renderer.h"
 #include "Foundations/RenderCommand.h"
 #include "Resources/Buffer.h"
 #include "Resources/Shader.h"
 #include "Resources/Material.h"
+#include "Resources/Light.h"
+
 #include "Scene/ECS/Components.h"
 
 #include <glm/gtc/type_ptr.hpp>
@@ -121,7 +122,7 @@ namespace Kaimos {
 
 	
 	// ----------------------- Public Renderer Methods ----------------------------------------------------
-	void Renderer2D::BeginScene(const glm::mat4& view_projection_matrix)
+	void Renderer2D::BeginScene(const glm::mat4& view_projection_matrix, const std::vector<Ref<Light>>& dir_lights, const std::vector<Ref<PointLight>>& point_lights)
 	{
 		Ref<Shader> shader = Renderer::GetShader("BatchedShader");
 		if (shader)

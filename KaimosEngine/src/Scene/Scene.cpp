@@ -7,6 +7,7 @@
 #include "Renderer/Renderer2D.h"
 #include "Renderer/Renderer3D.h"
 #include "Renderer/Resources/Mesh.h"
+#include "Renderer/Resources/Light.h"
 
 #include "Core/Resources/ResourceManager.h"
 #include "Core/Resources/Resource.h"
@@ -50,25 +51,63 @@ namespace Kaimos {
 
 
 	// ----------------------- Public/Private Scene Methods -----------------------------------------------
+	std::vector<Ref<Light>> Scene::GetSceneDirLights()
+	{
+		std::vector<Ref<Light>> dir_lights;
+		auto dirlights_group = m_Registry.group<DirectionalLightComponent>(entt::get<TransformComponent>);
+		dir_lights.reserve(dirlights_group.size());
+
+		for (auto ent : dirlights_group)
+		{
+			auto& [light, transform] = dirlights_group.get<DirectionalLightComponent, TransformComponent>(ent);
+			if (transform.EntityActive && light.Visible)
+				dir_lights.push_back(light.Light);
+		}
+
+		return dir_lights;
+	}
+
+	std::vector<Ref<PointLight>> Scene::GetScenePointLights()
+	{
+		std::vector<Ref<PointLight>> point_lights;
+		auto pointlights_group = m_Registry.group<PointLightComponent>(entt::get<TransformComponent>);
+		point_lights.reserve(pointlights_group.size());
+
+		for (auto ent : pointlights_group)
+		{
+			auto& [light, transform] = pointlights_group.get<PointLightComponent, TransformComponent>(ent);
+			if (transform.EntityActive && light.Visible)
+				point_lights.push_back(light.Light);
+		}
+
+		return point_lights;
+	}
+
 	void Scene::BeginScene(const Camera& camera, bool scene3D)
 	{
+		std::vector<Ref<Light>> dir_lights = GetSceneDirLights();
+		std::vector<Ref<PointLight>> plights = GetScenePointLights();
+
 		glm::mat4 view_proj = camera.GetViewProjection();
-		scene3D ? Renderer3D::BeginScene(view_proj) : Renderer2D::BeginScene(view_proj);
+		scene3D ? Renderer3D::BeginScene(view_proj, dir_lights, plights) : Renderer2D::BeginScene(view_proj, dir_lights, plights);
 	}
 
 	void Scene::BeginScene(const CameraComponent& camera_component, const TransformComponent& transform_component, bool scene3D)
 	{
+		std::vector<Ref<Light>> dir_lights = GetSceneDirLights();
+		std::vector<Ref<PointLight>> plights = GetScenePointLights();
+
 		glm::mat4 view_proj = camera_component.Camera.GetProjection() * glm::inverse(transform_component.GetTransform());
-		scene3D ? Renderer3D::BeginScene(view_proj) : Renderer2D::BeginScene(view_proj);
+		scene3D ? Renderer3D::BeginScene(view_proj, dir_lights, plights) : Renderer2D::BeginScene(view_proj, dir_lights, plights);
 	}
 
 	void Scene::RenderSprites(Timestep dt)
 	{
 		KS_PROFILE_FUNCTION();
-		auto sprite_group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
+		auto sprite_group = m_Registry.group<SpriteRendererComponent>(entt::get<TransformComponent>);
 		for (auto ent : sprite_group)
 		{
-			auto& [transform, sprite] = sprite_group.get<TransformComponent, SpriteRendererComponent>(ent);
+			auto& [sprite, transform] = sprite_group.get<SpriteRendererComponent, TransformComponent>(ent);
 			if (transform.EntityActive)
 				Renderer2D::DrawSprite(dt, transform.GetTransform(), sprite, (int)ent);
 		}
@@ -77,10 +116,10 @@ namespace Kaimos {
 	void Scene::RenderMeshes(Timestep dt)
 	{
 		KS_PROFILE_FUNCTION();
-		auto mesh_view = m_Registry.view<TransformComponent, MeshRendererComponent>();
-		for (auto ent : mesh_view)
+		auto mesh_group = m_Registry.group<TransformComponent>(entt::get<MeshRendererComponent>);
+		for (auto ent : mesh_group)
 		{
-			auto& [transform, mesh] = mesh_view.get<TransformComponent, MeshRendererComponent>(ent);
+			auto& [transform, mesh] = mesh_group.get<TransformComponent, MeshRendererComponent>(ent);
 			if (transform.EntityActive)
 				Renderer3D::DrawMesh(dt, transform.GetTransform(), mesh, (int)ent);
 		}
