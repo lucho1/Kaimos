@@ -113,7 +113,7 @@ namespace Kaimos {
 		// -- Memory Metrics Gathering --
 		float float_mem_allocs[MEMORY_ALLOCATIONS_SAMPLES];
 		for (uint i = 0; i < MEMORY_ALLOCATIONS_SAMPLES; ++i)
-			float_mem_allocs[i] = (float)m_MemoryAllocations[i];		
+			float_mem_allocs[i] = (float)m_MemoryAllocations[i];
 		
 
 		// -- Plots --
