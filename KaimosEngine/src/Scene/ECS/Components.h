@@ -105,10 +105,10 @@ namespace Kaimos {
 			StoredLightRadius = radius;
 		}
 
-		void SetLightValues(float intensity, const glm::vec4& irradiance)
+		void SetLightValues(float intensity, const glm::vec4& radiance)
 		{
 			Light->Intensity = intensity;
-			Light->Irradiance = irradiance;
+			Light->Radiance = radiance;
 		}
 	};
 
@@ -131,10 +131,10 @@ namespace Kaimos {
 			Light->SetRadius(radius);
 		}
 
-		void SetLightValues(float intensity, const glm::vec4& irradiance)
+		void SetLightValues(float intensity, const glm::vec4& radiance)
 		{
 			Light->Intensity = intensity;
-			Light->Irradiance = irradiance;
+			Light->Radiance = radiance;
 		}
 	};
 

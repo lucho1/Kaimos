@@ -353,8 +353,8 @@ namespace Kaimos {
 				ImGuiColorEditFlags flags = ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_Float | ImGuiColorEditFlags_AlphaPreview | ImGuiColorEditFlags_NoInputs;
 
 				ImGui::NewLine();
-				KaimosUI::UIFunctionalities::SetTextCursorAndWidth("Irradiance");
-				ImGui::ColorEdit4("###light_irradiance", glm::value_ptr(light->Irradiance), flags);
+				KaimosUI::UIFunctionalities::SetTextCursorAndWidth("Radiance");
+				ImGui::ColorEdit4("###light_radiance", glm::value_ptr(light->Radiance), flags);
 				Kaimos::KaimosUI::UIFunctionalities::DrawInlineSlider("Intensity", "###light_intensity", &light->Intensity);
 
 				// Light Switch
@@ -362,7 +362,7 @@ namespace Kaimos {
 				{
 					PointLightComponent& plight = entity.AddComponent<PointLightComponent>();
 					plight.SetComponentValues(component.StoredLightFalloff, component.StoredLightRadius);
-					plight.SetLightValues(light->Intensity, light->Irradiance);
+					plight.SetLightValues(light->Intensity, light->Radiance);
 
 					plight.Visible = component.Visible;
 					entity.RemoveComponent<DirectionalLightComponent>();
@@ -381,8 +381,8 @@ namespace Kaimos {
 				ImGuiColorEditFlags flags = ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_Float | ImGuiColorEditFlags_AlphaPreview | ImGuiColorEditFlags_NoInputs;
 
 				ImGui::NewLine();
-				KaimosUI::UIFunctionalities::SetTextCursorAndWidth("Irradiance");
-				ImGui::ColorEdit4("###light_irradiance", glm::value_ptr(light->Irradiance), flags);
+				KaimosUI::UIFunctionalities::SetTextCursorAndWidth("Radiance");
+				ImGui::ColorEdit4("###light_radiance", glm::value_ptr(light->Radiance), flags);
 				Kaimos::KaimosUI::UIFunctionalities::DrawInlineSlider("Intensity", "###light_intensity", &light->Intensity);
 
 				// Point Light Stuff
@@ -397,7 +397,7 @@ namespace Kaimos {
 				{
 					DirectionalLightComponent& dlight = entity.AddComponent<DirectionalLightComponent>();
 					dlight.SetComponentValues(light->FalloffMultiplier, light->GetRadius());
-					dlight.SetLightValues(light->Intensity, light->Irradiance);
+					dlight.SetLightValues(light->Intensity, light->Radiance);
 
 					dlight.Visible = component.Visible;
 					entity.RemoveComponent<PointLightComponent>();
