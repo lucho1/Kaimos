@@ -344,19 +344,21 @@ namespace Kaimos {
 		DrawComponentUI<DirectionalLightComponent>("Directional Light", entity, [&](auto& component)
 			{
 				// Light Type Selector
-				int item = 0;
-				ImGui::Text("Light Type"); ImGui::SameLine();
-				ImGui::Combo("###lighttype", &item, "Directional\0Pointlight\0\0");
+				int light_type = 0;
+				KaimosUI::UIFunctionalities::SetTextCursorAndWidth("Light Type");
+				ImGui::Combo("###lighttype", &light_type, "Directional\0Pointlight\0\0");
 
 				// Light Base Stuff
 				Light* light = component.Light.get();
-
 				ImGuiColorEditFlags flags = ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_Float | ImGuiColorEditFlags_AlphaPreview | ImGuiColorEditFlags_NoInputs;
-				ImGui::ColorEdit4("Irradiance", glm::value_ptr(light->Irradiance), flags);
+
+				ImGui::NewLine();
+				KaimosUI::UIFunctionalities::SetTextCursorAndWidth("Irradiance");
+				ImGui::ColorEdit4("###light_irradiance", glm::value_ptr(light->Irradiance), flags);
 				Kaimos::KaimosUI::UIFunctionalities::DrawInlineSlider("Intensity", "###light_intensity", &light->Intensity);
 
 				// Light Switch
-				if (item == 1)
+				if (light_type == 1)
 				{
 					PointLightComponent& plight = entity.AddComponent<PointLightComponent>();
 					plight.SetComponentValues(component.StoredLightFalloff, component.StoredLightRadius);
@@ -370,15 +372,17 @@ namespace Kaimos {
 		DrawComponentUI<PointLightComponent>("Point Light", entity, [&](auto& component)
 			{
 				// Light Type Selector
-				int item = 1;
-				ImGui::Text("Light Type"); ImGui::SameLine();
-				ImGui::Combo("###lighttype", &item, "Directional\0Pointlight\0\0");
+				int light_type = 1;
+				KaimosUI::UIFunctionalities::SetTextCursorAndWidth("Light Type");
+				ImGui::Combo("###lighttype", &light_type, "Directional\0Pointlight\0\0");
 
 				// Light Base Stuff
 				PointLight* light = component.Light.get();
-
 				ImGuiColorEditFlags flags = ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_Float | ImGuiColorEditFlags_AlphaPreview | ImGuiColorEditFlags_NoInputs;
-				ImGui::ColorEdit4("Irradiance", glm::value_ptr(light->Irradiance), flags);
+
+				ImGui::NewLine();
+				KaimosUI::UIFunctionalities::SetTextCursorAndWidth("Irradiance");
+				ImGui::ColorEdit4("###light_irradiance", glm::value_ptr(light->Irradiance), flags);
 				Kaimos::KaimosUI::UIFunctionalities::DrawInlineSlider("Intensity", "###light_intensity", &light->Intensity);
 
 				// Point Light Stuff
@@ -389,7 +393,7 @@ namespace Kaimos {
 				Kaimos::KaimosUI::UIFunctionalities::DrawInlineDragFloat("Falloff Intensity", "###plight_falloff", &light->FalloffMultiplier);
 
 				// Light Switch
-				if (item == 0)
+				if (light_type == 0)
 				{
 					DirectionalLightComponent& dlight = entity.AddComponent<DirectionalLightComponent>();
 					dlight.SetComponentValues(light->FalloffMultiplier, light->GetRadius());
@@ -485,8 +489,6 @@ namespace Kaimos {
 						ImGui::TreePop();
 						return;
 					}
-
-					ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[1]);
 
 					// Materials Dropdown
 					uint current_material_index = 0;
@@ -590,8 +592,6 @@ namespace Kaimos {
 					ImGui::Text("Material ID:\t\t\t %i", material->GetID());
 					ImGui::Text("Material Graph ID: %i", material->GetAttachedGraphID());
 
-					ImGui::PopFont();
-
 					// Open in Material Editor Button
 					ImGui::NewLine(); ImGui::NewLine();
 					if (Renderer::IsDefaultMaterial(material->GetID()))
@@ -611,7 +611,6 @@ namespace Kaimos {
 					}
 
 					ImGui::NewLine();
-
 					ImGui::TreePop();
 				}
 			});
@@ -643,7 +642,6 @@ namespace Kaimos {
 				meshes_names.push_back("None");
 
 				// Draw Meshes Dropdown
-				ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[1]);
 				if (KaimosUI::UIFunctionalities::DrawDropDown("Mesh", meshes_names, meshes_names.size(), current_mesh_name, current_mesh_index, 135.5f, 2.45f))
 				{
 					// Set Mesh
@@ -662,11 +660,7 @@ namespace Kaimos {
 
 				// Draw Mesh Info
 				if (!mesh)
-				{
-					ImGui::PopFont();
 					return;
-				}
-
 
 				// Mesh Info.
 				ImGui::Text("Mesh:\t\t\t\t\t  %s", mesh->GetName().c_str());
@@ -677,10 +671,7 @@ namespace Kaimos {
 				// Get Material
 				Ref<Material> material = Renderer::GetMaterial(component.MaterialID);
 				if (!material)
-				{
-					ImGui::PopFont();
 					return;
-				}
 
 				// Set Materials Dropdown
 				uint mats_size = Renderer::GetMaterialsQuantity();
@@ -784,8 +775,6 @@ namespace Kaimos {
 				ImGui::Text("Color:\t\t\t\t\t\tRGBA(%i, %i, %i, %i)", col.r, col.g, col.b, col.a);
 				ImGui::Text("Material ID:\t\t\t %i", material->GetID());
 				ImGui::Text("Material Graph ID: %i", material->GetAttachedGraphID());
-
-				ImGui::PopFont();
 
 				// Open in Material Editor Button
 				ImGui::NewLine(); ImGui::NewLine();

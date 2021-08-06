@@ -42,6 +42,8 @@ namespace Kaimos {
 
 		// --- Public Renderer Shaders Methods ---
 		static Ref<Shader> GetShader(const std::string& name);
+		static const glm::vec3 GetSceneColor();
+		static void SetSceneColor(const glm::vec3& color);
 
 		// --- Public Renderer Textures Methods ---
 		static void BindTextures();

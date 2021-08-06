@@ -6,6 +6,7 @@
 #include "Resources/Material.h"
 #include "Resources/Shader.h"
 #include "Resources/Texture.h"
+#include "Resources/Light.h"
 
 #include "Renderer2D.h"
 #include "Renderer3D.h"
@@ -18,6 +19,7 @@ namespace Kaimos {
 	struct RendererData
 	{
 		glm::mat4 ViewProjectionMatrix = glm::mat4(1.0f);
+		glm::vec3 SceneColor = glm::vec3(1.0f);
 		
 		// Shaders & Materials
 		ShaderLibrary Shaders;
@@ -247,6 +249,16 @@ namespace Kaimos {
 			return s_RendererData->Shaders.Get(name);
 
 		return nullptr;
+	}
+
+	const glm::vec3 Renderer::GetSceneColor()
+	{
+		return s_RendererData->SceneColor;
+	}
+
+	void Renderer::SetSceneColor(const glm::vec3& color)
+	{
+		s_RendererData->SceneColor = color;
 	}
 
 
