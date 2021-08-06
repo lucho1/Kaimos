@@ -1,7 +1,7 @@
 # Kaimos Engine
 Kaimos Engine is, a basic engine for educational purposes. It aims to be a 3D Geometry visualizer with a basic OpenGL renderer in order to be a basis for the development of the Degree Thesis (TFG) of my degree in Videogames Design and Development at CITM-UPC.
 
-The purpose of the TFG is to build a node-based Material Editor (like the Unreal's one) in order to make the understanding and creation of materials and environments edition easy for anyone without having a deep understanding of the subject and without having to write any kind of code. As well, my purpose is to gather the documentation to made this in the mentioned thesis (found here).
+The purpose of the TFG is to build a node-based Material Editor in order to make the understanding and creation of materials and environments edition easy for anyone without having a deep understanding of the subject and without having to write any kind of code. As well, my purpose is to gather the documentation to made this in the mentioned thesis (found here).
 
 ## Camera Controls
 To move through the scene, shown in the scene viewport, the **editor camera** can be used with the next controls (LMB, RMB and MMB refer to the left, right and middle mouse buttons respectively):
