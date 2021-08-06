@@ -18,8 +18,10 @@ namespace Kaimos {
 
 	struct RendererData
 	{
+		// Renderer Stuff
 		glm::mat4 ViewProjectionMatrix = glm::mat4(1.0f);
 		glm::vec3 SceneColor = glm::vec3(1.0f);
+		const uint MaxDirLights = 100, MaxPointLights = 100;
 		
 		// Shaders & Materials
 		ShaderLibrary Shaders;
@@ -241,16 +243,8 @@ namespace Kaimos {
 	}
 
 
-
-	// ----------------------- Public Renderer Shaders Methods -----------------------------------------------
-	Ref<Shader> Renderer::GetShader(const std::string& name)
-	{
-		if (s_RendererData->Shaders.Exists(name))
-			return s_RendererData->Shaders.Get(name);
-
-		return nullptr;
-	}
-
+	
+	// ----------------------- Public Getters & Renderer Shaders Methods -------------------------------------
 	const glm::vec3 Renderer::GetSceneColor()
 	{
 		return s_RendererData->SceneColor;
@@ -259,6 +253,24 @@ namespace Kaimos {
 	void Renderer::SetSceneColor(const glm::vec3& color)
 	{
 		s_RendererData->SceneColor = color;
+	}
+
+	const uint Renderer::GetMaxDirLights()
+	{
+		return s_RendererData->MaxDirLights;
+	}
+
+	const uint Renderer::GetMaxPointLights()
+	{
+		return s_RendererData->MaxPointLights;
+	}
+
+	Ref<Shader> Renderer::GetShader(const std::string& name)
+	{
+		if (s_RendererData->Shaders.Exists(name))
+			return s_RendererData->Shaders.Get(name);
+
+		return nullptr;
 	}
 
 
