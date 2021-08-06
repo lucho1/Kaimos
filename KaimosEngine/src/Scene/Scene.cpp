@@ -253,6 +253,7 @@ namespace Kaimos {
 	
 
 	// ----------------------- Private Entities Methods --------------------------------------------------
+	// On Component Added
 	template<typename T>
 	void Scene::OnComponentAdded(Entity entity, T& component) const
 	{
@@ -276,6 +277,21 @@ namespace Kaimos {
 	}
 
 	template<>
+	void Scene::OnComponentAdded<DirectionalLightComponent>(Entity entity, DirectionalLightComponent& component) const
+	{
+	}
+
+	template<>
+	void Scene::OnComponentAdded<PointLightComponent>(Entity entity, PointLightComponent& component) const
+	{
+	}
+
+	template<>
+	void Scene::OnComponentAdded<NativeScriptComponent>(Entity entity, NativeScriptComponent& component) const
+	{
+	}
+
+	template<>
 	void Scene::OnComponentAdded<SpriteRendererComponent>(Entity entity, SpriteRendererComponent& component) const
 	{
 		component.RemoveMaterial();
@@ -287,8 +303,20 @@ namespace Kaimos {
 		component.RemoveMaterial();
 	}
 
-	template<>
-	void Scene::OnComponentAdded<NativeScriptComponent>(Entity entity, NativeScriptComponent& component) const
-	{
-	}
+
+	// On Component Removed
+	//template<>
+	//void Scene::OnComponentRemoved<LightComponent>(Entity entity, LightComponent& component) const
+	//{
+	//	if (component.Light->GetLightType() == LightType::POINTLIGHT)
+	//	{
+	//		Ref<PointLight> plight_ref = Ref<PointLight>(static_cast<PointLight*>(component.Light.get()));
+	//		PointLight* plight = static_cast<PointLight*>(component.Light.get());
+	//
+	//		plight_ref.reset();
+	//		delete plight;
+	//	}
+	//	
+	//	component.Light.reset();
+	//}
 }

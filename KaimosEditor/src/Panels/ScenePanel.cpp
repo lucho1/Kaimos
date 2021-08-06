@@ -76,16 +76,37 @@ namespace Kaimos {
 				m_SelectedEntity.AddComponent<CameraComponent>();
 			}
 
-			if (ImGui::MenuItem("Create 2D Sprite"))
+			if (ImGui::BeginMenu("Create Geometry"))
 			{
-				m_SelectedEntity = m_SceneContext->CreateEntity("Sprite");
-				m_SelectedEntity.AddComponent<SpriteRendererComponent>();
+				if (ImGui::MenuItem("2D Sprite"))
+				{
+					m_SelectedEntity = m_SceneContext->CreateEntity("Sprite");
+					m_SelectedEntity.AddComponent<SpriteRendererComponent>();
+				}
+
+				if (ImGui::MenuItem("3D Mesh"))
+				{
+					m_SelectedEntity = m_SceneContext->CreateEntity("Mesh");
+					m_SelectedEntity.AddComponent<MeshRendererComponent>();
+				}
+				ImGui::EndMenu();
 			}
 
-			if (ImGui::MenuItem("Create 3D Mesh"))
+			if (ImGui::BeginMenu("Create Light"))
 			{
-				m_SelectedEntity = m_SceneContext->CreateEntity("Mesh");
-				m_SelectedEntity.AddComponent<MeshRendererComponent>();
+				if (ImGui::MenuItem("Directional Light"))
+				{
+					m_SelectedEntity = m_SceneContext->CreateEntity("Directional Light");
+					m_SelectedEntity.AddComponent<DirectionalLightComponent>();
+				}
+
+				if (ImGui::MenuItem("Point Light"))
+				{
+					m_SelectedEntity = m_SceneContext->CreateEntity("Point Light");
+					m_SelectedEntity.AddComponent<PointLightComponent>();
+				}
+
+				ImGui::EndMenu();
 			}
 
 			ImGui::EndPopup();
@@ -276,6 +297,26 @@ namespace Kaimos {
 				ImGui::CloseCurrentPopup();
 			}
 
+			if (ImGui::MenuItem("Directional Light"))
+			{
+				if (!m_SelectedEntity.HasComponent<DirectionalLightComponent>())
+					m_SelectedEntity.AddComponent<DirectionalLightComponent>();
+				else
+					KS_EDITOR_WARN("DirectionalLightComponent already exists in the Entity!");
+
+				ImGui::CloseCurrentPopup();
+			}
+
+			if (ImGui::MenuItem("Point Light"))
+			{
+				if (!m_SelectedEntity.HasComponent<PointLightComponent>())
+					m_SelectedEntity.AddComponent<PointLightComponent>();
+				else
+					KS_EDITOR_WARN("PointLightComponent already exists in the Entity!");
+
+				ImGui::CloseCurrentPopup();
+			}
+
 			ImGui::EndPopup();
 		}
 
@@ -296,6 +337,38 @@ namespace Kaimos {
 
 				// Scale
 				KaimosUI::UIFunctionalities::DrawVec3UI("Scale", component.Scale, xcol, ycol, zcol, 1.0f);
+			});
+
+
+		// -- Light Components --
+		DrawComponentUI<DirectionalLightComponent>("Directional Light", entity, [](auto& component)
+			{
+				// Light Base Stuff
+				Light* light = component.Light.get();
+
+				ImGuiColorEditFlags flags = ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_Float | ImGuiColorEditFlags_AlphaPreview | ImGuiColorEditFlags_NoInputs;
+				ImGui::ColorEdit4("Irradiance", glm::value_ptr(light->Irradiance), flags);
+				Kaimos::KaimosUI::UIFunctionalities::DrawInlineSlider("Intensity", "###light_intensity", &light->Intensity);
+
+			});
+
+		DrawComponentUI<PointLightComponent>("Light", entity, [](auto& component)
+			{
+				// Light Base Stuff
+				PointLight* light = component.Light.get();
+
+				ImGuiColorEditFlags flags = ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_Float | ImGuiColorEditFlags_AlphaPreview | ImGuiColorEditFlags_NoInputs;
+				ImGui::ColorEdit4("Irradiance", glm::value_ptr(light->Irradiance), flags);
+				Kaimos::KaimosUI::UIFunctionalities::DrawInlineSlider("Intensity", "###light_intensity", &light->Intensity);
+
+				// Light Type Selector
+
+				// Point Light Stuff
+				float plight_radius = light->GetRadius();
+				if (Kaimos::KaimosUI::UIFunctionalities::DrawInlineDragFloat("Radius", "###plight_radius", &plight_radius))
+					light->SetRadius(plight_radius);
+
+				Kaimos::KaimosUI::UIFunctionalities::DrawInlineDragFloat("Falloff Intensity", "###plight_falloff", &light->FalloffMultiplier);
 			});
 
 

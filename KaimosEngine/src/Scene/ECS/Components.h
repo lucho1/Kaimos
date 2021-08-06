@@ -8,6 +8,7 @@
 #include "Renderer/Cameras/Camera.h"
 #include "Renderer/Resources/Mesh.h"
 #include "Renderer/Resources/Material.h"
+#include "Renderer/Resources/Light.h"
 #include "ScriptableEntity.h"
 
 #include <glm/glm.hpp>
@@ -77,6 +78,45 @@ namespace Kaimos {
 		// --- Constructors ---
 		CameraComponent() = default;
 		CameraComponent(const CameraComponent&) = default;
+	};
+
+
+
+	// ---- LIGHT COMPONENTS ----------------------------------------
+	struct DirectionalLightComponent
+	{
+		// --- Variables ---
+		Ref<Kaimos::Light> Light = CreateRef<Kaimos::Light>();
+		bool Visible = true;
+
+		// --- Storage Variables (to switch types) ---
+		float StoredLightRadius = 50.0f, StoredLightFalloff = 1.0f;
+
+		// --- Constructors ---
+		DirectionalLightComponent() = default;
+		DirectionalLightComponent(const DirectionalLightComponent&) = default;
+
+		~DirectionalLightComponent() { Light.reset(); }
+	};
+
+	struct PointLightComponent
+	{
+		// --- Variables ---
+		Ref<Kaimos::PointLight> Light = CreateRef<Kaimos::PointLight>();
+		bool Visible = true;
+
+		// --- Constructors ---
+		PointLightComponent() = default;
+		PointLightComponent(const PointLightComponent&) = default;
+
+		~PointLightComponent() { Light.reset(); }
+
+		// --- Light Comp. Functions ---
+		void SetValues(float falloff, float radius)
+		{
+			Light->FalloffMultiplier = falloff;
+			Light->SetRadius(radius);
+		}
 	};
 
 
