@@ -108,6 +108,7 @@ namespace Kaimos {
 		YAML::Emitter output;
 		output << YAML::BeginMap;
 		output << YAML::Key << "KaimosScene" << YAML::Value << m_Scene->GetName().c_str();	// Save Scene as Key + SceneName as value
+		output << YAML::Key << "SceneColor" << YAML::Value << Renderer::GetSceneColor();	// Save Scene Color
 		output << YAML::Key << "Entities" << YAML::Value << YAML::BeginSeq;					// Save Entities as a sequence (like an array)
 
 		m_Scene->m_Registry.each([&](auto entityID)
@@ -155,6 +156,9 @@ namespace Kaimos {
 		KS_TRACE("Deserializing scene '{0}'", scene_name);
 		m_Scene->SetName(scene_name);
 		m_Scene->SetPath(filepath);
+
+		if (data["SceneColor"])
+			Renderer::SetSceneColor(data["SceneColor"].as<glm::vec3>());
 
 		// -- Entities Load --
 		uint entities_deserialized = 0;

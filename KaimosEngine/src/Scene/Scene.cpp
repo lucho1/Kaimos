@@ -41,11 +41,13 @@ namespace Kaimos {
 	Scene::Scene()
 	{
 		m_PrimaryCamera = {};
+		Renderer::SetSceneColor(glm::vec3(1.0f));
 	}
 
 	Scene::Scene(const std::string& name) : m_Name(name)
 	{
 		m_PrimaryCamera = {};
+		Renderer::SetSceneColor(glm::vec3(1.0f));
 	}
 	
 
