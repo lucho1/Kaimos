@@ -44,6 +44,9 @@ namespace Kaimos {
 		float GetRadius() const { return m_Radius; }
 		void SetRadius(float radius);
 
+		float GetLinearAttenuationFactor() const { return m_AttenuationLinearFactor; }
+		float GetQuadraticAttenuationFactor() const { return m_AttenuationQuadraticFactor; }
+
 	private:
 
 		// --- Private Lights Methods ---

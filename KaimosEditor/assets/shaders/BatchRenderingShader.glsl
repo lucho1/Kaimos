@@ -38,7 +38,7 @@ void main()
 #type FRAGMENT_SHADER
 #version 460 core
 
-#define MAX_DIR_LIGHTS 100
+#define MAX_DIR_LIGHTS 10
 #define MAX_POINT_LIGHTS 100
 
 layout(location = 0) out vec4 color;
@@ -57,30 +57,51 @@ in flat int v_EntityID;
 struct DirectionalLight
 {
 	vec4 Radiance;
-	float Intensity;
 	vec3 Direction;
+	float Intensity;
+};
+
+struct PointLight
+{
+	vec4 Radiance;
+	vec3 Position;
+	float Intensity;
+
+	float Radius;
+	float FalloffFactor, AttK, AttQ;
 };
 
 // Uniforms
 uniform sampler2D u_Textures[32];
 
 uniform vec3 u_SceneColor = vec3(1.0);
-uniform DirectionalLight u_DirectionalLights[MAX_DIR_LIGHTS] = DirectionalLight[MAX_DIR_LIGHTS](DirectionalLight(vec4(1.0), 1.0, vec3(0.0)));
-uniform const int u_DirectionalLightsNum = 0;
+uniform const int u_DirectionalLightsNum = 0, u_PointLightsNum = 0;
+uniform DirectionalLight u_DirectionalLights[MAX_DIR_LIGHTS] = DirectionalLight[MAX_DIR_LIGHTS](DirectionalLight(vec4(1.0), vec3(0.0), 1.0));
+uniform PointLight u_PointLights[MAX_POINT_LIGHTS] = PointLight[MAX_POINT_LIGHTS](PointLight(vec4(1.0), vec3(0.0), 1.0, 50.0, 1.0, 0.09, 0.032));
 
 
 void main()
 {
 	color2 = v_EntityID;
+	
+	vec3 normal = normalize(v_Normal);
 
 	vec3 lighting_result = vec3(0.0);
 	for(int i = 0; i < u_DirectionalLightsNum; ++i)
 	{
-		vec3 normal = normalize(v_Normal);
 		vec3 light_dir = normalize(u_DirectionalLights[i].Direction);
 
 		float diffuse_factor = max(dot(normal, light_dir), 0.0);
 		vec3 diffuse_component = diffuse_factor * u_DirectionalLights[i].Radiance.rgb;
+		lighting_result += diffuse_component;
+	}
+	
+	for(int i = 0; i < u_PointLightsNum; ++i)
+	{
+		vec3 light_dir = normalize(u_PointLights[i].Position - v_FragPos);
+
+		float diffuse_factor = max(dot(normal, light_dir), 0.0);
+		vec3 diffuse_component = diffuse_factor * u_PointLights[i].Radiance.rgb;
 		lighting_result += diffuse_component;
 	}
 

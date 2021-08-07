@@ -143,10 +143,26 @@ namespace Kaimos {
 			{
 				std::string light_array_uniform = "u_DirectionalLights[" + std::to_string(i) + "].";
 				shader->SetUFloat4(light_array_uniform + "Radiance", dir_lights[i].first->Radiance);
-				shader->SetUFloat(light_array_uniform + "Intensity", dir_lights[i].first->Intensity);
 				shader->SetUFloat3(light_array_uniform + "Direction", dir_lights[i].second);
+				shader->SetUFloat(light_array_uniform + "Intensity", dir_lights[i].first->Intensity);
 			}
 
+			uint max_point_lights = Renderer::GetMaxPointLights();
+			uint point_lights_size = point_lights.size() >= max_point_lights ? max_point_lights : point_lights.size();
+			shader->SetUInt("u_PointLightsNum", point_lights_size);
+
+			for (uint i = 0; i < point_lights_size; ++i)
+			{
+				std::string light_array_uniform = "u_PointLights[" + std::to_string(i) + "].";
+				shader->SetUFloat4(light_array_uniform + "Radiance", point_lights[i].first->Radiance);
+				shader->SetUFloat3(light_array_uniform + "Position", point_lights[i].second);
+				shader->SetUFloat(light_array_uniform + "Intensity", point_lights[i].first->Intensity);
+
+				shader->SetUFloat(light_array_uniform + "Radius", point_lights[i].first->GetRadius());
+				shader->SetUFloat(light_array_uniform + "FalloffFactor", point_lights[i].first->FalloffMultiplier);
+				shader->SetUFloat(light_array_uniform + "AttK", point_lights[i].first->GetLinearAttenuationFactor());
+				shader->SetUFloat(light_array_uniform + "AttQ", point_lights[i].first->GetQuadraticAttenuationFactor());
+			}
 
 			StartBatch();
 		}

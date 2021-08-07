@@ -21,7 +21,7 @@ namespace Kaimos {
 		// Renderer Stuff
 		glm::mat4 ViewProjectionMatrix = glm::mat4(1.0f);
 		glm::vec3 SceneColor = glm::vec3(1.0f);
-		const uint MaxDirLights = 100, MaxPointLights = 100;
+		const uint MaxDirLights = 10, MaxPointLights = 100;
 		
 		// Shaders & Materials
 		ShaderLibrary Shaders;
