@@ -53,9 +53,9 @@ namespace Kaimos {
 
 
 	// ----------------------- Private Scene Lights Methods -----------------------------------------------
-	std::vector<Ref<Light>> Scene::GetSceneDirLights()
+	std::vector<std::pair<Ref<Light>, glm::vec3>> Scene::GetSceneDirLights()
 	{
-		std::vector<Ref<Light>> dir_lights;
+		std::vector<std::pair<Ref<Light>, glm::vec3>> dir_lights;
 		auto dirlights_group = m_Registry.group<DirectionalLightComponent>(entt::get<TransformComponent>);
 		dir_lights.reserve(dirlights_group.size());
 
@@ -63,15 +63,15 @@ namespace Kaimos {
 		{
 			auto& [light, transform] = dirlights_group.get<DirectionalLightComponent, TransformComponent>(ent);
 			if (transform.EntityActive && light.Visible)
-				dir_lights.push_back(light.Light);
+				dir_lights.push_back(std::make_pair(light.Light, transform.GetForwardVector()));
 		}
 
 		return dir_lights;
 	}
 
-	std::vector<Ref<PointLight>> Scene::GetScenePointLights()
+	std::vector<std::pair<Ref<PointLight>, glm::vec3>> Scene::GetScenePointLights()
 	{
-		std::vector<Ref<PointLight>> point_lights;
+		std::vector<std::pair<Ref<PointLight>, glm::vec3>> point_lights;
 		auto pointlights_group = m_Registry.group<PointLightComponent>(entt::get<TransformComponent>);
 		point_lights.reserve(pointlights_group.size());
 
@@ -79,7 +79,7 @@ namespace Kaimos {
 		{
 			auto& [light, transform] = pointlights_group.get<PointLightComponent, TransformComponent>(ent);
 			if (transform.EntityActive && light.Visible)
-				point_lights.push_back(light.Light);
+				point_lights.push_back(std::make_pair(light.Light, transform.Translation));
 		}
 
 		return point_lights;
@@ -89,8 +89,8 @@ namespace Kaimos {
 	// ----------------------- Private Scene Rendering Methods --------------------------------------------
 	void Scene::BeginScene(const Camera& camera, bool scene3D)
 	{
-		std::vector<Ref<Light>> dir_lights = GetSceneDirLights();
-		std::vector<Ref<PointLight>> plights = GetScenePointLights();
+		std::vector<std::pair<Ref<Light>, glm::vec3>> dir_lights = GetSceneDirLights();
+		std::vector<std::pair<Ref<PointLight>, glm::vec3>> plights = GetScenePointLights();
 
 		glm::mat4 view_proj = camera.GetViewProjection();
 		scene3D ? Renderer3D::BeginScene(view_proj, dir_lights, plights) : Renderer2D::BeginScene(view_proj, dir_lights, plights);
@@ -98,8 +98,8 @@ namespace Kaimos {
 
 	void Scene::BeginScene(const CameraComponent& camera_component, const TransformComponent& transform_component, bool scene3D)
 	{
-		std::vector<Ref<Light>> dir_lights = GetSceneDirLights();
-		std::vector<Ref<PointLight>> plights = GetScenePointLights();
+		std::vector<std::pair<Ref<Light>, glm::vec3>> dir_lights = GetSceneDirLights();
+		std::vector<std::pair<Ref<PointLight>, glm::vec3>> plights = GetScenePointLights();
 
 		glm::mat4 view_proj = camera_component.Camera.GetProjection() * glm::inverse(transform_component.GetTransform());
 		scene3D ? Renderer3D::BeginScene(view_proj, dir_lights, plights) : Renderer2D::BeginScene(view_proj, dir_lights, plights);

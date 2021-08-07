@@ -57,8 +57,8 @@ namespace Kaimos {
 	private:
 
 		// --- Private Scene Lights Methods ---
-		std::vector<Ref<Light>> GetSceneDirLights();
-		std::vector<Ref<PointLight>> GetScenePointLights();
+		std::vector<std::pair<Ref<Light>, glm::vec3>> GetSceneDirLights();
+		std::vector<std::pair<Ref<PointLight>, glm::vec3>> GetScenePointLights();
 
 		// --- Private Scene Rendering Methods ---
 		void BeginScene(const Camera& camera, bool scene3D);

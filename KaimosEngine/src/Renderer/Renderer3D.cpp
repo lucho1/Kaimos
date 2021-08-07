@@ -61,6 +61,7 @@ namespace Kaimos {
 	void Renderer3D::Init()
 	{
 		KS_PROFILE_FUNCTION();
+		KS_TRACE("Initializing 3D Renderer");
 		s_3DData = new Renderer3DData();
 
 		// -- Vertex Buffer & Array --
@@ -75,10 +76,11 @@ namespace Kaimos {
 		BufferLayout layout = {
 			{ SHADER_DATATYPE::FLOAT3,	"a_Position" },
 			{ SHADER_DATATYPE::FLOAT3,	"a_Normal" },
+			{ SHADER_DATATYPE::FLOAT3,	"a_NormalTransformed" },
 			{ SHADER_DATATYPE::FLOAT2,	"a_TexCoord" },
 			{ SHADER_DATATYPE::FLOAT4,	"a_Color" },
 			{ SHADER_DATATYPE::FLOAT ,	"a_TexIndex" },
-			{ SHADER_DATATYPE::INT ,	"a_EntityID" }
+			{ SHADER_DATATYPE::INT,		"a_EntityID" }
 		};
 
 		// -- Vertex Array Filling --
@@ -105,7 +107,7 @@ namespace Kaimos {
 
 
 	// ----------------------- Public Renderer Methods ----------------------------------------------------
-	void Renderer3D::BeginScene(const glm::mat4& view_projection_matrix, const std::vector<Ref<Light>>& dir_lights, const std::vector<Ref<PointLight>>& point_lights)
+	void Renderer3D::BeginScene(const glm::mat4& view_projection_matrix, const std::vector<std::pair<Ref<Light>, glm::vec3>>& dir_lights, const std::vector<std::pair<Ref<PointLight>, glm::vec3>>& point_lights)
 	{
 		KS_PROFILE_FUNCTION();
 
@@ -115,6 +117,21 @@ namespace Kaimos {
 			s_3DData->VArray->Bind();
 			shader->Bind();
 			shader->SetUMat4("u_ViewProjection", view_projection_matrix);
+			shader->SetUFloat3("u_SceneColor", Renderer::GetSceneColor());
+
+			uint max_dir_lights = Renderer::GetMaxDirLights();
+			uint dir_lights_size = dir_lights.size() >= max_dir_lights ? max_dir_lights : dir_lights.size();
+			shader->SetUInt("u_DirectionalLightsNum", dir_lights_size);
+
+			for (uint i = 0; i < dir_lights_size; ++i)
+			{
+				std::string light_array_uniform = "u_DirectionalLights[" + std::to_string(i) + "].";
+				shader->SetUFloat4(light_array_uniform + "Radiance", dir_lights[i].first->Radiance);
+				shader->SetUFloat(light_array_uniform + "Intensity", dir_lights[i].first->Intensity);
+				shader->SetUFloat3(light_array_uniform + "Direction", dir_lights[i].second);
+			}
+
+
 			StartBatch();
 		}
 		else
@@ -203,6 +220,7 @@ namespace Kaimos {
 
 				s_3DData->VBufferPtr->Pos = transform * glm::vec4(mesh_vertex.Pos, 1.0f);
 				s_3DData->VBufferPtr->Normal = mesh_vertex.Normal;
+				s_3DData->VBufferPtr->NormalTrs = glm::mat3(glm::transpose(glm::inverse(transform))) * mesh_vertex.Normal;
 				s_3DData->VBufferPtr->TexCoord = mesh_vertex.TexCoord;
 
 				s_3DData->VBufferPtr->Color = material->Color;

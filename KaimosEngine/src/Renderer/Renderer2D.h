@@ -19,6 +19,7 @@ namespace Kaimos {
 		// --- Vertex Variables ---
 		glm::vec3 Pos		= glm::vec3(0.0f);
 		glm::vec3 Normal	= glm::vec3(0.0f);
+		glm::vec3 NormalTrs = glm::vec3(0.0f);
 		glm::vec2 TexCoord	= glm::vec2(0.0f);
 		glm::vec4 Color		= glm::vec4(1.0f);
 		float TexIndex		= 0.0f;
@@ -41,7 +42,7 @@ namespace Kaimos {
 		static void Shutdown();
 
 		// --- Public Renderer Methods ---
-		static void BeginScene(const glm::mat4& view_projection_matrix, const std::vector<Ref<Light>>& dir_lights, const std::vector<Ref<PointLight>>& point_lights);
+		static void BeginScene(const glm::mat4& view_projection_matrix, const std::vector<std::pair<Ref<Light>, glm::vec3>>& dir_lights, const std::vector<std::pair<Ref<PointLight>, glm::vec3>>& point_lights);
 		static void EndScene();
 
 		// --- Public Drawing Methods ---

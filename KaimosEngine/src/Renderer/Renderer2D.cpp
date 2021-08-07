@@ -89,6 +89,7 @@ namespace Kaimos {
 		BufferLayout layout = {
 			{ SHADER_DATATYPE::FLOAT3,	"a_Position" },
 			{ SHADER_DATATYPE::FLOAT3,	"a_Normal" },
+			{ SHADER_DATATYPE::FLOAT3,	"a_NormalTransformed" },
 			{ SHADER_DATATYPE::FLOAT2,	"a_TexCoord" },
 			{ SHADER_DATATYPE::FLOAT4,	"a_Color" },
 			{ SHADER_DATATYPE::FLOAT ,	"a_TexIndex" },
@@ -122,14 +123,31 @@ namespace Kaimos {
 
 	
 	// ----------------------- Public Renderer Methods ----------------------------------------------------
-	void Renderer2D::BeginScene(const glm::mat4& view_projection_matrix, const std::vector<Ref<Light>>& dir_lights, const std::vector<Ref<PointLight>>& point_lights)
+	void Renderer2D::BeginScene(const glm::mat4& view_projection_matrix, const std::vector<std::pair<Ref<Light>, glm::vec3>>& dir_lights, const std::vector<std::pair<Ref<PointLight>, glm::vec3>>& point_lights)
 	{
+		KS_PROFILE_FUNCTION();
+
 		Ref<Shader> shader = Renderer::GetShader("BatchedShader");
 		if (shader)
 		{
 			s_Data->QuadVArray->Bind();
 			shader->Bind();
 			shader->SetUMat4("u_ViewProjection", view_projection_matrix);
+			shader->SetUFloat3("u_SceneColor", Renderer::GetSceneColor());
+
+			uint max_dir_lights = Renderer::GetMaxDirLights();
+			uint dir_lights_size = dir_lights.size() >= max_dir_lights ? max_dir_lights : dir_lights.size();
+			shader->SetUInt("u_DirectionalLightsNum", dir_lights_size);
+
+			for (uint i = 0; i < dir_lights_size; ++i)
+			{
+				std::string light_array_uniform = "u_DirectionalLights[" + std::to_string(i) + "].";
+				shader->SetUFloat4(light_array_uniform + "Radiance", dir_lights[i].first->Radiance);
+				shader->SetUFloat(light_array_uniform + "Intensity", dir_lights[i].first->Intensity);
+				shader->SetUFloat3(light_array_uniform + "Direction", dir_lights[i].second);
+			}
+
+
 			StartBatch();
 		}
 		else
@@ -213,6 +231,7 @@ namespace Kaimos {
 			// Set the vertex data
 			s_Data->QuadVBufferPtr->Pos = transform * glm::vec4(quad_vertex.Pos, 1.0f);
 			s_Data->QuadVBufferPtr->Normal = quad_vertex.Normal;
+			s_Data->QuadVBufferPtr->NormalTrs = glm::mat3(glm::transpose(glm::inverse(transform))) * quad_vertex.Normal;
 			s_Data->QuadVBufferPtr->TexCoord = quad_vertex.TexCoord;
 
 			s_Data->QuadVBufferPtr->Color = material->Color;

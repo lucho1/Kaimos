@@ -204,7 +204,7 @@ namespace Kaimos {
 			QuadVertices[2].TexCoord =	{ 1.0f, 1.0f };
 			QuadVertices[3].TexCoord =	{ 0.0f, 1.0f };
 
-			QuadVertices[0].Normal = QuadVertices[1].Normal = QuadVertices[2].Normal = QuadVertices[3].Normal = { 0.0f,  0.0f, -1.0f };
+			QuadVertices[0].Normal = QuadVertices[1].Normal = QuadVertices[2].Normal = QuadVertices[3].Normal = { 0.0f,  0.0f, 1.0f };
 		}
 
 		void UpdateVertices()
