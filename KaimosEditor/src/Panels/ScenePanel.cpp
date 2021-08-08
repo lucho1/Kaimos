@@ -387,10 +387,10 @@ namespace Kaimos {
 
 				// Point Light Stuff
 				float plight_minradius = light->GetMinRadius(), plight_maxradius = light->GetMaxRadius();
-				if (Kaimos::KaimosUI::UIFunctionalities::DrawInlineDragFloat("Min Radius", "###plight_minradius", &plight_minradius, 0.05f, 0.0f, 2.0f, 0.0f, plight_maxradius))
+				if (Kaimos::KaimosUI::UIFunctionalities::DrawInlineDragFloat("Min Radius", "###plight_minradius", &plight_minradius, 0.1f, 0.0f, 2.0f, 0.0f, plight_maxradius))
 					light->SetMinRadius(plight_minradius);
 
-				if (Kaimos::KaimosUI::UIFunctionalities::DrawInlineDragFloat("Max Radius", "###plight_maxradius", &plight_maxradius, 0.05f, 0.0f, 2.0f, plight_minradius, FLT_MAX))
+				if (Kaimos::KaimosUI::UIFunctionalities::DrawInlineDragFloat("Max Radius", "###plight_maxradius", &plight_maxradius, 0.1f, 0.0f, 2.0f, plight_minradius, FLT_MAX))
 					light->SetMaxRadius(plight_maxradius);
 
 				Kaimos::KaimosUI::UIFunctionalities::DrawInlineDragFloat("Falloff Intensity", "###plight_falloff", &light->FalloffMultiplier, 0.01f, 0.0f, 2.0f, 0.0f, FLT_MAX);
