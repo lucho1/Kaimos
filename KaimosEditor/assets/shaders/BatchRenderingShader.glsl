@@ -72,6 +72,7 @@ struct PointLight
 };
 
 // Uniforms
+uniform vec3 u_ViewPos;
 uniform sampler2D u_Textures[32];
 
 uniform vec3 u_SceneColor = vec3(1.0);
@@ -92,8 +93,17 @@ void main()
 		vec3 light_dir = normalize(u_DirectionalLights[i].Direction);
 
 		float diffuse_factor = max(dot(normal, light_dir), 0.0);
-		vec3 diffuse_component = diffuse_factor * u_DirectionalLights[i].Radiance.rgb;
-		lighting_result += diffuse_component;
+		vec3 diffuse_component = diffuse_factor * u_DirectionalLights[i].Radiance.rgb;		
+
+		// specular strength???
+		vec3 view_dir = normalize(u_ViewPos - v_FragPos);
+		vec3 reflect_dir = reflect(-light_dir, normal);
+
+		// shininess/smoothness!
+		float spec_factor = pow(max(dot(view_dir, reflect_dir), 0.0), 32.0);
+		vec3 specular_component = spec_factor * u_PointLights[i].Radiance.rgb; // * spec_strenght
+
+		lighting_result += (diffuse_component + specular_component);
 	}
 	
 	for(int i = 0; i < u_PointLightsNum; ++i)
@@ -102,7 +112,16 @@ void main()
 
 		float diffuse_factor = max(dot(normal, light_dir), 0.0);
 		vec3 diffuse_component = diffuse_factor * u_PointLights[i].Radiance.rgb;
-		lighting_result += diffuse_component;
+
+		// specular strength???
+		vec3 view_dir = normalize(u_ViewPos - v_FragPos);
+		vec3 reflect_dir = reflect(-light_dir, normal);
+
+		// shininess/smoothness!
+		float spec_factor = pow(max(dot(view_dir, reflect_dir), 0.0), 32.0);
+		vec3 specular_component = spec_factor * u_PointLights[i].Radiance.rgb; // * spec_strenght
+
+		lighting_result += (diffuse_component + specular_component);
 	}
 
 	vec3 ambient_color = u_SceneColor * lighting_result;

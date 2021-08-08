@@ -30,7 +30,7 @@ namespace Kaimos {
 		~Scene() = default;
 
 		// --- Public Scene Methods ---
-		void OnUpdateEditor(Timestep dt, const Camera& camera);
+		void OnUpdateEditor(Timestep dt, const Camera& camera, const glm::vec3& camera_pos);
 		void OnUpdateRuntime(Timestep dt);
 
 		void RenderFromCamera(Timestep dt, const Entity& camera_entity);
@@ -61,7 +61,7 @@ namespace Kaimos {
 		std::vector<std::pair<Ref<PointLight>, glm::vec3>> GetScenePointLights();
 
 		// --- Private Scene Rendering Methods ---
-		void BeginScene(const Camera& camera, bool scene3D);
+		void BeginScene(const Camera& camera, const glm::vec3& camera_pos, bool scene3D);
 		void BeginScene(const CameraComponent& camera_component, const TransformComponent& transform_component, bool scene3D);
 
 		void RenderSprites(Timestep dt);

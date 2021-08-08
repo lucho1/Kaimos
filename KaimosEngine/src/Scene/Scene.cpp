@@ -87,13 +87,13 @@ namespace Kaimos {
 
 
 	// ----------------------- Private Scene Rendering Methods --------------------------------------------
-	void Scene::BeginScene(const Camera& camera, bool scene3D)
+	void Scene::BeginScene(const Camera& camera, const glm::vec3& camera_pos, bool scene3D)
 	{
 		std::vector<std::pair<Ref<Light>, glm::vec3>> dir_lights = GetSceneDirLights();
 		std::vector<std::pair<Ref<PointLight>, glm::vec3>> plights = GetScenePointLights();
 
 		glm::mat4 view_proj = camera.GetViewProjection();
-		scene3D ? Renderer3D::BeginScene(view_proj, dir_lights, plights) : Renderer2D::BeginScene(view_proj, dir_lights, plights);
+		scene3D ? Renderer3D::BeginScene(view_proj, camera_pos, dir_lights, plights) : Renderer2D::BeginScene(view_proj, camera_pos, dir_lights, plights);
 	}
 
 	void Scene::BeginScene(const CameraComponent& camera_component, const TransformComponent& transform_component, bool scene3D)
@@ -102,7 +102,7 @@ namespace Kaimos {
 		std::vector<std::pair<Ref<PointLight>, glm::vec3>> plights = GetScenePointLights();
 
 		glm::mat4 view_proj = camera_component.Camera.GetProjection() * glm::inverse(transform_component.GetTransform());
-		scene3D ? Renderer3D::BeginScene(view_proj, dir_lights, plights) : Renderer2D::BeginScene(view_proj, dir_lights, plights);
+		scene3D ? Renderer3D::BeginScene(view_proj, transform_component.Translation, dir_lights, plights) : Renderer2D::BeginScene(view_proj, transform_component.Translation, dir_lights, plights);
 	}
 
 	void Scene::RenderSprites(Timestep dt)
@@ -132,17 +132,17 @@ namespace Kaimos {
 
 
 	// ----------------------- Public Scene Methods -------------------------------------------------------
-	void Scene::OnUpdateEditor(Timestep dt, const Camera& camera)
+	void Scene::OnUpdateEditor(Timestep dt, const Camera& camera, const glm::vec3& camera_pos)
 	{
 		KS_PROFILE_FUNCTION();
 
 		// -- Render Meshes --
-		BeginScene(camera, true);
+		BeginScene(camera, camera_pos, true);
 		RenderMeshes(dt);
 		Renderer3D::EndScene();
 
 		// -- Render Sprites --
-		BeginScene(camera, false);
+		BeginScene(camera, camera_pos, false);
 		RenderSprites(dt);
 		Renderer2D::EndScene();
 	}

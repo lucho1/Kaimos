@@ -123,7 +123,7 @@ namespace Kaimos {
 
 	
 	// ----------------------- Public Renderer Methods ----------------------------------------------------
-	void Renderer2D::BeginScene(const glm::mat4& view_projection_matrix, const std::vector<std::pair<Ref<Light>, glm::vec3>>& dir_lights, const std::vector<std::pair<Ref<PointLight>, glm::vec3>>& point_lights)
+	void Renderer2D::BeginScene(const glm::mat4& view_projection_matrix, const glm::vec3& camera_pos, const std::vector<std::pair<Ref<Light>, glm::vec3>>& dir_lights, const std::vector<std::pair<Ref<PointLight>, glm::vec3>>& point_lights)
 	{
 		KS_PROFILE_FUNCTION();
 
@@ -133,6 +133,7 @@ namespace Kaimos {
 			s_Data->QuadVArray->Bind();
 			shader->Bind();
 			shader->SetUMat4("u_ViewProjection", view_projection_matrix);
+			shader->SetUFloat3("u_ViewPos", camera_pos);
 			shader->SetUFloat3("u_SceneColor", Renderer::GetSceneColor());
 
 			uint max_dir_lights = Renderer::GetMaxDirLights();
