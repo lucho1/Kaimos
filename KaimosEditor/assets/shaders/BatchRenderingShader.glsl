@@ -70,7 +70,7 @@ struct PointLight
 	float Intensity;
 
 	float Radius;
-	float FalloffFactor, AttK, AttQ;
+	float FalloffFactor, AttL, AttQ;
 };
 
 // Uniforms
@@ -117,13 +117,21 @@ void main()
 	
 	for(int i = 0; i < u_PointLightsNum; ++i)
 	{
-		vec3 light_dir = normalize(u_PointLights[i].Position - v_FragPos);
+		vec3 dist = u_PointLights[i].Position - v_FragPos;
+
+		vec3 light_dir = normalize(dist);
 		float diffuse_factor = max(dot(normal, light_dir), 0.0);
 
-		vec3 diffuse_component = diffuse_factor * u_DirectionalLights[i].Radiance.rgb;
-		vec3 specular_component = GetLightSpecularFactor(normal, light_dir) * u_DirectionalLights[i].Radiance.rgb; // * spec_strenght
+		vec3 diffuse_component = diffuse_factor * u_PointLights[i].Radiance.rgb;
+		vec3 specular_component = GetLightSpecularFactor(normal, light_dir) * u_PointLights[i].Radiance.rgb; // * spec_strenght
 
-		lighting_result += (diffuse_component + specular_component);
+		float dist_scalar = length(dist);
+
+		float linear_att = u_PointLights[i].AttL * dist_scalar;
+		float quadratic_att = u_PointLights[i].AttQ * (dist_scalar*dist_scalar);
+		float attenuation = 1.0 / (1.0 + linear_att + quadratic_att);
+
+		lighting_result += ((diffuse_component + specular_component) * attenuation);
 	}
 
 	vec3 ambient_color = u_SceneColor * lighting_result;

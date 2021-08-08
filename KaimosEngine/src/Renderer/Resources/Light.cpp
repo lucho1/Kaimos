@@ -1,5 +1,6 @@
 #include "kspch.h"
 #include "Light.h"
+#include "Core/Utils/Maths/Maths.h"
 
 namespace Kaimos {
 
@@ -19,6 +20,12 @@ namespace Kaimos {
 
 	void PointLight::CalculateAttenuationValues()
 	{
+		if (Maths::CompareFloats(m_Radius, 0.0f))
+		{
+			m_AttenuationLinearFactor = m_AttenuationQuadraticFactor = 100.0f;
+			return;
+		}
+
 		uint index = 0;
 		if(m_Radius >= LightDistanceValues[1])
 		{

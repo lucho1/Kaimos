@@ -161,7 +161,7 @@ namespace Kaimos {
 
 				shader->SetUFloat(light_array_uniform + "Radius", point_lights[i].first->GetRadius());
 				shader->SetUFloat(light_array_uniform + "FalloffFactor", point_lights[i].first->FalloffMultiplier);
-				shader->SetUFloat(light_array_uniform + "AttK", point_lights[i].first->GetLinearAttenuationFactor());
+				shader->SetUFloat(light_array_uniform + "AttL", point_lights[i].first->GetLinearAttenuationFactor());
 				shader->SetUFloat(light_array_uniform + "AttQ", point_lights[i].first->GetQuadraticAttenuationFactor());
 			}
 
