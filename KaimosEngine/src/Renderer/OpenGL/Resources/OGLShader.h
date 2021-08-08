@@ -50,8 +50,8 @@ namespace Kaimos {
 	private:
 
 		// --- Private OGL Shader Methods ---
-		const std::string ReadShaderFile(const std::string& filepath);
-		const std::unordered_map<GLenum, std::string> PreProcessShader(const std::string& source);
+		std::string ReadShaderFile(const std::string& filepath);
+		const std::unordered_map<GLenum, std::string> PreProcessShader(std::string& source);
 		
 		void CompileShader(const std::unordered_map<GLenum, std::string>&shader_sources);
 

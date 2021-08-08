@@ -42,8 +42,8 @@ void main()
 #type FRAGMENT_SHADER
 #version 460 core
 
-#define MAX_DIR_LIGHTS 10
-#define MAX_POINT_LIGHTS 100
+#define MAX_DIR_LIGHTS 0
+#define MAX_POINT_LIGHTS 0
 
 layout(location = 0) out vec4 color;
 layout(location = 1) out int color2;
