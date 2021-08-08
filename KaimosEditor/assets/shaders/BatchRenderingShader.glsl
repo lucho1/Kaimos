@@ -25,6 +25,7 @@ uniform mat4 u_ViewProjection;
 // - Main -
 void main()
 {
+	// Varyings Setting
 	v_Normal = a_NormalTransformed;
 	v_TexCoord = a_TexCoord;
 	v_Color = a_Color;
@@ -32,6 +33,7 @@ void main()
 	v_TexIndex = a_TexIndex;
 	v_EntityID = a_EntityID;
 
+	// Position Calculation
 	gl_Position = u_ViewProjection * vec4(a_Position, 1.0);
 }
 
@@ -99,10 +101,13 @@ float GetLightSpecularFactor(vec3 normal, vec3 norm_light_dir)
 // - Main -
 void main()
 {
-	color2 = v_EntityID;
-	
+	// Normal Vec
 	vec3 normal = normalize(v_Normal);
+
+	// Ligting Calculations
 	vec3 lighting_result = vec3(0.0);
+
+	// Directional Lights
 	for(int i = 0; i < u_DirectionalLightsNum; ++i)
 	{
 		vec3 light_dir = normalize(u_DirectionalLights[i].Direction);
@@ -114,18 +119,20 @@ void main()
 		lighting_result += (diffuse_component + specular_component);
 	}
 	
+	// Point Lights
 	for(int i = 0; i < u_PointLightsNum; ++i)
 	{
+		// Values Calculation
 		vec3 dist = u_PointLights[i].Position - v_FragPos;
 		float dist_scalar = length(dist);
 
+		// If outside radius, continue with next light
 		if(dist_scalar > u_PointLights[i].MaxRadius)
 			continue;
 
+		// Lighting Result Calculation
 		vec3 light_dir = normalize(dist);
 		float diffuse_factor = max(dot(normal, light_dir), 0.0);
-
-		// Light's Diffuse & Specular Components
 		vec3 diffuse_component = diffuse_factor * u_PointLights[i].Radiance.rgb;
 		vec3 specular_component = GetLightSpecularFactor(normal, light_dir) * u_PointLights[i].Radiance.rgb; // * spec_strenght
 
@@ -146,7 +153,11 @@ void main()
 		// Lighting Result
 		lighting_result += ((diffuse_component + specular_component) * attenuation * outer_attenuation);
 	}
-
+	
+	// Final Color Output Calculation (scene_color*light*object_color*texture)
 	vec3 ambient_color = u_SceneColor * lighting_result;
 	color = texture(u_Textures[int(v_TexIndex)], v_TexCoord) * vec4(ambient_color, 1.0) * v_Color;
+
+	// Color Output 2, Entity ID float value for Mouse Picking
+	color2 = v_EntityID;
 }
