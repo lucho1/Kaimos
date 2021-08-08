@@ -21,6 +21,7 @@ namespace Kaimos {
 		// --- Public Variables ---
 		glm::vec4 Radiance = glm::vec4(1.0f); // Color
 		float Intensity = 1.0f;
+		float SpecularStrength = 1.0f;
 
 	protected:
 

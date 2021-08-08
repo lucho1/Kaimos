@@ -356,6 +356,7 @@ namespace Kaimos {
 				KaimosUI::UIFunctionalities::SetTextCursorAndWidth("Radiance");
 				ImGui::ColorEdit4("###light_radiance", glm::value_ptr(light->Radiance), flags);
 				Kaimos::KaimosUI::UIFunctionalities::DrawInlineSlider("Intensity", "###light_intensity", &light->Intensity);
+				Kaimos::KaimosUI::UIFunctionalities::DrawInlineDragFloat("Specular Strength", "###light_specstrength", &light->SpecularStrength, 0.01f, 0.0f, 2.0f, 0.0f, FLT_MAX);
 
 				// Light Switch
 				if (light_type == 1)
@@ -394,6 +395,7 @@ namespace Kaimos {
 					light->SetMaxRadius(plight_maxradius);
 
 				Kaimos::KaimosUI::UIFunctionalities::DrawInlineDragFloat("Falloff Intensity", "###plight_falloff", &light->FalloffMultiplier, 0.01f, 0.0f, 2.0f, 0.0f, FLT_MAX);
+				Kaimos::KaimosUI::UIFunctionalities::DrawInlineDragFloat("Specular Strength", "###light_specstrength", &light->SpecularStrength, 0.01f, 0.0f, 2.0f, 0.0f, FLT_MAX);
 
 				// Light Switch
 				if (light_type == 0)

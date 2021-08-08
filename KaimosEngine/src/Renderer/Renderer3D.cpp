@@ -130,6 +130,7 @@ namespace Kaimos {
 				shader->SetUFloat4(light_array_uniform + "Radiance", dir_lights[i].first->Radiance);
 				shader->SetUFloat3(light_array_uniform + "Direction", dir_lights[i].second);
 				shader->SetUFloat(light_array_uniform + "Intensity", dir_lights[i].first->Intensity);
+				shader->SetUFloat(light_array_uniform + "SpecularStrength", dir_lights[i].first->SpecularStrength);
 			}
 
 			uint max_point_lights = Renderer::GetMaxPointLights();
@@ -142,6 +143,7 @@ namespace Kaimos {
 				shader->SetUFloat4(light_array_uniform + "Radiance", point_lights[i].first->Radiance);
 				shader->SetUFloat3(light_array_uniform + "Position", point_lights[i].second);
 				shader->SetUFloat(light_array_uniform + "Intensity", point_lights[i].first->Intensity);
+				shader->SetUFloat(light_array_uniform + "SpecularStrength", point_lights[i].first->SpecularStrength);
 
 				shader->SetUFloat(light_array_uniform + "MinRadius", point_lights[i].first->GetMinRadius());
 				shader->SetUFloat(light_array_uniform + "MaxRadius", point_lights[i].first->GetMaxRadius());

@@ -63,6 +63,7 @@ struct DirectionalLight
 	vec4 Radiance;
 	vec3 Direction;
 	float Intensity;
+	float SpecularStrength;
 };
 
 struct PointLight
@@ -70,6 +71,7 @@ struct PointLight
 	vec4 Radiance;
 	vec3 Position;
 	float Intensity;
+	float SpecularStrength;
 
 	float MinRadius, MaxRadius;
 	float FalloffFactor, AttL, AttQ;
@@ -81,8 +83,8 @@ uniform sampler2D u_Textures[32];
 
 uniform vec3 u_SceneColor = vec3(1.0);
 uniform const int u_DirectionalLightsNum = 0, u_PointLightsNum = 0;
-uniform DirectionalLight u_DirectionalLights[MAX_DIR_LIGHTS] = DirectionalLight[MAX_DIR_LIGHTS](DirectionalLight(vec4(1.0), vec3(0.0), 1.0));
-uniform PointLight u_PointLights[MAX_POINT_LIGHTS] = PointLight[MAX_POINT_LIGHTS](PointLight(vec4(1.0), vec3(0.0), 1.0, 50.0, 100.0, 1.0, 0.09, 0.032));
+uniform DirectionalLight u_DirectionalLights[MAX_DIR_LIGHTS] = DirectionalLight[MAX_DIR_LIGHTS](DirectionalLight(vec4(1.0), vec3(0.0), 1.0, 1.0));
+uniform PointLight u_PointLights[MAX_POINT_LIGHTS] = PointLight[MAX_POINT_LIGHTS](PointLight(vec4(1.0), vec3(0.0), 1.0, 1.0, 50.0, 100.0, 1.0, 0.09, 0.032));
 
 // Functions
 float GetLightSpecularFactor(vec3 normal, vec3 norm_light_dir)
@@ -114,9 +116,9 @@ void main()
 		float diffuse_factor = max(dot(normal, light_dir), 0.0);
 
 		vec3 diffuse_component = diffuse_factor * u_DirectionalLights[i].Radiance.rgb;
-		vec3 specular_component = GetLightSpecularFactor(normal, light_dir) * u_DirectionalLights[i].Radiance.rgb; // * spec_strenght
+		vec3 specular_component = GetLightSpecularFactor(normal, light_dir) * u_DirectionalLights[i].Radiance.rgb * u_DirectionalLights[i].SpecularStrength;
 
-		lighting_result += (diffuse_component + specular_component);
+		lighting_result += ((diffuse_component + specular_component) * u_DirectionalLights[i].Intensity);
 	}
 	
 	// Point Lights
@@ -134,7 +136,7 @@ void main()
 		vec3 light_dir = normalize(dist);
 		float diffuse_factor = max(dot(normal, light_dir), 0.0);
 		vec3 diffuse_component = diffuse_factor * u_PointLights[i].Radiance.rgb;
-		vec3 specular_component = GetLightSpecularFactor(normal, light_dir) * u_PointLights[i].Radiance.rgb; // * spec_strenght
+		vec3 specular_component = GetLightSpecularFactor(normal, light_dir) * u_PointLights[i].Radiance.rgb * u_PointLights[i].SpecularStrength;
 
 		// External Attenuation (from MinRad to MaxRad)
 		float outer_attenuation = 1.0;
@@ -151,7 +153,7 @@ void main()
 		float attenuation = (1.0 / (1.0 + linear_att + quadratic_att)) * u_PointLights[i].FalloffFactor;
 
 		// Lighting Result
-		lighting_result += ((diffuse_component + specular_component) * attenuation * outer_attenuation);
+		lighting_result += ((diffuse_component + specular_component) * attenuation * outer_attenuation * u_PointLights[i].Intensity);
 	}
 	
 	// Final Color Output Calculation (scene_color*light*object_color*texture)
