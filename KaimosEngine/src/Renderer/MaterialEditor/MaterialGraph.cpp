@@ -174,7 +174,7 @@ namespace Kaimos::MaterialEditor {
 
 
 	// ----------------------- Public Serialization Methods ----------------------------------------------
-	void MaterialGraph::DeserializeGraph(const YAML::Node& yaml_graph_node, Ref<Material> attached_material, std::string& texture_path)
+	void MaterialGraph::DeserializeGraph(const YAML::Node& yaml_graph_node, Ref<Material> attached_material, std::string& texture_path, std::string& normal_texture_path)
 	{
 		texture_path = "";
 		auto main_node = yaml_graph_node["MainRootNode"];
@@ -183,6 +183,9 @@ namespace Kaimos::MaterialEditor {
 		{
 			if(main_node["TextureFile"])
 				texture_path = main_node["TextureFile"].as<std::string>();
+
+			if (main_node["NormalTextureFile"])
+				normal_texture_path = main_node["NormalTextureFile"].as<std::string>();
 
 			m_MainMatNode = CreateRef<MainMaterialNode>(attached_material.get(), main_node["Node"].as<uint>());
 			m_MainMatNode->DeserializeMainNode(main_node["InputPins"]);

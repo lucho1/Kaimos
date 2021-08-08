@@ -222,13 +222,15 @@ namespace Kaimos {
 					uint graph_id = graph_subnode["MaterialGraph"].as<uint>();
 					ScopePtr<MaterialEditor::MaterialGraph> mat_graph = CreateScopePtr<MaterialEditor::MaterialGraph>(new MaterialEditor::MaterialGraph(graph_id));
 
-					std::string mat_texture_file;
-					mat_graph->DeserializeGraph(graph_subnode, material, mat_texture_file);
+					std::string mat_texture_file, mat_normtexture_file;
+					mat_graph->DeserializeGraph(graph_subnode, material, mat_texture_file, mat_normtexture_file);
 
 					// Finally, assign graph & texture to material
 					material->SetGraphUniqueRef(mat_graph);
 					if(!mat_texture_file.empty())
 						material->SetTexture(mat_texture_file);
+					if (!mat_normtexture_file.empty())
+						material->SetNormalTexture(mat_normtexture_file);
 				}
 			}
 		}
