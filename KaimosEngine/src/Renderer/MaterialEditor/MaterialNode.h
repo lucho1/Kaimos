@@ -96,6 +96,7 @@ namespace Kaimos::MaterialEditor {
 		// --- Public Class Methods ---
 		MainMaterialNode(Material* attached_material);
 		MainMaterialNode(Material* attached_material, uint id) : MaterialNode("Main Node", MaterialNodeType::MAIN, id), m_AttachedMaterial(attached_material) {}
+
 		~MainMaterialNode();
 
 		virtual void DrawNodeUI() override;
@@ -144,6 +145,7 @@ namespace Kaimos::MaterialEditor {
 		Ref<NodeInputPin> m_VertexNormalPin = nullptr;
 		Ref<NodeInputPin> m_TextureCoordinatesPin = nullptr;
 		Ref<NodeInputPin> m_ColorPin = nullptr;
+		Ref<NodeInputPin> m_SmoothnessPin = nullptr;
 	};
 
 

@@ -161,11 +161,13 @@ namespace Kaimos::MaterialEditor {
 		m_VertexNormalPin =			CreateRef<NodeInputPin>(this, PinDataType::VEC3, false, "Vertex Normal (Vec3)");
 		m_TextureCoordinatesPin =	CreateRef<NodeInputPin>(this, PinDataType::VEC2, false, "Texture Coordinates (Vec2)");
 		m_ColorPin =				CreateRef<NodeInputPin>(this, PinDataType::VEC4, false, "Color (Vec4)", 1.0f);
+		m_SmoothnessPin =			CreateRef<NodeInputPin>(this, PinDataType::FLOAT, false, "Smoothness (Float)", 0.5f);
 
 		m_NodeInputPins.push_back(m_VertexPositionPin);
 		m_NodeInputPins.push_back(m_VertexNormalPin);
 		m_NodeInputPins.push_back(m_TextureCoordinatesPin);
 		m_NodeInputPins.push_back(m_ColorPin);
+		m_NodeInputPins.push_back(m_SmoothnessPin);
 	}
 
 
@@ -176,6 +178,7 @@ namespace Kaimos::MaterialEditor {
 		m_VertexNormalPin.reset();
 		m_TextureCoordinatesPin.reset();
 		m_ColorPin.reset();
+		m_SmoothnessPin.reset();
 	}
 
 
@@ -183,16 +186,14 @@ namespace Kaimos::MaterialEditor {
 	{
 		for (auto inputpin_node : inputs_nodes)
 		{
-			uint pin_id =				inputpin_node["Pin"].as<uint>();
-			std::string pin_name =		inputpin_node["Name"].as<std::string>();
-			int pin_datatype =			inputpin_node["DataType"].as<int>();
-			glm::vec4 pin_value =		inputpin_node["Value"].as<glm::vec4>();
-			glm::vec4 pin_defvalue =	inputpin_node["DefValue"].as<glm::vec4>();
-			bool multitype_pin =		inputpin_node["AllowsMultipleTypes"].as<bool>();
-
+			uint pin_id = inputpin_node["Pin"].as<uint>();
+			std::string pin_name = inputpin_node["Name"].as<std::string>();
+			int pin_datatype = inputpin_node["DataType"].as<int>();
+			glm::vec4 pin_value = inputpin_node["Value"].as<glm::vec4>();
+			glm::vec4 pin_defvalue = inputpin_node["DefValue"].as<glm::vec4>();
+			bool multitype_pin = inputpin_node["AllowsMultipleTypes"].as<bool>();
 
 			Ref<NodeInputPin> pin = AddDeserializedInputPin(pin_name, pin_id, pin_datatype, pin_value, pin_defvalue, multitype_pin);
-
 			if (pin_name == "Vertex Position (Vec3)")
 				m_VertexPositionPin = pin;
 			else if (pin_name == "Vertex Normal (Vec3)")
@@ -201,6 +202,8 @@ namespace Kaimos::MaterialEditor {
 				m_TextureCoordinatesPin = pin;
 			else if (pin_name == "Color (Vec4)")
 				m_ColorPin = pin;
+			else if (pin_name == "Smoothness (Float)")
+				m_SmoothnessPin = pin;
 		}
 	}
 
@@ -243,6 +246,10 @@ namespace Kaimos::MaterialEditor {
 		m_VertexNormalPin->DrawUI(set_node_draggable, true);
 		m_TextureCoordinatesPin->DrawUI(set_node_draggable, true);
 		m_ColorPin->DrawUI(set_node_draggable, false, true, m_AttachedMaterial->Color);
+
+		glm::vec4 smoothness_vec = glm::vec4(m_AttachedMaterial->Smoothness);
+		m_SmoothnessPin->DrawUI(set_node_draggable, false, true, smoothness_vec);
+		m_AttachedMaterial->Smoothness = smoothness_vec.x;
 
 		ImNodes::SetNodeDraggable(m_ID, set_node_draggable);
 
@@ -301,11 +308,13 @@ namespace Kaimos::MaterialEditor {
 	void MainMaterialNode::SyncValuesWithMaterial()
 	{
 		m_ColorPin->SetInputValue(m_AttachedMaterial->Color);
+		m_SmoothnessPin->SetInputValue(glm::vec4(m_AttachedMaterial->Smoothness));
 	}
 
 	void MainMaterialNode::SyncMaterialValues()
 	{
 		m_AttachedMaterial->Color = m_ColorPin->GetValue();
+		m_AttachedMaterial->Smoothness = m_SmoothnessPin->GetValue().x;
 	}
 
 	void MainMaterialNode::SerializeNode(YAML::Emitter& output_emitter) const
