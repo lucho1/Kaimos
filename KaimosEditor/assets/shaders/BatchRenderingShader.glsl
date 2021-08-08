@@ -87,10 +87,12 @@ float GetLightSpecularFactor(vec3 normal, vec3 norm_light_dir)
 {
 	// specular strength???
 	vec3 view_dir = normalize(u_ViewPos - v_FragPos);
-	vec3 reflect_dir = reflect(-norm_light_dir, normal);
+	vec3 halfway_dir = normalize(norm_light_dir + view_dir);
 
 	// shininess/smoothness!
-	return pow(max(dot(view_dir, reflect_dir), 0.0), 32.0);
+	//vec3 reflect_dir = reflect(-norm_light_dir, normal); //phong
+	//return pow(max(dot(view_dir, reflect_dir), 0.0), 32.0);
+	return pow(max(dot(normal, halfway_dir), 0.0), 32.0); // blinn-phong
 }
 
 
