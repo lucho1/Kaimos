@@ -21,6 +21,8 @@ out flat int v_EntityID;
 // Uniforms
 uniform mat4 u_ViewProjection;
 
+
+// - Main -
 void main()
 {
 	v_Normal = a_NormalTransformed;
@@ -80,7 +82,19 @@ uniform const int u_DirectionalLightsNum = 0, u_PointLightsNum = 0;
 uniform DirectionalLight u_DirectionalLights[MAX_DIR_LIGHTS] = DirectionalLight[MAX_DIR_LIGHTS](DirectionalLight(vec4(1.0), vec3(0.0), 1.0));
 uniform PointLight u_PointLights[MAX_POINT_LIGHTS] = PointLight[MAX_POINT_LIGHTS](PointLight(vec4(1.0), vec3(0.0), 1.0, 50.0, 1.0, 0.09, 0.032));
 
+// Functions
+float GetLightSpecularFactor(vec3 normal, vec3 norm_light_dir)
+{
+	// specular strength???
+	vec3 view_dir = normalize(u_ViewPos - v_FragPos);
+	vec3 reflect_dir = reflect(-norm_light_dir, normal);
 
+	// shininess/smoothness!
+	return pow(max(dot(view_dir, reflect_dir), 0.0), 32.0);
+}
+
+
+// - Main -
 void main()
 {
 	color2 = v_EntityID;
@@ -91,17 +105,10 @@ void main()
 	for(int i = 0; i < u_DirectionalLightsNum; ++i)
 	{
 		vec3 light_dir = normalize(u_DirectionalLights[i].Direction);
-
 		float diffuse_factor = max(dot(normal, light_dir), 0.0);
-		vec3 diffuse_component = diffuse_factor * u_DirectionalLights[i].Radiance.rgb;		
 
-		// specular strength???
-		vec3 view_dir = normalize(u_ViewPos - v_FragPos);
-		vec3 reflect_dir = reflect(-light_dir, normal);
-
-		// shininess/smoothness!
-		float spec_factor = pow(max(dot(view_dir, reflect_dir), 0.0), 32.0);
-		vec3 specular_component = spec_factor * u_PointLights[i].Radiance.rgb; // * spec_strenght
+		vec3 diffuse_component = diffuse_factor * u_DirectionalLights[i].Radiance.rgb;
+		vec3 specular_component = GetLightSpecularFactor(normal, light_dir) * u_DirectionalLights[i].Radiance.rgb; // * spec_strenght
 
 		lighting_result += (diffuse_component + specular_component);
 	}
@@ -109,17 +116,10 @@ void main()
 	for(int i = 0; i < u_PointLightsNum; ++i)
 	{
 		vec3 light_dir = normalize(u_PointLights[i].Position - v_FragPos);
-
 		float diffuse_factor = max(dot(normal, light_dir), 0.0);
-		vec3 diffuse_component = diffuse_factor * u_PointLights[i].Radiance.rgb;
 
-		// specular strength???
-		vec3 view_dir = normalize(u_ViewPos - v_FragPos);
-		vec3 reflect_dir = reflect(-light_dir, normal);
-
-		// shininess/smoothness!
-		float spec_factor = pow(max(dot(view_dir, reflect_dir), 0.0), 32.0);
-		vec3 specular_component = spec_factor * u_PointLights[i].Radiance.rgb; // * spec_strenght
+		vec3 diffuse_component = diffuse_factor * u_DirectionalLights[i].Radiance.rgb;
+		vec3 specular_component = GetLightSpecularFactor(normal, light_dir) * u_DirectionalLights[i].Radiance.rgb; // * spec_strenght
 
 		lighting_result += (diffuse_component + specular_component);
 	}
