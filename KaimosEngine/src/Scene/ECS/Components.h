@@ -106,10 +106,11 @@ namespace Kaimos {
 			StoredLightMaxRadius = max_radius;
 		}
 
-		void SetLightValues(float intensity, const glm::vec4& radiance)
+		void SetLightValues(const glm::vec4& radiance, float intensity, float specular_strength)
 		{
-			Light->Intensity = intensity;
 			Light->Radiance = radiance;
+			Light->Intensity = intensity;
+			Light->SpecularStrength = specular_strength;
 		}
 	};
 
@@ -126,17 +127,18 @@ namespace Kaimos {
 		~PointLightComponent() { Light.reset(); }
 
 		// --- Light Functions ---
-		void SetComponentValues(float falloff, float min_radius, float max_radius)
+		void SetPointLightValues(float falloff, float min_radius, float max_radius)
 		{
 			Light->FalloffMultiplier = falloff;
 			Light->SetMinRadius(min_radius);
 			Light->SetMaxRadius(max_radius);
 		}
 
-		void SetLightValues(float intensity, const glm::vec4& radiance)
+		void SetLightValues(const glm::vec4& radiance, float intensity, float specular_strength)
 		{
-			Light->Intensity = intensity;
 			Light->Radiance = radiance;
+			Light->Intensity = intensity;
+			Light->SpecularStrength = specular_strength;
 		}
 	};
 

@@ -362,8 +362,8 @@ namespace Kaimos {
 				if (light_type == 1)
 				{
 					PointLightComponent& plight = entity.AddComponent<PointLightComponent>();
-					plight.SetComponentValues(component.StoredLightFalloff, component.StoredLightMinRadius, component.StoredLightMaxRadius);
-					plight.SetLightValues(light->Intensity, light->Radiance);
+					plight.SetPointLightValues(component.StoredLightFalloff, component.StoredLightMinRadius, component.StoredLightMaxRadius);
+					plight.SetLightValues(light->Radiance, light->Intensity, light->SpecularStrength);
 
 					plight.Visible = component.Visible;
 					entity.RemoveComponent<DirectionalLightComponent>();
@@ -402,7 +402,7 @@ namespace Kaimos {
 				{
 					DirectionalLightComponent& dlight = entity.AddComponent<DirectionalLightComponent>();
 					dlight.SetComponentValues(light->FalloffMultiplier, light->GetMinRadius(), light->GetMaxRadius());
-					dlight.SetLightValues(light->Intensity, light->Radiance);
+					dlight.SetLightValues(light->Radiance, light->Intensity, light->SpecularStrength);
 
 					dlight.Visible = component.Visible;
 					entity.RemoveComponent<PointLightComponent>();
