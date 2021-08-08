@@ -45,6 +45,27 @@ namespace Kaimos {
 		m_TextureFilepath.clear();
 	}
 
+	void Material::SetNormalTexture(const std::string& filepath)
+	{
+		Ref<Texture2D> texture = Texture2D::Create(filepath);
+		if (texture)
+		{
+			RemoveNormalTexture();
+			m_NormalTexture = texture;
+			m_NormalTextureFilepath = filepath.substr(filepath.find("assets"), filepath.size());
+		}
+		else
+			KS_EDITOR_WARN("Couldn't Load Texture from '{0}'", filepath);
+	}
+
+	void Material::RemoveNormalTexture()
+	{
+		if (m_NormalTexture)
+			m_NormalTexture.reset();
+
+		m_NormalTextureFilepath.clear();
+	}
+
 
 	
 	// ----------------------- Public Graph Methods -------------------------------------------------------

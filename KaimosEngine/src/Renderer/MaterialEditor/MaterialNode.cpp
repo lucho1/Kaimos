@@ -268,11 +268,13 @@ namespace Kaimos::MaterialEditor {
 
 		KaimosUI::UIFunctionalities::PopButton(false);
 
+		ImGui::PushID(0);
 		ImGui::SameLine();
 		if (KaimosUI::UIFunctionalities::DrawColoredButton("X", { 20.0f, 50.0f }, glm::vec3(0.2f), true))
 			m_AttachedMaterial->RemoveTexture();
 
 		KaimosUI::UIFunctionalities::PopButton(true);
+		ImGui::PopID();
 		ImGui::PopStyleVar();
 
 		if (m_AttachedMaterial->GetTexture())
@@ -286,6 +288,45 @@ namespace Kaimos::MaterialEditor {
 			ImGui::Indent(ImGui::CalcTextSize("Texture").x + 12.0f);
 			ImGui::Text("%s", tex_name.c_str());
 			ImGui::Text("%ix%i (ID %i)", m_AttachedMaterial->GetTexture()->GetWidth(), m_AttachedMaterial->GetTexture()->GetHeight(), id);
+		}
+
+		// -- Draw Normal Texture "Input" (Button) --
+		ImGui::Indent(-ImGui::CalcTextSize("Texture").x - 12.0f);
+		
+		uint norm_id = m_AttachedMaterial->GetNormalTexture() == nullptr ? 0 : m_AttachedMaterial->GetNormalTexture()->GetTextureID();
+		ImGui::Text("Normal");
+		ImGui::SameLine();
+		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { 0.0f, 0.0f });
+
+		if (KaimosUI::UIFunctionalities::DrawTexturedButton("###mtnormtexture_btn", norm_id, glm::vec2(50.0f), glm::vec3(0.1f)))
+		{
+			std::string texture_file = FileDialogs::OpenFile("Texture (*.png)\0*.png\0");
+			if (!texture_file.empty())
+				m_AttachedMaterial->SetNormalTexture(texture_file);
+		}
+
+		KaimosUI::UIFunctionalities::PopButton(false);
+
+		ImGui::PushID(1);
+		ImGui::SameLine();
+		if (KaimosUI::UIFunctionalities::DrawColoredButton("X", { 20.0f, 50.0f }, glm::vec3(0.2f), true))
+			m_AttachedMaterial->RemoveNormalTexture();
+
+		KaimosUI::UIFunctionalities::PopButton(true);
+		ImGui::PopID();
+		ImGui::PopStyleVar();
+
+		if (m_AttachedMaterial->GetNormalTexture())
+		{
+			std::string tex_path = m_AttachedMaterial->GetNormalTexturePath();
+			std::string tex_name = tex_path;
+
+			if (!tex_path.empty())
+				tex_name = tex_path.substr(tex_path.find_last_of("/\\" + 1, tex_path.size() - 1) + 1);
+
+			ImGui::Indent(ImGui::CalcTextSize("Normal").x + 12.0f);
+			ImGui::Text("%s", tex_name.c_str());
+			ImGui::Text("%ix%i (ID %i)", m_AttachedMaterial->GetNormalTexture()->GetWidth(), m_AttachedMaterial->GetNormalTexture()->GetHeight(), id);
 		}
 		
 

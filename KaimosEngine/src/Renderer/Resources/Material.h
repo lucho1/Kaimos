@@ -29,6 +29,8 @@ namespace Kaimos {
 		// --- Public Texture Methods ---
 		void SetTexture(const std::string& filepath);
 		void RemoveTexture();
+		void SetNormalTexture(const std::string& filepath);
+		void RemoveNormalTexture();
 
 		// --- Public Graph Methods ---
 		bool IsVertexAttributeTimed(MaterialEditor::VertexParameterNodeType vtxpm_node_type) const;
@@ -49,12 +51,14 @@ namespace Kaimos {
 	public:
 
 		// --- Getters ---
-		const Ref<Texture2D>& GetTexture()	const { return m_Texture; }
-		const std::string& GetTexturePath()	const { return m_TextureFilepath; }
+		const Ref<Texture2D>& GetTexture()			const { return m_Texture; }
+		const std::string& GetTexturePath()			const { return m_TextureFilepath; }
+		const Ref<Texture2D>& GetNormalTexture()	const { return m_NormalTexture; }
+		const std::string& GetNormalTexturePath()	const { return m_NormalTextureFilepath; }
 
-		uint GetID()						const { return m_ID; }
-		uint GetAttachedGraphID()			const { return m_AttachedGraph->GetID(); }
-		const std::string& GetName()		const { return m_Name; }
+		uint GetID()								const { return m_ID; }
+		uint GetAttachedGraphID()					const { return m_AttachedGraph->GetID(); }
+		const std::string& GetName()				const { return m_Name; }
 
 		
 	public:
@@ -69,8 +73,8 @@ namespace Kaimos {
 		uint m_ID = 0;
 		ScopePtr<MaterialEditor::MaterialGraph> m_AttachedGraph = nullptr;
 
-		Ref<Texture2D> m_Texture = nullptr;
-		std::string m_TextureFilepath = "";
+		Ref<Texture2D> m_Texture = nullptr, m_NormalTexture = nullptr;
+		std::string m_TextureFilepath = "", m_NormalTextureFilepath = "";
 		std::string m_Name = "Unnamed";
 	};
 }
