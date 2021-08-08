@@ -90,7 +90,7 @@ namespace Kaimos {
 		bool Visible = true;
 
 		// --- Storage Variables (to switch types) ---
-		float StoredLightRadius = 50.0f, StoredLightFalloff = 1.0f;
+		float StoredLightMinRadius = 50.0f, StoredLightMaxRadius = 100.f, StoredLightFalloff = 1.0f;
 
 		// --- Constructors ---
 		DirectionalLightComponent() = default;
@@ -99,10 +99,11 @@ namespace Kaimos {
 		~DirectionalLightComponent() { Light.reset(); }
 
 		// --- Light Functions ---
-		void SetComponentValues(float falloff, float radius)
+		void SetComponentValues(float falloff, float min_radius, float max_radius)
 		{
 			StoredLightFalloff = falloff;
-			StoredLightRadius = radius;
+			StoredLightMinRadius = min_radius;
+			StoredLightMaxRadius = max_radius;
 		}
 
 		void SetLightValues(float intensity, const glm::vec4& radiance)
@@ -125,10 +126,11 @@ namespace Kaimos {
 		~PointLightComponent() { Light.reset(); }
 
 		// --- Light Functions ---
-		void SetComponentValues(float falloff, float radius)
+		void SetComponentValues(float falloff, float min_radius, float max_radius)
 		{
 			Light->FalloffMultiplier = falloff;
-			Light->SetRadius(radius);
+			Light->SetMinRadius(min_radius);
+			Light->SetMaxRadius(max_radius);
 		}
 
 		void SetLightValues(float intensity, const glm::vec4& radiance)

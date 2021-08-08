@@ -41,8 +41,10 @@ namespace Kaimos {
 	public:
 
 		// --- Setters/Getters ---
-		float GetRadius() const { return m_Radius; }
-		void SetRadius(float radius);
+		float GetMaxRadius() const { return m_MaxRadius; }
+		float GetMinRadius() const { return m_MinRadius; }
+		void SetMaxRadius(float radius) { m_MaxRadius = radius; }
+		void SetMinRadius(float radius);
 
 		float GetLinearAttenuationFactor() const { return m_AttenuationLinearFactor; }
 		float GetQuadraticAttenuationFactor() const { return m_AttenuationQuadraticFactor; }
@@ -60,7 +62,7 @@ namespace Kaimos {
 	private:
 
 		// --- Private Variables ---
-		float m_Radius = 50.0f;
+		float m_MinRadius = 50.0f, m_MaxRadius = 100.0f;
 		float m_AttenuationLinearFactor = 0.09f, m_AttenuationQuadraticFactor = 0.032f;
 	};
 }

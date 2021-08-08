@@ -396,7 +396,7 @@ namespace Kaimos {
 				if (light_type == 0)
 				{
 					DirectionalLightComponent& dlight = entity.AddComponent<DirectionalLightComponent>();
-					dlight.SetComponentValues(light->FalloffMultiplier, light->GetRadius());
+					dlight.SetComponentValues(light->FalloffMultiplier, light->GetMinRadius(), light->GetMaxRadius());
 					dlight.SetLightValues(light->Intensity, light->Radiance);
 
 					dlight.Visible = component.Visible;

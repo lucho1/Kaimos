@@ -12,26 +12,20 @@ namespace Kaimos {
 
 
 	// ----------------------- Light Methods ---------------------------------------------------
-	void PointLight::SetRadius(float radius)
+	void PointLight::SetMinRadius(float radius)
 	{
-		m_Radius = radius;
+		m_MinRadius = radius;
 		CalculateAttenuationValues();
 	}
 
 	void PointLight::CalculateAttenuationValues()
 	{
-		if (Maths::CompareFloats(m_Radius, 0.0f))
-		{
-			m_AttenuationLinearFactor = m_AttenuationQuadraticFactor = 100.0f;
-			return;
-		}
-
 		uint index = 0;
-		if(m_Radius >= LightDistanceValues[1])
+		if(m_MinRadius >= LightDistanceValues[1])
 		{
 			for (uint i = 11; i >= 0; --i)
 			{
-				if (m_Radius > LightDistanceValues[i])
+				if (m_MinRadius > LightDistanceValues[i])
 				{
 					index = i;
 					break;

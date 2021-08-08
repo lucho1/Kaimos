@@ -69,7 +69,7 @@ struct PointLight
 	vec3 Position;
 	float Intensity;
 
-	float Radius;
+	float MinRadius, MaxRadius;
 	float FalloffFactor, AttL, AttQ;
 };
 
@@ -80,7 +80,7 @@ uniform sampler2D u_Textures[32];
 uniform vec3 u_SceneColor = vec3(1.0);
 uniform const int u_DirectionalLightsNum = 0, u_PointLightsNum = 0;
 uniform DirectionalLight u_DirectionalLights[MAX_DIR_LIGHTS] = DirectionalLight[MAX_DIR_LIGHTS](DirectionalLight(vec4(1.0), vec3(0.0), 1.0));
-uniform PointLight u_PointLights[MAX_POINT_LIGHTS] = PointLight[MAX_POINT_LIGHTS](PointLight(vec4(1.0), vec3(0.0), 1.0, 50.0, 1.0, 0.09, 0.032));
+uniform PointLight u_PointLights[MAX_POINT_LIGHTS] = PointLight[MAX_POINT_LIGHTS](PointLight(vec4(1.0), vec3(0.0), 1.0, 50.0, 100.0, 1.0, 0.09, 0.032));
 
 // Functions
 float GetLightSpecularFactor(vec3 normal, vec3 norm_light_dir)
@@ -117,18 +117,34 @@ void main()
 	for(int i = 0; i < u_PointLightsNum; ++i)
 	{
 		vec3 dist = u_PointLights[i].Position - v_FragPos;
-		vec3 light_dir = normalize(dist);
+		float dist_scalar = length(dist);
 
+		if(dist_scalar > u_PointLights[i].MaxRadius)
+			continue;
+
+		vec3 light_dir = normalize(dist);
 		float diffuse_factor = max(dot(normal, light_dir), 0.0);
+
+		// Light's Diffuse & Specular Components
 		vec3 diffuse_component = diffuse_factor * u_PointLights[i].Radiance.rgb;
 		vec3 specular_component = GetLightSpecularFactor(normal, light_dir) * u_PointLights[i].Radiance.rgb; // * spec_strenght
 
-		float dist_scalar = length(dist);
+		// External Attenuation (from MinRad to MaxRad)
+		float outer_attenuation = 1.0;
+		if(dist_scalar > u_PointLights[i].MinRadius && dist_scalar <= u_PointLights[i].MaxRadius)
+		{
+			float diff_rad = u_PointLights[i].MaxRadius - u_PointLights[i].MinRadius;
+			float diff_d = dist_scalar - u_PointLights[i].MinRadius;
+			outer_attenuation = 1.0 - (diff_d/diff_rad);
+		}
+
+		// Light Own Attenuation (within MinRad)
 		float linear_att = u_PointLights[i].AttL * dist_scalar;
 		float quadratic_att = u_PointLights[i].AttQ * (dist_scalar*dist_scalar);
 		float attenuation = (1.0 / (1.0 + linear_att + quadratic_att)) * u_PointLights[i].FalloffFactor;
 
-		lighting_result += ((diffuse_component + specular_component) * attenuation);
+		// Lighting Result
+		lighting_result += ((diffuse_component + specular_component) * attenuation * outer_attenuation);
 	}
 
 	vec3 ambient_color = u_SceneColor * lighting_result;
