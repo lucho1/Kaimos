@@ -102,7 +102,6 @@ void main()
 	color2 = v_EntityID;
 	
 	vec3 normal = normalize(v_Normal);
-
 	vec3 lighting_result = vec3(0.0);
 	for(int i = 0; i < u_DirectionalLightsNum; ++i)
 	{
@@ -118,18 +117,16 @@ void main()
 	for(int i = 0; i < u_PointLightsNum; ++i)
 	{
 		vec3 dist = u_PointLights[i].Position - v_FragPos;
-
 		vec3 light_dir = normalize(dist);
-		float diffuse_factor = max(dot(normal, light_dir), 0.0);
 
+		float diffuse_factor = max(dot(normal, light_dir), 0.0);
 		vec3 diffuse_component = diffuse_factor * u_PointLights[i].Radiance.rgb;
 		vec3 specular_component = GetLightSpecularFactor(normal, light_dir) * u_PointLights[i].Radiance.rgb; // * spec_strenght
 
 		float dist_scalar = length(dist);
-
 		float linear_att = u_PointLights[i].AttL * dist_scalar;
 		float quadratic_att = u_PointLights[i].AttQ * (dist_scalar*dist_scalar);
-		float attenuation = 1.0 / (1.0 + linear_att + quadratic_att);
+		float attenuation = (1.0 / (1.0 + linear_att + quadratic_att)) * u_PointLights[i].FalloffFactor;
 
 		lighting_result += ((diffuse_component + specular_component) * attenuation);
 	}
