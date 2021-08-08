@@ -361,7 +361,7 @@ namespace Kaimos {
 				if (light_type == 1)
 				{
 					PointLightComponent& plight = entity.AddComponent<PointLightComponent>();
-					plight.SetComponentValues(component.StoredLightFalloff, component.StoredLightRadius);
+					plight.SetComponentValues(component.StoredLightFalloff, component.StoredLightMinRadius, component.StoredLightMaxRadius);
 					plight.SetLightValues(light->Intensity, light->Radiance);
 
 					plight.Visible = component.Visible;
@@ -386,11 +386,14 @@ namespace Kaimos {
 				Kaimos::KaimosUI::UIFunctionalities::DrawInlineSlider("Intensity", "###light_intensity", &light->Intensity);
 
 				// Point Light Stuff
-				float plight_radius = light->GetRadius();
-				if (Kaimos::KaimosUI::UIFunctionalities::DrawInlineDragFloat("Radius", "###plight_radius", &plight_radius))
-					light->SetRadius(plight_radius);
+				float plight_minradius = light->GetMinRadius(), plight_maxradius = light->GetMaxRadius();
+				if (Kaimos::KaimosUI::UIFunctionalities::DrawInlineDragFloat("Min Radius", "###plight_minradius", &plight_minradius, 0.05f, 0.0f, 2.0f, 0.0f, plight_maxradius))
+					light->SetMinRadius(plight_minradius);
 
-				Kaimos::KaimosUI::UIFunctionalities::DrawInlineDragFloat("Falloff Intensity", "###plight_falloff", &light->FalloffMultiplier);
+				if (Kaimos::KaimosUI::UIFunctionalities::DrawInlineDragFloat("Max Radius", "###plight_maxradius", &plight_maxradius, 0.05f, 0.0f, 2.0f, plight_minradius, FLT_MAX))
+					light->SetMaxRadius(plight_maxradius);
+
+				Kaimos::KaimosUI::UIFunctionalities::DrawInlineDragFloat("Falloff Intensity", "###plight_falloff", &light->FalloffMultiplier, 0.01f, 0.0f, 2.0f, 0.0f, FLT_MAX);
 
 				// Light Switch
 				if (light_type == 0)
