@@ -127,7 +127,7 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 
 
 	// ----------------------- UI Methods -----------------------------------------------------------------
-	void DrawPinWidget(PinDataType pin_data_type, glm::vec4& value)
+	void DrawPinWidget(PinDataType pin_data_type, glm::vec4& value, float widget_speed, float widget_min, float widget_max, const char* widget_format)
 	{
 		ImGui::SameLine();
 		switch (pin_data_type)
@@ -135,25 +135,25 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 			case PinDataType::FLOAT:
 			{
 				ImGui::SetNextItemWidth(30.0f);
-				ImGui::DragFloat("###float_val", &value.x, 0.05f, 0.0f, 0.0f, "%.2f");
+				ImGui::DragFloat("###float_val", &value.x, widget_speed, widget_min, widget_max, widget_format);
 				return;
 			}
 			case PinDataType::INT:
 			{
 				ImGui::SetNextItemWidth(30.0f);
-				ImGui::DragFloat("###int_val", &value.x, 1.0f, 0.0f, 0.0f, "%.0f");
+				ImGui::DragFloat("###int_val", &value.x, 1.0f, widget_min, widget_max, "%.0f");
 				return;
 			}
 			case PinDataType::VEC2:
 			{
 				ImGui::SetNextItemWidth(60.0f);
-				ImGui::DragFloat2("###v2_val", glm::value_ptr(value), 0.05f, 0.0f, 0.0f, "%.2f");
+				ImGui::DragFloat2("###v2_val", glm::value_ptr(value), widget_speed, widget_min, widget_max, widget_format);
 				return;
 			}
 			case PinDataType::VEC3:
 			{
 				ImGui::SetNextItemWidth(90.0f);
-				ImGui::DragFloat3("###v3_val", glm::value_ptr(value), 0.05f, 0.0f, 0.0f, "%.2f");
+				ImGui::DragFloat3("###v3_val", glm::value_ptr(value), widget_speed, widget_min, widget_max, widget_format);
 				return;
 			}
 			case PinDataType::VEC4:
