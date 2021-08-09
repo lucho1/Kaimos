@@ -92,6 +92,7 @@ namespace Kaimos {
 			{ SHADER_DATATYPE::FLOAT3,	"a_NormalTransformed" },
 			{ SHADER_DATATYPE::FLOAT2,	"a_TexCoord" },
 			{ SHADER_DATATYPE::FLOAT4,	"a_Color" },
+			{ SHADER_DATATYPE::FLOAT ,	"a_Shininess" },
 			{ SHADER_DATATYPE::FLOAT ,	"a_TexIndex" },
 			{ SHADER_DATATYPE::INT ,	"a_EntityID" }
 		};
@@ -255,6 +256,7 @@ namespace Kaimos {
 			s_Data->QuadVBufferPtr->TexCoord = quad_vertex.TexCoord;
 
 			s_Data->QuadVBufferPtr->Color = material->Color;
+			s_Data->QuadVBufferPtr->Shininess = material->Smoothness * 256.0f;
 			s_Data->QuadVBufferPtr->TexIndex = texture_index;
 			s_Data->QuadVBufferPtr->EntityID = entity_id;
 

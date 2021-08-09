@@ -6,8 +6,9 @@ layout(location = 1) in vec3 a_Normal;
 layout(location = 2) in vec3 a_NormalTransformed;
 layout(location = 3) in vec2 a_TexCoord;
 layout(location = 4) in vec4 a_Color;
-layout(location = 5) in float a_TexIndex;
-layout(location = 6) in int a_EntityID;
+layout(location = 5) in float a_Shininess;
+layout(location = 6) in float a_TexIndex;
+layout(location = 7) in int a_EntityID;
 
 // Varyings
 out vec3 v_Normal;
@@ -15,6 +16,7 @@ out vec2 v_TexCoord;
 out vec4 v_Color;
 out vec3 v_FragPos;
 
+out flat float v_Shininess;
 out flat float v_TexIndex;
 out flat int v_EntityID;
 
@@ -30,6 +32,7 @@ void main()
 	v_TexCoord = a_TexCoord;
 	v_Color = a_Color;
 	v_FragPos = a_Position;
+	v_Shininess = a_Shininess;
 	v_TexIndex = a_TexIndex;
 	v_EntityID = a_EntityID;
 
@@ -54,6 +57,7 @@ in vec2 v_TexCoord;
 in vec4 v_Color;
 in vec3 v_FragPos;
 
+in flat float v_Shininess;
 in flat float v_TexIndex;
 in flat int v_EntityID;
 
@@ -89,14 +93,13 @@ uniform PointLight u_PointLights[MAX_POINT_LIGHTS] = PointLight[MAX_POINT_LIGHTS
 // Functions
 float GetLightSpecularFactor(vec3 normal, vec3 norm_light_dir)
 {
-	// specular strength???
 	vec3 view_dir = normalize(u_ViewPos - v_FragPos);
 	vec3 halfway_dir = normalize(norm_light_dir + view_dir);
 
 	// shininess/smoothness!
 	//vec3 reflect_dir = reflect(-norm_light_dir, normal); //phong
-	//return pow(max(dot(view_dir, reflect_dir), 0.0), 32.0);
-	return pow(max(dot(normal, halfway_dir), 0.0), 32.0); // blinn-phong
+	//return pow(max(dot(view_dir, reflect_dir), 0.0), v_Shininess);
+	return pow(max(dot(normal, halfway_dir), 0.0), v_Shininess); // blinn-phong
 }
 
 
