@@ -89,7 +89,6 @@ namespace Kaimos {
 		BufferLayout layout = {
 			{ SHADER_DATATYPE::FLOAT3,	"a_Position" },
 			{ SHADER_DATATYPE::FLOAT3,	"a_Normal" },
-			{ SHADER_DATATYPE::FLOAT3,	"a_NormalTransformed" },
 			{ SHADER_DATATYPE::FLOAT3,	"a_Tangent" },
 			{ SHADER_DATATYPE::FLOAT2,	"a_TexCoord" },
 			{ SHADER_DATATYPE::FLOAT4,	"a_Color" },
@@ -259,8 +258,7 @@ namespace Kaimos {
 
 			// Set the vertex data
 			s_Data->QuadVBufferPtr->Pos = transform * glm::vec4(quad_vertex.Pos, 1.0f);
-			s_Data->QuadVBufferPtr->Normal = glm::normalize(glm::vec3(transform * glm::vec4(quad_vertex.Normal, 0.0f)));;
-			s_Data->QuadVBufferPtr->NormalTrs = glm::mat3(glm::transpose(glm::inverse(transform))) * quad_vertex.Normal;
+			s_Data->QuadVBufferPtr->Normal = glm::normalize(glm::vec3(transform * glm::vec4(quad_vertex.Normal, 0.0f)));
 			s_Data->QuadVBufferPtr->Tangent = glm::normalize(glm::vec3(transform * glm::vec4(quad_vertex.Tangent, 0.0f)));
 			s_Data->QuadVBufferPtr->TexCoord = quad_vertex.TexCoord;
 

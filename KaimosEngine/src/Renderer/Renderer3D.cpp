@@ -76,7 +76,6 @@ namespace Kaimos {
 		BufferLayout layout = {
 			{ SHADER_DATATYPE::FLOAT3,	"a_Position" },
 			{ SHADER_DATATYPE::FLOAT3,	"a_Normal" },
-			{ SHADER_DATATYPE::FLOAT3,	"a_NormalTransformed" },
 			{ SHADER_DATATYPE::FLOAT3,	"a_Tangent" },
 			{ SHADER_DATATYPE::FLOAT2,	"a_TexCoord" },
 			{ SHADER_DATATYPE::FLOAT4,	"a_Color" },
@@ -249,8 +248,7 @@ namespace Kaimos {
 				Vertex& mesh_vertex = mesh_component.ModifiedVertices[i];
 
 				s_3DData->VBufferPtr->Pos = transform * glm::vec4(mesh_vertex.Pos, 1.0f);
-				s_3DData->VBufferPtr->Normal = glm::normalize(glm::vec3(transform * glm::vec4(mesh_vertex.Normal, 0.0f)));;
-				s_3DData->VBufferPtr->NormalTrs = glm::mat3(glm::transpose(glm::inverse(transform))) * mesh_vertex.Normal;
+				s_3DData->VBufferPtr->Normal = glm::normalize(glm::vec3(transform * glm::vec4(mesh_vertex.Normal, 0.0f)));
 				s_3DData->VBufferPtr->Tangent = glm::normalize(glm::vec3(transform * glm::vec4(mesh_vertex.Tangent, 0.0f)));
 				s_3DData->VBufferPtr->TexCoord = mesh_vertex.TexCoord;
 
