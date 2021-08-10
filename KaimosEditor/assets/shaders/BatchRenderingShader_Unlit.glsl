@@ -5,7 +5,7 @@ layout(location = 0) in vec3 a_Position;
 layout(location = 3) in vec2 a_TexCoord;
 layout(location = 4) in vec4 a_Color;
 layout(location = 8) in float a_TexIndex;
-layout(location = 10) in int a_EntityID;
+layout(location = 11) in int a_EntityID;
 
 // Varyings
 out vec2 v_TexCoord;
