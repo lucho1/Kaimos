@@ -21,7 +21,7 @@ namespace Kaimos::MaterialEditor {
 		glm::vec4 ProcessFloatAndVecMultiplication(const float float_val, const glm::vec4& vec_val, PinDataType vec_data_type);
 
 		// --- UI Methods ---
-		void DrawPinWidget(PinDataType pin_data_type, glm::vec4& value);
+		void DrawPinWidget(PinDataType pin_data_type, glm::vec4& value, float widget_speed = 0.05f, float widget_min = 0.0f, float widget_max = 0.0f, const char* widget_format = "%.2f");
 	}
 }
 

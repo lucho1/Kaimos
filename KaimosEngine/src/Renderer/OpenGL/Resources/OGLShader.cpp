@@ -1,5 +1,6 @@
 #include "kspch.h"
 #include "OGLShader.h"
+#include "Renderer/Renderer.h"
 
 #include <glad/glad.h>
 #include <glm/gtc/type_ptr.hpp>
@@ -98,7 +99,7 @@ namespace Kaimos {
 
 	
 	// ----------------------- Private OGL Shader Methods -------------------------------------------------
-	const std::string OGLShader::ReadShaderFile(const std::string& filepath)
+	std::string OGLShader::ReadShaderFile(const std::string& filepath)
 	{
 		KS_PROFILE_FUNCTION();
 
@@ -137,7 +138,7 @@ namespace Kaimos {
 	}
 
 
-	const std::unordered_map<GLenum, std::string> OGLShader::PreProcessShader(const std::string& source)
+	const std::unordered_map<GLenum, std::string> OGLShader::PreProcessShader(std::string& source)
 	{
 		KS_PROFILE_FUNCTION();
 
@@ -145,6 +146,26 @@ namespace Kaimos {
 		std::unordered_map<GLenum, std::string> ret;
 
 		// -- Variables to Process Shader --
+		// Lighting Defines
+		std::string dirlights_define = "#define MAX_DIR_LIGHTS ";
+		std::string pointlights_define = "#define MAX_POINT_LIGHTS ";
+
+		size_t define_dir_pos = source.find(dirlights_define, 0);
+		size_t define_point_pos = source.find(pointlights_define, 0);
+
+		if (define_dir_pos != std::string::npos)
+		{
+			std::string new_dir_define = dirlights_define + std::to_string(Renderer::GetMaxDirLights()) + "\n";
+			source.replace(define_dir_pos, dirlights_define.size() + 1, new_dir_define);
+		}
+
+		if (define_point_pos != std::string::npos)
+		{
+			std::string new_point_define = pointlights_define + std::to_string(Renderer::GetMaxPointLights()) + "\n";
+			source.replace(define_point_pos, pointlights_define.size() + 3, new_point_define);
+		}
+
+		// Shader Type Token
 		const char* type_token = "#type";						// Token to designate the beginning of a new shader (check any .glsl file)
 		size_t type_token_length = strlen(type_token);			// Length of the token
 		size_t pos = source.find(type_token, 0);				// Start of shader type declaration line - Find the position of the token (to find the shader beginning) to use it as a cursor

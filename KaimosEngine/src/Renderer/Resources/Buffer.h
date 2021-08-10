@@ -58,8 +58,8 @@ namespace Kaimos {
 				case SHADER_DATATYPE::FLOAT2:	return 2;
 				case SHADER_DATATYPE::FLOAT3:	return 3;
 				case SHADER_DATATYPE::FLOAT4:	return 4;
-				case SHADER_DATATYPE::MAT3:		return 3 * 3;
-				case SHADER_DATATYPE::MAT4:		return 4 * 4;
+				case SHADER_DATATYPE::MAT3:		return 3;// *3;
+				case SHADER_DATATYPE::MAT4:		return 4;// *4;
 				case SHADER_DATATYPE::INT:		return 1;
 				case SHADER_DATATYPE::INT2:		return 2;
 				case SHADER_DATATYPE::INT3:		return 3;

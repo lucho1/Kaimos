@@ -8,6 +8,7 @@
 #include "Renderer/Cameras/Camera.h"
 #include "Renderer/Resources/Mesh.h"
 #include "Renderer/Resources/Material.h"
+#include "Renderer/Resources/Light.h"
 #include "ScriptableEntity.h"
 
 #include <glm/glm.hpp>
@@ -81,6 +82,68 @@ namespace Kaimos {
 
 
 
+	// ---- LIGHT COMPONENTS ----------------------------------------
+	struct DirectionalLightComponent
+	{
+		// --- Variables ---
+		Ref<Kaimos::Light> Light = CreateRef<Kaimos::Light>();
+		bool Visible = true;
+
+		// --- Storage Variables (to switch types) ---
+		float StoredLightMinRadius = 50.0f, StoredLightMaxRadius = 100.f, StoredLightFalloff = 1.0f;
+
+		// --- Constructors ---
+		DirectionalLightComponent() = default;
+		DirectionalLightComponent(const DirectionalLightComponent&) = default;
+
+		~DirectionalLightComponent() { Light.reset(); }
+
+		// --- Light Functions ---
+		void SetComponentValues(float falloff, float min_radius, float max_radius)
+		{
+			StoredLightFalloff = falloff;
+			StoredLightMinRadius = min_radius;
+			StoredLightMaxRadius = max_radius;
+		}
+
+		void SetLightValues(const glm::vec4& radiance, float intensity, float specular_strength)
+		{
+			Light->Radiance = radiance;
+			Light->Intensity = intensity;
+			Light->SpecularStrength = specular_strength;
+		}
+	};
+
+	struct PointLightComponent
+	{
+		// --- Variables ---
+		Ref<Kaimos::PointLight> Light = CreateRef<Kaimos::PointLight>();
+		bool Visible = true;
+
+		// --- Constructors ---
+		PointLightComponent() = default;
+		PointLightComponent(const PointLightComponent&) = default;
+
+		~PointLightComponent() { Light.reset(); }
+
+		// --- Light Functions ---
+		void SetPointLightValues(float falloff, float min_radius, float max_radius)
+		{
+			Light->FalloffMultiplier = falloff;
+			Light->SetMinRadius(min_radius);
+			Light->SetMaxRadius(max_radius);
+		}
+
+		void SetLightValues(const glm::vec4& radiance, float intensity, float specular_strength)
+		{
+			Light->Radiance = radiance;
+			Light->Intensity = intensity;
+			Light->SpecularStrength = specular_strength;
+		}
+	};
+
+
+
 	// ---- SCRIPT COMPONENT ---------------------------------------
 	struct NativeScriptComponent
 	{
@@ -133,6 +196,37 @@ namespace Kaimos {
 
 
 		// --- Vertices Functions ---
+		void CalculateTangents()
+		{
+			// For this function, the same than mesh, not gonna use it to
+			// "reconstruct" the tangents in case anything changes with time nodes
+			// but I'll leave it in case I have problems in the future with time & normals
+			// In any case, I need it to construct Tangents on the meshes setup
+			glm::vec3 edge1 = QuadVertices[1].Pos - QuadVertices[0].Pos;
+			glm::vec3 edge2 = QuadVertices[2].Pos - QuadVertices[0].Pos;
+			glm::vec2 deltaUV1 = QuadVertices[1].TexCoord - QuadVertices[0].TexCoord;
+			glm::vec2 deltaUV2 = QuadVertices[2].TexCoord - QuadVertices[0].TexCoord;
+
+			glm::vec3 tangent1, tangent2;
+			float f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
+			tangent1.x = f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
+			tangent1.y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
+			tangent1.z = f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
+
+			edge1 = QuadVertices[2].Pos - QuadVertices[0].Pos;
+			edge2 = QuadVertices[3].Pos - QuadVertices[0].Pos;
+			deltaUV1 = QuadVertices[2].TexCoord - QuadVertices[0].TexCoord;
+			deltaUV2 = QuadVertices[3].TexCoord - QuadVertices[0].TexCoord;
+
+			f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
+			tangent2.x = f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
+			tangent2.y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
+			tangent2.z = f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
+
+			QuadVertices[0].Tangent = QuadVertices[3].Tangent = tangent1;
+			QuadVertices[1].Tangent = QuadVertices[2].Tangent = tangent2;
+		}
+
 		void SetupVertices()
 		{
 			QuadVertices[0].Pos =	{ -0.5f, -0.5f, 0.0f };
@@ -145,7 +239,8 @@ namespace Kaimos {
 			QuadVertices[2].TexCoord =	{ 1.0f, 1.0f };
 			QuadVertices[3].TexCoord =	{ 0.0f, 1.0f };
 
-			QuadVertices[0].Normal = QuadVertices[1].Normal = QuadVertices[2].Normal = QuadVertices[3].Normal = { 0.0f,  0.0f, -1.0f };
+			QuadVertices[0].Normal = QuadVertices[1].Normal = QuadVertices[2].Normal = QuadVertices[3].Normal = { 0.0f,  0.0f, 1.0f };
+			CalculateTangents();
 		}
 
 		void UpdateVertices()
@@ -170,6 +265,8 @@ namespace Kaimos {
 				NormalsTimed = material->IsVertexAttributeTimed(MaterialEditor::VertexParameterNodeType::NORMAL);
 				TexCoordsTimed = material->IsVertexAttributeTimed(MaterialEditor::VertexParameterNodeType::TEX_COORDS);
 			}
+
+			//CalculateTangents();
 		}
 
 		void UpdateTimedVertices()
@@ -200,6 +297,9 @@ namespace Kaimos {
 					vertex.TexCoord = material->GetVertexAttributeResult<glm::vec2>(MaterialEditor::VertexParameterNodeType::TEX_COORDS);
 				}
 			}
+
+			//if (PositionTimed || TexCoordsTimed)
+			//	CalculateTangents();
 		}
 	};
 
@@ -282,6 +382,8 @@ namespace Kaimos {
 				NormalsTimed = material->IsVertexAttributeTimed(MaterialEditor::VertexParameterNodeType::NORMAL);
 				TexCoordsTimed = material->IsVertexAttributeTimed(MaterialEditor::VertexParameterNodeType::TEX_COORDS);
 			}
+
+			//CalculateTangents(mesh);
 		}
 
 		void UpdateTimedVertices()
@@ -317,8 +419,61 @@ namespace Kaimos {
 					vertex.TexCoord = material->GetVertexAttributeResult<glm::vec2>(MaterialEditor::VertexParameterNodeType::TEX_COORDS);
 				}
 			}
+
+			//if (PositionTimed || TexCoordsTimed)
+			//	CalculateTangents(mesh);
 		}
 	};
 }
 
 #endif //_COMPONENTS_H_
+
+
+
+
+
+
+
+
+
+
+// --- NOT GONNA USE THIS FUNCTION BUT WILL LEAVE IT HERE IN CASE I HAVE ISSUES WITH TIME & NORMALS ---
+//void CalculateTangents(const Ref<Mesh>& mesh)
+//{
+//	//std::vector<uint> indices = mesh->GetIndices();
+//	for (uint i = 0; i < (ModifiedVertices.size() - 4); i+=4)
+//	{
+//		Vertex v0 = ModifiedVertices[i];
+//		Vertex v1 = ModifiedVertices[i + 1];
+//		Vertex v2 = ModifiedVertices[i + 2];
+//		Vertex v3 = ModifiedVertices[i + 3];
+//		//Vertex v0 = ModifiedVertices[indices[i]];
+//		//Vertex v1 = ModifiedVertices[indices[i + 1]];
+//		//Vertex v2 = ModifiedVertices[indices[i + 2]];
+//		//Vertex v3 = ModifiedVertices[indices[i + 3]];
+//
+//		glm::vec3 edge1 = v1.Pos - v0.Pos;
+//		glm::vec3 edge2 = v2.Pos - v0.Pos;
+//		glm::vec2 deltaUV1 = v1.TexCoord - v0.TexCoord;
+//		glm::vec2 deltaUV2 = v2.TexCoord - v0.TexCoord;
+//
+//		glm::vec3 tangent1, tangent2;
+//		float f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
+//		tangent1.x = f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
+//		tangent1.y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
+//		tangent1.z = f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
+//
+//		edge1 = v2.Pos - v0.Pos;
+//		edge2 = v3.Pos - v0.Pos;
+//		deltaUV1 = v2.TexCoord - v0.TexCoord;
+//		deltaUV2 = v3.TexCoord - v0.TexCoord;
+//
+//		f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
+//		tangent2.x = f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
+//		tangent2.y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
+//		tangent2.z = f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
+// 
+//		ModifiedVertices[i+0].Tangent = ModifiedVertices[i+3].Tangent = tangent1;
+//		ModifiedVertices[i+1].Tangent = ModifiedVertices[i+2].Tangent = tangent2; // Or negate???
+//	}
+//}

@@ -1,11 +1,12 @@
 #include "kspch.h"
 #include "Renderer2D.h"
 
-#include "Renderer.h"
 #include "Foundations/RenderCommand.h"
 #include "Resources/Buffer.h"
 #include "Resources/Shader.h"
 #include "Resources/Material.h"
+#include "Resources/Light.h"
+
 #include "Scene/ECS/Components.h"
 
 #include <glm/gtc/type_ptr.hpp>
@@ -88,9 +89,15 @@ namespace Kaimos {
 		BufferLayout layout = {
 			{ SHADER_DATATYPE::FLOAT3,	"a_Position" },
 			{ SHADER_DATATYPE::FLOAT3,	"a_Normal" },
+			{ SHADER_DATATYPE::FLOAT3,	"a_Tangent" },
 			{ SHADER_DATATYPE::FLOAT2,	"a_TexCoord" },
 			{ SHADER_DATATYPE::FLOAT4,	"a_Color" },
+			{ SHADER_DATATYPE::FLOAT ,	"a_Shininess" },
+			{ SHADER_DATATYPE::FLOAT ,	"a_NormalStrength" },
+			{ SHADER_DATATYPE::FLOAT ,	"a_SpecularStrength" },
 			{ SHADER_DATATYPE::FLOAT ,	"a_TexIndex" },
+			{ SHADER_DATATYPE::FLOAT ,	"a_NormTexIndex" },
+			{ SHADER_DATATYPE::FLOAT ,	"a_SpecTexIndex" },
 			{ SHADER_DATATYPE::INT ,	"a_EntityID" }
 		};
 
@@ -121,17 +128,55 @@ namespace Kaimos {
 
 	
 	// ----------------------- Public Renderer Methods ----------------------------------------------------
-	void Renderer2D::BeginScene(const CameraComponent& camera_component, const TransformComponent& transform_component)
+	void Renderer2D::BeginScene(const glm::mat4& view_projection_matrix, const glm::vec3& camera_pos, const std::vector<std::pair<Ref<Light>, glm::vec3>>& dir_lights, const std::vector<std::pair<Ref<PointLight>, glm::vec3>>& point_lights)
 	{
 		KS_PROFILE_FUNCTION();
-		glm::mat4 view_proj = camera_component.Camera.GetProjection() * glm::inverse(transform_component.GetTransform());
-		SetupRenderingShader(view_proj);
-	}
-	
-	void Renderer2D::BeginScene(const Camera& camera)
-	{
-		KS_PROFILE_FUNCTION();
-		SetupRenderingShader(camera.GetViewProjection());
+
+		Ref<Shader> shader = Renderer::GetShader("BatchedShader");
+		if (shader)
+		{
+			s_Data->QuadVArray->Bind();
+			shader->Bind();
+			shader->SetUMat4("u_ViewProjection", view_projection_matrix);
+			shader->SetUFloat3("u_ViewPos", camera_pos);
+			shader->SetUFloat3("u_SceneColor", Renderer::GetSceneColor());
+
+			uint max_dir_lights = Renderer::GetMaxDirLights();
+			uint dir_lights_size = dir_lights.size() >= max_dir_lights ? max_dir_lights : dir_lights.size();
+			shader->SetUInt("u_DirectionalLightsNum", dir_lights_size);
+
+			for (uint i = 0; i < dir_lights_size; ++i)
+			{
+				std::string light_array_uniform = "u_DirectionalLights[" + std::to_string(i) + "].";
+				shader->SetUFloat4(light_array_uniform + "Radiance", dir_lights[i].first->Radiance);
+				shader->SetUFloat3(light_array_uniform + "Direction", dir_lights[i].second);
+				shader->SetUFloat(light_array_uniform + "Intensity", dir_lights[i].first->Intensity);
+				shader->SetUFloat(light_array_uniform + "SpecularStrength", dir_lights[i].first->SpecularStrength);
+			}
+
+			uint max_point_lights = Renderer::GetMaxPointLights();
+			uint point_lights_size = point_lights.size() >= max_point_lights ? max_point_lights : point_lights.size();
+			shader->SetUInt("u_PointLightsNum", point_lights_size);
+
+			for (uint i = 0; i < point_lights_size; ++i)
+			{
+				std::string light_array_uniform = "u_PointLights[" + std::to_string(i) + "].";
+				shader->SetUFloat4(light_array_uniform + "Radiance", point_lights[i].first->Radiance);
+				shader->SetUFloat3(light_array_uniform + "Position", point_lights[i].second);
+				shader->SetUFloat(light_array_uniform + "Intensity", point_lights[i].first->Intensity);
+				shader->SetUFloat(light_array_uniform + "SpecularStrength", point_lights[i].first->SpecularStrength);
+
+				shader->SetUFloat(light_array_uniform + "MinRadius", point_lights[i].first->GetMinRadius());
+				shader->SetUFloat(light_array_uniform + "MaxRadius", point_lights[i].first->GetMaxRadius());
+				shader->SetUFloat(light_array_uniform + "FalloffFactor", point_lights[i].first->FalloffMultiplier);
+				shader->SetUFloat(light_array_uniform + "AttL", point_lights[i].first->GetLinearAttenuationFactor());
+				shader->SetUFloat(light_array_uniform + "AttQ", point_lights[i].first->GetQuadraticAttenuationFactor());
+			}
+
+			StartBatch();
+		}
+		else
+			KS_FATAL_ERROR("Renderer2D: Tried to Render with a null Shader!");
 	}
 
 	void Renderer2D::EndScene()
@@ -143,20 +188,6 @@ namespace Kaimos {
 
 
 	// ----------------------- Private Renderer Methods ---------------------------------------------------
-	void Renderer2D::SetupRenderingShader(const glm::mat4& vp_matrix)
-	{
-		Ref<Shader> shader = Renderer::GetShader("BatchedShader2D");
-		if (shader)
-		{
-			s_Data->QuadVArray->Bind();
-			shader->Bind();
-			shader->SetUMat4("u_ViewProjection", vp_matrix);
-			StartBatch();
-		}
-		else
-			KS_FATAL_ERROR("Tried to Render with a null Shader!");
-	}
-
 	void Renderer2D::Flush()
 	{
 		KS_PROFILE_FUNCTION();
@@ -199,13 +230,17 @@ namespace Kaimos {
 		if (s_Data->QuadIndicesDrawCount >= s_Data->MaxIndices)
 			NextBatch();
 
-		// -- Get Texture index if Sprite has Texture --
+		// -- Get Material & Check it fits in Batch --
 		Ref<Material> material = Renderer::GetMaterial(sprite_component.SpriteMaterialID);
 		if (!material)
 			KS_FATAL_ERROR("Tried to Render a Sprite with a null Material!");
 
+		Renderer::CheckMaterialFitsInBatch(material, &NextBatch);
 
-		uint texture_index = Renderer::GetTextureIndex(material->GetTexture(), &NextBatch);
+		// -- Get Texture indexex --
+		uint texture_index = Renderer::GetTextureIndex(material->GetTexture(), false, &NextBatch);
+		uint normal_texture_index = Renderer::GetTextureIndex(material->GetNormalTexture(), true, &NextBatch);
+		uint specular_texture_index = Renderer::GetTextureIndex(material->GetSpecularTexture(), false, &NextBatch);
 
 		// -- Update Sprite Timed Vertices --
 		static float accumulated_dt = 0.0f;
@@ -224,11 +259,18 @@ namespace Kaimos {
 
 			// Set the vertex data
 			s_Data->QuadVBufferPtr->Pos = transform * glm::vec4(quad_vertex.Pos, 1.0f);
-			s_Data->QuadVBufferPtr->Normal = quad_vertex.Normal;
+			s_Data->QuadVBufferPtr->Normal = glm::normalize(glm::vec3(transform * glm::vec4(quad_vertex.Normal, 0.0f)));
+			s_Data->QuadVBufferPtr->Tangent = glm::normalize(glm::vec3(transform * glm::vec4(quad_vertex.Tangent, 0.0f)));
 			s_Data->QuadVBufferPtr->TexCoord = quad_vertex.TexCoord;
 
 			s_Data->QuadVBufferPtr->Color = material->Color;
+			s_Data->QuadVBufferPtr->Shininess = material->Smoothness * 256.0f;
+			s_Data->QuadVBufferPtr->Bumpiness = material->Bumpiness;
+			s_Data->QuadVBufferPtr->Specularity = material->Specularity;
+
 			s_Data->QuadVBufferPtr->TexIndex = texture_index;
+			s_Data->QuadVBufferPtr->NormTexIndex = normal_texture_index;
+			s_Data->QuadVBufferPtr->SpecTexIndex = specular_texture_index;
 			s_Data->QuadVBufferPtr->EntityID = entity_id;
 
 			++s_Data->QuadVBufferPtr;

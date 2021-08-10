@@ -6,6 +6,7 @@
 #include "Resources/Material.h"
 #include "Resources/Shader.h"
 #include "Resources/Texture.h"
+#include "Resources/Light.h"
 
 #include "Renderer2D.h"
 #include "Renderer3D.h"
@@ -17,7 +18,10 @@ namespace Kaimos {
 
 	struct RendererData
 	{
+		// Renderer Stuff
 		glm::mat4 ViewProjectionMatrix = glm::mat4(1.0f);
+		glm::vec3 SceneColor = glm::vec3(1.0f);
+		const uint MaxDirLights = 10, MaxPointLights = 100;
 		
 		// Shaders & Materials
 		ShaderLibrary Shaders;
@@ -25,10 +29,10 @@ namespace Kaimos {
 		std::unordered_map<uint, Ref<Material>> Materials;
 
 		// Textures
-		uint TextureSlotIndex = 1;									// Slot 0 -> White Texture 
+		uint TextureSlotIndex = 2;									// Slot 0 -> White Texture, Slot 1 -> Normal Texture
 		static const uint MaxTextureSlots = 32;						// TODO: RenderCapabilities - Variables based on what the hardware can do
 		std::array<Ref<Texture2D>, MaxTextureSlots> TextureSlots;
-		Ref<Texture2D> WhiteTexture = nullptr;
+		Ref<Texture2D> WhiteTexture = nullptr, NormalTexture = nullptr;
 	};
 
 	static RendererData* s_RendererData = nullptr;
@@ -41,21 +45,25 @@ namespace Kaimos {
 		KS_INFO("\n\n--- CREATING KAIMOS RENDERER ---");
 		s_RendererData = new RendererData();
 
-		// -- White Texture Creation --
-		uint whiteTextData = 0xffffffff; // Full Fs for every channel there (2x4 channels - rgba -)
+		// -- Default Textures Creation --
+		uint white_data = 0xffffffff; // Full Fs for every channel there (2x4 channels - rgba -)
 		s_RendererData->WhiteTexture = Texture2D::Create(1, 1);
-		s_RendererData->WhiteTexture->SetData(&whiteTextData, sizeof(whiteTextData)); // or sizeof(uint)
+		s_RendererData->WhiteTexture->SetData(&white_data, sizeof(white_data)); // or sizeof(uint)
+
+		uint normal_data = 0xffff8080;
+		s_RendererData->NormalTexture = Texture2D::Create(1, 1);
+		s_RendererData->NormalTexture->SetData(&normal_data, sizeof(normal_data)); // or sizeof(uint)
 
 		// -- Texture Slots Filling --
 		s_RendererData->TextureSlots[0] = s_RendererData->WhiteTexture;
+		s_RendererData->TextureSlots[1] = s_RendererData->NormalTexture;
 		int texture_samplers[s_RendererData->MaxTextureSlots];
 
 		for (uint i = 0; i < s_RendererData->MaxTextureSlots; ++i)
 			texture_samplers[i] = i;
 
 		// -- Shaders Creation --
-		s_RendererData->Shaders.Load("BatchedShader2D", "assets/shaders/BatchRendering_TextureShader.glsl");
-		s_RendererData->Shaders.Load("BatchedShader3D", "assets/shaders/3DTextureShader.glsl");
+		s_RendererData->Shaders.Load("BatchedShader", "assets/shaders/BatchRenderingShader.glsl");
 
 		// -- Shaders Uniform of Texture Slots --
 		s_RendererData->Shaders.ForEachShader([&](const Ref<Shader>& shader)
@@ -95,6 +103,7 @@ namespace Kaimos {
 		
 		s_RendererData->Materials.clear();
 		s_RendererData->WhiteTexture.reset();
+		s_RendererData->NormalTexture.reset();
 		delete s_RendererData;
 	}
 
@@ -219,13 +228,17 @@ namespace Kaimos {
 					uint graph_id = graph_subnode["MaterialGraph"].as<uint>();
 					ScopePtr<MaterialEditor::MaterialGraph> mat_graph = CreateScopePtr<MaterialEditor::MaterialGraph>(new MaterialEditor::MaterialGraph(graph_id));
 
-					std::string mat_texture_file;
-					mat_graph->DeserializeGraph(graph_subnode, material, mat_texture_file);
+					std::string mat_texture_file, mat_normtexture_file, mat_spectexture_file;
+					mat_graph->DeserializeGraph(graph_subnode, material, mat_texture_file, mat_normtexture_file, mat_spectexture_file);
 
 					// Finally, assign graph & texture to material
 					material->SetGraphUniqueRef(mat_graph);
 					if(!mat_texture_file.empty())
 						material->SetTexture(mat_texture_file);
+					if (!mat_normtexture_file.empty())
+						material->SetNormalTexture(mat_normtexture_file);
+					if (!mat_spectexture_file.empty())
+						material->SetSpecularTexture(mat_spectexture_file);
 				}
 			}
 		}
@@ -240,8 +253,38 @@ namespace Kaimos {
 	}
 
 
+	
+	// ----------------------- Public Getters & Renderer Shaders Methods -------------------------------------
+	uint Renderer::GetMaxTextureSlots()
+	{
+		return s_RendererData->MaxTextureSlots;
+	}
 
-	// ----------------------- Public Renderer Shaders Methods -----------------------------------------------
+	uint Renderer::GetCurrentTextureSlot()
+	{
+		return s_RendererData->TextureSlotIndex;
+	}
+
+	const glm::vec3 Renderer::GetSceneColor()
+	{
+		return s_RendererData->SceneColor;
+	}
+
+	void Renderer::SetSceneColor(const glm::vec3& color)
+	{
+		s_RendererData->SceneColor = color;
+	}
+
+	const uint Renderer::GetMaxDirLights()
+	{
+		return s_RendererData->MaxDirLights;
+	}
+
+	const uint Renderer::GetMaxPointLights()
+	{
+		return s_RendererData->MaxPointLights;
+	}
+
 	Ref<Shader> Renderer::GetShader(const std::string& name)
 	{
 		if (s_RendererData->Shaders.Exists(name))
@@ -253,15 +296,38 @@ namespace Kaimos {
 
 
 	// ----------------------- Public Renderer Materials Methods ---------------------------------------------
+	void Renderer::ResetTextureSlotIndex()
+	{
+		s_RendererData->TextureSlotIndex = 2; // 0 is white texture, 1 is normal texture
+	}
+
 	void Renderer::BindTextures()
 	{
 		for (uint i = 0; i < s_RendererData->TextureSlotIndex; ++i)
 			s_RendererData->TextureSlots[i]->Bind(i);
 	}
 
-	uint Renderer::GetTextureIndex(const Ref<Texture2D>& texture, std::function<void()> NextBatchFunction)
+	void Renderer::CheckMaterialFitsInBatch(const Ref<Material>& material, std::function<void()> NextBatchFunction)
 	{
-		uint ret = 0;
+		bool start_new_batch = false;
+
+		if (s_RendererData->TextureSlotIndex == (s_RendererData->MaxTextureSlots - 2))
+			if (material->HasAlbedo() && material->HasNormal() && material->HasSpecular())
+				start_new_batch = true;
+		else if (s_RendererData->TextureSlotIndex == (s_RendererData->MaxTextureSlots - 1))
+			if ((material->HasAlbedo() && material->HasNormal()) || (material->HasAlbedo() && material->HasSpecular()) || (material->HasNormal() && material->HasSpecular()))
+				start_new_batch = true;
+
+		if (start_new_batch)
+		{
+			NextBatchFunction();
+			s_RendererData->TextureSlotIndex = 2; // 0 is white texture, 1 is normal texture
+		}
+	}
+
+	uint Renderer::GetTextureIndex(const Ref<Texture2D>& texture, bool is_normal, std::function<void()> NextBatchFunction)
+	{
+		uint ret = is_normal ? 1 : 0;
 		if (texture)
 		{
 			// -- Find Texture if Exists --
@@ -275,13 +341,13 @@ namespace Kaimos {
 			}
 
 			// -- If it doesn't exists, add it to batch data --
-			if (ret == 0)
+			if (ret == 0 || ret == 1)
 			{
 				// - New Batch if Needed -
 				if (s_RendererData->TextureSlotIndex >= s_RendererData->MaxTextureSlots)
 				{
 					NextBatchFunction();
-					s_RendererData->TextureSlotIndex = 1; // 0 is white texture
+					s_RendererData->TextureSlotIndex = 2; // 0 is white texture, 1 is normal texture
 				}
 
 				// - Set Texture -

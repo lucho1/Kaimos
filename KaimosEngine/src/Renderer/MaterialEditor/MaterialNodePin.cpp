@@ -213,7 +213,7 @@ namespace Kaimos::MaterialEditor {
 	}
 
 
-	void NodeInputPin::DrawUI(bool& allow_node_drag, bool is_vtxattribute, bool modify_value, glm::vec4& value_to_modify)
+	void NodeInputPin::DrawUI(bool& allow_node_drag, bool is_vtxattribute, bool modify_value, glm::vec4& value_to_modify, float widget_speed, float widget_min, float widget_max, const char* widget_format)
 	{
 		ImNodes::BeginInputAttribute(m_ID);
 		ImGui::Text(m_Name.c_str());
@@ -228,7 +228,7 @@ namespace Kaimos::MaterialEditor {
 		{
 			ImGui::PushID(m_ID);
 
-			NodeUtils::DrawPinWidget(m_PinDataType, m_Value);
+			NodeUtils::DrawPinWidget(m_PinDataType, m_Value, widget_speed, widget_min, widget_max, widget_format);
 			SetDefaultValue(m_Value);
 
 			if (ImGui::IsItemHovered() || ImGui::IsItemFocused() || ImGui::IsItemActive() || ImGui::IsItemEdited() || ImGui::IsItemClicked())

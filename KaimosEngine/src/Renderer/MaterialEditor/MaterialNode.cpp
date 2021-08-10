@@ -161,11 +161,18 @@ namespace Kaimos::MaterialEditor {
 		m_VertexNormalPin =			CreateRef<NodeInputPin>(this, PinDataType::VEC3, false, "Vertex Normal (Vec3)");
 		m_TextureCoordinatesPin =	CreateRef<NodeInputPin>(this, PinDataType::VEC2, false, "Texture Coordinates (Vec2)");
 		m_ColorPin =				CreateRef<NodeInputPin>(this, PinDataType::VEC4, false, "Color (Vec4)", 1.0f);
+		m_SmoothnessPin =			CreateRef<NodeInputPin>(this, PinDataType::FLOAT, false, "Smoothness (Float)", 0.5f);
+		m_SpecularityPin =			CreateRef<NodeInputPin>(this, PinDataType::FLOAT, false, "Specularity (Float)", 1.0f);
+		m_BumpinessPin =			CreateRef<NodeInputPin>(this, PinDataType::FLOAT, false, "Bumpiness (Float)", 1.0f);
+		
 
 		m_NodeInputPins.push_back(m_VertexPositionPin);
 		m_NodeInputPins.push_back(m_VertexNormalPin);
 		m_NodeInputPins.push_back(m_TextureCoordinatesPin);
 		m_NodeInputPins.push_back(m_ColorPin);
+		m_NodeInputPins.push_back(m_SmoothnessPin);
+		m_NodeInputPins.push_back(m_SpecularityPin);
+		m_NodeInputPins.push_back(m_BumpinessPin);
 	}
 
 
@@ -176,6 +183,9 @@ namespace Kaimos::MaterialEditor {
 		m_VertexNormalPin.reset();
 		m_TextureCoordinatesPin.reset();
 		m_ColorPin.reset();
+		m_SmoothnessPin.reset();
+		m_SpecularityPin.reset();
+		m_BumpinessPin.reset();
 	}
 
 
@@ -183,16 +193,14 @@ namespace Kaimos::MaterialEditor {
 	{
 		for (auto inputpin_node : inputs_nodes)
 		{
-			uint pin_id =				inputpin_node["Pin"].as<uint>();
-			std::string pin_name =		inputpin_node["Name"].as<std::string>();
-			int pin_datatype =			inputpin_node["DataType"].as<int>();
-			glm::vec4 pin_value =		inputpin_node["Value"].as<glm::vec4>();
-			glm::vec4 pin_defvalue =	inputpin_node["DefValue"].as<glm::vec4>();
-			bool multitype_pin =		inputpin_node["AllowsMultipleTypes"].as<bool>();
-
+			uint pin_id = inputpin_node["Pin"].as<uint>();
+			std::string pin_name = inputpin_node["Name"].as<std::string>();
+			int pin_datatype = inputpin_node["DataType"].as<int>();
+			glm::vec4 pin_value = inputpin_node["Value"].as<glm::vec4>();
+			glm::vec4 pin_defvalue = inputpin_node["DefValue"].as<glm::vec4>();
+			bool multitype_pin = inputpin_node["AllowsMultipleTypes"].as<bool>();
 
 			Ref<NodeInputPin> pin = AddDeserializedInputPin(pin_name, pin_id, pin_datatype, pin_value, pin_defvalue, multitype_pin);
-
 			if (pin_name == "Vertex Position (Vec3)")
 				m_VertexPositionPin = pin;
 			else if (pin_name == "Vertex Normal (Vec3)")
@@ -201,6 +209,12 @@ namespace Kaimos::MaterialEditor {
 				m_TextureCoordinatesPin = pin;
 			else if (pin_name == "Color (Vec4)")
 				m_ColorPin = pin;
+			else if (pin_name == "Smoothness (Float)")
+				m_SmoothnessPin = pin;
+			else if (pin_name == "Specularity (Float)")
+				m_SpecularityPin = pin;
+			else if (pin_name == "Bumpiness (Float)")
+				m_BumpinessPin = pin;
 		}
 	}
 
@@ -236,39 +250,47 @@ namespace Kaimos::MaterialEditor {
 		ImGui::Text(m_Name.c_str());
 		ImNodes::EndNodeTitleBar();
 
-		// -- Draw Input Pins --
+		// -- Draw Vertex Attribute Input Pins --
 		bool set_node_draggable = true;
 
 		m_VertexPositionPin->DrawUI(set_node_draggable, true);
 		m_VertexNormalPin->DrawUI(set_node_draggable, true);
 		m_TextureCoordinatesPin->DrawUI(set_node_draggable, true);
+
+
+		// -- Draw Texture "Input" (Button) & Pins --
+		ImGui::NewLine();
 		m_ColorPin->DrawUI(set_node_draggable, false, true, m_AttachedMaterial->Color);
 
-		ImNodes::SetNodeDraggable(m_ID, set_node_draggable);
+		glm::vec4 smoothness_vec = glm::vec4(m_AttachedMaterial->Smoothness);
+		m_SmoothnessPin->DrawUI(set_node_draggable, false, true, smoothness_vec, 0.01f, 0.01f, 4.0f, "%.2f");
+		m_AttachedMaterial->Smoothness = smoothness_vec.x;
 
-		// -- Draw Texture "Input" (Button) --
 		uint id = m_AttachedMaterial->GetTexture() == nullptr ? 0 : m_AttachedMaterial->GetTexture()->GetTextureID();
 		ImGui::Text("Texture");
-		ImGui::SameLine();
+		ImGui::SameLine(65.0f);
 		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { 0.0f, 0.0f });
 
 		if (KaimosUI::UIFunctionalities::DrawTexturedButton("###mttexture_btn", id, glm::vec2(50.0f), glm::vec3(0.1f)))
 		{
-			std::string texture_file = FileDialogs::OpenFile("Texture (*.png)\0*.png\0");
+			std::string texture_file = FileDialogs::OpenFile("Texture (*.png;*.jpg)\0*.png;*.jpg\0PNG Texture (*.png)\0*.png\0JPG Texture (*.jpg)\0*.jpg\0");
+
 			if (!texture_file.empty())
 				m_AttachedMaterial->SetTexture(texture_file);
 		}
 
 		KaimosUI::UIFunctionalities::PopButton(false);
 
+		ImGui::PushID(0);
 		ImGui::SameLine();
-		if (KaimosUI::UIFunctionalities::DrawColoredButton("X", { 20.0f, 50.0f }, glm::vec3(0.2f), true))
+		if (KaimosUI::UIFunctionalities::DrawColoredButton("X", { 20.0f, 50.0f }, glm::vec3(0.15f), true))
 			m_AttachedMaterial->RemoveTexture();
 
 		KaimosUI::UIFunctionalities::PopButton(true);
+		ImGui::PopID();
 		ImGui::PopStyleVar();
 
-		if (m_AttachedMaterial->GetTexture())
+		if (m_AttachedMaterial->HasAlbedo())
 		{
 			std::string tex_path = m_AttachedMaterial->GetTexturePath();
 			std::string tex_name = tex_path;
@@ -276,13 +298,118 @@ namespace Kaimos::MaterialEditor {
 			if (!tex_path.empty())
 				tex_name = tex_path.substr(tex_path.find_last_of("/\\" + 1, tex_path.size() - 1) + 1);
 
-			ImGui::Indent(ImGui::CalcTextSize("Texture").x + 12.0f);
+			float text_pos = 100.0f - ImGui::CalcTextSize(tex_name.c_str()).x * 0.5f;
+			ImGui::Indent(text_pos);
 			ImGui::Text("%s", tex_name.c_str());
-			ImGui::Text("%ix%i (ID %i)", m_AttachedMaterial->GetTexture()->GetWidth(), m_AttachedMaterial->GetTexture()->GetHeight(), id);
+			ImGui::Indent(-text_pos);
+
+			char texture_info[24];
+			sprintf_s(texture_info, 24, "%ix%i (ID %i)", m_AttachedMaterial->GetTexture()->GetWidth(), m_AttachedMaterial->GetTexture()->GetHeight(), id);
+			text_pos = 100.0f - ImGui::CalcTextSize(texture_info).x * 0.5f;
+			ImGui::Indent(text_pos); ImGui::Text(texture_info); ImGui::Indent(-text_pos);
+		}
+
+
+		// -- Draw Normal Texture "Input" (Button) & Pins --
+		ImGui::NewLine();
+		glm::vec4 bumpiness_vec = glm::vec4(m_AttachedMaterial->Bumpiness);
+		m_BumpinessPin->DrawUI(set_node_draggable, false, true, bumpiness_vec, 0.01f, 0.05f, FLT_MAX, "%.2f");
+		m_AttachedMaterial->Bumpiness = bumpiness_vec.x;
+
+		uint norm_id = m_AttachedMaterial->GetNormalTexture() == nullptr ? 0 : m_AttachedMaterial->GetNormalTexture()->GetTextureID();
+		ImGui::Text("Normal");
+		ImGui::SameLine(65.0f);
+		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { 0.0f, 0.0f });
+
+		if (KaimosUI::UIFunctionalities::DrawTexturedButton("###mtnormtexture_btn", norm_id, glm::vec2(50.0f), glm::vec3(0.1f)))
+		{
+			std::string texture_file = FileDialogs::OpenFile("Texture (*.png;*.jpg)\0*.png;*.jpg\0PNG Texture (*.png)\0*.png\0JPG Texture (*.jpg)\0*.jpg\0");
+			if (!texture_file.empty())
+				m_AttachedMaterial->SetNormalTexture(texture_file);
+		}
+
+		KaimosUI::UIFunctionalities::PopButton(false);
+
+		ImGui::PushID(1);
+		ImGui::SameLine();
+		if (KaimosUI::UIFunctionalities::DrawColoredButton("X", { 20.0f, 50.0f }, glm::vec3(0.15f), true))
+			m_AttachedMaterial->RemoveNormalTexture();
+
+		KaimosUI::UIFunctionalities::PopButton(true);
+		ImGui::PopID();
+		ImGui::PopStyleVar();
+
+		if (m_AttachedMaterial->HasNormal())
+		{
+			std::string tex_path = m_AttachedMaterial->GetNormalTexturePath();
+			std::string tex_name = tex_path;
+
+			if (!tex_path.empty())
+				tex_name = tex_path.substr(tex_path.find_last_of("/\\" + 1, tex_path.size() - 1) + 1);
+
+			float text_pos = 100.0f - ImGui::CalcTextSize(tex_name.c_str()).x * 0.5f;
+			ImGui::Indent(text_pos);
+			ImGui::Text("%s", tex_name.c_str());
+			ImGui::Indent(-text_pos);
+
+			char texture_info[24];
+			sprintf_s(texture_info, 24, "%ix%i (ID %i)", m_AttachedMaterial->GetNormalTexture()->GetWidth(), m_AttachedMaterial->GetNormalTexture()->GetHeight(), norm_id);
+			text_pos = 100.0f - ImGui::CalcTextSize(texture_info).x * 0.5f;
+			ImGui::Indent(text_pos); ImGui::Text(texture_info); ImGui::Indent(-text_pos);
+		}
+
+
+		// -- Draw Specular Texture "Input" (Button) & Pins --
+		ImGui::NewLine();
+		glm::vec4 specularity_vec = glm::vec4(m_AttachedMaterial->Specularity);
+		m_SpecularityPin->DrawUI(set_node_draggable, false, true, specularity_vec, 0.01f, 0.01f, FLT_MAX, "%.2f");
+		m_AttachedMaterial->Specularity = specularity_vec.x;
+
+		uint spec_id = m_AttachedMaterial->GetSpecularTexture() == nullptr ? 0 : m_AttachedMaterial->GetSpecularTexture()->GetTextureID();
+		ImGui::Text("Specular");
+		ImGui::SameLine(65.0f);
+		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { 0.0f, 0.0f });
+
+		if (KaimosUI::UIFunctionalities::DrawTexturedButton("###mtspectexture_btn", spec_id, glm::vec2(50.0f), glm::vec3(0.1f)))
+		{
+			std::string texture_file = FileDialogs::OpenFile("Texture (*.png;*.jpg)\0*.png;*.jpg\0PNG Texture (*.png)\0*.png\0JPG Texture (*.jpg)\0*.jpg\0");
+			if (!texture_file.empty())
+				m_AttachedMaterial->SetSpecularTexture(texture_file);
+		}
+
+		KaimosUI::UIFunctionalities::PopButton(false);
+
+		ImGui::PushID(2);
+		ImGui::SameLine();
+		if (KaimosUI::UIFunctionalities::DrawColoredButton("X", { 20.0f, 50.0f }, glm::vec3(0.15f), true))
+			m_AttachedMaterial->RemoveSpecularTexture();
+
+		KaimosUI::UIFunctionalities::PopButton(true);
+		ImGui::PopID();
+		ImGui::PopStyleVar();
+
+		if (m_AttachedMaterial->HasSpecular())
+		{
+			std::string tex_path = m_AttachedMaterial->GetSpecularTexturePath();
+			std::string tex_name = tex_path;
+
+			if (!tex_path.empty())
+				tex_name = tex_path.substr(tex_path.find_last_of("/\\" + 1, tex_path.size() - 1) + 1);
+
+			float text_pos = 100.0f - ImGui::CalcTextSize(tex_name.c_str()).x * 0.5f;
+			ImGui::Indent(text_pos);
+			ImGui::Text("%s", tex_name.c_str());
+			ImGui::Indent(-text_pos);
+
+			char texture_info[24];
+			sprintf_s(texture_info, 24, "%ix%i (ID %i)", m_AttachedMaterial->GetSpecularTexture()->GetWidth(), m_AttachedMaterial->GetSpecularTexture()->GetHeight(), spec_id);
+			text_pos = 100.0f - ImGui::CalcTextSize(texture_info).x * 0.5f;
+			ImGui::Indent(text_pos); ImGui::Text(texture_info); ImGui::Indent(-text_pos);
 		}
 		
 
 		// -- End Node Draw --
+		ImNodes::SetNodeDraggable(m_ID, set_node_draggable);
 		ImNodes::EndNode();
 
 		// -- Draw Links --
@@ -301,17 +428,25 @@ namespace Kaimos::MaterialEditor {
 	void MainMaterialNode::SyncValuesWithMaterial()
 	{
 		m_ColorPin->SetInputValue(m_AttachedMaterial->Color);
+		m_SmoothnessPin->SetInputValue(glm::vec4(m_AttachedMaterial->Smoothness));
+		m_SpecularityPin->SetInputValue(glm::vec4(m_AttachedMaterial->Specularity));
+		m_BumpinessPin->SetInputValue(glm::vec4(m_AttachedMaterial->Bumpiness));
 	}
 
 	void MainMaterialNode::SyncMaterialValues()
 	{
 		m_AttachedMaterial->Color = m_ColorPin->GetValue();
+		m_AttachedMaterial->Smoothness = m_SmoothnessPin->GetValue().x;
+		m_AttachedMaterial->Specularity = m_SpecularityPin->GetValue().x;
+		m_AttachedMaterial->Bumpiness = m_BumpinessPin->GetValue().x;
 	}
 
 	void MainMaterialNode::SerializeNode(YAML::Emitter& output_emitter) const
 	{
 		// -- Serialize Base Node --
 		output_emitter << YAML::Key << "TextureFile" << YAML::Value << m_AttachedMaterial->GetTexturePath();
+		output_emitter << YAML::Key << "NormalTextureFile" << YAML::Value << m_AttachedMaterial->GetNormalTexturePath();
+		output_emitter << YAML::Key << "SpecularTextureFile" << YAML::Value << m_AttachedMaterial->GetSpecularTexturePath();
 		SerializeBaseNode(output_emitter);
 	}
 

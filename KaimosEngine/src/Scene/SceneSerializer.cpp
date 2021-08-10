@@ -54,9 +54,9 @@ namespace Kaimos {
 			
 			CameraComponent& cam_comp = entity.GetComponent<CameraComponent>();
 			Camera& camera = cam_comp.Camera;
-			output << YAML::Key << "Camera" << YAML::Value;
 
 			// -- Begin Cam Map --
+			output << YAML::Key << "Camera" << YAML::Value;
 			output << YAML::BeginMap;
 			output << YAML::Key << "ProjectionType" << YAML::Value << (int)camera.GetProjectionType();
 
@@ -70,6 +70,53 @@ namespace Kaimos {
 
 			output << YAML::Key << "PrimaryCamera" << YAML::Value << cam_comp.Primary;
 			output << YAML::Key << "FixedAR" << YAML::Value << cam_comp.FixedAspectRatio;
+			output << YAML::EndMap;
+		}
+
+		if (entity.HasComponent<DirectionalLightComponent>())
+		{
+			DirectionalLightComponent& light_comp = entity.GetComponent<DirectionalLightComponent>();
+
+			output << YAML::Key << "DirectionalLightComponent";
+			output << YAML::BeginMap;
+			output << YAML::Key << "Visible" << YAML::Value << light_comp.Visible;
+			output << YAML::Key << "StoredLightMinRadius" << YAML::Value << light_comp.StoredLightMinRadius;
+			output << YAML::Key << "StoredLightMaxRadius" << YAML::Value << light_comp.StoredLightMaxRadius;
+			output << YAML::Key << "StoredLightFalloff" << YAML::Value << light_comp.StoredLightFalloff;
+
+			// -- Begin Light Map --
+			output << YAML::Key << "Light" << YAML::Value;
+			output << YAML::BeginMap;
+			output << YAML::Key << "Radiance" << YAML::Value << light_comp.Light->Radiance;
+			output << YAML::Key << "Intensity" << YAML::Value << light_comp.Light->Intensity;
+			output << YAML::Key << "SpecularStrength" << YAML::Value << light_comp.Light->SpecularStrength;
+			output << YAML::EndMap;
+			// -- End Light Map --
+
+			output << YAML::EndMap;
+		}
+
+		if (entity.HasComponent<PointLightComponent>())
+		{
+			PointLightComponent& light_comp = entity.GetComponent<PointLightComponent>();
+
+			output << YAML::Key << "PointLightComponent";
+			output << YAML::BeginMap;
+			output << YAML::Key << "Visible" << YAML::Value << light_comp.Visible;
+
+			// -- Begin Light Map --
+			output << YAML::Key << "Light" << YAML::Value;
+			output << YAML::BeginMap;
+			output << YAML::Key << "Radiance" << YAML::Value << light_comp.Light->Radiance;
+			output << YAML::Key << "Intensity" << YAML::Value << light_comp.Light->Intensity;
+			output << YAML::Key << "SpecularStrength" << YAML::Value << light_comp.Light->SpecularStrength;
+
+			output << YAML::Key << "FalloffMultiplier" << YAML::Value << light_comp.Light->FalloffMultiplier;
+			output << YAML::Key << "MinRadius" << YAML::Value << light_comp.Light->GetMinRadius();
+			output << YAML::Key << "MaxRadius" << YAML::Value << light_comp.Light->GetMaxRadius();
+			output << YAML::EndMap;
+			// -- End Light Map --
+
 			output << YAML::EndMap;
 		}
 
@@ -108,6 +155,7 @@ namespace Kaimos {
 		YAML::Emitter output;
 		output << YAML::BeginMap;
 		output << YAML::Key << "KaimosScene" << YAML::Value << m_Scene->GetName().c_str();	// Save Scene as Key + SceneName as value
+		output << YAML::Key << "SceneColor" << YAML::Value << Renderer::GetSceneColor();	// Save Scene Color
 		output << YAML::Key << "Entities" << YAML::Value << YAML::BeginSeq;					// Save Entities as a sequence (like an array)
 
 		m_Scene->m_Registry.each([&](auto entityID)
@@ -156,6 +204,9 @@ namespace Kaimos {
 		m_Scene->SetName(scene_name);
 		m_Scene->SetPath(filepath);
 
+		if (data["SceneColor"])
+			Renderer::SetSceneColor(data["SceneColor"].as<glm::vec3>());
+
 		// -- Entities Load --
 		uint entities_deserialized = 0;
 		YAML::Node entities = data["Entities"];
@@ -191,7 +242,7 @@ namespace Kaimos {
 					CameraComponent& cam_comp = deserialized_entity.AddComponent<CameraComponent>();
 					YAML::Node& camera_node = cameracomp_node["Camera"];
 
-					if (camera_node["ProjectionType"].as<int>() == (int)Kaimos::CAMERA_PROJECTION::ORTHOGRAPHIC)
+					if (camera_node["ProjectionType"].as<int>() == static_cast<int>(Kaimos::CAMERA_PROJECTION::ORTHOGRAPHIC))
 						cam_comp.Camera.SetOrthographicParameters();
 					else
 						cam_comp.Camera.SetPerspectiveParameters();
@@ -209,6 +260,43 @@ namespace Kaimos {
 
 					if(cam_comp.Primary)
 						m_Scene->SetPrimaryCamera(deserialized_entity);
+				}
+
+				YAML::Node dirlightcomp_node = entity["DirectionalLightComponent"];
+				if (dirlightcomp_node)
+				{
+					DirectionalLightComponent& light_comp = deserialized_entity.AddComponent<DirectionalLightComponent>();
+					YAML::Node& light_node = dirlightcomp_node["Light"];
+
+					glm::vec4 radiance = light_node["Radiance"].as<glm::vec4>();
+					float intensity = light_node["Intensity"].as<float>();
+					float specular_strength = light_node["SpecularStrength"].as<float>();
+
+					float min_rad = dirlightcomp_node["StoredLightMinRadius"].as<float>();
+					float max_rad = dirlightcomp_node["StoredLightMaxRadius"].as<float>();
+					float falloff = dirlightcomp_node["StoredLightFalloff"].as<float>();
+
+					light_comp.Visible = dirlightcomp_node["Visible"].as<bool>();
+					light_comp.SetComponentValues(falloff, min_rad, max_rad);
+					light_comp.SetLightValues(radiance, intensity, specular_strength);
+				}
+
+				YAML::Node pointlightcomp_node = entity["PointLightComponent"];
+				if (pointlightcomp_node)
+				{
+					PointLightComponent& light_comp = deserialized_entity.AddComponent<PointLightComponent>();
+					YAML::Node& light_node = pointlightcomp_node["Light"];
+
+					glm::vec4 radiance = light_node["Radiance"].as<glm::vec4>();
+					float intensity = light_node["Intensity"].as<float>();
+					float specular_strength = light_node["SpecularStrength"].as<float>();
+					float falloff = light_node["FalloffMultiplier"].as<float>();
+					float min_rad = light_node["MinRadius"].as<float>();
+					float max_rad = light_node["MaxRadius"].as<float>();
+
+					light_comp.Visible = pointlightcomp_node["Visible"].as<bool>();
+					light_comp.SetLightValues(radiance, intensity, specular_strength);
+					light_comp.SetPointLightValues(falloff, min_rad, max_rad);
 				}
 
 				YAML::Node sprite_node = entity["SpriteRendererComponent"];

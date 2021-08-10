@@ -7,6 +7,7 @@
 #include "Renderer/Renderer2D.h"
 #include "Renderer/Renderer3D.h"
 #include "Renderer/Resources/Mesh.h"
+#include "Renderer/Resources/Light.h"
 
 #include "Core/Resources/ResourceManager.h"
 #include "Core/Resources/Resource.h"
@@ -40,23 +41,77 @@ namespace Kaimos {
 	Scene::Scene()
 	{
 		m_PrimaryCamera = {};
+		Renderer::SetSceneColor(glm::vec3(1.0f));
 	}
 
 	Scene::Scene(const std::string& name) : m_Name(name)
 	{
 		m_PrimaryCamera = {};
+		Renderer::SetSceneColor(glm::vec3(1.0f));
 	}
 	
 
 
-	// ----------------------- Public/Private Scene Methods -----------------------------------------------
+	// ----------------------- Private Scene Lights Methods -----------------------------------------------
+	std::vector<std::pair<Ref<Light>, glm::vec3>> Scene::GetSceneDirLights()
+	{
+		std::vector<std::pair<Ref<Light>, glm::vec3>> dir_lights;
+		auto dirlights_group = m_Registry.group<DirectionalLightComponent>(entt::get<TransformComponent>);
+		dir_lights.reserve(dirlights_group.size());
+
+		for (auto ent : dirlights_group)
+		{
+			auto& [light, transform] = dirlights_group.get<DirectionalLightComponent, TransformComponent>(ent);
+			if (transform.EntityActive && light.Visible)
+				dir_lights.push_back(std::make_pair(light.Light, transform.GetForwardVector()));
+		}
+
+		return dir_lights;
+	}
+
+	std::vector<std::pair<Ref<PointLight>, glm::vec3>> Scene::GetScenePointLights()
+	{
+		std::vector<std::pair<Ref<PointLight>, glm::vec3>> point_lights;
+		auto pointlights_group = m_Registry.group<PointLightComponent>(entt::get<TransformComponent>);
+		point_lights.reserve(pointlights_group.size());
+
+		for (auto ent : pointlights_group)
+		{
+			auto& [light, transform] = pointlights_group.get<PointLightComponent, TransformComponent>(ent);
+			if (transform.EntityActive && light.Visible)
+				point_lights.push_back(std::make_pair(light.Light, transform.Translation));
+		}
+
+		return point_lights;
+	}
+
+
+	// ----------------------- Private Scene Rendering Methods --------------------------------------------
+	void Scene::BeginScene(const Camera& camera, const glm::vec3& camera_pos, bool scene3D)
+	{
+		std::vector<std::pair<Ref<Light>, glm::vec3>> dir_lights = GetSceneDirLights();
+		std::vector<std::pair<Ref<PointLight>, glm::vec3>> plights = GetScenePointLights();
+
+		glm::mat4 view_proj = camera.GetViewProjection();
+		scene3D ? Renderer3D::BeginScene(view_proj, camera_pos, dir_lights, plights) : Renderer2D::BeginScene(view_proj, camera_pos, dir_lights, plights);
+	}
+
+	void Scene::BeginScene(const CameraComponent& camera_component, const TransformComponent& transform_component, bool scene3D)
+	{
+		std::vector<std::pair<Ref<Light>, glm::vec3>> dir_lights = GetSceneDirLights();
+		std::vector<std::pair<Ref<PointLight>, glm::vec3>> plights = GetScenePointLights();
+
+		glm::mat4 view_proj = camera_component.Camera.GetProjection() * glm::inverse(transform_component.GetTransform());
+		scene3D ? Renderer3D::BeginScene(view_proj, transform_component.Translation, dir_lights, plights) : Renderer2D::BeginScene(view_proj, transform_component.Translation, dir_lights, plights);
+	}
+
 	void Scene::RenderSprites(Timestep dt)
 	{
 		KS_PROFILE_FUNCTION();
-		auto sprite_group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
+		auto sprite_group = m_Registry.group<SpriteRendererComponent>(entt::get<TransformComponent>);
 		for (auto ent : sprite_group)
 		{
-			auto& [transform, sprite] = sprite_group.get<TransformComponent, SpriteRendererComponent>(ent);
+			auto& [sprite, transform] = sprite_group.get<SpriteRendererComponent, TransformComponent>(ent);
 			if (transform.EntityActive)
 				Renderer2D::DrawSprite(dt, transform.GetTransform(), sprite, (int)ent);
 		}
@@ -65,29 +120,33 @@ namespace Kaimos {
 	void Scene::RenderMeshes(Timestep dt)
 	{
 		KS_PROFILE_FUNCTION();
-		auto mesh_view = m_Registry.view<TransformComponent, MeshRendererComponent>();
-		for (auto ent : mesh_view)
+		auto mesh_group = m_Registry.group<TransformComponent>(entt::get<MeshRendererComponent>);
+		for (auto ent : mesh_group)
 		{
-			auto& [transform, mesh] = mesh_view.get<TransformComponent, MeshRendererComponent>(ent);
+			auto& [transform, mesh] = mesh_group.get<TransformComponent, MeshRendererComponent>(ent);
 			if (transform.EntityActive)
 				Renderer3D::DrawMesh(dt, transform.GetTransform(), mesh, (int)ent);
 		}
 	}
 
-	void Scene::OnUpdateEditor(Timestep dt, const Camera& camera)
+
+
+	// ----------------------- Public Scene Methods -------------------------------------------------------
+	void Scene::OnUpdateEditor(Timestep dt, const Camera& camera, const glm::vec3& camera_pos)
 	{
 		KS_PROFILE_FUNCTION();
 
 		// -- Render Meshes --
-		Renderer3D::BeginScene(camera);
+		BeginScene(camera, camera_pos, true);
 		RenderMeshes(dt);
 		Renderer3D::EndScene();
 
 		// -- Render Sprites --
-		Renderer2D::BeginScene(camera);
+		BeginScene(camera, camera_pos, false);
 		RenderSprites(dt);
 		Renderer2D::EndScene();
 	}
+
 
 	void Scene::OnUpdateRuntime(Timestep dt)
 	{
@@ -110,11 +169,11 @@ namespace Kaimos {
 		static bool primary_camera_warn = false;
 		if (m_PrimaryCamera)
 		{
-			Renderer3D::BeginScene(m_PrimaryCamera.GetComponent<CameraComponent>(), m_PrimaryCamera.GetComponent<TransformComponent>());
+			BeginScene(m_PrimaryCamera.GetComponent<CameraComponent>(), m_PrimaryCamera.GetComponent<TransformComponent>(), true);
 			RenderMeshes(dt);
 			Renderer3D::EndScene();
 
-			Renderer2D::BeginScene(m_PrimaryCamera.GetComponent<CameraComponent>(), m_PrimaryCamera.GetComponent<TransformComponent>());
+			BeginScene(m_PrimaryCamera.GetComponent<CameraComponent>(), m_PrimaryCamera.GetComponent<TransformComponent>(), false);
 			RenderSprites(dt);
 			Renderer2D::EndScene();
 			primary_camera_warn = false;
@@ -126,20 +185,22 @@ namespace Kaimos {
 		}
 	}
 
+
 	void Scene::RenderFromCamera(Timestep dt, const Entity& camera_entity)
 	{
 		// -- Render --
 		if (camera_entity && camera_entity.HasComponent<CameraComponent>())
 		{
-			Renderer3D::BeginScene(m_PrimaryCamera.GetComponent<CameraComponent>(), m_PrimaryCamera.GetComponent<TransformComponent>());
+			BeginScene(m_PrimaryCamera.GetComponent<CameraComponent>(), m_PrimaryCamera.GetComponent<TransformComponent>(), true);
 			RenderMeshes(dt);
 			Renderer3D::EndScene();
 
-			Renderer2D::BeginScene(camera_entity.GetComponent<CameraComponent>(), camera_entity.GetComponent<TransformComponent>());
+			BeginScene(camera_entity.GetComponent<CameraComponent>(), camera_entity.GetComponent<TransformComponent>(), false);
 			RenderSprites(dt);
 			Renderer2D::EndScene();
 		}
 	}
+
 
 	void Scene::SetViewportSize(uint width, uint height)
 	{
@@ -156,12 +217,16 @@ namespace Kaimos {
 		//}
 	}
 
+
 	void Scene::ConvertModelIntoEntities(const Ref<Resources::ResourceModel>& model)
 	{
 		if (model && Resources::ResourceManager::ModelExists(model->GetID()))
 			ConvertMeshIntoEntities(model->GetRootMesh());
 	}
 
+
+
+	// ----------------------- Private Scene Methods ------------------------------------------------------
 	void Scene::ConvertMeshIntoEntities(const Ref<Mesh>& mesh)
 	{
 		if (!mesh || !Resources::ResourceManager::MeshExists(mesh->GetID()))
@@ -252,7 +317,8 @@ namespace Kaimos {
 
 	
 
-	// ----------------------- Private Entities Methods --------------------------------------------------
+	// ----------------------- Private Scene Entities Methods --------------------------------------------
+	// On Component Added
 	template<typename T>
 	void Scene::OnComponentAdded(Entity entity, T& component) const
 	{
@@ -276,6 +342,21 @@ namespace Kaimos {
 	}
 
 	template<>
+	void Scene::OnComponentAdded<DirectionalLightComponent>(Entity entity, DirectionalLightComponent& component) const
+	{
+	}
+
+	template<>
+	void Scene::OnComponentAdded<PointLightComponent>(Entity entity, PointLightComponent& component) const
+	{
+	}
+
+	template<>
+	void Scene::OnComponentAdded<NativeScriptComponent>(Entity entity, NativeScriptComponent& component) const
+	{
+	}
+
+	template<>
 	void Scene::OnComponentAdded<SpriteRendererComponent>(Entity entity, SpriteRendererComponent& component) const
 	{
 		component.RemoveMaterial();
@@ -287,8 +368,20 @@ namespace Kaimos {
 		component.RemoveMaterial();
 	}
 
-	template<>
-	void Scene::OnComponentAdded<NativeScriptComponent>(Entity entity, NativeScriptComponent& component) const
-	{
-	}
+
+	// On Component Removed
+	//template<>
+	//void Scene::OnComponentRemoved<LightComponent>(Entity entity, LightComponent& component) const
+	//{
+	//	if (component.Light->GetLightType() == LightType::POINTLIGHT)
+	//	{
+	//		Ref<PointLight> plight_ref = Ref<PointLight>(static_cast<PointLight*>(component.Light.get()));
+	//		PointLight* plight = static_cast<PointLight*>(component.Light.get());
+	//
+	//		plight_ref.reset();
+	//		delete plight;
+	//	}
+	//	
+	//	component.Light.reset();
+	//}
 }

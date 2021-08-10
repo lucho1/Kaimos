@@ -76,16 +76,37 @@ namespace Kaimos {
 				m_SelectedEntity.AddComponent<CameraComponent>();
 			}
 
-			if (ImGui::MenuItem("Create 2D Sprite"))
+			if (ImGui::BeginMenu("Create Geometry"))
 			{
-				m_SelectedEntity = m_SceneContext->CreateEntity("Sprite");
-				m_SelectedEntity.AddComponent<SpriteRendererComponent>();
+				if (ImGui::MenuItem("2D Sprite"))
+				{
+					m_SelectedEntity = m_SceneContext->CreateEntity("Sprite");
+					m_SelectedEntity.AddComponent<SpriteRendererComponent>();
+				}
+
+				if (ImGui::MenuItem("3D Mesh"))
+				{
+					m_SelectedEntity = m_SceneContext->CreateEntity("Mesh");
+					m_SelectedEntity.AddComponent<MeshRendererComponent>();
+				}
+				ImGui::EndMenu();
 			}
 
-			if (ImGui::MenuItem("Create 3D Mesh"))
+			if (ImGui::BeginMenu("Create Light"))
 			{
-				m_SelectedEntity = m_SceneContext->CreateEntity("Mesh");
-				m_SelectedEntity.AddComponent<MeshRendererComponent>();
+				if (ImGui::MenuItem("Directional Light"))
+				{
+					m_SelectedEntity = m_SceneContext->CreateEntity("Directional Light");
+					m_SelectedEntity.AddComponent<DirectionalLightComponent>();
+				}
+
+				if (ImGui::MenuItem("Point Light"))
+				{
+					m_SelectedEntity = m_SceneContext->CreateEntity("Point Light");
+					m_SelectedEntity.AddComponent<PointLightComponent>();
+				}
+
+				ImGui::EndMenu();
 			}
 
 			ImGui::EndPopup();
@@ -276,6 +297,26 @@ namespace Kaimos {
 				ImGui::CloseCurrentPopup();
 			}
 
+			if (ImGui::MenuItem("Directional Light"))
+			{
+				if (!m_SelectedEntity.HasComponent<DirectionalLightComponent>() && !m_SelectedEntity.HasComponent<PointLightComponent>())
+					m_SelectedEntity.AddComponent<DirectionalLightComponent>();
+				else
+					KS_EDITOR_WARN("Entity already has a Light Component!");
+
+				ImGui::CloseCurrentPopup();
+			}
+
+			if (ImGui::MenuItem("Point Light"))
+			{
+				if (!m_SelectedEntity.HasComponent<PointLightComponent>() && !m_SelectedEntity.HasComponent<DirectionalLightComponent>())
+					m_SelectedEntity.AddComponent<PointLightComponent>();
+				else
+					KS_EDITOR_WARN("Entity already has a Light Component!");
+
+				ImGui::CloseCurrentPopup();
+			}
+
 			ImGui::EndPopup();
 		}
 
@@ -296,6 +337,76 @@ namespace Kaimos {
 
 				// Scale
 				KaimosUI::UIFunctionalities::DrawVec3UI("Scale", component.Scale, xcol, ycol, zcol, 1.0f);
+			});
+
+
+		// -- Light Components --
+		DrawComponentUI<DirectionalLightComponent>("Directional Light", entity, [&](auto& component)
+			{
+				// Light Type Selector
+				int light_type = 0;
+				KaimosUI::UIFunctionalities::SetTextCursorAndWidth("Light Type");
+				ImGui::Combo("###lighttype", &light_type, "Directional\0Pointlight\0\0");
+
+				// Light Base Stuff
+				Light* light = component.Light.get();
+				ImGuiColorEditFlags flags = ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_Float | ImGuiColorEditFlags_AlphaPreview | ImGuiColorEditFlags_NoInputs;
+
+				ImGui::NewLine();
+				KaimosUI::UIFunctionalities::SetTextCursorAndWidth("Radiance");
+				ImGui::ColorEdit4("###light_radiance", glm::value_ptr(light->Radiance), flags);
+				Kaimos::KaimosUI::UIFunctionalities::DrawInlineSlider("Intensity", "###light_intensity", &light->Intensity);
+				Kaimos::KaimosUI::UIFunctionalities::DrawInlineDragFloat("Specular Strength", "###light_specstrength", &light->SpecularStrength, 0.01f, 0.0f, 2.0f, 0.0f, FLT_MAX);
+
+				// Light Switch
+				if (light_type == 1)
+				{
+					PointLightComponent& plight = entity.AddComponent<PointLightComponent>();
+					plight.SetPointLightValues(component.StoredLightFalloff, component.StoredLightMinRadius, component.StoredLightMaxRadius);
+					plight.SetLightValues(light->Radiance, light->Intensity, light->SpecularStrength);
+
+					plight.Visible = component.Visible;
+					entity.RemoveComponent<DirectionalLightComponent>();
+				}
+			});
+
+		DrawComponentUI<PointLightComponent>("Point Light", entity, [&](auto& component)
+			{
+				// Light Type Selector
+				int light_type = 1;
+				KaimosUI::UIFunctionalities::SetTextCursorAndWidth("Light Type");
+				ImGui::Combo("###lighttype", &light_type, "Directional\0Pointlight\0\0");
+
+				// Light Base Stuff
+				PointLight* light = component.Light.get();
+				ImGuiColorEditFlags flags = ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_Float | ImGuiColorEditFlags_AlphaPreview | ImGuiColorEditFlags_NoInputs;
+
+				ImGui::NewLine();
+				KaimosUI::UIFunctionalities::SetTextCursorAndWidth("Radiance");
+				ImGui::ColorEdit4("###light_radiance", glm::value_ptr(light->Radiance), flags);
+				Kaimos::KaimosUI::UIFunctionalities::DrawInlineSlider("Intensity", "###light_intensity", &light->Intensity);
+
+				// Point Light Stuff
+				float plight_minradius = light->GetMinRadius(), plight_maxradius = light->GetMaxRadius();
+				if (Kaimos::KaimosUI::UIFunctionalities::DrawInlineDragFloat("Min Radius", "###plight_minradius", &plight_minradius, 0.1f, 0.0f, 2.0f, 0.0f, plight_maxradius))
+					light->SetMinRadius(plight_minradius);
+
+				if (Kaimos::KaimosUI::UIFunctionalities::DrawInlineDragFloat("Max Radius", "###plight_maxradius", &plight_maxradius, 0.1f, 0.0f, 2.0f, plight_minradius, FLT_MAX))
+					light->SetMaxRadius(plight_maxradius);
+
+				Kaimos::KaimosUI::UIFunctionalities::DrawInlineDragFloat("Falloff Intensity", "###plight_falloff", &light->FalloffMultiplier, 0.01f, 0.0f, 2.0f, 0.0f, FLT_MAX);
+				Kaimos::KaimosUI::UIFunctionalities::DrawInlineDragFloat("Specular Strength", "###light_specstrength", &light->SpecularStrength, 0.01f, 0.0f, 2.0f, 0.0f, FLT_MAX);
+
+				// Light Switch
+				if (light_type == 0)
+				{
+					DirectionalLightComponent& dlight = entity.AddComponent<DirectionalLightComponent>();
+					dlight.SetComponentValues(light->FalloffMultiplier, light->GetMinRadius(), light->GetMaxRadius());
+					dlight.SetLightValues(light->Radiance, light->Intensity, light->SpecularStrength);
+
+					dlight.Visible = component.Visible;
+					entity.RemoveComponent<PointLightComponent>();
+				}
 			});
 
 
@@ -383,8 +494,6 @@ namespace Kaimos {
 						ImGui::TreePop();
 						return;
 					}
-
-					ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[1]);
 
 					// Materials Dropdown
 					uint current_material_index = 0;
@@ -488,8 +597,6 @@ namespace Kaimos {
 					ImGui::Text("Material ID:\t\t\t %i", material->GetID());
 					ImGui::Text("Material Graph ID: %i", material->GetAttachedGraphID());
 
-					ImGui::PopFont();
-
 					// Open in Material Editor Button
 					ImGui::NewLine(); ImGui::NewLine();
 					if (Renderer::IsDefaultMaterial(material->GetID()))
@@ -509,7 +616,6 @@ namespace Kaimos {
 					}
 
 					ImGui::NewLine();
-
 					ImGui::TreePop();
 				}
 			});
@@ -541,7 +647,6 @@ namespace Kaimos {
 				meshes_names.push_back("None");
 
 				// Draw Meshes Dropdown
-				ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[1]);
 				if (KaimosUI::UIFunctionalities::DrawDropDown("Mesh", meshes_names, meshes_names.size(), current_mesh_name, current_mesh_index, 135.5f, 2.45f))
 				{
 					// Set Mesh
@@ -560,11 +665,7 @@ namespace Kaimos {
 
 				// Draw Mesh Info
 				if (!mesh)
-				{
-					ImGui::PopFont();
 					return;
-				}
-
 
 				// Mesh Info.
 				ImGui::Text("Mesh:\t\t\t\t\t  %s", mesh->GetName().c_str());
@@ -575,10 +676,7 @@ namespace Kaimos {
 				// Get Material
 				Ref<Material> material = Renderer::GetMaterial(component.MaterialID);
 				if (!material)
-				{
-					ImGui::PopFont();
 					return;
-				}
 
 				// Set Materials Dropdown
 				uint mats_size = Renderer::GetMaterialsQuantity();
@@ -682,8 +780,6 @@ namespace Kaimos {
 				ImGui::Text("Color:\t\t\t\t\t\tRGBA(%i, %i, %i, %i)", col.r, col.g, col.b, col.a);
 				ImGui::Text("Material ID:\t\t\t %i", material->GetID());
 				ImGui::Text("Material Graph ID: %i", material->GetAttachedGraphID());
-
-				ImGui::PopFont();
 
 				// Open in Material Editor Button
 				ImGui::NewLine(); ImGui::NewLine();

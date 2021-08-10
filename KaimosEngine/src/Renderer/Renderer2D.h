@@ -3,12 +3,13 @@
 
 #include "Core/Utils/Time/Timestep.h"
 #include "Cameras/Camera.h"
-#include "Resources/Texture.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 
 namespace Kaimos {
 
+	class Light;
+	class PointLight;
 	struct TransformComponent;
 	struct CameraComponent;
 	struct SpriteRendererComponent;
@@ -18,9 +19,15 @@ namespace Kaimos {
 		// --- Vertex Variables ---
 		glm::vec3 Pos		= glm::vec3(0.0f);
 		glm::vec3 Normal	= glm::vec3(0.0f);
+		glm::vec3 Tangent	= glm::vec3(0.0f);
 		glm::vec2 TexCoord	= glm::vec2(0.0f);
 		glm::vec4 Color		= glm::vec4(1.0f);
+		float Shininess		= 0.5f;
+		float Bumpiness		= 0.5f;
+		float Specularity	= 0.5f;
 		float TexIndex		= 0.0f;
+		float NormTexIndex	= 0.0f;
+		float SpecTexIndex	= 0.0f;
 
 		// --- Editor Variables ---
 		int EntityID		= 0;
@@ -40,8 +47,7 @@ namespace Kaimos {
 		static void Shutdown();
 
 		// --- Public Renderer Methods ---
-		static void BeginScene(const CameraComponent& camera_component, const TransformComponent& transform_component);
-		static void BeginScene(const Camera& camera);
+		static void BeginScene(const glm::mat4& view_projection_matrix, const glm::vec3& camera_pos, const std::vector<std::pair<Ref<Light>, glm::vec3>>& dir_lights, const std::vector<std::pair<Ref<PointLight>, glm::vec3>>& point_lights);
 		static void EndScene();
 
 		// --- Public Drawing Methods ---
@@ -50,8 +56,6 @@ namespace Kaimos {
 	private:
 
 		// --- Private Renderer Methods ---
-		static void SetupRenderingShader(const glm::mat4& vp_matrix);
-
 		static void Flush();
 		static void StartBatch();
 		static void NextBatch();

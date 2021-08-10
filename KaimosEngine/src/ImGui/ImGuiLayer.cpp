@@ -127,7 +127,7 @@ namespace Kaimos {
 		
 		// -- Fonts Load --
 		std::string rudasemi_path = INTERNAL_FONTS_PATH + std::string("Ruda/Ruda-SemiBold.ttf");			// You can also try "Opensans/OpenSans-SemiBold.ttf" (in 14.0f)
-		std::string rudablack_path = INTERNAL_FONTS_PATH + std::string("Ruda/Ruda-SemiBold.ttf");
+		std::string rudablack_path = INTERNAL_FONTS_PATH + std::string("Ruda/Ruda-ExtraBold.ttf");
 		std::string rudafont_path = INTERNAL_FONTS_PATH + std::string("Ruda/Ruda-VariableFont_wght.ttf");
 
 		// Default Font + Secondary one

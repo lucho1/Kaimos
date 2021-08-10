@@ -57,7 +57,10 @@ namespace Kaimos::KaimosUI {
 		// Draw controller of vec3 (ue4-like): name = label ("position"), value = ref to vec3, xyz colors = vec3 axis colors,
 		// reset value = reset on pressing axis button, labels = names for axis (xyz, rgb...), column width = width of controller elements
 		static void DrawVec3UI(const std::string& name, glm::vec3& value, const glm::vec3& xcolor, const glm::vec3& ycolor, const glm::vec3& zcolor, float reset_value = 0.0f, const std::string& labels = {"XYZ"}, float column_width = 100.0f);
-		
+
+		// Draw Text + Set Cursor & Width for a next item
+		static void SetTextCursorAndWidth(const char* text, float width = 0.0f, float spacing = 2.0f);
+
 	private:
 
 		// --- Private UI Methods ---
@@ -65,7 +68,6 @@ namespace Kaimos::KaimosUI {
 		static void PushButtonSettings(const glm::vec3& active_color, const glm::vec3& hover_color, ImFont* font = nullptr);
 		
 		static void SetItemWidth(float width);
-		static void SetTextCursorAndWidth(const char* text, float width, float spacing);
 		
 		static void InlineDragFloat(const char* label, float* value, float speed);
 	};

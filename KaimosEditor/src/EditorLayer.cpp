@@ -102,7 +102,7 @@ namespace Kaimos {
 		m_Framebuffer->ClearFBOTexture(1, -1);
 
 		// -- Scene Update --
-		m_CurrentScene->OnUpdateEditor(dt, m_EditorCamera.GetCamera());
+		m_CurrentScene->OnUpdateEditor(dt, m_EditorCamera.GetCamera(), m_EditorCamera.GetPosition());
 
 		// -- Mouse Picking --
 		// Get Mouse position with respect to the viewport boundaries

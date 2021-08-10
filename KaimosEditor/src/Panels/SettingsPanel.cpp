@@ -1,8 +1,13 @@
 #include "kspch.h"
 #include "SettingsPanel.h"
+
+#include "Renderer/Renderer.h"
+
 #include "ImGui/ImGuiUtils.h"
 
 #include <ImGui/imgui.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 namespace Kaimos {
 
@@ -20,13 +25,20 @@ namespace Kaimos {
 			//	entity_name = hovered_entity.GetComponent<TagComponent>().Tag;
 			//ImGui::Text("Hovered Entity: %s", entity_name.c_str());
 
-			// Camera Display Options
-			ImGui::NewLine(); ImGui::Separator();
+			// -- Camera Display Options --
+			// Title
 			static uint current_option_type = 0;
 			const std::vector<std::string> camera_viewport_display_options = { "Always Show Primary Camera", "Show Only on Camera Selected", "Never Show" };
 			std::string current_option = camera_viewport_display_options[current_option_type];
 
+			ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[1]);
+			float font_size = ImGui::GetFontSize() * 17.5f; // 17.5 is half the characters of "Primary Camera Mini-Screen Viewport"
+			ImGui::SameLine(ImGui::GetWindowSize().x / 2 - font_size + (font_size / 2));
+			
 			ImGui::Text("Primary Camera Mini-Screen Viewport");
+			ImGui::PopFont();
+
+			// Display Options Dropdown
 			if (KaimosUI::UIFunctionalities::DrawDropDown("Display Options", camera_viewport_display_options, 3, current_option, current_option_type, ImGui::CalcItemWidth() / 2.0f))
 			{
 				switch (current_option_type)
@@ -37,6 +49,23 @@ namespace Kaimos {
 					default:	ShowCameraMiniScreen = true; ShowCameraWhenSelected = false;	break;
 				}
 			}
+
+			// -- Renderer Options --
+			// Title
+			ImGui::NewLine(); ImGui::Separator();
+			ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[1]);
+			font_size = ImGui::GetFontSize() * 8.5f; // 8.5 is half the characters of "Renderer Settings"
+			ImGui::SameLine(ImGui::GetWindowSize().x / 2 - font_size + (font_size / 2));
+
+			ImGui::Text("Renderer Settings");
+			ImGui::PopFont();
+
+			// Scene Color
+			KaimosUI::UIFunctionalities::SetTextCursorAndWidth("Scene Color");
+
+			glm::vec3 scene_color = Renderer::GetSceneColor();
+			if (ImGui::ColorEdit3("###scene_color", glm::value_ptr(scene_color), ImGuiColorEditFlags_Float | ImGuiColorEditFlags_NoInputs))
+				Renderer::SetSceneColor(scene_color);
 
 			ImGui::End();
 		}
@@ -74,7 +103,7 @@ namespace Kaimos {
 		if (m_MemoryAllocationsIndex == MEMORY_ALLOCATIONS_SAMPLES)
 			m_MemoryAllocationsIndex = 0;
 
-		m_MemoryAllocations[m_MemoryAllocationsIndex] = m_MemoryMetrics.GetCurrentAllocations();
+		m_MemoryAllocations[m_MemoryAllocationsIndex] = static_cast<uint>(BTOMB(m_MemoryMetrics.GetCurrentMemoryUsage()) * 10.0f);
 		++m_MemoryAllocationsIndex;
 	}
 
@@ -84,15 +113,17 @@ namespace Kaimos {
 		// -- Memory Metrics Gathering --
 		float float_mem_allocs[MEMORY_ALLOCATIONS_SAMPLES];
 		for (uint i = 0; i < MEMORY_ALLOCATIONS_SAMPLES; ++i)
-			float_mem_allocs[i] = (float)m_MemoryAllocations[i];		
+			float_mem_allocs[i] = (float)m_MemoryAllocations[i];
 		
 
 		// -- Plots --
 		// Plots Text
 		ImGui::NewLine();
+		ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[1]);
 		float font_size = ImGui::GetFontSize() * 6.0f; // 6 is half the characters of "Memory Usage"
 		ImGui::SameLine(ImGui::GetWindowSize().x / 2 - font_size + (font_size / 2));
 		ImGui::Text("Memory Usage");
+		ImGui::PopFont();
 
 		// Avg. Allocs. to Display
 		char overlay[50];
