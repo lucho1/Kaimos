@@ -248,7 +248,7 @@ namespace Kaimos::MaterialEditor {
 		m_ColorPin->DrawUI(set_node_draggable, false, true, m_AttachedMaterial->Color);
 
 		glm::vec4 smoothness_vec = glm::vec4(m_AttachedMaterial->Smoothness);
-		m_SmoothnessPin->DrawUI(set_node_draggable, false, true, smoothness_vec);
+		m_SmoothnessPin->DrawUI(set_node_draggable, false, true, smoothness_vec, 0.01f, 0.01f, 4.0f, "%.2f");
 		m_AttachedMaterial->Smoothness = smoothness_vec.x;
 
 		ImNodes::SetNodeDraggable(m_ID, set_node_draggable);
@@ -261,7 +261,8 @@ namespace Kaimos::MaterialEditor {
 
 		if (KaimosUI::UIFunctionalities::DrawTexturedButton("###mttexture_btn", id, glm::vec2(50.0f), glm::vec3(0.1f)))
 		{
-			std::string texture_file = FileDialogs::OpenFile("Texture (*.png)\0*.png\0");
+			std::string texture_file = FileDialogs::OpenFile("Texture (*.png;*.jpg)\0*.png;*.jpg\0PNG Texture (*.png)\0*.png\0JPG Texture (*.jpg)\0*.jpg\0");
+
 			if (!texture_file.empty())
 				m_AttachedMaterial->SetTexture(texture_file);
 		}
@@ -300,7 +301,7 @@ namespace Kaimos::MaterialEditor {
 
 		if (KaimosUI::UIFunctionalities::DrawTexturedButton("###mtnormtexture_btn", norm_id, glm::vec2(50.0f), glm::vec3(0.1f)))
 		{
-			std::string texture_file = FileDialogs::OpenFile("Texture (*.png)\0*.png\0");
+			std::string texture_file = FileDialogs::OpenFile("Texture (*.png;*.jpg)\0*.png;*.jpg\0PNG Texture (*.png)\0*.png\0JPG Texture (*.jpg)\0*.jpg\0");
 			if (!texture_file.empty())
 				m_AttachedMaterial->SetNormalTexture(texture_file);
 		}

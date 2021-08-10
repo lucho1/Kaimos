@@ -15,7 +15,7 @@
 
 namespace Kaimos::Importers
 {
-	static const uint s_ImportingFlags = aiProcess_Triangulate | aiProcess_CalcTangentSpace | aiProcess_GenSmoothNormals //| aiProcess_FlipUVs // FlipUVs gives problem with UVs, I think because STB already flips them
+	static const uint s_ImportingFlags = aiProcess_Triangulate | aiProcess_CalcTangentSpace | aiProcess_GenSmoothNormals | aiProcess_FlipUVs // FlipUVs gives problem with UVs, I think because STB already flips them
 		| aiProcess_JoinIdenticalVertices | aiProcess_PreTransformVertices | aiProcess_ImproveCacheLocality | aiProcess_OptimizeMeshes | aiProcess_SortByPType;
 
 	// ----------------------- Protected Importer Methods -------------------------------------------------
@@ -199,8 +199,11 @@ namespace Kaimos::Importers
 		if (ai_material->GetTextureCount(aiTextureType_DIFFUSE) > 0)
 			mat->SetTexture(GetMaterialTextureFilename(ai_material, aiTextureType_DIFFUSE, directory));
 
+		if (ai_material->GetTextureCount(aiTextureType_NORMALS) > 0)
+			mat->SetNormalTexture(GetMaterialTextureFilename(ai_material, aiTextureType_NORMALS, directory));
+
 		// Also:
-		// aiTextureType_EMISSIVE, aiTextureType_SPECULAR, aiTextureType_NORMALS, aiTextureType_HEIGHT, aiTextureType_DISPLACEMENT
+		// aiTextureType_EMISSIVE, aiTextureType_SPECULAR, aiTextureType_HEIGHT, aiTextureType_DISPLACEMENT
 
 		// -- Return Material --
 		return mat->GetID();
@@ -291,8 +294,8 @@ namespace Kaimos::Importers
 		std::vector<Vertex> ret;
 		for (uint i = 0; i < ai_mesh->mNumVertices; ++i)
 		{
-			// Positions & Normals
-			glm::vec3 positions = glm::vec3(0.0f), normals = glm::vec3(0.0f);
+			// Positions, Normals & Tangents
+			glm::vec3 positions = glm::vec3(0.0f), normals = glm::vec3(0.0f), tangent = glm::vec3(0.0f); // TODO: Tangents Flipped?
 			glm::vec2 texture_coords = glm::vec2(0.0f);
 
 			if (ai_mesh->HasPositions())
@@ -304,23 +307,15 @@ namespace Kaimos::Importers
 			if (ai_mesh->mTextureCoords[0])
 				texture_coords = { ai_mesh->mTextureCoords[0][i].x, ai_mesh->mTextureCoords[0][i].y };
 			
-			// Tangents & Bitangents
-			//glm::vec3 tangents = glm::vec3(0.0f), bitangents = glm::vec3(0.0f); // TODO: Flipped?
-			//if (ai_mesh->HasTangentsAndBitangents())
-			//{
-			//	tangents = { ai_mesh->mTangents[i].x, ai_mesh->mTangents[i].y, ai_mesh->mTangents[i].z };
-			//	bitangents = { ai_mesh->mBitangents[i].x, ai_mesh->mBitangents[i].y, ai_mesh->mBitangents[i].z };
-			//}
-			//
-			//vertices.insert(vertices.end(), 3, *glm::value_ptr(tangents));
-			//vertices.insert(vertices.end(), 3, *glm::value_ptr(bitangents));
-
+			if (ai_mesh->HasTangentsAndBitangents())
+				tangent = { ai_mesh->mTangents[i].x, ai_mesh->mTangents[i].y, ai_mesh->mTangents[i].z };
 
 			// Set Vertices Data
 			Kaimos::Vertex vertex;
 			vertex.Pos = positions;
 			vertex.Normal = normals;
 			vertex.TexCoord = texture_coords;
+			vertex.Tangent = tangent;
 
 			ret.push_back(vertex);
 		}

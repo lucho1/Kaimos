@@ -90,10 +90,12 @@ namespace Kaimos {
 			{ SHADER_DATATYPE::FLOAT3,	"a_Position" },
 			{ SHADER_DATATYPE::FLOAT3,	"a_Normal" },
 			{ SHADER_DATATYPE::FLOAT3,	"a_NormalTransformed" },
+			{ SHADER_DATATYPE::FLOAT3,	"a_Tangent" },
 			{ SHADER_DATATYPE::FLOAT2,	"a_TexCoord" },
 			{ SHADER_DATATYPE::FLOAT4,	"a_Color" },
 			{ SHADER_DATATYPE::FLOAT ,	"a_Shininess" },
 			{ SHADER_DATATYPE::FLOAT ,	"a_TexIndex" },
+			{ SHADER_DATATYPE::FLOAT ,	"a_NormTexIndex" },
 			{ SHADER_DATATYPE::INT ,	"a_EntityID" }
 		};
 
@@ -231,8 +233,14 @@ namespace Kaimos {
 		if (!material)
 			KS_FATAL_ERROR("Tried to Render a Sprite with a null Material!");
 
+		if (material->HasAlbedo() && material->HasNormal() && Renderer::GetCurrentTextureSlot() == (Renderer::GetMaxTextureSlots() - 1))
+		{
+			NextBatch();
+			Renderer::ResetTextureSlotIndex();
+		}
 
-		uint texture_index = Renderer::GetTextureIndex(material->GetTexture(), &NextBatch);
+		uint texture_index = Renderer::GetTextureIndex(material->GetTexture(), false, &NextBatch);
+		uint normal_texture_index = Renderer::GetTextureIndex(material->GetNormalTexture(), true, &NextBatch);
 
 		// -- Update Sprite Timed Vertices --
 		static float accumulated_dt = 0.0f;
@@ -251,13 +259,15 @@ namespace Kaimos {
 
 			// Set the vertex data
 			s_Data->QuadVBufferPtr->Pos = transform * glm::vec4(quad_vertex.Pos, 1.0f);
-			s_Data->QuadVBufferPtr->Normal = quad_vertex.Normal;
+			s_Data->QuadVBufferPtr->Normal = glm::normalize(glm::vec3(transform * glm::vec4(quad_vertex.Normal, 0.0f)));;
 			s_Data->QuadVBufferPtr->NormalTrs = glm::mat3(glm::transpose(glm::inverse(transform))) * quad_vertex.Normal;
+			s_Data->QuadVBufferPtr->Tangent = glm::normalize(glm::vec3(transform * glm::vec4(quad_vertex.Tangent, 0.0f)));
 			s_Data->QuadVBufferPtr->TexCoord = quad_vertex.TexCoord;
 
 			s_Data->QuadVBufferPtr->Color = material->Color;
 			s_Data->QuadVBufferPtr->Shininess = material->Smoothness * 256.0f;
 			s_Data->QuadVBufferPtr->TexIndex = texture_index;
+			s_Data->QuadVBufferPtr->NormTexIndex = normal_texture_index;
 			s_Data->QuadVBufferPtr->EntityID = entity_id;
 
 			++s_Data->QuadVBufferPtr;

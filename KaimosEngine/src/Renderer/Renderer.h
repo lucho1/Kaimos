@@ -35,6 +35,9 @@ namespace Kaimos {
 		// --- Getters ---
 		inline static const RendererAPI::API GetRendererAPI() { return RendererAPI::GetAPI(); }
 
+		static uint GetMaxTextureSlots();
+		static uint GetCurrentTextureSlot();
+
 		static const glm::vec3 GetSceneColor();
 		static void SetSceneColor(const glm::vec3& color);
 		static const uint GetMaxDirLights();
@@ -50,8 +53,9 @@ namespace Kaimos {
 		static Ref<Shader> GetShader(const std::string& name);
 
 		// --- Public Renderer Textures Methods ---
+		static void ResetTextureSlotIndex();
 		static void BindTextures();
-		static uint GetTextureIndex(const Ref<Texture2D>& texture, std::function<void()> NextBatchFunction);
+		static uint GetTextureIndex(const Ref<Texture2D>& texture, bool is_normal, std::function<void()> NextBatchFunction);
 
 		// --- Public Renderer Materials Methods ---
 		static Ref<Material> CreateMaterial(const std::string& name);

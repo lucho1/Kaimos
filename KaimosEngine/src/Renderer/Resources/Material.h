@@ -56,6 +56,9 @@ namespace Kaimos {
 		const Ref<Texture2D>& GetNormalTexture()	const { return m_NormalTexture; }
 		const std::string& GetNormalTexturePath()	const { return m_NormalTextureFilepath; }
 
+		bool HasAlbedo() const { return m_Texture != nullptr; }
+		bool HasNormal() const { return m_NormalTexture != nullptr; }
+
 		uint GetID()								const { return m_ID; }
 		uint GetAttachedGraphID()					const { return m_AttachedGraph->GetID(); }
 		const std::string& GetName()				const { return m_Name; }

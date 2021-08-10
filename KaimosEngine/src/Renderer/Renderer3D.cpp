@@ -77,10 +77,12 @@ namespace Kaimos {
 			{ SHADER_DATATYPE::FLOAT3,	"a_Position" },
 			{ SHADER_DATATYPE::FLOAT3,	"a_Normal" },
 			{ SHADER_DATATYPE::FLOAT3,	"a_NormalTransformed" },
+			{ SHADER_DATATYPE::FLOAT3,	"a_Tangent" },
 			{ SHADER_DATATYPE::FLOAT2,	"a_TexCoord" },
 			{ SHADER_DATATYPE::FLOAT4,	"a_Color" },
 			{ SHADER_DATATYPE::FLOAT ,	"a_Shininess" },
 			{ SHADER_DATATYPE::FLOAT ,	"a_TexIndex" },
+			{ SHADER_DATATYPE::FLOAT ,	"a_NormTexIndex" },
 			{ SHADER_DATATYPE::INT,		"a_EntityID" }
 		};
 
@@ -222,7 +224,14 @@ namespace Kaimos {
 			if (!material)
 				KS_FATAL_ERROR("Tried to Render a Mesh with a null Material!");
 
-			uint texture_index = Renderer::GetTextureIndex(material->GetTexture(), &NextBatch);
+			if (material->HasAlbedo() && material->HasNormal() && Renderer::GetCurrentTextureSlot() == (Renderer::GetMaxTextureSlots() - 1))
+			{
+				NextBatch();
+				Renderer::ResetTextureSlotIndex();
+			}
+
+			uint texture_index = Renderer::GetTextureIndex(material->GetTexture(), false, &NextBatch);
+			uint normal_texture_index = Renderer::GetTextureIndex(material->GetNormalTexture(), true, &NextBatch);
 
 			// -- Update Mesh Timed Vertices --
 			static float accumulated_dt = 0.0f;
@@ -240,13 +249,15 @@ namespace Kaimos {
 				Vertex& mesh_vertex = mesh_component.ModifiedVertices[i];
 
 				s_3DData->VBufferPtr->Pos = transform * glm::vec4(mesh_vertex.Pos, 1.0f);
-				s_3DData->VBufferPtr->Normal = mesh_vertex.Normal;
+				s_3DData->VBufferPtr->Normal = glm::normalize(glm::vec3(transform * glm::vec4(mesh_vertex.Normal, 0.0f)));;
 				s_3DData->VBufferPtr->NormalTrs = glm::mat3(glm::transpose(glm::inverse(transform))) * mesh_vertex.Normal;
+				s_3DData->VBufferPtr->Tangent = glm::normalize(glm::vec3(transform * glm::vec4(mesh_vertex.Tangent, 0.0f)));
 				s_3DData->VBufferPtr->TexCoord = mesh_vertex.TexCoord;
 
 				s_3DData->VBufferPtr->Color = material->Color;
 				s_3DData->VBufferPtr->Shininess = material->Smoothness * 256.0f;
 				s_3DData->VBufferPtr->TexIndex = texture_index;
+				s_3DData->VBufferPtr->NormTexIndex = normal_texture_index;
 				s_3DData->VBufferPtr->EntityID = entity_id;
 
 				++s_3DData->VBufferPtr;

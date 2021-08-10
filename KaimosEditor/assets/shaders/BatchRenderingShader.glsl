@@ -4,20 +4,24 @@
 layout(location = 0) in vec3 a_Position;
 layout(location = 1) in vec3 a_Normal;
 layout(location = 2) in vec3 a_NormalTransformed;
-layout(location = 3) in vec2 a_TexCoord;
-layout(location = 4) in vec4 a_Color;
-layout(location = 5) in float a_Shininess;
-layout(location = 6) in float a_TexIndex;
-layout(location = 7) in int a_EntityID;
+layout(location = 3) in vec3 a_Tangent;
+layout(location = 4) in vec2 a_TexCoord;
+layout(location = 5) in vec4 a_Color;
+layout(location = 6) in float a_Shininess;
+layout(location = 7) in float a_TexIndex;
+layout(location = 8) in float a_NormTexIndex;
+layout(location = 9) in int a_EntityID;
 
 // Varyings
 out vec3 v_Normal;
+out mat3 v_TBN;
 out vec2 v_TexCoord;
 out vec4 v_Color;
 out vec3 v_FragPos;
 
 out flat float v_Shininess;
 out flat float v_TexIndex;
+out flat float v_NormTexIndex;
 out flat int v_EntityID;
 
 // Uniforms
@@ -34,10 +38,17 @@ void main()
 	v_FragPos = a_Position;
 	v_Shininess = a_Shininess;
 	v_TexIndex = a_TexIndex;
+	v_NormTexIndex = a_NormTexIndex;
 	v_EntityID = a_EntityID;
 
 	// Position Calculation
 	gl_Position = u_ViewProjection * vec4(a_Position, 1.0);
+
+	vec3 T = a_Tangent;
+	vec3 N = a_Normal;
+	T = normalize(T - dot(T, N) * N);
+	vec3 B = cross(N, T);
+	v_TBN = mat3(T, B, N);
 }
 
 
@@ -53,12 +64,14 @@ layout(location = 1) out int color2;
 
 // Varyings
 in vec3 v_Normal;
+in mat3 v_TBN;
 in vec2 v_TexCoord;
 in vec4 v_Color;
 in vec3 v_FragPos;
 
 in flat float v_Shininess;
 in flat float v_TexIndex;
+in flat float v_NormTexIndex;
 in flat int v_EntityID;
 
 // Light Structs
@@ -96,7 +109,6 @@ float GetLightSpecularFactor(vec3 normal, vec3 norm_light_dir)
 	vec3 view_dir = normalize(u_ViewPos - v_FragPos);
 	vec3 halfway_dir = normalize(norm_light_dir + view_dir);
 
-	// shininess/smoothness!
 	//vec3 reflect_dir = reflect(-norm_light_dir, normal); //phong
 	//return pow(max(dot(view_dir, reflect_dir), 0.0), v_Shininess);
 	return pow(max(dot(normal, halfway_dir), 0.0), v_Shininess); // blinn-phong
@@ -107,7 +119,12 @@ float GetLightSpecularFactor(vec3 normal, vec3 norm_light_dir)
 void main()
 {
 	// Normal Vec
-	vec3 normal = normalize(v_Normal);
+	vec3 normal = texture(u_Textures[int(v_NormTexIndex)], v_TexCoord).rgb;
+    normal = normal * 2.0 - 1.0;
+	normal = normalize(v_TBN * normal);
+
+	//vec3 normal = normalize(v_Normal);
+
 
 	// Ligting Calculations
 	vec3 lighting_result = vec3(0.0);
