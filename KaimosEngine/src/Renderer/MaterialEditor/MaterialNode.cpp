@@ -428,6 +428,7 @@ namespace Kaimos::MaterialEditor {
 		// -- Serialize Base Node --
 		output_emitter << YAML::Key << "TextureFile" << YAML::Value << m_AttachedMaterial->GetTexturePath();
 		output_emitter << YAML::Key << "NormalTextureFile" << YAML::Value << m_AttachedMaterial->GetNormalTexturePath();
+		output_emitter << YAML::Key << "SpecularTextureFile" << YAML::Value << m_AttachedMaterial->GetSpecularTexturePath();
 		SerializeBaseNode(output_emitter);
 	}
 
