@@ -250,32 +250,25 @@ namespace Kaimos::MaterialEditor {
 		ImGui::Text(m_Name.c_str());
 		ImNodes::EndNodeTitleBar();
 
-		// -- Draw Input Pins --
+		// -- Draw Vertex Attribute Input Pins --
 		bool set_node_draggable = true;
 
 		m_VertexPositionPin->DrawUI(set_node_draggable, true);
 		m_VertexNormalPin->DrawUI(set_node_draggable, true);
 		m_TextureCoordinatesPin->DrawUI(set_node_draggable, true);
+
+
+		// -- Draw Texture "Input" (Button) & Pins --
+		ImGui::NewLine();
 		m_ColorPin->DrawUI(set_node_draggable, false, true, m_AttachedMaterial->Color);
 
 		glm::vec4 smoothness_vec = glm::vec4(m_AttachedMaterial->Smoothness);
 		m_SmoothnessPin->DrawUI(set_node_draggable, false, true, smoothness_vec, 0.01f, 0.01f, 4.0f, "%.2f");
 		m_AttachedMaterial->Smoothness = smoothness_vec.x;
 
-		glm::vec4 specularity_vec = glm::vec4(m_AttachedMaterial->Specularity);
-		m_SpecularityPin->DrawUI(set_node_draggable, false, true, specularity_vec, 0.01f, 0.01f, FLT_MAX, "%.2f");
-		m_AttachedMaterial->Specularity = specularity_vec.x;
-
-		glm::vec4 bumpiness_vec = glm::vec4(m_AttachedMaterial->Bumpiness);
-		m_BumpinessPin->DrawUI(set_node_draggable, false, true, bumpiness_vec, 0.01f, 0.05f, FLT_MAX, "%.2f");
-		m_AttachedMaterial->Bumpiness = bumpiness_vec.x;
-
-		ImNodes::SetNodeDraggable(m_ID, set_node_draggable);
-
-		// -- Draw Texture "Input" (Button) --
 		uint id = m_AttachedMaterial->GetTexture() == nullptr ? 0 : m_AttachedMaterial->GetTexture()->GetTextureID();
-		ImGui::Text("Texture ");
-		ImGui::SameLine();
+		ImGui::Text("Texture");
+		ImGui::SameLine(65.0f);
 		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { 0.0f, 0.0f });
 
 		if (KaimosUI::UIFunctionalities::DrawTexturedButton("###mttexture_btn", id, glm::vec2(50.0f), glm::vec3(0.1f)))
@@ -290,7 +283,7 @@ namespace Kaimos::MaterialEditor {
 
 		ImGui::PushID(0);
 		ImGui::SameLine();
-		if (KaimosUI::UIFunctionalities::DrawColoredButton("X", { 20.0f, 50.0f }, glm::vec3(0.2f), true))
+		if (KaimosUI::UIFunctionalities::DrawColoredButton("X", { 20.0f, 50.0f }, glm::vec3(0.15f), true))
 			m_AttachedMaterial->RemoveTexture();
 
 		KaimosUI::UIFunctionalities::PopButton(true);
@@ -305,17 +298,27 @@ namespace Kaimos::MaterialEditor {
 			if (!tex_path.empty())
 				tex_name = tex_path.substr(tex_path.find_last_of("/\\" + 1, tex_path.size() - 1) + 1);
 
-			float indent = ImGui::CalcTextSize("Texture ").x;
-			ImGui::Indent(indent);
+			float text_pos = 100.0f - ImGui::CalcTextSize(tex_name.c_str()).x * 0.5f;
+			ImGui::Indent(text_pos);
 			ImGui::Text("%s", tex_name.c_str());
-			ImGui::Text("%ix%i (ID %i)", m_AttachedMaterial->GetTexture()->GetWidth(), m_AttachedMaterial->GetTexture()->GetHeight(), id);
-			ImGui::Indent(-indent);
+			ImGui::Indent(-text_pos);
+
+			char texture_info[24];
+			sprintf_s(texture_info, 24, "%ix%i (ID %i)", m_AttachedMaterial->GetTexture()->GetWidth(), m_AttachedMaterial->GetTexture()->GetHeight(), id);
+			text_pos = 100.0f - ImGui::CalcTextSize(texture_info).x * 0.5f;
+			ImGui::Indent(text_pos); ImGui::Text(texture_info); ImGui::Indent(-text_pos);
 		}
 
-		// -- Draw Normal Texture "Input" (Button) --		
+
+		// -- Draw Normal Texture "Input" (Button) & Pins --
+		ImGui::NewLine();
+		glm::vec4 bumpiness_vec = glm::vec4(m_AttachedMaterial->Bumpiness);
+		m_BumpinessPin->DrawUI(set_node_draggable, false, true, bumpiness_vec, 0.01f, 0.05f, FLT_MAX, "%.2f");
+		m_AttachedMaterial->Bumpiness = bumpiness_vec.x;
+
 		uint norm_id = m_AttachedMaterial->GetNormalTexture() == nullptr ? 0 : m_AttachedMaterial->GetNormalTexture()->GetTextureID();
-		ImGui::Text("Normal  ");
-		ImGui::SameLine();
+		ImGui::Text("Normal");
+		ImGui::SameLine(65.0f);
 		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { 0.0f, 0.0f });
 
 		if (KaimosUI::UIFunctionalities::DrawTexturedButton("###mtnormtexture_btn", norm_id, glm::vec2(50.0f), glm::vec3(0.1f)))
@@ -329,7 +332,7 @@ namespace Kaimos::MaterialEditor {
 
 		ImGui::PushID(1);
 		ImGui::SameLine();
-		if (KaimosUI::UIFunctionalities::DrawColoredButton("X", { 20.0f, 50.0f }, glm::vec3(0.2f), true))
+		if (KaimosUI::UIFunctionalities::DrawColoredButton("X", { 20.0f, 50.0f }, glm::vec3(0.15f), true))
 			m_AttachedMaterial->RemoveNormalTexture();
 
 		KaimosUI::UIFunctionalities::PopButton(true);
@@ -344,17 +347,27 @@ namespace Kaimos::MaterialEditor {
 			if (!tex_path.empty())
 				tex_name = tex_path.substr(tex_path.find_last_of("/\\" + 1, tex_path.size() - 1) + 1);
 
-			float indent = ImGui::CalcTextSize("Normal  ").x;
-			ImGui::Indent(indent);
+			float text_pos = 100.0f - ImGui::CalcTextSize(tex_name.c_str()).x * 0.5f;
+			ImGui::Indent(text_pos);
 			ImGui::Text("%s", tex_name.c_str());
-			ImGui::Text("%ix%i (ID %i)", m_AttachedMaterial->GetNormalTexture()->GetWidth(), m_AttachedMaterial->GetNormalTexture()->GetHeight(), norm_id);
-			ImGui::Indent(-indent);
+			ImGui::Indent(-text_pos);
+
+			char texture_info[24];
+			sprintf_s(texture_info, 24, "%ix%i (ID %i)", m_AttachedMaterial->GetNormalTexture()->GetWidth(), m_AttachedMaterial->GetNormalTexture()->GetHeight(), norm_id);
+			text_pos = 100.0f - ImGui::CalcTextSize(texture_info).x * 0.5f;
+			ImGui::Indent(text_pos); ImGui::Text(texture_info); ImGui::Indent(-text_pos);
 		}
 
-		// -- Draw Specular Texture "Input" (Button) --		
+
+		// -- Draw Specular Texture "Input" (Button) & Pins --
+		ImGui::NewLine();
+		glm::vec4 specularity_vec = glm::vec4(m_AttachedMaterial->Specularity);
+		m_SpecularityPin->DrawUI(set_node_draggable, false, true, specularity_vec, 0.01f, 0.01f, FLT_MAX, "%.2f");
+		m_AttachedMaterial->Specularity = specularity_vec.x;
+
 		uint spec_id = m_AttachedMaterial->GetSpecularTexture() == nullptr ? 0 : m_AttachedMaterial->GetSpecularTexture()->GetTextureID();
 		ImGui::Text("Specular");
-		ImGui::SameLine();
+		ImGui::SameLine(65.0f);
 		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { 0.0f, 0.0f });
 
 		if (KaimosUI::UIFunctionalities::DrawTexturedButton("###mtspectexture_btn", spec_id, glm::vec2(50.0f), glm::vec3(0.1f)))
@@ -368,7 +381,7 @@ namespace Kaimos::MaterialEditor {
 
 		ImGui::PushID(2);
 		ImGui::SameLine();
-		if (KaimosUI::UIFunctionalities::DrawColoredButton("X", { 20.0f, 50.0f }, glm::vec3(0.2f), true))
+		if (KaimosUI::UIFunctionalities::DrawColoredButton("X", { 20.0f, 50.0f }, glm::vec3(0.15f), true))
 			m_AttachedMaterial->RemoveSpecularTexture();
 
 		KaimosUI::UIFunctionalities::PopButton(true);
@@ -383,15 +396,20 @@ namespace Kaimos::MaterialEditor {
 			if (!tex_path.empty())
 				tex_name = tex_path.substr(tex_path.find_last_of("/\\" + 1, tex_path.size() - 1) + 1);
 
-			float indent = ImGui::CalcTextSize("Specular").x;
-			ImGui::Indent(indent);
+			float text_pos = 100.0f - ImGui::CalcTextSize(tex_name.c_str()).x * 0.5f;
+			ImGui::Indent(text_pos);
 			ImGui::Text("%s", tex_name.c_str());
-			ImGui::Text("%ix%i (ID %i)", m_AttachedMaterial->GetSpecularTexture()->GetWidth(), m_AttachedMaterial->GetSpecularTexture()->GetHeight(), spec_id);
-			ImGui::Indent(-indent);
+			ImGui::Indent(-text_pos);
+
+			char texture_info[24];
+			sprintf_s(texture_info, 24, "%ix%i (ID %i)", m_AttachedMaterial->GetSpecularTexture()->GetWidth(), m_AttachedMaterial->GetSpecularTexture()->GetHeight(), spec_id);
+			text_pos = 100.0f - ImGui::CalcTextSize(texture_info).x * 0.5f;
+			ImGui::Indent(text_pos); ImGui::Text(texture_info); ImGui::Indent(-text_pos);
 		}
 		
 
 		// -- End Node Draw --
+		ImNodes::SetNodeDraggable(m_ID, set_node_draggable);
 		ImNodes::EndNode();
 
 		// -- Draw Links --
