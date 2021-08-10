@@ -80,6 +80,8 @@ namespace Kaimos {
 			{ SHADER_DATATYPE::FLOAT2,	"a_TexCoord" },
 			{ SHADER_DATATYPE::FLOAT4,	"a_Color" },
 			{ SHADER_DATATYPE::FLOAT ,	"a_Shininess" },
+			{ SHADER_DATATYPE::FLOAT ,	"a_NormalStrength" },
+			{ SHADER_DATATYPE::FLOAT ,	"a_SpecularStrength" },
 			{ SHADER_DATATYPE::FLOAT ,	"a_TexIndex" },
 			{ SHADER_DATATYPE::FLOAT ,	"a_NormTexIndex" },
 			{ SHADER_DATATYPE::INT,		"a_EntityID" }
@@ -254,6 +256,9 @@ namespace Kaimos {
 
 				s_3DData->VBufferPtr->Color = material->Color;
 				s_3DData->VBufferPtr->Shininess = material->Smoothness * 256.0f;
+				s_3DData->VBufferPtr->Bumpiness = material->Bumpiness;
+				s_3DData->VBufferPtr->Specularity = material->Specularity;
+
 				s_3DData->VBufferPtr->TexIndex = texture_index;
 				s_3DData->VBufferPtr->NormTexIndex = normal_texture_index;
 				s_3DData->VBufferPtr->EntityID = entity_id;

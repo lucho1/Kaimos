@@ -7,9 +7,11 @@ layout(location = 2) in vec3 a_Tangent;
 layout(location = 3) in vec2 a_TexCoord;
 layout(location = 4) in vec4 a_Color;
 layout(location = 5) in float a_Shininess;
-layout(location = 6) in float a_TexIndex;
-layout(location = 7) in float a_NormTexIndex;
-layout(location = 8) in int a_EntityID;
+layout(location = 6) in float a_NormalStrength;
+layout(location = 7) in float a_SpecularStrength;
+layout(location = 8) in float a_TexIndex;
+layout(location = 9) in float a_NormTexIndex;
+layout(location = 10) in int a_EntityID;
 
 // Varyings
 out vec3 v_FragPos;
@@ -18,6 +20,9 @@ out vec2 v_TexCoord;
 out vec4 v_Color;
 
 out flat float v_Shininess;
+out flat float v_NormalStrength;
+out flat float v_SpecularStrength;
+
 out flat float v_TexIndex;
 out flat float v_NormTexIndex;
 out flat int v_EntityID;
@@ -35,6 +40,8 @@ void main()
 	v_Color = a_Color;
 	v_Shininess = a_Shininess;
 	v_TexIndex = a_TexIndex;
+	v_NormalStrength = a_NormalStrength; 
+	v_SpecularStrength = a_SpecularStrength;
 	v_NormTexIndex = a_NormTexIndex;
 	v_EntityID = a_EntityID;
 
@@ -64,6 +71,9 @@ in vec2 v_TexCoord;
 in vec4 v_Color;
 
 in flat float v_Shininess;
+in flat float v_NormalStrength;
+in flat float v_SpecularStrength;
+
 in flat float v_TexIndex;
 in flat float v_NormTexIndex;
 in flat int v_EntityID;
@@ -98,36 +108,36 @@ uniform DirectionalLight u_DirectionalLights[MAX_DIR_LIGHTS] = DirectionalLight[
 uniform PointLight u_PointLights[MAX_POINT_LIGHTS] = PointLight[MAX_POINT_LIGHTS](PointLight(vec4(1.0), vec3(0.0), 1.0, 1.0, 50.0, 100.0, 1.0, 0.09, 0.032));
 
 // Functions
-float GetLightSpecularFactor(vec3 normal, vec3 norm_light_dir)
+float GetLightSpecularFactor(vec3 normal, vec3 norm_light_dir, float light_specular_strength)
 {
 	vec3 view_dir = normalize(u_ViewPos - v_FragPos);
 	vec3 halfway_dir = normalize(norm_light_dir + view_dir);
 
 	//vec3 reflect_dir = reflect(-norm_light_dir, normal); //phong
 	//return pow(max(dot(view_dir, reflect_dir), 0.0), v_Shininess);
-	return pow(max(dot(normal, halfway_dir), 0.0), v_Shininess); // blinn-phong
+	return pow(max(dot(normal, halfway_dir), 0.0), v_Shininess) * v_SpecularStrength * light_specular_strength; // blinn-phong
 }
 
 
 // - Main -
 void main()
 {
-	// Normal Vec
+	// - Normal Vec -
 	vec3 normal = texture(u_Textures[int(v_NormTexIndex)], v_TexCoord).rgb;
     normal = normal * 2.0 - 1.0;
+	normal.z *= v_NormalStrength;
 	normal = normalize(v_TBN * normal);
 
-	// Ligting Calculations
+	// - Ligting Calculations -
 	vec3 lighting_result = vec3(0.0);
 
 	// Directional Lights
 	for(int i = 0; i < u_DirectionalLightsNum; ++i)
 	{
 		vec3 light_dir = normalize(u_DirectionalLights[i].Direction);
-		float diffuse_factor = max(dot(normal, light_dir), 0.0);
 
-		vec3 diffuse_component = diffuse_factor * u_DirectionalLights[i].Radiance.rgb;
-		vec3 specular_component = GetLightSpecularFactor(normal, light_dir) * u_DirectionalLights[i].Radiance.rgb * u_DirectionalLights[i].SpecularStrength;
+		vec3 diffuse_component = max(dot(normal, light_dir), 0.0) * u_DirectionalLights[i].Radiance.rgb;													// diffuse_factor * light_color
+		vec3 specular_component = u_DirectionalLights[i].Radiance.rgb * GetLightSpecularFactor(normal, light_dir, u_DirectionalLights[i].SpecularStrength);	// specular_factor * light_color
 
 		lighting_result += ((diffuse_component + specular_component) * u_DirectionalLights[i].Intensity);
 	}
@@ -145,9 +155,9 @@ void main()
 
 		// Lighting Result Calculation
 		vec3 light_dir = normalize(dist);
-		float diffuse_factor = max(dot(normal, light_dir), 0.0);
-		vec3 diffuse_component = diffuse_factor * u_PointLights[i].Radiance.rgb;
-		vec3 specular_component = GetLightSpecularFactor(normal, light_dir) * u_PointLights[i].Radiance.rgb * u_PointLights[i].SpecularStrength;
+
+		vec3 diffuse_component = max(dot(normal, light_dir), 0.0) * u_PointLights[i].Radiance.rgb;												// diffuse_factor * light_color
+		vec3 specular_component = GetLightSpecularFactor(normal, light_dir, u_PointLights[i].SpecularStrength) * u_PointLights[i].Radiance.rgb;	// specular_factor * light_color
 
 		// External Attenuation (from MinRad to MaxRad)
 		float outer_attenuation = 1.0;
@@ -167,10 +177,10 @@ void main()
 		lighting_result += ((diffuse_component + specular_component) * attenuation * outer_attenuation * u_PointLights[i].Intensity);
 	}
 	
-	// Final Color Output Calculation (scene_color*light*object_color*texture)
+	// - Final Color Output Calculation (scene_color*light*object_color*texture) -
 	vec3 ambient_color = u_SceneColor * lighting_result;
 	color = texture(u_Textures[int(v_TexIndex)], v_TexCoord) * vec4(ambient_color, 1.0) * v_Color;
 
-	// Color Output 2, Entity ID float value for Mouse Picking
+	// - Color Output 2, Entity ID float value for Mouse Picking -
 	color2 = v_EntityID;
 }

@@ -68,7 +68,7 @@ namespace Kaimos {
 
 		// --- Public Variables ---
 		glm::vec4 Color = glm::vec4(1.0f);
-		float Smoothness = 0.5f;
+		float Smoothness = 0.5f, Bumpiness = 1.0f, Specularity = 1.0f;
 
 	private:
 

@@ -162,12 +162,17 @@ namespace Kaimos::MaterialEditor {
 		m_TextureCoordinatesPin =	CreateRef<NodeInputPin>(this, PinDataType::VEC2, false, "Texture Coordinates (Vec2)");
 		m_ColorPin =				CreateRef<NodeInputPin>(this, PinDataType::VEC4, false, "Color (Vec4)", 1.0f);
 		m_SmoothnessPin =			CreateRef<NodeInputPin>(this, PinDataType::FLOAT, false, "Smoothness (Float)", 0.5f);
+		m_SpecularityPin =			CreateRef<NodeInputPin>(this, PinDataType::FLOAT, false, "Specularity (Float)", 1.0f);
+		m_BumpinessPin =			CreateRef<NodeInputPin>(this, PinDataType::FLOAT, false, "Bumpiness (Float)", 1.0f);
+		
 
 		m_NodeInputPins.push_back(m_VertexPositionPin);
 		m_NodeInputPins.push_back(m_VertexNormalPin);
 		m_NodeInputPins.push_back(m_TextureCoordinatesPin);
 		m_NodeInputPins.push_back(m_ColorPin);
 		m_NodeInputPins.push_back(m_SmoothnessPin);
+		m_NodeInputPins.push_back(m_SpecularityPin);
+		m_NodeInputPins.push_back(m_BumpinessPin);
 	}
 
 
@@ -179,6 +184,8 @@ namespace Kaimos::MaterialEditor {
 		m_TextureCoordinatesPin.reset();
 		m_ColorPin.reset();
 		m_SmoothnessPin.reset();
+		m_SpecularityPin.reset();
+		m_BumpinessPin.reset();
 	}
 
 
@@ -204,6 +211,10 @@ namespace Kaimos::MaterialEditor {
 				m_ColorPin = pin;
 			else if (pin_name == "Smoothness (Float)")
 				m_SmoothnessPin = pin;
+			else if (pin_name == "Specularity (Float)")
+				m_SpecularityPin = pin;
+			else if (pin_name == "Bumpiness (Float)")
+				m_BumpinessPin = pin;
 		}
 	}
 
@@ -250,6 +261,14 @@ namespace Kaimos::MaterialEditor {
 		glm::vec4 smoothness_vec = glm::vec4(m_AttachedMaterial->Smoothness);
 		m_SmoothnessPin->DrawUI(set_node_draggable, false, true, smoothness_vec, 0.01f, 0.01f, 4.0f, "%.2f");
 		m_AttachedMaterial->Smoothness = smoothness_vec.x;
+
+		glm::vec4 specularity_vec = glm::vec4(m_AttachedMaterial->Specularity);
+		m_SpecularityPin->DrawUI(set_node_draggable, false, true, specularity_vec, 0.01f, 0.01f, FLT_MAX, "%.2f");
+		m_AttachedMaterial->Specularity = specularity_vec.x;
+
+		glm::vec4 bumpiness_vec = glm::vec4(m_AttachedMaterial->Bumpiness);
+		m_BumpinessPin->DrawUI(set_node_draggable, false, true, bumpiness_vec, 0.01f, 0.05f, FLT_MAX, "%.2f");
+		m_AttachedMaterial->Bumpiness = bumpiness_vec.x;
 
 		ImNodes::SetNodeDraggable(m_ID, set_node_draggable);
 
@@ -353,12 +372,16 @@ namespace Kaimos::MaterialEditor {
 	{
 		m_ColorPin->SetInputValue(m_AttachedMaterial->Color);
 		m_SmoothnessPin->SetInputValue(glm::vec4(m_AttachedMaterial->Smoothness));
+		m_SpecularityPin->SetInputValue(glm::vec4(m_AttachedMaterial->Specularity));
+		m_BumpinessPin->SetInputValue(glm::vec4(m_AttachedMaterial->Bumpiness));
 	}
 
 	void MainMaterialNode::SyncMaterialValues()
 	{
 		m_AttachedMaterial->Color = m_ColorPin->GetValue();
 		m_AttachedMaterial->Smoothness = m_SmoothnessPin->GetValue().x;
+		m_AttachedMaterial->Specularity = m_SpecularityPin->GetValue().x;
+		m_AttachedMaterial->Bumpiness = m_BumpinessPin->GetValue().x;
 	}
 
 	void MainMaterialNode::SerializeNode(YAML::Emitter& output_emitter) const

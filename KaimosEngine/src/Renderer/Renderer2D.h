@@ -23,6 +23,8 @@ namespace Kaimos {
 		glm::vec2 TexCoord	= glm::vec2(0.0f);
 		glm::vec4 Color		= glm::vec4(1.0f);
 		float Shininess		= 0.5f;
+		float Bumpiness		= 0.5f;
+		float Specularity	= 0.5f;
 		float TexIndex		= 0.0f;
 		float NormTexIndex	= 0.0f;
 
