@@ -40,8 +40,7 @@ void main()
 
 	vec3 T = a_Tangent, N = a_Normal;
 	T = normalize(T - dot(T, N) * N);
-	vec3 B = cross(N, T);
-	v_TBN = mat3(T, B, N);
+	v_TBN = mat3(T, cross(N, T), N);
 
 	// Position Calculation
 	gl_Position = u_ViewProjection * vec4(a_Position, 1.0);
@@ -59,10 +58,10 @@ layout(location = 0) out vec4 color;
 layout(location = 1) out int color2;
 
 // Varyings
+in vec3 v_FragPos;
 in mat3 v_TBN;
 in vec2 v_TexCoord;
 in vec4 v_Color;
-in vec3 v_FragPos;
 
 in flat float v_Shininess;
 in flat float v_TexIndex;
