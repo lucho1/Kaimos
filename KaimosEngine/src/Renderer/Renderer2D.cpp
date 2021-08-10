@@ -97,6 +97,7 @@ namespace Kaimos {
 			{ SHADER_DATATYPE::FLOAT ,	"a_SpecularStrength" },
 			{ SHADER_DATATYPE::FLOAT ,	"a_TexIndex" },
 			{ SHADER_DATATYPE::FLOAT ,	"a_NormTexIndex" },
+			{ SHADER_DATATYPE::FLOAT ,	"a_SpecTexIndex" },
 			{ SHADER_DATATYPE::INT ,	"a_EntityID" }
 		};
 
@@ -229,19 +230,17 @@ namespace Kaimos {
 		if (s_Data->QuadIndicesDrawCount >= s_Data->MaxIndices)
 			NextBatch();
 
-		// -- Get Texture index if Sprite has Texture --
+		// -- Get Material & Check it fits in Batch --
 		Ref<Material> material = Renderer::GetMaterial(sprite_component.SpriteMaterialID);
 		if (!material)
 			KS_FATAL_ERROR("Tried to Render a Sprite with a null Material!");
 
-		if (material->HasAlbedo() && material->HasNormal() && Renderer::GetCurrentTextureSlot() == (Renderer::GetMaxTextureSlots() - 1))
-		{
-			NextBatch();
-			Renderer::ResetTextureSlotIndex();
-		}
+		Renderer::CheckMaterialFitsInBatch(material, &NextBatch);
 
+		// -- Get Texture indexex --
 		uint texture_index = Renderer::GetTextureIndex(material->GetTexture(), false, &NextBatch);
 		uint normal_texture_index = Renderer::GetTextureIndex(material->GetNormalTexture(), true, &NextBatch);
+		uint specular_texture_index = Renderer::GetTextureIndex(material->GetSpecularTexture(), false, &NextBatch);
 
 		// -- Update Sprite Timed Vertices --
 		static float accumulated_dt = 0.0f;
@@ -271,6 +270,7 @@ namespace Kaimos {
 
 			s_Data->QuadVBufferPtr->TexIndex = texture_index;
 			s_Data->QuadVBufferPtr->NormTexIndex = normal_texture_index;
+			s_Data->QuadVBufferPtr->SpecTexIndex = specular_texture_index;
 			s_Data->QuadVBufferPtr->EntityID = entity_id;
 
 			++s_Data->QuadVBufferPtr;

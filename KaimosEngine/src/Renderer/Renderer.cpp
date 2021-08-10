@@ -305,6 +305,24 @@ namespace Kaimos {
 			s_RendererData->TextureSlots[i]->Bind(i);
 	}
 
+	void Renderer::CheckMaterialFitsInBatch(const Ref<Material>& material, std::function<void()> NextBatchFunction)
+	{
+		bool start_new_batch = false;
+
+		if (s_RendererData->TextureSlotIndex == (s_RendererData->MaxTextureSlots - 2))
+			if (material->HasAlbedo() && material->HasNormal() && material->HasSpecular())
+				start_new_batch = true;
+		else if (s_RendererData->TextureSlotIndex == (s_RendererData->MaxTextureSlots - 1))
+			if ((material->HasAlbedo() && material->HasNormal()) || (material->HasAlbedo() && material->HasSpecular()) || (material->HasNormal() && material->HasSpecular()))
+				start_new_batch = true;
+
+		if (start_new_batch)
+		{
+			NextBatchFunction();
+			s_RendererData->TextureSlotIndex = 2; // 0 is white texture, 1 is normal texture
+		}
+	}
+
 	uint Renderer::GetTextureIndex(const Ref<Texture2D>& texture, bool is_normal, std::function<void()> NextBatchFunction)
 	{
 		uint ret = is_normal ? 1 : 0;

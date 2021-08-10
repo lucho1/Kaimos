@@ -31,6 +31,8 @@ namespace Kaimos {
 		void RemoveTexture();
 		void SetNormalTexture(const std::string& filepath);
 		void RemoveNormalTexture();
+		void SetSpecularTexture(const std::string& filepath);
+		void RemoveSpecularTexture();
 
 		// --- Public Graph Methods ---
 		bool IsVertexAttributeTimed(MaterialEditor::VertexParameterNodeType vtxpm_node_type) const;
@@ -51,17 +53,21 @@ namespace Kaimos {
 	public:
 
 		// --- Getters ---
+		uint GetID()								const { return m_ID; }
+		uint GetAttachedGraphID()					const { return m_AttachedGraph->GetID(); }
+		const std::string& GetName()				const { return m_Name; }
+
+		// --- Texture Getters ---
 		const Ref<Texture2D>& GetTexture()			const { return m_Texture; }
 		const std::string& GetTexturePath()			const { return m_TextureFilepath; }
 		const Ref<Texture2D>& GetNormalTexture()	const { return m_NormalTexture; }
 		const std::string& GetNormalTexturePath()	const { return m_NormalTextureFilepath; }
+		const Ref<Texture2D>& GetSpecularTexture()	const { return m_SpecularTexture; }
+		const std::string& GetSpecularTexturePath()	const { return m_SpecularTexturePath; }
 
-		bool HasAlbedo() const { return m_Texture != nullptr; }
-		bool HasNormal() const { return m_NormalTexture != nullptr; }
-
-		uint GetID()								const { return m_ID; }
-		uint GetAttachedGraphID()					const { return m_AttachedGraph->GetID(); }
-		const std::string& GetName()				const { return m_Name; }
+		bool HasAlbedo() const		{ return m_Texture != nullptr; }
+		bool HasNormal() const		{ return m_NormalTexture != nullptr; }
+		bool HasSpecular() const	{ return m_SpecularTexture != nullptr; }
 
 		
 	public:
@@ -76,8 +82,8 @@ namespace Kaimos {
 		uint m_ID = 0;
 		ScopePtr<MaterialEditor::MaterialGraph> m_AttachedGraph = nullptr;
 
-		Ref<Texture2D> m_Texture = nullptr, m_NormalTexture = nullptr;
-		std::string m_TextureFilepath = "", m_NormalTextureFilepath = "";
+		Ref<Texture2D> m_Texture = nullptr, m_NormalTexture = nullptr, m_SpecularTexture = nullptr;
+		std::string m_TextureFilepath = "", m_NormalTextureFilepath = "", m_SpecularTexturePath = "";
 		std::string m_Name = "Unnamed";
 	};
 }

@@ -55,6 +55,7 @@ namespace Kaimos {
 		// --- Public Renderer Textures Methods ---
 		static void ResetTextureSlotIndex();
 		static void BindTextures();
+		static void CheckMaterialFitsInBatch(const Ref<Material>& material, std::function<void()> NextBatchFunction);
 		static uint GetTextureIndex(const Ref<Texture2D>& texture, bool is_normal, std::function<void()> NextBatchFunction);
 
 		// --- Public Renderer Materials Methods ---

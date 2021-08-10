@@ -11,7 +11,8 @@ layout(location = 6) in float a_NormalStrength;
 layout(location = 7) in float a_SpecularStrength;
 layout(location = 8) in float a_TexIndex;
 layout(location = 9) in float a_NormTexIndex;
-layout(location = 10) in int a_EntityID;
+layout(location = 10) in float a_SpecTexIndex;
+layout(location = 11) in int a_EntityID;
 
 // Varyings
 out vec3 v_FragPos;
@@ -25,6 +26,7 @@ out flat float v_SpecularStrength;
 
 out flat float v_TexIndex;
 out flat float v_NormTexIndex;
+out flat float v_SpecTexIndex;
 out flat int v_EntityID;
 
 // Uniforms
@@ -38,13 +40,17 @@ void main()
 	v_FragPos = a_Position;
 	v_TexCoord = a_TexCoord;
 	v_Color = a_Color;
+
 	v_Shininess = a_Shininess;
 	v_TexIndex = a_TexIndex;
 	v_NormalStrength = a_NormalStrength; 
 	v_SpecularStrength = a_SpecularStrength;
+
 	v_NormTexIndex = a_NormTexIndex;
+	v_SpecTexIndex = a_SpecTexIndex;
 	v_EntityID = a_EntityID;
 
+	// TBN Matrix Calculation (for normal mapping)
 	vec3 T = a_Tangent, N = a_Normal;
 	T = normalize(T - dot(T, N) * N);
 	v_TBN = mat3(T, cross(N, T), N);
@@ -76,6 +82,7 @@ in flat float v_SpecularStrength;
 
 in flat float v_TexIndex;
 in flat float v_NormTexIndex;
+in flat float v_SpecTexIndex;
 in flat int v_EntityID;
 
 // Light Structs
@@ -130,14 +137,16 @@ void main()
 
 	// - Ligting Calculations -
 	vec3 lighting_result = vec3(0.0);
+	vec3 specular_map = texture(u_Textures[int(v_SpecTexIndex)], v_TexCoord).rgb;
 
 	// Directional Lights
 	for(int i = 0; i < u_DirectionalLightsNum; ++i)
 	{
 		vec3 light_dir = normalize(u_DirectionalLights[i].Direction);
+		vec3 radiance = u_DirectionalLights[i].Radiance.rgb;
 
-		vec3 diffuse_component = max(dot(normal, light_dir), 0.0) * u_DirectionalLights[i].Radiance.rgb;													// diffuse_factor * light_color
-		vec3 specular_component = u_DirectionalLights[i].Radiance.rgb * GetLightSpecularFactor(normal, light_dir, u_DirectionalLights[i].SpecularStrength);	// specular_factor * light_color
+		vec3 diffuse_component = radiance * max(dot(normal, light_dir), 0.0);																	// diffuse_factor * light_color
+		vec3 specular_component = radiance * specular_map * GetLightSpecularFactor(normal, light_dir, u_DirectionalLights[i].SpecularStrength);	// specular_factor * light_color
 
 		lighting_result += ((diffuse_component + specular_component) * u_DirectionalLights[i].Intensity);
 	}
@@ -155,9 +164,10 @@ void main()
 
 		// Lighting Result Calculation
 		vec3 light_dir = normalize(dist);
+		vec3 radiance = u_PointLights[i].Radiance.rgb;
 
-		vec3 diffuse_component = max(dot(normal, light_dir), 0.0) * u_PointLights[i].Radiance.rgb;												// diffuse_factor * light_color
-		vec3 specular_component = GetLightSpecularFactor(normal, light_dir, u_PointLights[i].SpecularStrength) * u_PointLights[i].Radiance.rgb;	// specular_factor * light_color
+		vec3 diffuse_component = radiance * max(dot(normal, light_dir), 0.0);																// diffuse_factor * light_color
+		vec3 specular_component = radiance * specular_map * GetLightSpecularFactor(normal, light_dir, u_PointLights[i].SpecularStrength);	// specular_factor * light_color
 
 		// External Attenuation (from MinRad to MaxRad)
 		float outer_attenuation = 1.0;

@@ -28,6 +28,7 @@ namespace Kaimos {
 		float Specularity	= 0.5f;
 		float TexIndex		= 0.0f;
 		float NormTexIndex	= 0.0f;
+		float SpecTexIndex	= 0.0f;
 
 		// --- Editor Variables ---
 		int EntityID		= 0;

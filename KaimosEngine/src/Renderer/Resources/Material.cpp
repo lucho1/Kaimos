@@ -34,7 +34,7 @@ namespace Kaimos {
 			m_TextureFilepath = filepath.substr(filepath.find("assets"), filepath.size());
 		}
 		else
-			KS_EDITOR_WARN("Couldn't Load Texture from '{0}'", filepath);
+			KS_EDITOR_WARN("Couldn't Load Diffuse/Albedo Texture from '{0}'", filepath);
 	}
 
 	void Material::RemoveTexture()
@@ -55,7 +55,7 @@ namespace Kaimos {
 			m_NormalTextureFilepath = filepath.substr(filepath.find("assets"), filepath.size());
 		}
 		else
-			KS_EDITOR_WARN("Couldn't Load Texture from '{0}'", filepath);
+			KS_EDITOR_WARN("Couldn't Load Normal Texture from '{0}'", filepath);
 	}
 
 	void Material::RemoveNormalTexture()
@@ -64,6 +64,27 @@ namespace Kaimos {
 			m_NormalTexture.reset();
 
 		m_NormalTextureFilepath.clear();
+	}
+
+	void Material::SetSpecularTexture(const std::string& filepath)
+	{
+		Ref<Texture2D> texture = Texture2D::Create(filepath);
+		if (texture)
+		{
+			RemoveSpecularTexture();
+			m_SpecularTexture = texture;
+			m_SpecularTexturePath = filepath.substr(filepath.find("assets"), filepath.size());
+		}
+		else
+			KS_EDITOR_WARN("Couldn't Load Specular Texture from '{0}'", filepath);
+	}
+
+	void Material::RemoveSpecularTexture()
+	{
+		if (m_SpecularTexture)
+			m_SpecularTexture.reset();
+
+		m_SpecularTexturePath.clear();
 	}
 
 

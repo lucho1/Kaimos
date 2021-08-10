@@ -84,6 +84,7 @@ namespace Kaimos {
 			{ SHADER_DATATYPE::FLOAT ,	"a_SpecularStrength" },
 			{ SHADER_DATATYPE::FLOAT ,	"a_TexIndex" },
 			{ SHADER_DATATYPE::FLOAT ,	"a_NormTexIndex" },
+			{ SHADER_DATATYPE::FLOAT ,	"a_SpecTexIndex" },
 			{ SHADER_DATATYPE::INT,		"a_EntityID" }
 		};
 
@@ -220,19 +221,17 @@ namespace Kaimos {
 		Ref<Mesh> mesh = Resources::ResourceManager::GetMesh(mesh_component.MeshID);
 		if (mesh && mesh->GetVertices().size() == mesh_component.ModifiedVertices.size())
 		{
-			// -- Get Material & Texture Index --
+			// -- Get Material & Check it fits in Batch --
 			Ref<Material> material = Renderer::GetMaterial(mesh_component.MaterialID);
 			if (!material)
 				KS_FATAL_ERROR("Tried to Render a Mesh with a null Material!");
 
-			if (material->HasAlbedo() && material->HasNormal() && Renderer::GetCurrentTextureSlot() == (Renderer::GetMaxTextureSlots() - 1))
-			{
-				NextBatch();
-				Renderer::ResetTextureSlotIndex();
-			}
+			Renderer::CheckMaterialFitsInBatch(material, &NextBatch);
 
+			// -- Get Texture indexex --
 			uint texture_index = Renderer::GetTextureIndex(material->GetTexture(), false, &NextBatch);
 			uint normal_texture_index = Renderer::GetTextureIndex(material->GetNormalTexture(), true, &NextBatch);
+			uint specular_texture_index = Renderer::GetTextureIndex(material->GetSpecularTexture(), false, &NextBatch);
 
 			// -- Update Mesh Timed Vertices --
 			static float accumulated_dt = 0.0f;
@@ -261,6 +260,7 @@ namespace Kaimos {
 
 				s_3DData->VBufferPtr->TexIndex = texture_index;
 				s_3DData->VBufferPtr->NormTexIndex = normal_texture_index;
+				s_3DData->VBufferPtr->SpecTexIndex = specular_texture_index;
 				s_3DData->VBufferPtr->EntityID = entity_id;
 
 				++s_3DData->VBufferPtr;

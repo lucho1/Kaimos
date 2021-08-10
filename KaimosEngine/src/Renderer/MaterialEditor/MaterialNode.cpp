@@ -274,7 +274,7 @@ namespace Kaimos::MaterialEditor {
 
 		// -- Draw Texture "Input" (Button) --
 		uint id = m_AttachedMaterial->GetTexture() == nullptr ? 0 : m_AttachedMaterial->GetTexture()->GetTextureID();
-		ImGui::Text("Texture");
+		ImGui::Text("Texture ");
 		ImGui::SameLine();
 		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { 0.0f, 0.0f });
 
@@ -297,7 +297,7 @@ namespace Kaimos::MaterialEditor {
 		ImGui::PopID();
 		ImGui::PopStyleVar();
 
-		if (m_AttachedMaterial->GetTexture())
+		if (m_AttachedMaterial->HasAlbedo())
 		{
 			std::string tex_path = m_AttachedMaterial->GetTexturePath();
 			std::string tex_name = tex_path;
@@ -305,7 +305,7 @@ namespace Kaimos::MaterialEditor {
 			if (!tex_path.empty())
 				tex_name = tex_path.substr(tex_path.find_last_of("/\\" + 1, tex_path.size() - 1) + 1);
 
-			float indent = ImGui::CalcTextSize("Texture").x + 12.0f;
+			float indent = ImGui::CalcTextSize("Texture ").x;
 			ImGui::Indent(indent);
 			ImGui::Text("%s", tex_name.c_str());
 			ImGui::Text("%ix%i (ID %i)", m_AttachedMaterial->GetTexture()->GetWidth(), m_AttachedMaterial->GetTexture()->GetHeight(), id);
@@ -314,7 +314,7 @@ namespace Kaimos::MaterialEditor {
 
 		// -- Draw Normal Texture "Input" (Button) --		
 		uint norm_id = m_AttachedMaterial->GetNormalTexture() == nullptr ? 0 : m_AttachedMaterial->GetNormalTexture()->GetTextureID();
-		ImGui::Text("Normal");
+		ImGui::Text("Normal  ");
 		ImGui::SameLine();
 		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { 0.0f, 0.0f });
 
@@ -336,7 +336,7 @@ namespace Kaimos::MaterialEditor {
 		ImGui::PopID();
 		ImGui::PopStyleVar();
 
-		if (m_AttachedMaterial->GetNormalTexture())
+		if (m_AttachedMaterial->HasNormal())
 		{
 			std::string tex_path = m_AttachedMaterial->GetNormalTexturePath();
 			std::string tex_name = tex_path;
@@ -344,10 +344,49 @@ namespace Kaimos::MaterialEditor {
 			if (!tex_path.empty())
 				tex_name = tex_path.substr(tex_path.find_last_of("/\\" + 1, tex_path.size() - 1) + 1);
 
-			float indent = ImGui::CalcTextSize("Normal").x + 12.0f;
+			float indent = ImGui::CalcTextSize("Normal  ").x;
 			ImGui::Indent(indent);
 			ImGui::Text("%s", tex_name.c_str());
-			ImGui::Text("%ix%i (ID %i)", m_AttachedMaterial->GetNormalTexture()->GetWidth(), m_AttachedMaterial->GetNormalTexture()->GetHeight(), id);
+			ImGui::Text("%ix%i (ID %i)", m_AttachedMaterial->GetNormalTexture()->GetWidth(), m_AttachedMaterial->GetNormalTexture()->GetHeight(), norm_id);
+			ImGui::Indent(-indent);
+		}
+
+		// -- Draw Specular Texture "Input" (Button) --		
+		uint spec_id = m_AttachedMaterial->GetSpecularTexture() == nullptr ? 0 : m_AttachedMaterial->GetSpecularTexture()->GetTextureID();
+		ImGui::Text("Specular");
+		ImGui::SameLine();
+		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { 0.0f, 0.0f });
+
+		if (KaimosUI::UIFunctionalities::DrawTexturedButton("###mtspectexture_btn", spec_id, glm::vec2(50.0f), glm::vec3(0.1f)))
+		{
+			std::string texture_file = FileDialogs::OpenFile("Texture (*.png;*.jpg)\0*.png;*.jpg\0PNG Texture (*.png)\0*.png\0JPG Texture (*.jpg)\0*.jpg\0");
+			if (!texture_file.empty())
+				m_AttachedMaterial->SetSpecularTexture(texture_file);
+		}
+
+		KaimosUI::UIFunctionalities::PopButton(false);
+
+		ImGui::PushID(2);
+		ImGui::SameLine();
+		if (KaimosUI::UIFunctionalities::DrawColoredButton("X", { 20.0f, 50.0f }, glm::vec3(0.2f), true))
+			m_AttachedMaterial->RemoveSpecularTexture();
+
+		KaimosUI::UIFunctionalities::PopButton(true);
+		ImGui::PopID();
+		ImGui::PopStyleVar();
+
+		if (m_AttachedMaterial->HasSpecular())
+		{
+			std::string tex_path = m_AttachedMaterial->GetSpecularTexturePath();
+			std::string tex_name = tex_path;
+
+			if (!tex_path.empty())
+				tex_name = tex_path.substr(tex_path.find_last_of("/\\" + 1, tex_path.size() - 1) + 1);
+
+			float indent = ImGui::CalcTextSize("Specular").x;
+			ImGui::Indent(indent);
+			ImGui::Text("%s", tex_name.c_str());
+			ImGui::Text("%ix%i (ID %i)", m_AttachedMaterial->GetSpecularTexture()->GetWidth(), m_AttachedMaterial->GetSpecularTexture()->GetHeight(), spec_id);
 			ImGui::Indent(-indent);
 		}
 		
