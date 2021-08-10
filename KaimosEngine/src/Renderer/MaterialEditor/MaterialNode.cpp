@@ -286,14 +286,14 @@ namespace Kaimos::MaterialEditor {
 			if (!tex_path.empty())
 				tex_name = tex_path.substr(tex_path.find_last_of("/\\" + 1, tex_path.size() - 1) + 1);
 
-			ImGui::Indent(ImGui::CalcTextSize("Texture").x + 12.0f);
+			float indent = ImGui::CalcTextSize("Texture").x + 12.0f;
+			ImGui::Indent(indent);
 			ImGui::Text("%s", tex_name.c_str());
 			ImGui::Text("%ix%i (ID %i)", m_AttachedMaterial->GetTexture()->GetWidth(), m_AttachedMaterial->GetTexture()->GetHeight(), id);
+			ImGui::Indent(-indent);
 		}
 
-		// -- Draw Normal Texture "Input" (Button) --
-		ImGui::Indent(-ImGui::CalcTextSize("Texture").x - 12.0f);
-		
+		// -- Draw Normal Texture "Input" (Button) --		
 		uint norm_id = m_AttachedMaterial->GetNormalTexture() == nullptr ? 0 : m_AttachedMaterial->GetNormalTexture()->GetTextureID();
 		ImGui::Text("Normal");
 		ImGui::SameLine();
@@ -325,9 +325,11 @@ namespace Kaimos::MaterialEditor {
 			if (!tex_path.empty())
 				tex_name = tex_path.substr(tex_path.find_last_of("/\\" + 1, tex_path.size() - 1) + 1);
 
-			ImGui::Indent(ImGui::CalcTextSize("Normal").x + 12.0f);
+			float indent = ImGui::CalcTextSize("Normal").x + 12.0f;
+			ImGui::Indent(indent);
 			ImGui::Text("%s", tex_name.c_str());
 			ImGui::Text("%ix%i (ID %i)", m_AttachedMaterial->GetNormalTexture()->GetWidth(), m_AttachedMaterial->GetNormalTexture()->GetHeight(), id);
+			ImGui::Indent(-indent);
 		}
 		
 
