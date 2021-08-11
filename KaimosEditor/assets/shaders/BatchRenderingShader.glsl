@@ -31,6 +31,7 @@ out flat int v_EntityID;
 
 // Uniforms
 uniform mat4 u_ViewProjection;
+uniform vec3 u_SceneColor = vec3(1.0);
 
 
 // - Main -
@@ -39,7 +40,7 @@ void main()
 	// Varyings Setting
 	v_FragPos = a_Position;
 	v_TexCoord = a_TexCoord;
-	v_Color = a_Color;
+	v_Color = vec4(u_SceneColor, 1.0) * a_Color;
 
 	v_Shininess = a_Shininess;
 	v_TexIndex = a_TexIndex;
@@ -109,7 +110,6 @@ struct PointLight
 uniform vec3 u_ViewPos;
 uniform sampler2D u_Textures[32];
 
-uniform vec3 u_SceneColor = vec3(1.0);
 uniform const int u_DirectionalLightsNum = 0, u_PointLightsNum = 0;
 uniform DirectionalLight u_DirectionalLights[MAX_DIR_LIGHTS] = DirectionalLight[MAX_DIR_LIGHTS](DirectionalLight(vec4(1.0), vec3(0.0), 1.0, 1.0));
 uniform PointLight u_PointLights[MAX_POINT_LIGHTS] = PointLight[MAX_POINT_LIGHTS](PointLight(vec4(1.0), vec3(0.0), 1.0, 1.0, 50.0, 100.0, 1.0, 0.09, 0.032));
@@ -188,8 +188,7 @@ void main()
 	}
 	
 	// - Final Color Output Calculation (scene_color*light*object_color*texture) -
-	vec3 ambient_color = u_SceneColor * lighting_result;
-	color = texture(u_Textures[int(v_TexIndex)], v_TexCoord) * vec4(ambient_color, 1.0) * v_Color;
+	color = texture(u_Textures[int(v_TexIndex)], v_TexCoord) * vec4(lighting_result, 1.0) * v_Color;
 
 	// - Color Output 2, Entity ID float value for Mouse Picking -
 	color2 = v_EntityID;
