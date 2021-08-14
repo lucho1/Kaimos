@@ -64,6 +64,7 @@ namespace Kaimos {
 
 		// -- Shaders Creation --
 		s_RendererData->Shaders.Load("BatchedShader", "assets/shaders/BatchRenderingShader.glsl");
+		s_RendererData->Shaders.Load("PBR_BatchedShader", "assets/shaders/PBR_BatchRenderingShader.glsl");
 
 		// -- Shaders Uniform of Texture Slots --
 		s_RendererData->Shaders.ForEachShader([&](const Ref<Shader>& shader)

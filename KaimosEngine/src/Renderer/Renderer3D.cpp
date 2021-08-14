@@ -116,7 +116,7 @@ namespace Kaimos {
 	{
 		KS_PROFILE_FUNCTION();
 
-		Ref<Shader> shader = Renderer::GetShader("BatchedShader");
+		Ref<Shader> shader = Renderer::GetShader("PBR_BatchedShader");
 		if (shader)
 		{
 			s_3DData->VArray->Bind();

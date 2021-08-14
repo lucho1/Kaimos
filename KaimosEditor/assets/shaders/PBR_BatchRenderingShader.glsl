@@ -1,6 +1,7 @@
 #type VERTEX_SHADER
 #version 460 core
 
+// --- Attributes ---
 layout(location = 0) in vec3 a_Position;
 layout(location = 1) in vec3 a_Normal;
 layout(location = 2) in vec3 a_Tangent;
@@ -14,7 +15,7 @@ layout(location = 9) in float a_NormTexIndex;
 layout(location = 10) in float a_SpecTexIndex;
 layout(location = 11) in int a_EntityID;
 
-// Varyings
+// --- Varyings ---
 out vec3 v_FragPos;
 out mat3 v_TBN;
 out vec2 v_TexCoord;
@@ -29,18 +30,17 @@ out flat float v_NormTexIndex;
 out flat float v_SpecTexIndex;
 out flat int v_EntityID;
 
-// Uniforms
+// --- Uniforms ---
 uniform mat4 u_ViewProjection;
-uniform vec3 u_SceneColor = vec3(1.0);
 
 
-// - Main -
+// --- Main ---
 void main()
 {
 	// Varyings Setting
 	v_FragPos = a_Position;
 	v_TexCoord = a_TexCoord;
-	v_Color = vec4(u_SceneColor, 1.0) * a_Color;
+	v_Color = a_Color;
 
 	v_Shininess = a_Shininess;
 	v_TexIndex = a_TexIndex;
@@ -65,13 +65,16 @@ void main()
 #type FRAGMENT_SHADER
 #version 460 core
 
+// --- PreDefinitions ---
 #define MAX_DIR_LIGHTS 0
 #define MAX_POINT_LIGHTS 0
+const float PI = 3.14159265359;
 
+// --- Outputs ---
 layout(location = 0) out vec4 color;
 layout(location = 1) out int color2;
 
-// Varyings
+// --- Varyings ---
 in vec3 v_FragPos;
 in mat3 v_TBN;
 in vec2 v_TexCoord;
@@ -86,7 +89,7 @@ in flat float v_NormTexIndex;
 in flat float v_SpecTexIndex;
 in flat int v_EntityID;
 
-// Light Structs
+// --- Light Structs ---
 struct DirectionalLight
 {
 	vec4 Radiance;
@@ -106,90 +109,154 @@ struct PointLight
 	float FalloffFactor, AttL, AttQ;
 };
 
-// Uniforms
+// --- Uniforms ---
 uniform vec3 u_ViewPos;
+uniform vec3 u_SceneColor = vec3(1.0);
 uniform sampler2D u_Textures[32];
 
 uniform const int u_DirectionalLightsNum = 0, u_PointLightsNum = 0;
 uniform DirectionalLight u_DirectionalLights[MAX_DIR_LIGHTS] = DirectionalLight[MAX_DIR_LIGHTS](DirectionalLight(vec4(1.0), vec3(0.0), 1.0, 1.0));
 uniform PointLight u_PointLights[MAX_POINT_LIGHTS] = PointLight[MAX_POINT_LIGHTS](PointLight(vec4(1.0), vec3(0.0), 1.0, 1.0, 50.0, 100.0, 1.0, 0.09, 0.032));
 
-// Functions
-float GetLightSpecularFactor(vec3 normal, vec3 norm_light_dir, float light_specular_strength)
-{
-	vec3 view_dir = normalize(u_ViewPos - v_FragPos);
-	vec3 halfway_dir = normalize(norm_light_dir + view_dir);
+// --- Functions Declaration ---
+vec3 CalculateCookTorranceSpecular(vec3 F0, vec3 V, vec3 N, vec3 light_dir, float roughness, float NdotV, inout float NdotL, inout vec3 F);
+vec3 CalculateLambertDiffuse(vec3 F, float metallic, vec3 albedo_color);
 
-	//vec3 reflect_dir = reflect(-norm_light_dir, normal); //phong
-	//return pow(max(dot(view_dir, reflect_dir), 0.0), v_Shininess);
-	return pow(max(dot(normal, halfway_dir), 0.0), v_Shininess) * v_SpecularStrength * light_specular_strength; // blinn-phong
-}
+vec3 FresnelSchlick(float cos_theta, vec3 F0);
+float DistributionGGX(vec3 N, vec3 H, float roughness);
+float GeometrySchlickGGX(float NdotV, float roughness);
+float GeometrySmith(float NdotV, float NdotL, float roughness);
 
 
-// - Main -
+// --- Main ---
 void main()
 {
-	// - Normal Vec -
-	vec3 normal = texture(u_Textures[int(v_NormTexIndex)], v_TexCoord).rgb;
-    normal = normal * 2.0 - 1.0;
-	normal.z *= v_NormalStrength;
-	normal = normalize(v_TBN * normal);
-
-	// - Ligting Calculations -
-	vec3 lighting_result = vec3(0.0);
+	// PBR Variables
+	float metallic = 0.1, roughness = 0.25, ao = 1.0;
+	vec4 albedo = texture(u_Textures[int(v_TexIndex)], v_TexCoord) * v_Color;
 	vec3 specular_map = texture(u_Textures[int(v_SpecTexIndex)], v_TexCoord).rgb;
+	vec3 F0 = mix(vec3(0.04), albedo.rgb, metallic);
 
+	// Normal Calculation
+	vec3 normal = texture(u_Textures[int(v_NormTexIndex)], v_TexCoord).xyz * 2.0 - 1.0;
+	normal.z *= v_NormalStrength;
+
+	// Lighting Calculations
+	vec3 N = normalize(v_TBN * normal);
+	vec3 V = normalize(u_ViewPos - v_FragPos);
+	float NdotL, NdotV = max(dot(N, V), 0.0);
+
+	vec3 F, L0 = vec3(0.0);
+	vec3 lighting_result = vec3(0.0);
+	
 	// Directional Lights
 	for(int i = 0; i < u_DirectionalLightsNum; ++i)
 	{
-		vec3 light_dir = normalize(u_DirectionalLights[i].Direction);
-		vec3 radiance = u_DirectionalLights[i].Radiance.rgb;
+		vec3 dir = normalize(u_DirectionalLights[i].Direction);
+		vec3 radiance = u_DirectionalLights[i].Radiance.rgb * u_DirectionalLights[i].Intensity;
 
-		vec3 diffuse_component = radiance * max(dot(normal, light_dir), 0.0);																	// diffuse_factor * light_color
-		vec3 specular_component = radiance * specular_map * GetLightSpecularFactor(normal, light_dir, u_DirectionalLights[i].SpecularStrength);	// specular_factor * light_color
+		vec3 ck_specular = CalculateCookTorranceSpecular(F0, V, N, dir, roughness, NdotV, NdotL, F) * u_DirectionalLights[i].SpecularStrength;
+		vec3 lambert_diffuse = CalculateLambertDiffuse(F, metallic, albedo.rgb);
 
-		lighting_result += ((diffuse_component + specular_component) * u_DirectionalLights[i].Intensity);
+		L0 += (lambert_diffuse + ck_specular) * radiance * NdotL;
 	}
-	
+		
 	// Point Lights
 	for(int i = 0; i < u_PointLightsNum; ++i)
 	{
-		// Values Calculation
-		vec3 dist = u_PointLights[i].Position - v_FragPos;
-		float dist_scalar = length(dist);
+		vec3 dir = u_PointLights[i].Position - v_FragPos;
+		float dist = length(dir);
 
 		// If outside radius, continue with next light
-		if(dist_scalar > u_PointLights[i].MaxRadius)
+		if(dist > u_PointLights[i].MaxRadius)
 			continue;
 
-		// Lighting Result Calculation
-		vec3 light_dir = normalize(dist);
-		vec3 radiance = u_PointLights[i].Radiance.rgb;
-
-		vec3 diffuse_component = radiance * max(dot(normal, light_dir), 0.0);																// diffuse_factor * light_color
-		vec3 specular_component = radiance * specular_map * GetLightSpecularFactor(normal, light_dir, u_PointLights[i].SpecularStrength);	// specular_factor * light_color
-
 		// External Attenuation (from MinRad to MaxRad)
-		float outer_attenuation = 1.0;
-		if(dist_scalar > u_PointLights[i].MinRadius && dist_scalar <= u_PointLights[i].MaxRadius)
-		{
-			float diff_rad = u_PointLights[i].MaxRadius - u_PointLights[i].MinRadius;
-			float diff_d = dist_scalar - u_PointLights[i].MinRadius;
-			outer_attenuation = 1.0 - (diff_d/diff_rad);
-		}
+		//float outer_attenuation = 1.0;
+		//if(dist > u_PointLights[i].MinRadius && dist <= u_PointLights[i].MaxRadius)
+		//{
+		//	float diff_rad = u_PointLights[i].MaxRadius - u_PointLights[i].MinRadius;
+		//	float diff_d = dist - u_PointLights[i].MinRadius;
+		//	outer_attenuation = 1.0 - (diff_d/diff_rad);
+		//}
 
-		// Light Own Attenuation (within MinRad)
-		float linear_att = u_PointLights[i].AttL * dist_scalar;
-		float quadratic_att = u_PointLights[i].AttQ * (dist_scalar*dist_scalar);
-		float attenuation = (1.0 / (1.0 + linear_att + quadratic_att)) * u_PointLights[i].FalloffFactor;
+		// Light Attenuation (within MinRad)
+		//float falloff = 1.0 - pow(dist/u_PointLights[i].MinRadius, 4.0);
+		//falloff = falloff*falloff;
+		//float attenuation = falloff/(dist*dist + 1.0);
 
-		// Lighting Result
-		lighting_result += ((diffuse_component + specular_component) * attenuation * outer_attenuation * u_PointLights[i].Intensity);
+		//float attenuation = (1.0/(dist*dist)) * u_PointLights[i].FalloffFactor;
+		vec3 radiance = u_PointLights[i].Radiance.rgb * u_PointLights[i].Intensity;// * attenuation;
+
+		vec3 ck_specular = CalculateCookTorranceSpecular(F0, V, N, dir, roughness, NdotV, NdotL, F) * u_PointLights[i].SpecularStrength;
+		vec3 lambert_diffuse = CalculateLambertDiffuse(F, metallic, albedo.rgb);
+
+		L0 += (lambert_diffuse + ck_specular) * radiance * NdotL;
 	}
 	
-	// - Final Color Output Calculation (scene_color*light*object_color*texture) -
-	color = texture(u_Textures[int(v_TexIndex)], v_TexCoord) * vec4(lighting_result, 1.0) * v_Color;
+	// Final Result Calculation (scene_color*object_color*ao + light) + ToneMapping/GammaCorrection
+	vec3 result = u_SceneColor * albedo.rgb * ao + L0;
+	result = result/(result + vec3(1.0));
+	result = pow(result, vec3(1.0/2.2));
 
-	// - Color Output 2, Entity ID float value for Mouse Picking -
+
+	// Color Outputs, Final Color & Entity ID float value for Mouse Picking
+	color = vec4(result, albedo.a);
 	color2 = v_EntityID;
+}
+
+
+
+// --- Functions Definition ---
+vec3 CalculateCookTorranceSpecular(vec3 F0, vec3 V, vec3 N, vec3 light_dir, float roughness, float NdotV, inout float NdotL, inout vec3 F)
+{
+	vec3 L = normalize(light_dir);
+	vec3 H = normalize(V + L);
+	NdotL = max(dot(N, L), 0.0);
+
+	float NDF = DistributionGGX(N, H, roughness);
+	float G = GeometrySmith(NdotV, NdotL, roughness);
+	F = FresnelSchlick(clamp(dot(H, V), 0.0, 1.0), F0);
+
+	vec3 ret = (NDF*G*F)/max(4.0 * NdotV * NdotL, 0.001);
+	return ret;
+}
+
+vec3 CalculateLambertDiffuse(vec3 F, float metallic, vec3 albedo_color)
+{
+	vec3 kD = vec3(1.0) - F; // F would be "Ks" part of the integral
+	kD *= (1.0 - metallic);
+	return kD*albedo_color/PI;
+}
+
+
+vec3 FresnelSchlick(float cos_theta, vec3 F0)
+{
+	return F0 + (1.0 - F0) * pow(max(1.0 - cos_theta, 0.0), 5.0);
+}
+
+float DistributionGGX(vec3 N, vec3 H, float roughness)
+{
+	float a = roughness*roughness;
+	float a_sq = a*a;
+	float NdotH = max(dot(N, H), 0.0);
+	float NdotH_sq = NdotH*NdotH;
+
+	float denom = (NdotH_sq * (a_sq - 1.0) + 1.0);
+	return a_sq/max((PI*denom*denom), 0.0000001);
+}
+
+float GeometrySchlickGGX(float NdotV, float roughness)
+{
+	float r = roughness + 1.0;
+	float k = (r*r)/8.0;
+	float denom = NdotV * (1.0-k) + k;
+	return NdotV/denom;
+}
+
+float GeometrySmith(float NdotV, float NdotL, float roughness)
+{
+	float ggx2 = GeometrySchlickGGX(NdotV, roughness);
+	float ggx1 = GeometrySchlickGGX(NdotL, roughness);
+	return ggx1 * ggx2;
 }
