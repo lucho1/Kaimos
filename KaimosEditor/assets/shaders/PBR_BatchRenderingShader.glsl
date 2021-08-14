@@ -134,8 +134,7 @@ void main()
 	// PBR Variables
 	float metallic = 0.1, roughness = 0.25, ao = 1.0;
 	vec4 albedo = texture(u_Textures[int(v_TexIndex)], v_TexCoord) * v_Color;
-	vec3 specular_map = texture(u_Textures[int(v_SpecTexIndex)], v_TexCoord).rgb;
-	vec3 F0 = mix(vec3(0.04), albedo.rgb, metallic);
+	//vec3 specular_map = texture(u_Textures[int(v_SpecTexIndex)], v_TexCoord).rgb;
 
 	// Normal Calculation
 	vec3 normal = texture(u_Textures[int(v_NormTexIndex)], v_TexCoord).xyz * 2.0 - 1.0;
@@ -146,8 +145,8 @@ void main()
 	vec3 V = normalize(u_ViewPos - v_FragPos);
 	float NdotL, NdotV = max(dot(N, V), 0.0);
 
-	vec3 F, L0 = vec3(0.0);
-	vec3 lighting_result = vec3(0.0);
+	vec3 F, F0 = mix(vec3(0.04), albedo.rgb, metallic);
+	vec3 L0 = vec3(0.0);
 	
 	// Directional Lights
 	for(int i = 0; i < u_DirectionalLightsNum; ++i)
