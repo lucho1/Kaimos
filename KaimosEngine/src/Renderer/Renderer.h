@@ -42,6 +42,8 @@ namespace Kaimos {
 		static void SetSceneColor(const glm::vec3& color);
 		static const uint GetMaxDirLights();
 		static const uint GetMaxPointLights();
+		static bool IsSceneInPBRPipeline();
+		static void SetPBRPipeline(bool pbr_pipeline);
 
 
 		// --- Event Methods ---

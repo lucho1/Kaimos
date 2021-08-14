@@ -25,8 +25,8 @@ namespace Kaimos {
 	public:
 
 		// --- Public Class Methods ---
-		Scene();
-		Scene(const std::string& name);
+		Scene(bool pbr_pipeline);
+		Scene(const std::string& name, bool pbr_pipeline);
 		~Scene() = default;
 
 		// --- Public Scene Methods ---

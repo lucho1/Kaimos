@@ -38,16 +38,18 @@ namespace Kaimos {
 
 
 	// ----------------------- Public Class Methods -------------------------------------------------------
-	Scene::Scene()
+	Scene::Scene(bool pbr_pipeline)
 	{
 		m_PrimaryCamera = {};
 		Renderer::SetSceneColor(glm::vec3(1.0f));
+		Renderer::SetPBRPipeline(pbr_pipeline);
 	}
 
-	Scene::Scene(const std::string& name) : m_Name(name)
+	Scene::Scene(const std::string& name, bool pbr_pipeline) : m_Name(name)
 	{
 		m_PrimaryCamera = {};
 		Renderer::SetSceneColor(glm::vec3(1.0f));
+		Renderer::SetPBRPipeline(pbr_pipeline);
 	}
 	
 

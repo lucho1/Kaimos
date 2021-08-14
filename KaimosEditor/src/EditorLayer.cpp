@@ -219,6 +219,7 @@ namespace Kaimos {
 		static bool show_uidemo = false;
 		
 		// -- Upper Menu Tab Bar --
+		bool open_new_scenepopup = false;
 		if (ImGui::BeginMenuBar())
 		{
 			if (ImGui::BeginMenu("File"))
@@ -227,7 +228,7 @@ namespace Kaimos {
 					Application::Get().GetWindow().SetFullscreen(fullscreen);
 
 				if (ImGui::MenuItem("New", "Ctrl+N"))
-					NewScene();
+					open_new_scenepopup = true;
 
 				if (ImGui::MenuItem("Open...", "Ctrl+O"))
 					OpenScene();
@@ -264,6 +265,15 @@ namespace Kaimos {
 			ImGui::EndMenuBar();
 		}
 		
+		// New Scene Popup
+		if (open_new_scenepopup)
+		{
+			ImGui::OpenPopup("Create Scene");
+			open_new_scenepopup = false;
+		}
+
+		NewSceneScreen();
+
 		ImGui::End();
 
 		// -- Demo Window --
@@ -597,7 +607,7 @@ namespace Kaimos {
 		switch (ev.GetKeyCode())
 		{
 			case KEY::N:
-				if (control_pressed) NewScene();
+				if (control_pressed) NewSceneScreen();
 				break;
 			case KEY::O:
 				if (control_pressed) OpenScene();
@@ -633,11 +643,70 @@ namespace Kaimos {
 
 	
 	// ----------------------- Private Editor Methods -----------------------------------------------------
-	void EditorLayer::NewScene(bool set_viewport)
+	void EditorLayer::NewSceneScreen()
+	{
+		if (ImGui::BeginPopupModal("Create Scene", NULL, ImGuiWindowFlags_NoResize))
+		{
+			static char scene_name[128] = "";
+			ImGui::Text("Choose a Name for the new Scene:");
+			ImGui::PushItemWidth(ImGui::GetContentRegionAvailWidth());
+			bool entered_scene = ImGui::InputTextWithHint("###SceneNameInputTxt", "Scene Name", scene_name, IM_ARRAYSIZE(scene_name), ImGuiInputTextFlags_CharsNoBlank | ImGuiInputTextFlags_AutoSelectAll | ImGuiInputTextFlags_EnterReturnsTrue);
+			ImGui::PopItemWidth();
+
+			ImGui::Text("Scene Render Pipeline");
+			static int render_pipeline = 1;
+			ImGui::PushItemWidth(ImGui::GetContentRegionAvailWidth());
+			ImGui::Combo("###scenerenderpipeline", &render_pipeline, "Non-PBR\0PBR\0\0");
+
+			ImGui::NewLine();
+			if (ImGui::Button("Create", ImVec2(55.0f, 28.25f)) || entered_scene)
+				ImGui::OpenPopup("Scene Created");
+
+			bool close_popup = false, closing_warn = false;
+			if (ImGui::BeginPopupModal("Scene Created", NULL, ImGuiWindowFlags_NoResize))
+			{
+				const std::string scene_name_str = scene_name;
+				if (scene_name_str.empty())
+				{
+					ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "A Scene without name cannot be created!");
+					ImGui::NewLine(); ImGui::SameLine(ImGui::GetWindowSize().x / 2.0f - 47.0f / 2.0f);
+					if (closing_warn = (ImGui::Button("Close") || ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Enter)) || ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Escape))))
+						ImGui::CloseCurrentPopup();
+				}
+				else
+				{
+					ImGui::Text("Scene '%s' Created", scene_name);
+					ImGui::NewLine(); ImGui::NewLine();
+					ImGui::SameLine(ImGui::GetWindowSize().x / 2.0f - 47.0f / 2.0f);
+					if (ImGui::Button("Close") || ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Enter)) && !entered_scene || ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Escape)))
+					{
+						close_popup = true;
+						ImGui::CloseCurrentPopup();
+						NewScene(true, render_pipeline, scene_name_str);
+						memset(scene_name, 0, sizeof(scene_name));
+					}
+				}
+
+				ImGui::EndPopup();
+			}
+
+			ImGui::SameLine(ImGui::GetWindowSize().x - 75.0f);
+			if (ImGui::Button("Cancel") || close_popup || ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Escape)) && !closing_warn)
+			{
+				ImGui::CloseCurrentPopup();
+				memset(scene_name, 0, sizeof(scene_name));
+			}
+
+			ImGui::EndPopup();
+		}
+	}
+
+	void EditorLayer::NewScene(bool set_viewport, bool pbr_scene, const std::string& name)
 	{
 		m_KMEPanel.UnsetGraphToModify();
-		m_CurrentScene = CreateRef<Scene>();
+		m_CurrentScene = name.empty() ? CreateRef<Scene>(pbr_scene) : CreateRef<Scene>(name, pbr_scene);
 		m_ScenePanel.SetContext(m_CurrentScene);
+
 		if(set_viewport)
 			m_CurrentScene->SetViewportSize((uint)m_ViewportSize.x, (uint)m_ViewportSize.y);
 	}

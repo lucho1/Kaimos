@@ -22,6 +22,7 @@ namespace Kaimos {
 		glm::mat4 ViewProjectionMatrix = glm::mat4(1.0f);
 		glm::vec3 SceneColor = glm::vec3(1.0f);
 		const uint MaxDirLights = 10, MaxPointLights = 100;
+		bool PBR_Pipeline = false;
 		
 		// Shaders & Materials
 		ShaderLibrary Shaders;
@@ -284,6 +285,17 @@ namespace Kaimos {
 	const uint Renderer::GetMaxPointLights()
 	{
 		return s_RendererData->MaxPointLights;
+	}
+
+	bool Renderer::IsSceneInPBRPipeline()
+	{
+		return s_RendererData->PBR_Pipeline;
+	}
+
+	void Renderer::SetPBRPipeline(bool pbr_pipeline)
+	{
+		s_RendererData->PBR_Pipeline = pbr_pipeline;
+		// Set Materials PBR Bool
 	}
 
 	Ref<Shader> Renderer::GetShader(const std::string& name)

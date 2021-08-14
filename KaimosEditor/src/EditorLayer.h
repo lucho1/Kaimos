@@ -42,7 +42,9 @@ namespace Kaimos {
 		bool OnMouseScrolled(MouseScrolledEvent& ev);
 
 		// --- Private Editor Methods ---
-		void NewScene(bool set_viewport = true);
+		void NewSceneScreen();
+
+		void NewScene(bool set_viewport = true, bool pbr_scene = true, const std::string& name = ""); // pbr true, viewport true, name ""
 		void OpenScene();
 		void SaveScene();
 		void SaveSceneAs();
