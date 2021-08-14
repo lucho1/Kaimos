@@ -26,13 +26,9 @@ out mat3 v_TBN;
 out vec2 v_TexCoord;
 out vec4 v_Color;
 
-out flat float v_Shininess;
-out flat float v_NormalStrength;
-out flat float v_SpecularStrength;
+out flat float v_Shininess, v_NormalStrength, v_SpecularStrength;
+out flat float v_TexIndex, v_NormTexIndex, v_SpecTexIndex;
 
-out flat float v_TexIndex;
-out flat float v_NormTexIndex;
-out flat float v_SpecTexIndex;
 out flat int v_EntityID;
 
 // --- Uniforms ---
@@ -55,6 +51,7 @@ void main()
 	v_TexIndex = a_TexIndex;
 	v_NormTexIndex = a_NormTexIndex;
 	v_SpecTexIndex = a_SpecTexIndex;
+	
 	v_EntityID = a_EntityID;
 
 	// TBN Matrix Calculation (for normal mapping)
@@ -83,13 +80,9 @@ in mat3 v_TBN;
 in vec2 v_TexCoord;
 in vec4 v_Color;
 
-in flat float v_Shininess;
-in flat float v_NormalStrength;
-in flat float v_SpecularStrength;
+in flat float v_Shininess, v_NormalStrength, v_SpecularStrength;
+in flat float v_TexIndex, v_NormTexIndex, v_SpecTexIndex;
 
-in flat float v_TexIndex;
-in flat float v_NormTexIndex;
-in flat float v_SpecTexIndex;
 in flat int v_EntityID;
 
 // --- Light Structs ---

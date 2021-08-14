@@ -58,7 +58,7 @@ namespace Kaimos {
 		SetSceneParameters(false);
 
 		SceneSerializer m_Serializer(m_CurrentScene);
-		m_Serializer.Deserialize("assets/scenes/PBRScene.kaimos");
+		m_Serializer.Deserialize("assets/scenes/PBRSphereTest.kaimos");
 		m_KMEPanel = MaterialEditorPanel(m_CurrentScene);
 		m_ScenePanel = ScenePanel(m_CurrentScene, &m_KMEPanel);
 	}

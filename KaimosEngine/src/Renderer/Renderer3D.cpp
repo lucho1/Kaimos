@@ -25,13 +25,18 @@ namespace Kaimos {
 		uint IndicesDrawCount = 0;
 		uint IndicesCurrentOffset = 0;
 		std::vector<uint> Indices;
+		Ref<IndexBuffer> IBuffer			= nullptr;
 
 		NonPBRVertex* NonPBR_VBufferBase	= nullptr;
 		NonPBRVertex* NonPBR_VBufferPtr		= nullptr;
 
-		Ref<VertexArray> VArray				= nullptr;
-		Ref<IndexBuffer> IBuffer			= nullptr;
+		PBRVertex* PBR_VBufferBase			= nullptr;
+		PBRVertex* PBR_VBufferPtr			= nullptr;
+
 		Ref<VertexBuffer> VBuffer			= nullptr;
+		Ref<VertexArray> VArray				= nullptr;
+		Ref<VertexBuffer> PBRVBuffer		= nullptr;
+		Ref<VertexArray> PBRVArray			= nullptr;
 	};
 
 	static Renderer3DData* s_3DData = nullptr;	// On shutdown, this is deleted, and ~VertexArray() called, freeing GPU Memory too
@@ -63,15 +68,20 @@ namespace Kaimos {
 		KS_TRACE("Initializing 3D Renderer");
 		s_3DData = new Renderer3DData();
 
-		// -- Vertex Buffer & Array --
+		// -- Vertex, Index Buffers & Array --
 		const uint max_vertices = s_3DData->MaxFaces * 4;
 
 		s_3DData->NonPBR_VBufferBase = new NonPBRVertex[max_vertices];
 		s_3DData->VArray = VertexArray::Create();
 		s_3DData->VBuffer = VertexBuffer::Create(max_vertices * sizeof(NonPBRVertex));
 
-		// -- Vertex Layout & Index Buffer Creation --
+		s_3DData->PBR_VBufferBase = new PBRVertex[max_vertices];
+		s_3DData->PBRVArray = VertexArray::Create();
+		s_3DData->PBRVBuffer = VertexBuffer::Create(max_vertices * sizeof(PBRVertex));
+
 		s_3DData->IBuffer = IndexBuffer::Create(s_3DData->MaxIndices);
+
+		// -- Vertex Layout & Index Buffer Creation --
 		BufferLayout non_pbr_layout = {
 			{ SHADER_DATATYPE::FLOAT3,	"a_Position" },
 			{ SHADER_DATATYPE::FLOAT3,	"a_Normal" },
@@ -99,12 +109,12 @@ namespace Kaimos {
 			{ SHADER_DATATYPE::FLOAT ,	"a_NormTexIndex" },
 			{ SHADER_DATATYPE::INT ,	"a_EntityID" },
 
-			{ SHADER_DATATYPE::FLOAT ,	"a_Roughness" },
-			{ SHADER_DATATYPE::FLOAT ,	"a_Metallic" },
-			{ SHADER_DATATYPE::FLOAT ,	"a_AmbientOcclussionValue" },
-			{ SHADER_DATATYPE::FLOAT ,	"a_MetalTexIndex" },
-			{ SHADER_DATATYPE::FLOAT ,	"a_RoughTexIndex" },
-			{ SHADER_DATATYPE::FLOAT ,	"a_AOTexIndex" }
+			{ SHADER_DATATYPE::FLOAT,	"a_Roughness" },
+			{ SHADER_DATATYPE::FLOAT,	"a_Metallic" },
+			{ SHADER_DATATYPE::FLOAT,	"a_AmbientOcclusionValue" },
+			{ SHADER_DATATYPE::FLOAT,	"a_MetalTexIndex" },
+			{ SHADER_DATATYPE::FLOAT,	"a_RoughTexIndex" },
+			{ SHADER_DATATYPE::FLOAT,	"a_AOTexIndex" }
 		};
 
 		// -- Vertex Array Filling --
@@ -112,9 +122,16 @@ namespace Kaimos {
 		s_3DData->VArray->AddVertexBuffer(s_3DData->VBuffer);
 		s_3DData->VArray->SetIndexBuffer(s_3DData->IBuffer);
 
-		// -- Arrays Unbinding & Indices Deletion --
 		s_3DData->VArray->Unbind();
 		s_3DData->VBuffer->Unbind();
+
+		s_3DData->PBRVBuffer->SetLayout(pbr_layout);
+		s_3DData->PBRVArray->AddVertexBuffer(s_3DData->PBRVBuffer);
+		s_3DData->PBRVArray->SetIndexBuffer(s_3DData->IBuffer);
+
+		// -- Arrays Unbinding & Indices Deletion --
+		s_3DData->PBRVArray->Unbind();
+		s_3DData->PBRVBuffer->Unbind();
 		s_3DData->IBuffer->Unbind();
 	}
 
@@ -125,6 +142,7 @@ namespace Kaimos {
 		// This is deleted here (manually), and not treated as smart pointer, waiting for the end of the program lifetime
 		// because there is still some code of the graphics (OpenGL) that it has to run to free VRAM (for ex. deleting VArrays, Shaders...)
 		delete[] s_3DData->NonPBR_VBufferBase;
+		delete[] s_3DData->PBR_VBufferBase;
 		delete s_3DData;
 	}
 
@@ -134,7 +152,7 @@ namespace Kaimos {
 	void Renderer3D::BeginScene()
 	{
 		KS_PROFILE_FUNCTION();
-		s_3DData->VArray->Bind();
+		Renderer::IsSceneInPBRPipeline() ? s_3DData->PBRVArray->Bind() : s_3DData->VArray->Bind();
 		StartBatch();
 	}
 
@@ -155,15 +173,28 @@ namespace Kaimos {
 		if (s_3DData->IndicesDrawCount == 0)
 			return;
 
+		// -- Set Index Buffer Data --
+		s_3DData->IBuffer->SetData(s_3DData->Indices.data(), s_3DData->Indices.size());
+
 		// -- Set Vertex Buffer Data --
 		// Data cast: uint8_t = 1 byte large, subtraction give elements in terms of bytes
-		uint v_data_size = (uint)((uint8_t*)s_3DData->NonPBR_VBufferPtr - (uint8_t*)s_3DData->NonPBR_VBufferBase);
-		s_3DData->VBuffer->SetData(s_3DData->NonPBR_VBufferBase, v_data_size);
-		s_3DData->IBuffer->SetData(s_3DData->Indices.data(), s_3DData->Indices.size());
+		Ref<VertexArray> v_array = nullptr;
+		if (Renderer::IsSceneInPBRPipeline())
+		{
+			uint v_data_size = (uint)((uint8_t*)s_3DData->PBR_VBufferPtr - (uint8_t*)s_3DData->PBR_VBufferBase);
+			s_3DData->PBRVBuffer->SetData(s_3DData->PBR_VBufferBase, v_data_size);
+			v_array = s_3DData->PBRVArray;
+		}
+		else
+		{
+			uint v_data_size = (uint)((uint8_t*)s_3DData->NonPBR_VBufferPtr - (uint8_t*)s_3DData->NonPBR_VBufferBase);
+			s_3DData->VBuffer->SetData(s_3DData->NonPBR_VBufferBase, v_data_size);
+			v_array = s_3DData->VArray;
+		}
 
 		// -- Bind Textures & Draw Vertex Array --
 		Renderer::BindTextures();
-		RenderCommand::DrawIndexed(s_3DData->VArray, s_3DData->IndicesDrawCount);
+		RenderCommand::DrawIndexed(v_array, s_3DData->IndicesDrawCount);
 		++s_3DData->RendererStats.DrawCalls;
 	}
 
@@ -172,8 +203,12 @@ namespace Kaimos {
 		KS_PROFILE_FUNCTION();
 		s_3DData->IndicesDrawCount = 0;
 		s_3DData->IndicesCurrentOffset = 0;
-		s_3DData->NonPBR_VBufferPtr = s_3DData->NonPBR_VBufferBase;
 		s_3DData->Indices.clear();
+		
+		if(Renderer::IsSceneInPBRPipeline())
+			s_3DData->PBR_VBufferPtr = s_3DData->PBR_VBufferBase;
+		else
+			s_3DData->NonPBR_VBufferPtr = s_3DData->NonPBR_VBufferBase;
 	}
 
 	void Renderer3D::NextBatch()
@@ -183,6 +218,20 @@ namespace Kaimos {
 		StartBatch();
 	}
 
+	void Renderer3D::SetBaseVertexData(Vertex* dynamic_vertex, const Vertex& mesh_vertex, const glm::mat4& transform, const Ref<Material>& material, uint albedo_ix, uint norm_ix, uint ent_id)
+	{
+		dynamic_vertex->Pos = transform * glm::vec4(mesh_vertex.Pos, 1.0f);
+		dynamic_vertex->Normal = glm::normalize(glm::vec3(transform * glm::vec4(mesh_vertex.Normal, 0.0f)));
+		dynamic_vertex->Tangent = glm::normalize(glm::vec3(transform * glm::vec4(mesh_vertex.Tangent, 0.0f)));
+		dynamic_vertex->TexCoord = mesh_vertex.TexCoord;
+		
+		dynamic_vertex->Color = material->Color;
+		dynamic_vertex->Bumpiness = material->Bumpiness;
+		
+		dynamic_vertex->TexIndex = albedo_ix;
+		dynamic_vertex->NormTexIndex = norm_ix;
+		dynamic_vertex->EntityID = ent_id;
+	}
 
 
 	// ----------------------- Public Drawing Methods -----------------------------------------------------
@@ -201,13 +250,6 @@ namespace Kaimos {
 			if (!material)
 				KS_FATAL_ERROR("Tried to Render a Mesh with a null Material!");
 
-			Renderer::CheckMaterialFitsInBatch(material, &NextBatch);
-
-			// -- Get Texture indexex --
-			uint texture_index = Renderer::GetTextureIndex(material->GetTexture(), false, &NextBatch);
-			uint normal_texture_index = Renderer::GetTextureIndex(material->GetNormalTexture(), true, &NextBatch);
-			uint specular_texture_index = Renderer::GetTextureIndex(material->GetSpecularTexture(), false, &NextBatch);
-
 			// -- Update Mesh Timed Vertices --
 			static float accumulated_dt = 0.0f;
 			accumulated_dt += dt.GetMilliseconds();
@@ -217,28 +259,52 @@ namespace Kaimos {
 				accumulated_dt = 0.0f;
 			}
 
+			// -- Get Texture indexes --
+			bool pbr = Renderer::IsSceneInPBRPipeline();
+			Renderer::CheckMaterialFitsInBatch(material, &NextBatch);
+
+			uint tex_ix, norm_ix, spec_ix, met_ix, rough_ix, ao_ix;
+			tex_ix = Renderer::GetTextureIndex(material->GetTexture(), false, &NextBatch);
+			norm_ix = Renderer::GetTextureIndex(material->GetNormalTexture(), true, &NextBatch);
+
+			if (pbr)
+			{
+				met_ix = 0;
+				rough_ix = 0;
+				ao_ix = 0;
+			}
+			else
+				spec_ix = Renderer::GetTextureIndex(material->GetSpecularTexture(), false, &NextBatch);
+
 			// -- Setup Vertex Array & Vertex Attributes --
 			for (uint i = 0; i < mesh->m_Vertices.size(); ++i)
 			{
 				// Set the vertex data
 				Vertex& mesh_vertex = mesh_component.ModifiedVertices[i];
+				if (pbr)
+				{
+					SetBaseVertexData(s_3DData->PBR_VBufferPtr, mesh_vertex, transform, material, tex_ix, norm_ix, entity_id);
 
-				s_3DData->NonPBR_VBufferPtr->Pos = transform * glm::vec4(mesh_vertex.Pos, 1.0f);
-				s_3DData->NonPBR_VBufferPtr->Normal = glm::normalize(glm::vec3(transform * glm::vec4(mesh_vertex.Normal, 0.0f)));
-				s_3DData->NonPBR_VBufferPtr->Tangent = glm::normalize(glm::vec3(transform * glm::vec4(mesh_vertex.Tangent, 0.0f)));
-				s_3DData->NonPBR_VBufferPtr->TexCoord = mesh_vertex.TexCoord;
+					s_3DData->PBR_VBufferPtr->Roughness = material->Roughness;
+					s_3DData->PBR_VBufferPtr->Metallic = material->Metallic;
+					s_3DData->PBR_VBufferPtr->AmbientOcc = material->AmbientOcclusion;
 
-				s_3DData->NonPBR_VBufferPtr->Color = material->Color;
-				s_3DData->NonPBR_VBufferPtr->Shininess = material->Smoothness * 256.0f;
-				s_3DData->NonPBR_VBufferPtr->Bumpiness = material->Bumpiness;
-				s_3DData->NonPBR_VBufferPtr->Specularity = material->Specularity;
+					s_3DData->PBR_VBufferPtr->MetalTexIndex = met_ix;
+					s_3DData->PBR_VBufferPtr->RoughTexIndex = rough_ix;
+					s_3DData->PBR_VBufferPtr->AOTexIndex = ao_ix;
 
-				s_3DData->NonPBR_VBufferPtr->TexIndex = texture_index;
-				s_3DData->NonPBR_VBufferPtr->NormTexIndex = normal_texture_index;
-				s_3DData->NonPBR_VBufferPtr->SpecTexIndex = specular_texture_index;
-				s_3DData->NonPBR_VBufferPtr->EntityID = entity_id;
+					++s_3DData->PBR_VBufferPtr;
+				}
+				else
+				{
+					SetBaseVertexData(s_3DData->NonPBR_VBufferPtr, mesh_vertex, transform, material, tex_ix, norm_ix, entity_id);
 
-				++s_3DData->NonPBR_VBufferPtr;
+					s_3DData->NonPBR_VBufferPtr->Shininess = material->Smoothness * 256.0f;
+					s_3DData->NonPBR_VBufferPtr->Specularity = material->Specularity;
+					s_3DData->NonPBR_VBufferPtr->SpecTexIndex = spec_ix;
+
+					++s_3DData->NonPBR_VBufferPtr;
+				}
 			}
 
 			// -- Setup Index Buffer --

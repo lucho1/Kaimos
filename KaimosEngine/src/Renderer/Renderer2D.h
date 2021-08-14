@@ -8,6 +8,8 @@
 
 namespace Kaimos {
 
+	class Material;
+
 	struct SpriteRendererComponent;
 	struct QuadVertex
 	{
@@ -71,6 +73,8 @@ namespace Kaimos {
 		static void Flush();
 		static void StartBatch();
 		static void NextBatch();
+
+		static void SetBaseVertexData(QuadVertex* dynamic_vertex, const QuadVertex& quad_vertex, const glm::mat4& transform, const Ref<Material>& material, uint albedo_ix, uint norm_ix, uint ent_id);
 
 		// --- Renderer Statistics ---
 		struct Statistics

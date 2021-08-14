@@ -145,9 +145,16 @@ namespace Kaimos::MaterialEditor {
 		Ref<NodeInputPin> m_VertexNormalPin = nullptr;
 		Ref<NodeInputPin> m_TextureCoordinatesPin = nullptr;
 		Ref<NodeInputPin> m_ColorPin = nullptr;
+		Ref<NodeInputPin> m_BumpinessPin = nullptr;
+
+		// Non-PBR Values 
 		Ref<NodeInputPin> m_SmoothnessPin = nullptr;
 		Ref<NodeInputPin> m_SpecularityPin = nullptr;
-		Ref<NodeInputPin> m_BumpinessPin = nullptr;
+
+		// PBR Values
+		Ref<NodeInputPin> m_RoughnessPin = nullptr;
+		Ref<NodeInputPin> m_MetallicPin = nullptr;
+		Ref<NodeInputPin> m_AmbientOcclusionPin = nullptr;
 	};
 
 

@@ -74,7 +74,8 @@ namespace Kaimos {
 
 		// --- Public Variables ---
 		glm::vec4 Color = glm::vec4(1.0f);
-		float Smoothness = 0.5f, Bumpiness = 1.0f, Specularity = 1.0f;
+		float Smoothness = 0.5f, Bumpiness = 1.0f, Specularity = 1.0f; // Non-PBR Values
+		float Roughness = 0.5f, Metallic = 0.5f, AmbientOcclusion = 0.5f; // PBR Values
 		bool InPBRPipeline = false;
 
 	private:

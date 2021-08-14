@@ -161,18 +161,28 @@ namespace Kaimos::MaterialEditor {
 		m_VertexNormalPin =			CreateRef<NodeInputPin>(this, PinDataType::VEC3, false, "Vertex Normal (Vec3)");
 		m_TextureCoordinatesPin =	CreateRef<NodeInputPin>(this, PinDataType::VEC2, false, "Texture Coordinates (Vec2)");
 		m_ColorPin =				CreateRef<NodeInputPin>(this, PinDataType::VEC4, false, "Color (Vec4)", 1.0f);
+		m_BumpinessPin =			CreateRef<NodeInputPin>(this, PinDataType::FLOAT, false, "Bumpiness (Float)", 1.0f);
+		
 		m_SmoothnessPin =			CreateRef<NodeInputPin>(this, PinDataType::FLOAT, false, "Smoothness (Float)", 0.5f);
 		m_SpecularityPin =			CreateRef<NodeInputPin>(this, PinDataType::FLOAT, false, "Specularity (Float)", 1.0f);
-		m_BumpinessPin =			CreateRef<NodeInputPin>(this, PinDataType::FLOAT, false, "Bumpiness (Float)", 1.0f);
+
+		m_RoughnessPin =			CreateRef<NodeInputPin>(this, PinDataType::FLOAT, false, "Roughness (Float)", 0.5f);
+		m_MetallicPin =				CreateRef<NodeInputPin>(this, PinDataType::FLOAT, false, "Metallic (Float)", 0.5f);
+		m_AmbientOcclusionPin =		CreateRef<NodeInputPin>(this, PinDataType::FLOAT, false, "Ambient Occlusion (Float)", 0.2f);
 		
 
 		m_NodeInputPins.push_back(m_VertexPositionPin);
 		m_NodeInputPins.push_back(m_VertexNormalPin);
 		m_NodeInputPins.push_back(m_TextureCoordinatesPin);
 		m_NodeInputPins.push_back(m_ColorPin);
+		m_NodeInputPins.push_back(m_BumpinessPin);
+
 		m_NodeInputPins.push_back(m_SmoothnessPin);
 		m_NodeInputPins.push_back(m_SpecularityPin);
-		m_NodeInputPins.push_back(m_BumpinessPin);
+
+		m_NodeInputPins.push_back(m_RoughnessPin);
+		m_NodeInputPins.push_back(m_MetallicPin);
+		m_NodeInputPins.push_back(m_AmbientOcclusionPin);
 	}
 
 
@@ -186,6 +196,9 @@ namespace Kaimos::MaterialEditor {
 		m_SmoothnessPin.reset();
 		m_SpecularityPin.reset();
 		m_BumpinessPin.reset();
+		m_RoughnessPin.reset();
+		m_MetallicPin.reset();
+		m_AmbientOcclusionPin.reset();
 	}
 
 
@@ -215,6 +228,12 @@ namespace Kaimos::MaterialEditor {
 				m_SpecularityPin = pin;
 			else if (pin_name == "Bumpiness (Float)")
 				m_BumpinessPin = pin;
+			else if (pin_name == "Roughness (Float)")
+				m_RoughnessPin = pin;
+			else if (pin_name == "Metallic (Float)")
+				m_MetallicPin = pin;
+			else if (pin_name == "Ambient Occlusion (Float)")
+				m_AmbientOcclusionPin = pin;
 		}
 	}
 
@@ -262,9 +281,27 @@ namespace Kaimos::MaterialEditor {
 		ImGui::NewLine();
 		m_ColorPin->DrawUI(set_node_draggable, false, true, m_AttachedMaterial->Color);
 
-		glm::vec4 smoothness_vec = glm::vec4(m_AttachedMaterial->Smoothness);
-		m_SmoothnessPin->DrawUI(set_node_draggable, false, true, smoothness_vec, 0.01f, 0.01f, 4.0f, "%.2f");
-		m_AttachedMaterial->Smoothness = smoothness_vec.x;
+		bool PBR_Pipeline = Renderer::IsSceneInPBRPipeline();
+		if (PBR_Pipeline)
+		{
+			glm::vec4 roughness_vec = glm::vec4(m_AttachedMaterial->Roughness);
+			m_RoughnessPin->DrawUI(set_node_draggable, false, true, roughness_vec, 0.01f, 0.02f, 1.0f, "%.2f");
+			m_AttachedMaterial->Roughness = roughness_vec.x;
+		
+			glm::vec4 metallic_vec = glm::vec4(m_AttachedMaterial->Metallic);
+			m_MetallicPin->DrawUI(set_node_draggable, false, true, metallic_vec, 0.01f, 0.01f, 1.0f, "%.2f");
+			m_AttachedMaterial->Metallic = metallic_vec.x;
+		
+			glm::vec4 ao_vec = glm::vec4(m_AttachedMaterial->AmbientOcclusion);
+			m_AmbientOcclusionPin->DrawUI(set_node_draggable, false, true, ao_vec, 0.01f, 0.0f, 1.0f, "%.2f");
+			m_AttachedMaterial->AmbientOcclusion = ao_vec.x;
+		}
+		else
+		{
+			glm::vec4 smoothness_vec = glm::vec4(m_AttachedMaterial->Smoothness);
+			m_SmoothnessPin->DrawUI(set_node_draggable, false, true, smoothness_vec, 0.01f, 0.01f, 4.0f, "%.2f");
+			m_AttachedMaterial->Smoothness = smoothness_vec.x;
+		}		
 
 		uint id = m_AttachedMaterial->GetTexture() == nullptr ? 0 : m_AttachedMaterial->GetTexture()->GetTextureID();
 		ImGui::Text("Texture");
@@ -360,51 +397,54 @@ namespace Kaimos::MaterialEditor {
 
 
 		// -- Draw Specular Texture "Input" (Button) & Pins --
-		ImGui::NewLine();
-		glm::vec4 specularity_vec = glm::vec4(m_AttachedMaterial->Specularity);
-		m_SpecularityPin->DrawUI(set_node_draggable, false, true, specularity_vec, 0.01f, 0.01f, FLT_MAX, "%.2f");
-		m_AttachedMaterial->Specularity = specularity_vec.x;
-
-		uint spec_id = m_AttachedMaterial->GetSpecularTexture() == nullptr ? 0 : m_AttachedMaterial->GetSpecularTexture()->GetTextureID();
-		ImGui::Text("Specular");
-		ImGui::SameLine(65.0f);
-		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { 0.0f, 0.0f });
-
-		if (KaimosUI::UIFunctionalities::DrawTexturedButton("###mtspectexture_btn", spec_id, glm::vec2(50.0f), glm::vec3(0.1f)))
+		if (!PBR_Pipeline)
 		{
-			std::string texture_file = FileDialogs::OpenFile("Texture (*.png;*.jpg)\0*.png;*.jpg\0PNG Texture (*.png)\0*.png\0JPG Texture (*.jpg)\0*.jpg\0");
-			if (!texture_file.empty())
-				m_AttachedMaterial->SetSpecularTexture(texture_file);
-		}
+			ImGui::NewLine();
+			glm::vec4 specularity_vec = glm::vec4(m_AttachedMaterial->Specularity);
+			m_SpecularityPin->DrawUI(set_node_draggable, false, true, specularity_vec, 0.01f, 0.01f, FLT_MAX, "%.2f");
+			m_AttachedMaterial->Specularity = specularity_vec.x;
 
-		KaimosUI::UIFunctionalities::PopButton(false);
+			uint spec_id = m_AttachedMaterial->GetSpecularTexture() == nullptr ? 0 : m_AttachedMaterial->GetSpecularTexture()->GetTextureID();
+			ImGui::Text("Specular");
+			ImGui::SameLine(65.0f);
+			ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { 0.0f, 0.0f });
 
-		ImGui::PushID(2);
-		ImGui::SameLine();
-		if (KaimosUI::UIFunctionalities::DrawColoredButton("X", { 20.0f, 50.0f }, glm::vec3(0.15f), true))
-			m_AttachedMaterial->RemoveSpecularTexture();
+			if (KaimosUI::UIFunctionalities::DrawTexturedButton("###mtspectexture_btn", spec_id, glm::vec2(50.0f), glm::vec3(0.1f)))
+			{
+				std::string texture_file = FileDialogs::OpenFile("Texture (*.png;*.jpg)\0*.png;*.jpg\0PNG Texture (*.png)\0*.png\0JPG Texture (*.jpg)\0*.jpg\0");
+				if (!texture_file.empty())
+					m_AttachedMaterial->SetSpecularTexture(texture_file);
+			}
 
-		KaimosUI::UIFunctionalities::PopButton(true);
-		ImGui::PopID();
-		ImGui::PopStyleVar();
+			KaimosUI::UIFunctionalities::PopButton(false);
 
-		if (m_AttachedMaterial->HasSpecular())
-		{
-			std::string tex_path = m_AttachedMaterial->GetSpecularTexturePath();
-			std::string tex_name = tex_path;
+			ImGui::PushID(2);
+			ImGui::SameLine();
+			if (KaimosUI::UIFunctionalities::DrawColoredButton("X", { 20.0f, 50.0f }, glm::vec3(0.15f), true))
+				m_AttachedMaterial->RemoveSpecularTexture();
 
-			if (!tex_path.empty())
-				tex_name = tex_path.substr(tex_path.find_last_of("/\\" + 1, tex_path.size() - 1) + 1);
+			KaimosUI::UIFunctionalities::PopButton(true);
+			ImGui::PopID();
+			ImGui::PopStyleVar();
 
-			float text_pos = 100.0f - ImGui::CalcTextSize(tex_name.c_str()).x * 0.5f;
-			ImGui::Indent(text_pos);
-			ImGui::Text("%s", tex_name.c_str());
-			ImGui::Indent(-text_pos);
+			if (m_AttachedMaterial->HasSpecular())
+			{
+				std::string tex_path = m_AttachedMaterial->GetSpecularTexturePath();
+				std::string tex_name = tex_path;
 
-			char texture_info[24];
-			sprintf_s(texture_info, 24, "%ix%i (ID %i)", m_AttachedMaterial->GetSpecularTexture()->GetWidth(), m_AttachedMaterial->GetSpecularTexture()->GetHeight(), spec_id);
-			text_pos = 100.0f - ImGui::CalcTextSize(texture_info).x * 0.5f;
-			ImGui::Indent(text_pos); ImGui::Text(texture_info); ImGui::Indent(-text_pos);
+				if (!tex_path.empty())
+					tex_name = tex_path.substr(tex_path.find_last_of("/\\" + 1, tex_path.size() - 1) + 1);
+
+				float text_pos = 100.0f - ImGui::CalcTextSize(tex_name.c_str()).x * 0.5f;
+				ImGui::Indent(text_pos);
+				ImGui::Text("%s", tex_name.c_str());
+				ImGui::Indent(-text_pos);
+
+				char texture_info[24];
+				sprintf_s(texture_info, 24, "%ix%i (ID %i)", m_AttachedMaterial->GetSpecularTexture()->GetWidth(), m_AttachedMaterial->GetSpecularTexture()->GetHeight(), spec_id);
+				text_pos = 100.0f - ImGui::CalcTextSize(texture_info).x * 0.5f;
+				ImGui::Indent(text_pos); ImGui::Text(texture_info); ImGui::Indent(-text_pos);
+			}
 		}
 		
 
@@ -431,6 +471,10 @@ namespace Kaimos::MaterialEditor {
 		m_SmoothnessPin->SetInputValue(glm::vec4(m_AttachedMaterial->Smoothness));
 		m_SpecularityPin->SetInputValue(glm::vec4(m_AttachedMaterial->Specularity));
 		m_BumpinessPin->SetInputValue(glm::vec4(m_AttachedMaterial->Bumpiness));
+
+		m_RoughnessPin->SetInputValue(glm::vec4(m_AttachedMaterial->Roughness));
+		m_MetallicPin->SetInputValue(glm::vec4(m_AttachedMaterial->Metallic));
+		m_AmbientOcclusionPin->SetInputValue(glm::vec4(m_AttachedMaterial->AmbientOcclusion));
 	}
 
 	void MainMaterialNode::SyncMaterialValues()
@@ -439,6 +483,10 @@ namespace Kaimos::MaterialEditor {
 		m_AttachedMaterial->Smoothness = m_SmoothnessPin->GetValue().x;
 		m_AttachedMaterial->Specularity = m_SpecularityPin->GetValue().x;
 		m_AttachedMaterial->Bumpiness = m_BumpinessPin->GetValue().x;
+
+		m_AttachedMaterial->Roughness = m_RoughnessPin->GetValue().x;
+		m_AttachedMaterial->Metallic = m_MetallicPin->GetValue().x;
+		m_AttachedMaterial->AmbientOcclusion = m_AmbientOcclusionPin->GetValue().x;
 	}
 
 	void MainMaterialNode::SerializeNode(YAML::Emitter& output_emitter) const

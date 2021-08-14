@@ -8,6 +8,8 @@
 
 namespace Kaimos {
 
+	class Material;
+
 	struct MeshRendererComponent;
 	struct Vertex
 	{
@@ -69,6 +71,8 @@ namespace Kaimos {
 		static void Flush();
 		static void StartBatch();
 		static void NextBatch();
+
+		static void SetBaseVertexData(Vertex* dynamic_vertex, const Vertex& mesh_vertex, const glm::mat4& transform, const Ref<Material>& material, uint albedo_ix, uint norm_ix, uint ent_id);
 
 	private:
 

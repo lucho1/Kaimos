@@ -15,12 +15,12 @@ layout(location = 7) in float a_NormTexIndex;
 layout(location = 8) in int a_EntityID;
 
 // PBR Attributes
-layout(location = 12) in float a_Roughness;
-layout(location = 13) in float a_Metallic;
-layout(location = 14) in float a_AmbientOcclussionValue;
-layout(location = 15) in float a_MetalTexIndex;
-layout(location = 16) in float a_RoughTexIndex;
-layout(location = 17) in float a_AOTexIndex;
+layout(location = 9) in float a_Roughness;
+layout(location = 10) in float a_Metallic;
+layout(location = 11) in float a_AmbientOcclusionValue;
+layout(location = 12) in float a_MetalTexIndex;
+layout(location = 13) in float a_RoughTexIndex;
+layout(location = 14) in float a_AOTexIndex;
 
 
 // --- Varyings ---
@@ -29,9 +29,8 @@ out mat3 v_TBN;
 out vec2 v_TexCoord;
 out vec4 v_Color;
 
-out flat float v_NormalStrength;
-out flat float v_TexIndex;
-out flat float v_NormTexIndex;
+out flat float v_NormalStrength, v_Roughness, v_Metallic, v_AmbientOcclusionValue;
+out flat float v_TexIndex, v_NormTexIndex, v_MetalTexIndex, v_RoughTexIndex, v_AOTexIndex;
 
 out flat int v_EntityID;
 
@@ -47,9 +46,16 @@ void main()
 	v_TexCoord = a_TexCoord;
 	v_Color = a_Color;
 
-	v_NormalStrength = a_NormalStrength; 
+	v_NormalStrength = a_NormalStrength;
+	v_Roughness = a_Roughness;
+	v_Metallic = a_Metallic;
+	v_AmbientOcclusionValue = a_AmbientOcclusionValue;
+
 	v_TexIndex = a_TexIndex;
 	v_NormTexIndex = a_NormTexIndex;
+	v_MetalTexIndex = a_MetalTexIndex;
+	v_RoughTexIndex = a_RoughTexIndex;
+	v_AOTexIndex = a_AOTexIndex;
 	
 	v_EntityID = a_EntityID;
 
@@ -82,9 +88,8 @@ in mat3 v_TBN;
 in vec2 v_TexCoord;
 in vec4 v_Color;
 
-in flat float v_NormalStrength;
-in flat float v_TexIndex;
-in flat float v_NormTexIndex;
+in flat float v_NormalStrength, v_Roughness, v_Metallic, v_AmbientOcclusionValue;
+in flat float v_TexIndex, v_NormTexIndex, v_MetalTexIndex, v_RoughTexIndex, v_AOTexIndex;
 
 in flat int v_EntityID;
 
@@ -131,7 +136,6 @@ float GeometrySmith(float NdotV, float NdotL, float roughness);
 void main()
 {
 	// PBR Variables
-	float metallic = 0.1, roughness = 0.25, ao = 1.0;
 	vec4 albedo = texture(u_Textures[int(v_TexIndex)], v_TexCoord) * v_Color;
 
 	// Normal Calculation
@@ -143,7 +147,7 @@ void main()
 	vec3 V = normalize(u_ViewPos - v_FragPos);
 	float NdotL, NdotV = max(dot(N, V), 0.0);
 
-	vec3 F, F0 = mix(vec3(0.04), albedo.rgb, metallic);
+	vec3 F, F0 = mix(vec3(0.04), albedo.rgb, v_Metallic);
 	vec3 L0 = vec3(0.0);
 	
 	// Directional Lights
@@ -152,8 +156,8 @@ void main()
 		vec3 dir = normalize(u_DirectionalLights[i].Direction);
 		vec3 radiance = u_DirectionalLights[i].Radiance.rgb * u_DirectionalLights[i].Intensity;
 
-		vec3 ck_specular = CalculateCookTorranceSpecular(F0, V, N, dir, roughness, NdotV, NdotL, F) * u_DirectionalLights[i].SpecularStrength;
-		vec3 lambert_diffuse = CalculateLambertDiffuse(F, metallic, albedo.rgb);
+		vec3 ck_specular = CalculateCookTorranceSpecular(F0, V, N, dir, v_Roughness, NdotV, NdotL, F) * u_DirectionalLights[i].SpecularStrength;
+		vec3 lambert_diffuse = CalculateLambertDiffuse(F, v_Metallic, albedo.rgb);
 
 		L0 += (lambert_diffuse + ck_specular) * radiance * NdotL;
 	}
@@ -185,14 +189,14 @@ void main()
 		//float attenuation = (1.0/(dist*dist)) * u_PointLights[i].FalloffFactor;
 		vec3 radiance = u_PointLights[i].Radiance.rgb * u_PointLights[i].Intensity;// * attenuation;
 
-		vec3 ck_specular = CalculateCookTorranceSpecular(F0, V, N, dir, roughness, NdotV, NdotL, F) * u_PointLights[i].SpecularStrength;
-		vec3 lambert_diffuse = CalculateLambertDiffuse(F, metallic, albedo.rgb);
+		vec3 ck_specular = CalculateCookTorranceSpecular(F0, V, N, dir, v_Roughness, NdotV, NdotL, F) * u_PointLights[i].SpecularStrength;
+		vec3 lambert_diffuse = CalculateLambertDiffuse(F, v_Metallic, albedo.rgb);
 
 		L0 += (lambert_diffuse + ck_specular) * radiance * NdotL;
 	}
 	
 	// Final Result Calculation (scene_color*object_color*ao + light) + ToneMapping/GammaCorrection
-	vec3 result = u_SceneColor * albedo.rgb * ao + L0;
+	vec3 result = u_SceneColor * albedo.rgb * v_AmbientOcclusionValue + L0;
 	result = result/(result + vec3(1.0));
 	result = pow(result, vec3(1.0/2.2));
 
