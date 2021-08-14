@@ -3,10 +3,8 @@
 
 #include "Foundations/RenderCommand.h"
 #include "Resources/Buffer.h"
-#include "Resources/Shader.h"
 #include "Resources/Mesh.h"
 #include "Resources/Material.h"
-#include "Resources/Light.h"
 
 #include "Core/Resources/ResourceManager.h"
 #include "Scene/ECS/Components.h"
@@ -112,55 +110,11 @@ namespace Kaimos {
 
 
 	// ----------------------- Public Renderer Methods ----------------------------------------------------
-	void Renderer3D::BeginScene(const glm::mat4& view_projection_matrix, const glm::vec3& camera_pos, const std::vector<std::pair<Ref<Light>, glm::vec3>>& dir_lights, const std::vector<std::pair<Ref<PointLight>, glm::vec3>>& point_lights)
+	void Renderer3D::BeginScene()
 	{
 		KS_PROFILE_FUNCTION();
-
-		Ref<Shader> shader = Renderer::GetShader("PBR_BatchedShader");
-		if (shader)
-		{
-			s_3DData->VArray->Bind();
-			shader->Bind();
-			shader->SetUMat4("u_ViewProjection", view_projection_matrix);
-			shader->SetUFloat3("u_ViewPos", camera_pos);
-			shader->SetUFloat3("u_SceneColor", Renderer::GetSceneColor());
-
-			uint max_dir_lights = Renderer::GetMaxDirLights();
-			uint dir_lights_size = dir_lights.size() >= max_dir_lights ? max_dir_lights : dir_lights.size();
-			shader->SetUInt("u_DirectionalLightsNum", dir_lights_size);
-
-			for (uint i = 0; i < dir_lights_size; ++i)
-			{
-				std::string light_array_uniform = "u_DirectionalLights[" + std::to_string(i) + "].";
-				shader->SetUFloat4(light_array_uniform + "Radiance", dir_lights[i].first->Radiance);
-				shader->SetUFloat3(light_array_uniform + "Direction", dir_lights[i].second);
-				shader->SetUFloat(light_array_uniform + "Intensity", dir_lights[i].first->Intensity);
-				shader->SetUFloat(light_array_uniform + "SpecularStrength", dir_lights[i].first->SpecularStrength);
-			}
-
-			uint max_point_lights = Renderer::GetMaxPointLights();
-			uint point_lights_size = point_lights.size() >= max_point_lights ? max_point_lights : point_lights.size();
-			shader->SetUInt("u_PointLightsNum", point_lights_size);
-
-			for (uint i = 0; i < point_lights_size; ++i)
-			{
-				std::string light_array_uniform = "u_PointLights[" + std::to_string(i) + "].";
-				shader->SetUFloat4(light_array_uniform + "Radiance", point_lights[i].first->Radiance);
-				shader->SetUFloat3(light_array_uniform + "Position", point_lights[i].second);
-				shader->SetUFloat(light_array_uniform + "Intensity", point_lights[i].first->Intensity);
-				shader->SetUFloat(light_array_uniform + "SpecularStrength", point_lights[i].first->SpecularStrength);
-
-				shader->SetUFloat(light_array_uniform + "MinRadius", point_lights[i].first->GetMinRadius());
-				shader->SetUFloat(light_array_uniform + "MaxRadius", point_lights[i].first->GetMaxRadius());
-				shader->SetUFloat(light_array_uniform + "FalloffFactor", point_lights[i].first->FalloffMultiplier);
-				shader->SetUFloat(light_array_uniform + "AttL", point_lights[i].first->GetLinearAttenuationFactor());
-				shader->SetUFloat(light_array_uniform + "AttQ", point_lights[i].first->GetQuadraticAttenuationFactor());
-			}
-
-			StartBatch();
-		}
-		else
-			KS_FATAL_ERROR("Renderer3D: Tried to Render with a null Shader!");
+		s_3DData->VArray->Bind();
+		StartBatch();
 	}
 
 	void Renderer3D::EndScene()

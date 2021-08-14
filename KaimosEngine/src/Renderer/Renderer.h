@@ -11,6 +11,9 @@ namespace Kaimos {
 	class Shader;
 	class Texture2D;
 
+	class Light;
+	class PointLight;
+
 	class Renderer // TODO: I should review what does this does and see how it is used, because is very similar to Renderer2D
 	{
 	public:
@@ -21,7 +24,7 @@ namespace Kaimos {
 		static void Shutdown();
 
 		// --- Public Renderer Methods ---
-		static void BeginScene(const Camera& camera);
+		static void BeginScene(const glm::mat4& view_projection_matrix, const glm::vec3& camera_pos, const std::vector<std::pair<Ref<Light>, glm::vec3>>& dir_lights, const std::vector<std::pair<Ref<PointLight>, glm::vec3>>& point_lights);
 		static void EndScene();
 
 		static void Submit(const Ref<Shader>& shader, const Ref<VertexArray>& vertex_array, const glm::mat4& transformation = glm::mat4(1.0f));
@@ -51,9 +54,6 @@ namespace Kaimos {
 
 	public:
 
-		// --- Public Renderer Shaders Methods ---
-		static Ref<Shader> GetShader(const std::string& name);
-
 		// --- Public Renderer Textures Methods ---
 		static void ResetTextureSlotIndex();
 		static void BindTextures();
@@ -74,10 +74,12 @@ namespace Kaimos {
 
 	private:
 
-		// --- Private Renderer Materials Methods ---
+		// --- Private Renderer Materials & Shaders Methods ---
 		inline static bool MaterialExists(uint material_id);
 		static void CreateDefaultMaterial(uint default_mat_id = 0);
 		static Ref<Material> CreateMaterialWithID(uint material_id, const std::string& name);
+
+		static Ref<Shader> GetShader(const std::string& name);
 	};
 }
 

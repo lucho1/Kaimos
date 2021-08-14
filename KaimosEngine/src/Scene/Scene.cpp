@@ -94,7 +94,8 @@ namespace Kaimos {
 		std::vector<std::pair<Ref<PointLight>, glm::vec3>> plights = GetScenePointLights();
 
 		glm::mat4 view_proj = camera.GetViewProjection();
-		scene3D ? Renderer3D::BeginScene(view_proj, camera_pos, dir_lights, plights) : Renderer2D::BeginScene(view_proj, camera_pos, dir_lights, plights);
+		Renderer::BeginScene(view_proj, camera_pos, dir_lights, plights);
+		scene3D ? Renderer3D::BeginScene() : Renderer2D::BeginScene();
 	}
 
 	void Scene::BeginScene(const CameraComponent& camera_component, const TransformComponent& transform_component, bool scene3D)
@@ -103,7 +104,8 @@ namespace Kaimos {
 		std::vector<std::pair<Ref<PointLight>, glm::vec3>> plights = GetScenePointLights();
 
 		glm::mat4 view_proj = camera_component.Camera.GetProjection() * glm::inverse(transform_component.GetTransform());
-		scene3D ? Renderer3D::BeginScene(view_proj, transform_component.Translation, dir_lights, plights) : Renderer2D::BeginScene(view_proj, transform_component.Translation, dir_lights, plights);
+		Renderer::BeginScene(view_proj, transform_component.Translation, dir_lights, plights);
+		scene3D ? Renderer3D::BeginScene() : Renderer2D::BeginScene();
 	}
 
 	void Scene::RenderSprites(Timestep dt)

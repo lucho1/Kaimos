@@ -8,13 +8,7 @@
 
 namespace Kaimos {
 
-	class Light;
-	class PointLight;
-
-	struct TransformComponent;
-	struct CameraComponent;
 	struct MeshRendererComponent;
-
 	struct Vertex
 	{
 		// --- Vertex Variables ---
@@ -46,7 +40,7 @@ namespace Kaimos {
 		static void Shutdown();
 
 		// --- Public Renderer Methods ---
-		static void BeginScene(const glm::mat4& view_projection_matrix, const glm::vec3& camera_pos, const std::vector<std::pair<Ref<Light>, glm::vec3>>& dir_lights, const std::vector<std::pair<Ref<PointLight>, glm::vec3>>& point_lights);
+		static void BeginScene();
 		static void EndScene();
 
 		// --- Public Drawing Methods ---
