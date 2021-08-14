@@ -56,6 +56,8 @@ namespace Kaimos::MaterialEditor {
 		bool IsVertexAttributeTimed(VertexParameterNodeType vtxpm_node_type) const;
 
 		uint GetMaterialAttachedID();
+		const std::string& GetMaterialAttachedName() const;
+
 		void SyncMainNodeValuesWithMaterial();
 		void SyncMaterialValuesWithGraph();
 		void SyncVertexParameterNodes(VertexParameterNodeType vtxpm_node_type, const glm::vec4& value);

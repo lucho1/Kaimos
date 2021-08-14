@@ -13,6 +13,13 @@ namespace Kaimos {
 	void MaterialEditorPanel::OnUIRender()
 	{
 		ImGui::Begin("Kaimos Material Editor", &ShowPanel);
+
+		if (m_SetFocus)
+		{
+			ImGui::SetWindowFocus();
+			m_SetFocus = false;
+		}
+
 		if (!m_CurrentGraph)
 		{
 			ImGui::End();
@@ -21,6 +28,14 @@ namespace Kaimos {
 
 		if (ImGui::Button("Compile"))
 			m_SceneContext->UpdateMeshAndSpriteComponentsVertices(m_CurrentGraph->GetMaterialAttachedID());
+
+		if (m_CurrentGraph)
+		{
+			ImGui::SameLine();
+			ImGui::Text("Material: %s", m_CurrentGraph->GetMaterialAttachedName().c_str());
+		}
+		else
+			ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "No Material Opened");
 
 		// -- Begin Editor --
 		ImNodes::BeginNodeEditor();
@@ -202,6 +217,8 @@ namespace Kaimos {
 			LoadCurrentGraphSettings();
 			ShowPanel = true;
 		}
+
+		m_SetFocus = true;
 	}
 
 	bool MaterialEditorPanel::IsModifyingMaterialGraph(Material* material)

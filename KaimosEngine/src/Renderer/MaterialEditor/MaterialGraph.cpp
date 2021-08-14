@@ -135,6 +135,11 @@ namespace Kaimos::MaterialEditor {
 		return m_MainMatNode->m_AttachedMaterial->GetID();
 	}
 
+	const std::string& MaterialGraph::GetMaterialAttachedName() const
+	{
+		return m_MainMatNode->m_AttachedMaterial->GetName();
+	}
+
 	void MaterialGraph::SyncMainNodeValuesWithMaterial()
 	{
 		m_MainMatNode->SyncValuesWithMaterial();

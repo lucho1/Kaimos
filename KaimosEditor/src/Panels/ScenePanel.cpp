@@ -530,40 +530,41 @@ namespace Kaimos {
 					if (ImGui::BeginPopupModal("Material Creation", NULL, ImGuiWindowFlags_NoResize))
 					{
 						static char mtl_name[128] = "";
-						ImGui::Text("You are about to create a Material, Choose a Name for it:");						
+						ImGui::Text("Choose a name for the new Material:");						
 						ImGui::PushItemWidth(ImGui::GetContentRegionAvailWidth());
-						ImGui::InputTextWithHint("###MtlNameInputTxt", "Material Name", mtl_name, IM_ARRAYSIZE(mtl_name), ImGuiInputTextFlags_CharsNoBlank | ImGuiInputTextFlags_AutoSelectAll | ImGuiInputTextFlags_EnterReturnsTrue);
+						bool entered_mtl = ImGui::InputTextWithHint("###MtlNameInputTxt", "Material Name", mtl_name, IM_ARRAYSIZE(mtl_name), ImGuiInputTextFlags_CharsNoBlank | ImGuiInputTextFlags_AutoSelectAll | ImGuiInputTextFlags_EnterReturnsTrue);
 						ImGui::PopItemWidth();
 
-						//static int item = 1;
-						//ImGui::Combo("Combo", &item, "aaaa\0bbbb\0cccc\0dddd\0eeee\0\0");
-
 						ImGui::NewLine();
-						if (ImGui::Button("Create", ImVec2(55.0f, 28.25f)))
-							ImGui::OpenPopup("MaterialCreated");
+						if (ImGui::Button("Create", ImVec2(55.0f, 28.25f)) || entered_mtl)
+							ImGui::OpenPopup("Material Created");
 
-						bool close_popup = false;
-						if (ImGui::BeginPopupModal("MaterialCreated", NULL, ImGuiWindowFlags_NoResize))
+						bool close_popup = false, closing_warn = false;
+						if (ImGui::BeginPopupModal("Material Created", NULL, ImGuiWindowFlags_NoResize))
 						{
 							const std::string mtl_name_str = mtl_name;
 							if (mtl_name_str.empty())
 							{
 								ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "A Material without name cannot be created!");
-								ImGui::NewLine();
+								ImGui::NewLine(); ImGui::NewLine();
 								ImGui::SameLine(ImGui::GetWindowSize().x / 2.0f - 47.0f / 2.0f);
-								if (ImGui::Button("Close"))
+								if (closing_warn = (ImGui::Button("Close") || ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_Enter)) || ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Escape))))
 									ImGui::CloseCurrentPopup();
 							}
 							else
 							{
 								ImGui::Text("Material '%s' Created!", mtl_name);
-								ImGui::NewLine(); ImGui::NewLine();
+								ImGui::NewLine();
 								ImGui::SameLine(ImGui::GetWindowSize().x / 2.0f - 47.0f / 2.0f);
-								if (ImGui::Button("Close"))
+								if (ImGui::Button("Close") || ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Enter)) && !entered_mtl || ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Escape)))
 								{
 									close_popup = true;
 									ImGui::CloseCurrentPopup();
-									Renderer::CreateMaterial(mtl_name_str);
+									Ref<Material> mtl = Renderer::CreateMaterial(mtl_name_str);
+
+									component.SetMaterial(mtl->GetID());
+									material = mtl;
+									memset(mtl_name, 0, sizeof(mtl_name));
 								}
 							}
 
@@ -571,8 +572,11 @@ namespace Kaimos {
 						}
 						
 						ImGui::SameLine(ImGui::GetWindowSize().x - 75.0f);
-						if (ImGui::Button("Cancel") || close_popup)
+						if (ImGui::Button("Cancel") || close_popup || ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Escape)) && !closing_warn)
+						{
 							ImGui::CloseCurrentPopup();
+							memset(mtl_name, 0, sizeof(mtl_name));
+						}
 
 						ImGui::EndPopup();
 					}
@@ -715,19 +719,16 @@ namespace Kaimos {
 				if (ImGui::BeginPopupModal("Material Creation", NULL, ImGuiWindowFlags_NoResize))
 				{
 					static char mtl_name[128] = "";
-					ImGui::Text("You are about to create a Material, Choose a Name for it:");
+					ImGui::Text("Choose a Name for the new Material:");
 					ImGui::PushItemWidth(ImGui::GetContentRegionAvailWidth());
-					ImGui::InputTextWithHint("###MtlNameInputTxt", "Material Name", mtl_name, IM_ARRAYSIZE(mtl_name), ImGuiInputTextFlags_CharsNoBlank | ImGuiInputTextFlags_AutoSelectAll | ImGuiInputTextFlags_EnterReturnsTrue);
+					bool entered_mtl = ImGui::InputTextWithHint("###MtlNameInputTxt", "Material Name", mtl_name, IM_ARRAYSIZE(mtl_name), ImGuiInputTextFlags_CharsNoBlank | ImGuiInputTextFlags_AutoSelectAll | ImGuiInputTextFlags_EnterReturnsTrue);
 					ImGui::PopItemWidth();
 
-					//static int item = 1;
-					//ImGui::Combo("Combo", &item, "aaaa\0bbbb\0cccc\0dddd\0eeee\0\0");
-
 					ImGui::NewLine();
-					if (ImGui::Button("Create", ImVec2(55.0f, 28.25f)))
+					if (ImGui::Button("Create", ImVec2(55.0f, 28.25f)) || entered_mtl)
 						ImGui::OpenPopup("MaterialCreated");
 
-					bool close_popup = false;
+					bool close_popup = false, closing_warn = false;
 					if (ImGui::BeginPopupModal("MaterialCreated", NULL, ImGuiWindowFlags_NoResize))
 					{
 						const std::string mtl_name_str = mtl_name;
@@ -736,7 +737,7 @@ namespace Kaimos {
 							ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "A Material without name cannot be created!");
 							ImGui::NewLine(); ImGui::NewLine();
 							ImGui::SameLine(ImGui::GetWindowSize().x / 2.0f - 47.0f / 2.0f);
-							if (ImGui::Button("Close"))
+							if (closing_warn = (ImGui::Button("Close") || ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_Enter)) || ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Escape))))
 								ImGui::CloseCurrentPopup();
 						}
 						else
@@ -744,11 +745,15 @@ namespace Kaimos {
 							ImGui::Text("Material '%s' Created!", mtl_name);
 							ImGui::NewLine();
 							ImGui::SameLine(ImGui::GetWindowSize().x / 2.0f - 47.0f / 2.0f);
-							if (ImGui::Button("Close"))
+							if (ImGui::Button("Close") || ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Enter)) && !entered_mtl || ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Escape)))
 							{
 								close_popup = true;
 								ImGui::CloseCurrentPopup();
-								Renderer::CreateMaterial(mtl_name_str);
+								Ref<Material> mtl = Renderer::CreateMaterial(mtl_name_str);
+
+								component.SetMaterial(mtl->GetID());
+								material = mtl;
+								memset(mtl_name, 0, sizeof(mtl_name));
 							}
 						}
 
@@ -756,8 +761,11 @@ namespace Kaimos {
 					}
 
 					ImGui::SameLine(ImGui::GetWindowSize().x - 75.0f);
-					if (ImGui::Button("Cancel") || close_popup)
+					if (ImGui::Button("Cancel") || close_popup || ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Escape)) && !closing_warn)
+					{
 						ImGui::CloseCurrentPopup();
+						memset(mtl_name, 0, sizeof(mtl_name));
+					}
 
 					ImGui::EndPopup();
 				}

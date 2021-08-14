@@ -46,6 +46,8 @@ namespace Kaimos {
 		// --- Private Variables ---
 		MaterialEditor::MaterialGraph* m_CurrentGraph = nullptr;
 		Ref<Scene> m_SceneContext = nullptr;
+
+		bool m_SetFocus = false;
 	};
 }
 
