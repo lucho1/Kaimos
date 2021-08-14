@@ -54,7 +54,9 @@ namespace Kaimos {
 		m_PrimaryCameraFramebuffer = Framebuffer::Create(primcam_fbo_settings);
 
 		// -- Create & Load Scene --
-		NewScene(false);
+		m_CurrentScene = CreateRef<Scene>();
+		SetSceneParameters(false);
+
 		SceneSerializer m_Serializer(m_CurrentScene);
 		m_Serializer.Deserialize("assets/scenes/PBRScene.kaimos");
 		m_KMEPanel = MaterialEditorPanel(m_CurrentScene);
@@ -682,7 +684,9 @@ namespace Kaimos {
 					{
 						close_popup = true;
 						ImGui::CloseCurrentPopup();
-						NewScene(true, render_pipeline, scene_name_str);
+
+						m_CurrentScene = CreateRef<Scene>(scene_name_str, render_pipeline);
+						SetSceneParameters();
 						memset(scene_name, 0, sizeof(scene_name));
 					}
 				}
@@ -701,13 +705,11 @@ namespace Kaimos {
 		}
 	}
 
-	void EditorLayer::NewScene(bool set_viewport, bool pbr_scene, const std::string& name)
+	void EditorLayer::SetSceneParameters(bool set_viewport)
 	{
 		m_KMEPanel.UnsetGraphToModify();
-		m_CurrentScene = name.empty() ? CreateRef<Scene>(pbr_scene) : CreateRef<Scene>(name, pbr_scene);
 		m_ScenePanel.SetContext(m_CurrentScene);
-
-		if(set_viewport)
+		if (set_viewport)
 			m_CurrentScene->SetViewportSize((uint)m_ViewportSize.x, (uint)m_ViewportSize.y);
 	}
 
@@ -769,7 +771,9 @@ namespace Kaimos {
 		std::string filepath = FileDialogs::OpenFile("Kaimos Scene (*.kaimos)\0*.kaimos\0");
 		if (!filepath.empty() && filepath != m_CurrentScene->GetPath()) // TODO: Compare the relative paths or scenes ids/names! Requires filesystem or scene IDs
 		{
-			NewScene();
+			m_CurrentScene = CreateRef<Scene>();
+			SetSceneParameters();
+
 			SceneSerializer m_Serializer(m_CurrentScene);
 			m_Serializer.Deserialize(filepath);
 		}
