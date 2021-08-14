@@ -21,11 +21,11 @@ namespace Kaimos {
 		static const uint MaxIndices = MaxQuads * 6;
 
 		uint QuadIndicesDrawCount = 0;
-		QuadVertex* QuadVBufferBase			= nullptr;
-		QuadVertex* QuadVBufferPtr			= nullptr;
+		NonPBRQuadVertex* NonPBR_QuadVBufferBase	= nullptr;
+		NonPBRQuadVertex* NonPBR_QuadVBufferPtr		= nullptr;
 
-		Ref<VertexArray> QuadVArray			= nullptr;
-		Ref<VertexBuffer> QuadVBuffer		= nullptr;
+		Ref<VertexArray> QuadVArray					= nullptr;
+		Ref<VertexBuffer> QuadVBuffer				= nullptr;
 	};
 	
 	static Renderer2DData* s_Data = nullptr;	// On shutdown, this is deleted, and ~VertexArray() called, freeing GPU Memory too
@@ -78,29 +78,49 @@ namespace Kaimos {
 		// -- Vertex Buffer & Array --
 		const uint max_vertices = s_Data->MaxQuads * 4;
 
-		s_Data->QuadVBufferBase = new QuadVertex[max_vertices];
+		s_Data->NonPBR_QuadVBufferBase = new NonPBRQuadVertex[max_vertices];
 		s_Data->QuadVArray = VertexArray::Create();
-		s_Data->QuadVBuffer = VertexBuffer::Create(max_vertices * sizeof(QuadVertex));
+		s_Data->QuadVBuffer = VertexBuffer::Create(max_vertices * sizeof(NonPBRQuadVertex));
 
 		// -- Vertex Layout & Index Buffer Creation --
 		index_buffer = IndexBuffer::Create(quad_indices, s_Data->MaxIndices);
-		BufferLayout layout = {
+		BufferLayout non_pbr_layout = {
 			{ SHADER_DATATYPE::FLOAT3,	"a_Position" },
 			{ SHADER_DATATYPE::FLOAT3,	"a_Normal" },
 			{ SHADER_DATATYPE::FLOAT3,	"a_Tangent" },
 			{ SHADER_DATATYPE::FLOAT2,	"a_TexCoord" },
 			{ SHADER_DATATYPE::FLOAT4,	"a_Color" },
-			{ SHADER_DATATYPE::FLOAT ,	"a_Shininess" },
 			{ SHADER_DATATYPE::FLOAT ,	"a_NormalStrength" },
-			{ SHADER_DATATYPE::FLOAT ,	"a_SpecularStrength" },
 			{ SHADER_DATATYPE::FLOAT ,	"a_TexIndex" },
 			{ SHADER_DATATYPE::FLOAT ,	"a_NormTexIndex" },
-			{ SHADER_DATATYPE::FLOAT ,	"a_SpecTexIndex" },
-			{ SHADER_DATATYPE::INT ,	"a_EntityID" }
+			{ SHADER_DATATYPE::INT ,	"a_EntityID" },
+
+			{ SHADER_DATATYPE::FLOAT ,	"a_Shininess" },
+			{ SHADER_DATATYPE::FLOAT ,	"a_SpecularStrength" },
+			{ SHADER_DATATYPE::FLOAT ,	"a_SpecTexIndex" }
+		};
+
+		BufferLayout pbr_layout = {
+			{ SHADER_DATATYPE::FLOAT3,	"a_Position" },
+			{ SHADER_DATATYPE::FLOAT3,	"a_Normal" },
+			{ SHADER_DATATYPE::FLOAT3,	"a_Tangent" },
+			{ SHADER_DATATYPE::FLOAT2,	"a_TexCoord" },
+			{ SHADER_DATATYPE::FLOAT4,	"a_Color" },
+			{ SHADER_DATATYPE::FLOAT ,	"a_NormalStrength" },
+			{ SHADER_DATATYPE::FLOAT ,	"a_TexIndex" },
+			{ SHADER_DATATYPE::FLOAT ,	"a_NormTexIndex" },
+			{ SHADER_DATATYPE::INT ,	"a_EntityID" },
+
+			{ SHADER_DATATYPE::FLOAT ,	"a_Roughness" },
+			{ SHADER_DATATYPE::FLOAT ,	"a_Metallic" },
+			{ SHADER_DATATYPE::FLOAT ,	"a_AmbientOcclussionValue" },
+			{ SHADER_DATATYPE::FLOAT ,	"a_MetalTexIndex" },
+			{ SHADER_DATATYPE::FLOAT ,	"a_RoughTexIndex" },
+			{ SHADER_DATATYPE::FLOAT ,	"a_AOTexIndex" }
 		};
 
 		// -- Vertex Array Filling --
-		s_Data->QuadVBuffer->SetLayout(layout);
+		s_Data->QuadVBuffer->SetLayout(non_pbr_layout);
 		s_Data->QuadVArray->AddVertexBuffer(s_Data->QuadVBuffer);
 		s_Data->QuadVArray->SetIndexBuffer(index_buffer);
 
@@ -119,7 +139,7 @@ namespace Kaimos {
 
 		// This is deleted here (manually), and not treated as smart pointer, waiting for the end of the program lifetime
 		// because there is still some code of the graphics (OpenGL) that it has to run to free VRAM (for ex. deleting VArrays, Shaders...)
-		delete[] s_Data->QuadVBufferBase;
+		delete[] s_Data->NonPBR_QuadVBufferBase;
 		delete s_Data;
 	}
 
@@ -152,8 +172,8 @@ namespace Kaimos {
 
 		// -- Set Vertex Buffer Data --
 		// Data cast: uint8_t = 1 byte large, subtraction give elements in terms of bytes
-		uint data_size = (uint)((uint8_t*)s_Data->QuadVBufferPtr - (uint8_t*)s_Data->QuadVBufferBase);
-		s_Data->QuadVBuffer->SetData(s_Data->QuadVBufferBase, data_size);
+		uint data_size = (uint)((uint8_t*)s_Data->NonPBR_QuadVBufferPtr - (uint8_t*)s_Data->NonPBR_QuadVBufferBase);
+		s_Data->QuadVBuffer->SetData(s_Data->NonPBR_QuadVBufferBase, data_size);
 
 		// -- Bind Textures & Draw Vertex Array --
 		Renderer::BindTextures();
@@ -165,7 +185,7 @@ namespace Kaimos {
 	{
 		KS_PROFILE_FUNCTION();
 		s_Data->QuadIndicesDrawCount = 0;
-		s_Data->QuadVBufferPtr = s_Data->QuadVBufferBase;
+		s_Data->NonPBR_QuadVBufferPtr = s_Data->NonPBR_QuadVBufferBase;
 	}
 	
 	void Renderer2D::NextBatch()
@@ -212,22 +232,22 @@ namespace Kaimos {
 			QuadVertex& quad_vertex = sprite_component.QuadVertices[i];
 
 			// Set the vertex data
-			s_Data->QuadVBufferPtr->Pos = transform * glm::vec4(quad_vertex.Pos, 1.0f);
-			s_Data->QuadVBufferPtr->Normal = glm::normalize(glm::vec3(transform * glm::vec4(quad_vertex.Normal, 0.0f)));
-			s_Data->QuadVBufferPtr->Tangent = glm::normalize(glm::vec3(transform * glm::vec4(quad_vertex.Tangent, 0.0f)));
-			s_Data->QuadVBufferPtr->TexCoord = quad_vertex.TexCoord;
+			s_Data->NonPBR_QuadVBufferPtr->Pos = transform * glm::vec4(quad_vertex.Pos, 1.0f);
+			s_Data->NonPBR_QuadVBufferPtr->Normal = glm::normalize(glm::vec3(transform * glm::vec4(quad_vertex.Normal, 0.0f)));
+			s_Data->NonPBR_QuadVBufferPtr->Tangent = glm::normalize(glm::vec3(transform * glm::vec4(quad_vertex.Tangent, 0.0f)));
+			s_Data->NonPBR_QuadVBufferPtr->TexCoord = quad_vertex.TexCoord;
 
-			s_Data->QuadVBufferPtr->Color = material->Color;
-			s_Data->QuadVBufferPtr->Shininess = material->Smoothness * 256.0f;
-			s_Data->QuadVBufferPtr->Bumpiness = material->Bumpiness;
-			s_Data->QuadVBufferPtr->Specularity = material->Specularity;
+			s_Data->NonPBR_QuadVBufferPtr->Color = material->Color;
+			s_Data->NonPBR_QuadVBufferPtr->Shininess = material->Smoothness * 256.0f;
+			s_Data->NonPBR_QuadVBufferPtr->Bumpiness = material->Bumpiness;
+			s_Data->NonPBR_QuadVBufferPtr->Specularity = material->Specularity;
 
-			s_Data->QuadVBufferPtr->TexIndex = texture_index;
-			s_Data->QuadVBufferPtr->NormTexIndex = normal_texture_index;
-			s_Data->QuadVBufferPtr->SpecTexIndex = specular_texture_index;
-			s_Data->QuadVBufferPtr->EntityID = entity_id;
+			s_Data->NonPBR_QuadVBufferPtr->TexIndex = texture_index;
+			s_Data->NonPBR_QuadVBufferPtr->NormTexIndex = normal_texture_index;
+			s_Data->NonPBR_QuadVBufferPtr->SpecTexIndex = specular_texture_index;
+			s_Data->NonPBR_QuadVBufferPtr->EntityID = entity_id;
 
-			++s_Data->QuadVBufferPtr;
+			++s_Data->NonPBR_QuadVBufferPtr;
 		}
 
 		// -- Update Stats (Quad = 2 Triangles = 6 Indices) --

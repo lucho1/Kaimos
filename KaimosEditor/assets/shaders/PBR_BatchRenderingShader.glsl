@@ -7,13 +7,21 @@ layout(location = 1) in vec3 a_Normal;
 layout(location = 2) in vec3 a_Tangent;
 layout(location = 3) in vec2 a_TexCoord;
 layout(location = 4) in vec4 a_Color;
-layout(location = 5) in float a_Shininess;
-layout(location = 6) in float a_NormalStrength;
-layout(location = 7) in float a_SpecularStrength;
-layout(location = 8) in float a_TexIndex;
-layout(location = 9) in float a_NormTexIndex;
-layout(location = 10) in float a_SpecTexIndex;
-layout(location = 11) in int a_EntityID;
+
+layout(location = 5) in float a_NormalStrength;
+layout(location = 6) in float a_TexIndex;
+layout(location = 7) in float a_NormTexIndex;
+
+layout(location = 8) in int a_EntityID;
+
+// PBR Attributes
+layout(location = 12) in float a_Roughness;
+layout(location = 13) in float a_Metallic;
+layout(location = 14) in float a_AmbientOcclussionValue;
+layout(location = 15) in float a_MetalTexIndex;
+layout(location = 16) in float a_RoughTexIndex;
+layout(location = 17) in float a_AOTexIndex;
+
 
 // --- Varyings ---
 out vec3 v_FragPos;
@@ -21,13 +29,10 @@ out mat3 v_TBN;
 out vec2 v_TexCoord;
 out vec4 v_Color;
 
-out flat float v_Shininess;
 out flat float v_NormalStrength;
-out flat float v_SpecularStrength;
-
 out flat float v_TexIndex;
 out flat float v_NormTexIndex;
-out flat float v_SpecTexIndex;
+
 out flat int v_EntityID;
 
 // --- Uniforms ---
@@ -42,13 +47,10 @@ void main()
 	v_TexCoord = a_TexCoord;
 	v_Color = a_Color;
 
-	v_Shininess = a_Shininess;
-	v_TexIndex = a_TexIndex;
 	v_NormalStrength = a_NormalStrength; 
-	v_SpecularStrength = a_SpecularStrength;
-
+	v_TexIndex = a_TexIndex;
 	v_NormTexIndex = a_NormTexIndex;
-	v_SpecTexIndex = a_SpecTexIndex;
+	
 	v_EntityID = a_EntityID;
 
 	// TBN Matrix Calculation (for normal mapping)
@@ -80,13 +82,10 @@ in mat3 v_TBN;
 in vec2 v_TexCoord;
 in vec4 v_Color;
 
-in flat float v_Shininess;
 in flat float v_NormalStrength;
-in flat float v_SpecularStrength;
-
 in flat float v_TexIndex;
 in flat float v_NormTexIndex;
-in flat float v_SpecTexIndex;
+
 in flat int v_EntityID;
 
 // --- Light Structs ---
@@ -134,7 +133,6 @@ void main()
 	// PBR Variables
 	float metallic = 0.1, roughness = 0.25, ao = 1.0;
 	vec4 albedo = texture(u_Textures[int(v_TexIndex)], v_TexCoord) * v_Color;
-	//vec3 specular_map = texture(u_Textures[int(v_SpecTexIndex)], v_TexCoord).rgb;
 
 	// Normal Calculation
 	vec3 normal = texture(u_Textures[int(v_NormTexIndex)], v_TexCoord).xyz * 2.0 - 1.0;

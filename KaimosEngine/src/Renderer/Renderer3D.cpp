@@ -24,13 +24,14 @@ namespace Kaimos {
 
 		uint IndicesDrawCount = 0;
 		uint IndicesCurrentOffset = 0;
-		Vertex* VBufferBase			= nullptr;
-		Vertex* VBufferPtr			= nullptr;
 		std::vector<uint> Indices;
 
-		Ref<VertexArray> VArray		= nullptr;
-		Ref<IndexBuffer> IBuffer	= nullptr;
-		Ref<VertexBuffer> VBuffer	= nullptr;
+		NonPBRVertex* NonPBR_VBufferBase	= nullptr;
+		NonPBRVertex* NonPBR_VBufferPtr		= nullptr;
+
+		Ref<VertexArray> VArray				= nullptr;
+		Ref<IndexBuffer> IBuffer			= nullptr;
+		Ref<VertexBuffer> VBuffer			= nullptr;
 	};
 
 	static Renderer3DData* s_3DData = nullptr;	// On shutdown, this is deleted, and ~VertexArray() called, freeing GPU Memory too
@@ -65,29 +66,49 @@ namespace Kaimos {
 		// -- Vertex Buffer & Array --
 		const uint max_vertices = s_3DData->MaxFaces * 4;
 
-		s_3DData->VBufferBase = new Vertex[max_vertices];
+		s_3DData->NonPBR_VBufferBase = new NonPBRVertex[max_vertices];
 		s_3DData->VArray = VertexArray::Create();
-		s_3DData->VBuffer = VertexBuffer::Create(max_vertices * sizeof(Vertex));
+		s_3DData->VBuffer = VertexBuffer::Create(max_vertices * sizeof(NonPBRVertex));
 
 		// -- Vertex Layout & Index Buffer Creation --
 		s_3DData->IBuffer = IndexBuffer::Create(s_3DData->MaxIndices);
-		BufferLayout layout = {
+		BufferLayout non_pbr_layout = {
 			{ SHADER_DATATYPE::FLOAT3,	"a_Position" },
 			{ SHADER_DATATYPE::FLOAT3,	"a_Normal" },
 			{ SHADER_DATATYPE::FLOAT3,	"a_Tangent" },
 			{ SHADER_DATATYPE::FLOAT2,	"a_TexCoord" },
 			{ SHADER_DATATYPE::FLOAT4,	"a_Color" },
-			{ SHADER_DATATYPE::FLOAT ,	"a_Shininess" },
 			{ SHADER_DATATYPE::FLOAT ,	"a_NormalStrength" },
-			{ SHADER_DATATYPE::FLOAT ,	"a_SpecularStrength" },
 			{ SHADER_DATATYPE::FLOAT ,	"a_TexIndex" },
 			{ SHADER_DATATYPE::FLOAT ,	"a_NormTexIndex" },
-			{ SHADER_DATATYPE::FLOAT ,	"a_SpecTexIndex" },
-			{ SHADER_DATATYPE::INT,		"a_EntityID" }
+			{ SHADER_DATATYPE::INT ,	"a_EntityID" },
+
+			{ SHADER_DATATYPE::FLOAT ,	"a_Shininess" },
+			{ SHADER_DATATYPE::FLOAT ,	"a_SpecularStrength" },
+			{ SHADER_DATATYPE::FLOAT ,	"a_SpecTexIndex" }
+		};
+
+		BufferLayout pbr_layout = {
+			{ SHADER_DATATYPE::FLOAT3,	"a_Position" },
+			{ SHADER_DATATYPE::FLOAT3,	"a_Normal" },
+			{ SHADER_DATATYPE::FLOAT3,	"a_Tangent" },
+			{ SHADER_DATATYPE::FLOAT2,	"a_TexCoord" },
+			{ SHADER_DATATYPE::FLOAT4,	"a_Color" },
+			{ SHADER_DATATYPE::FLOAT ,	"a_NormalStrength" },
+			{ SHADER_DATATYPE::FLOAT ,	"a_TexIndex" },
+			{ SHADER_DATATYPE::FLOAT ,	"a_NormTexIndex" },
+			{ SHADER_DATATYPE::INT ,	"a_EntityID" },
+
+			{ SHADER_DATATYPE::FLOAT ,	"a_Roughness" },
+			{ SHADER_DATATYPE::FLOAT ,	"a_Metallic" },
+			{ SHADER_DATATYPE::FLOAT ,	"a_AmbientOcclussionValue" },
+			{ SHADER_DATATYPE::FLOAT ,	"a_MetalTexIndex" },
+			{ SHADER_DATATYPE::FLOAT ,	"a_RoughTexIndex" },
+			{ SHADER_DATATYPE::FLOAT ,	"a_AOTexIndex" }
 		};
 
 		// -- Vertex Array Filling --
-		s_3DData->VBuffer->SetLayout(layout);
+		s_3DData->VBuffer->SetLayout(non_pbr_layout);
 		s_3DData->VArray->AddVertexBuffer(s_3DData->VBuffer);
 		s_3DData->VArray->SetIndexBuffer(s_3DData->IBuffer);
 
@@ -103,7 +124,7 @@ namespace Kaimos {
 
 		// This is deleted here (manually), and not treated as smart pointer, waiting for the end of the program lifetime
 		// because there is still some code of the graphics (OpenGL) that it has to run to free VRAM (for ex. deleting VArrays, Shaders...)
-		delete[] s_3DData->VBufferBase;
+		delete[] s_3DData->NonPBR_VBufferBase;
 		delete s_3DData;
 	}
 
@@ -136,8 +157,8 @@ namespace Kaimos {
 
 		// -- Set Vertex Buffer Data --
 		// Data cast: uint8_t = 1 byte large, subtraction give elements in terms of bytes
-		uint v_data_size = (uint)((uint8_t*)s_3DData->VBufferPtr - (uint8_t*)s_3DData->VBufferBase);
-		s_3DData->VBuffer->SetData(s_3DData->VBufferBase, v_data_size);
+		uint v_data_size = (uint)((uint8_t*)s_3DData->NonPBR_VBufferPtr - (uint8_t*)s_3DData->NonPBR_VBufferBase);
+		s_3DData->VBuffer->SetData(s_3DData->NonPBR_VBufferBase, v_data_size);
 		s_3DData->IBuffer->SetData(s_3DData->Indices.data(), s_3DData->Indices.size());
 
 		// -- Bind Textures & Draw Vertex Array --
@@ -151,7 +172,7 @@ namespace Kaimos {
 		KS_PROFILE_FUNCTION();
 		s_3DData->IndicesDrawCount = 0;
 		s_3DData->IndicesCurrentOffset = 0;
-		s_3DData->VBufferPtr = s_3DData->VBufferBase;
+		s_3DData->NonPBR_VBufferPtr = s_3DData->NonPBR_VBufferBase;
 		s_3DData->Indices.clear();
 	}
 
@@ -202,22 +223,22 @@ namespace Kaimos {
 				// Set the vertex data
 				Vertex& mesh_vertex = mesh_component.ModifiedVertices[i];
 
-				s_3DData->VBufferPtr->Pos = transform * glm::vec4(mesh_vertex.Pos, 1.0f);
-				s_3DData->VBufferPtr->Normal = glm::normalize(glm::vec3(transform * glm::vec4(mesh_vertex.Normal, 0.0f)));
-				s_3DData->VBufferPtr->Tangent = glm::normalize(glm::vec3(transform * glm::vec4(mesh_vertex.Tangent, 0.0f)));
-				s_3DData->VBufferPtr->TexCoord = mesh_vertex.TexCoord;
+				s_3DData->NonPBR_VBufferPtr->Pos = transform * glm::vec4(mesh_vertex.Pos, 1.0f);
+				s_3DData->NonPBR_VBufferPtr->Normal = glm::normalize(glm::vec3(transform * glm::vec4(mesh_vertex.Normal, 0.0f)));
+				s_3DData->NonPBR_VBufferPtr->Tangent = glm::normalize(glm::vec3(transform * glm::vec4(mesh_vertex.Tangent, 0.0f)));
+				s_3DData->NonPBR_VBufferPtr->TexCoord = mesh_vertex.TexCoord;
 
-				s_3DData->VBufferPtr->Color = material->Color;
-				s_3DData->VBufferPtr->Shininess = material->Smoothness * 256.0f;
-				s_3DData->VBufferPtr->Bumpiness = material->Bumpiness;
-				s_3DData->VBufferPtr->Specularity = material->Specularity;
+				s_3DData->NonPBR_VBufferPtr->Color = material->Color;
+				s_3DData->NonPBR_VBufferPtr->Shininess = material->Smoothness * 256.0f;
+				s_3DData->NonPBR_VBufferPtr->Bumpiness = material->Bumpiness;
+				s_3DData->NonPBR_VBufferPtr->Specularity = material->Specularity;
 
-				s_3DData->VBufferPtr->TexIndex = texture_index;
-				s_3DData->VBufferPtr->NormTexIndex = normal_texture_index;
-				s_3DData->VBufferPtr->SpecTexIndex = specular_texture_index;
-				s_3DData->VBufferPtr->EntityID = entity_id;
+				s_3DData->NonPBR_VBufferPtr->TexIndex = texture_index;
+				s_3DData->NonPBR_VBufferPtr->NormTexIndex = normal_texture_index;
+				s_3DData->NonPBR_VBufferPtr->SpecTexIndex = specular_texture_index;
+				s_3DData->NonPBR_VBufferPtr->EntityID = entity_id;
 
-				++s_3DData->VBufferPtr;
+				++s_3DData->NonPBR_VBufferPtr;
 			}
 
 			// -- Setup Index Buffer --

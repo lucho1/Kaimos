@@ -1,20 +1,26 @@
 #type VERTEX_SHADER
 #version 460 core
 
+// --- Attributes ---
 layout(location = 0) in vec3 a_Position;
 layout(location = 1) in vec3 a_Normal;
 layout(location = 2) in vec3 a_Tangent;
 layout(location = 3) in vec2 a_TexCoord;
 layout(location = 4) in vec4 a_Color;
-layout(location = 5) in float a_Shininess;
-layout(location = 6) in float a_NormalStrength;
-layout(location = 7) in float a_SpecularStrength;
-layout(location = 8) in float a_TexIndex;
-layout(location = 9) in float a_NormTexIndex;
-layout(location = 10) in float a_SpecTexIndex;
-layout(location = 11) in int a_EntityID;
 
-// Varyings
+layout(location = 5) in float a_NormalStrength;
+layout(location = 6) in float a_TexIndex;
+layout(location = 7) in float a_NormTexIndex;
+
+layout(location = 8) in int a_EntityID;
+
+// Non-PBR Attributes
+layout(location = 9) in float a_Shininess;
+layout(location = 10) in float a_SpecularStrength;
+layout(location = 11) in float a_SpecTexIndex;
+
+
+// --- Varyings ---
 out vec3 v_FragPos;
 out mat3 v_TBN;
 out vec2 v_TexCoord;
@@ -29,12 +35,12 @@ out flat float v_NormTexIndex;
 out flat float v_SpecTexIndex;
 out flat int v_EntityID;
 
-// Uniforms
+// --- Uniforms ---
 uniform mat4 u_ViewProjection;
 uniform vec3 u_SceneColor = vec3(1.0);
 
 
-// - Main -
+// --- Main ---
 void main()
 {
 	// Varyings Setting
@@ -43,10 +49,10 @@ void main()
 	v_Color = vec4(u_SceneColor, 1.0) * a_Color;
 
 	v_Shininess = a_Shininess;
-	v_TexIndex = a_TexIndex;
 	v_NormalStrength = a_NormalStrength; 
 	v_SpecularStrength = a_SpecularStrength;
 
+	v_TexIndex = a_TexIndex;
 	v_NormTexIndex = a_NormTexIndex;
 	v_SpecTexIndex = a_SpecTexIndex;
 	v_EntityID = a_EntityID;
@@ -71,7 +77,7 @@ void main()
 layout(location = 0) out vec4 color;
 layout(location = 1) out int color2;
 
-// Varyings
+// --- Varyings ---
 in vec3 v_FragPos;
 in mat3 v_TBN;
 in vec2 v_TexCoord;
@@ -86,7 +92,7 @@ in flat float v_NormTexIndex;
 in flat float v_SpecTexIndex;
 in flat int v_EntityID;
 
-// Light Structs
+// --- Light Structs ---
 struct DirectionalLight
 {
 	vec4 Radiance;
@@ -106,7 +112,7 @@ struct PointLight
 	float FalloffFactor, AttL, AttQ;
 };
 
-// Uniforms
+// --- Uniforms ---
 uniform vec3 u_ViewPos;
 uniform sampler2D u_Textures[32];
 
@@ -114,7 +120,7 @@ uniform const int u_DirectionalLightsNum = 0, u_PointLightsNum = 0;
 uniform DirectionalLight u_DirectionalLights[MAX_DIR_LIGHTS] = DirectionalLight[MAX_DIR_LIGHTS](DirectionalLight(vec4(1.0), vec3(0.0), 1.0, 1.0));
 uniform PointLight u_PointLights[MAX_POINT_LIGHTS] = PointLight[MAX_POINT_LIGHTS](PointLight(vec4(1.0), vec3(0.0), 1.0, 1.0, 50.0, 100.0, 1.0, 0.09, 0.032));
 
-// Functions
+// --- Functions ---
 float GetLightSpecularFactor(vec3 normal, vec3 norm_light_dir, float light_specular_strength)
 {
 	vec3 view_dir = normalize(u_ViewPos - v_FragPos);
@@ -126,7 +132,7 @@ float GetLightSpecularFactor(vec3 normal, vec3 norm_light_dir, float light_specu
 }
 
 
-// - Main -
+// --- Main ---
 void main()
 {
 	// - Normal Vec -
