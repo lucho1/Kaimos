@@ -294,8 +294,12 @@ namespace Kaimos {
 
 	void Renderer::SetPBRPipeline(bool pbr_pipeline)
 	{
-		s_RendererData->PBR_Pipeline = pbr_pipeline;
-		// Set Materials PBR Bool
+		if (s_RendererData->PBR_Pipeline != pbr_pipeline)
+		{
+			s_RendererData->PBR_Pipeline = pbr_pipeline;
+			for (auto& mat : s_RendererData->Materials)
+				mat.second->InPBRPipeline = pbr_pipeline;
+		}
 	}
 
 	Ref<Shader> Renderer::GetShader(const std::string& name)
