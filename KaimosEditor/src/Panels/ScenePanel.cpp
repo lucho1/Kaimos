@@ -582,22 +582,7 @@ namespace Kaimos {
 					}
 
 
-					// Texture Info
-					if (const Ref<Texture2D>& texture = material->GetTexture())
-					{
-						std::string tex_path = material->GetTexturePath();
-						std::string tex_name = tex_path;
-						if (!tex_path.empty())
-							tex_name = tex_path.substr(tex_path.find_last_of("/\\" + 1, tex_path.size() - 1) + 1);
-
-						ImGui::Text("Texture (ID %i):\t\t %s (%ix%i)", texture->GetTextureID(), tex_name.c_str(), texture->GetWidth(), texture->GetHeight());
-					}
-					else
-						ImGui::Text("Texture:\t\t\t\t\tNone");
-
-					// Tiling & UV Offset Info
-					glm::ivec4 col = material->Color * 255.0f;
-					ImGui::Text("Color:\t\t\t\t\t\tRGBA(%i, %i, %i, %i)", col.r, col.g, col.b, col.a);
+					// Material Info
 					ImGui::Text("Material ID:\t\t\t %i", material->GetID());
 					ImGui::Text("Material Graph ID: %i", material->GetAttachedGraphID());
 
@@ -770,22 +755,7 @@ namespace Kaimos {
 					ImGui::EndPopup();
 				}
 
-				// Texture Info
-				if (const Ref<Texture2D>& texture = material->GetTexture())
-				{
-					std::string tex_path = material->GetTexturePath();
-					std::string tex_name = tex_path;
-					if (!tex_path.empty())
-						tex_name = tex_path.substr(tex_path.find_last_of("/\\" + 1, tex_path.size() - 1) + 1);
-
-					ImGui::Text("Texture (ID %i):\t\t %s (%ix%i)", texture->GetTextureID(), tex_name.c_str(), texture->GetWidth(), texture->GetHeight());
-				}
-				else
-					ImGui::Text("Texture:\t\t\t\t\tNone");
-
-				// General Info
-				glm::ivec4 col = material->Color * 255.0f;
-				ImGui::Text("Color:\t\t\t\t\t\tRGBA(%i, %i, %i, %i)", col.r, col.g, col.b, col.a);
+				// Material Info
 				ImGui::Text("Material ID:\t\t\t %i", material->GetID());
 				ImGui::Text("Material Graph ID: %i", material->GetAttachedGraphID());
 

@@ -264,8 +264,8 @@ namespace Kaimos {
 			Renderer::CheckMaterialFitsInBatch(material, &NextBatch);
 
 			uint tex_ix, norm_ix, spec_ix, met_ix, rough_ix, ao_ix;
-			tex_ix = Renderer::GetTextureIndex(material->GetTexture(), false, &NextBatch);
-			norm_ix = Renderer::GetTextureIndex(material->GetNormalTexture(), true, &NextBatch);
+			tex_ix = Renderer::GetTextureIndex(material->GetTexture(MATERIAL_TEXTURES::ALBEDO), false, &NextBatch);
+			norm_ix = Renderer::GetTextureIndex(material->GetTexture(MATERIAL_TEXTURES::NORMAL), true, &NextBatch);
 
 			if (pbr)
 			{
@@ -274,7 +274,7 @@ namespace Kaimos {
 				ao_ix = 0;
 			}
 			else
-				spec_ix = Renderer::GetTextureIndex(material->GetSpecularTexture(), false, &NextBatch);
+				spec_ix = Renderer::GetTextureIndex(material->GetTexture(MATERIAL_TEXTURES::SPECULAR), false, &NextBatch);
 
 			// -- Setup Vertex Array & Vertex Attributes --
 			for (uint i = 0; i < mesh->m_Vertices.size(); ++i)

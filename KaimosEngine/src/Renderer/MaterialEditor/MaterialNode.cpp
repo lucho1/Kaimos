@@ -255,6 +255,35 @@ namespace Kaimos::MaterialEditor {
 	}
 
 
+
+	void MainMaterialNode::DrawTextureButton(uint tex_id, const std::string& tex_name, const std::string& ui_label, std::function<void(const std::string&)> SetTexFunc, std::function<void()> RemoveTextFunc)
+	{
+		ImGui::Text(tex_name.c_str());
+		ImGui::SameLine(65.0f);
+		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { 0.0f, 0.0f });
+
+		// Texture Btn
+		if (KaimosUI::UIFunctionalities::DrawTexturedButton(ui_label.c_str(), tex_id, glm::vec2(50.0f), glm::vec3(0.1f)))
+		{
+			std::string texture_file = FileDialogs::OpenFile("Texture (*.png;*.jpg)\0*.png;*.jpg\0PNG Texture (*.png)\0*.png\0JPG Texture (*.jpg)\0*.jpg\0");
+			if (!texture_file.empty())
+				SetTexFunc(texture_file);
+		}
+
+		KaimosUI::UIFunctionalities::PopButton(false);
+		ImGui::PushID(0);
+		ImGui::SameLine();
+
+		// "X" Btn (to remove texture)
+		if (KaimosUI::UIFunctionalities::DrawColoredButton("X", { 20.0f, 50.0f }, glm::vec3(0.15f), true))
+			RemoveTextFunc();
+
+		KaimosUI::UIFunctionalities::PopButton(true);
+		ImGui::PopID();
+		ImGui::PopStyleVar();
+	}
+
+
 	void MainMaterialNode::DrawNodeUI()
 	{
 		// -- Push Node Colors --
@@ -303,33 +332,35 @@ namespace Kaimos::MaterialEditor {
 			m_AttachedMaterial->Smoothness = smoothness_vec.x;
 		}		
 
-		uint id = m_AttachedMaterial->GetTexture() == nullptr ? 0 : m_AttachedMaterial->GetTexture()->GetTextureID();
+		uint id = m_AttachedMaterial->GetTextureID(MATERIAL_TEXTURES::ALBEDO);
+		//DrawTextureButton(id, "Albedo", "###mt_albedo_btn", &m_AttachedMaterial->SetTexture, &m_AttachedMaterial->RemoveTexture);
+
 		ImGui::Text("Texture");
 		ImGui::SameLine(65.0f);
 		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { 0.0f, 0.0f });
-
+		
 		if (KaimosUI::UIFunctionalities::DrawTexturedButton("###mttexture_btn", id, glm::vec2(50.0f), glm::vec3(0.1f)))
 		{
 			std::string texture_file = FileDialogs::OpenFile("Texture (*.png;*.jpg)\0*.png;*.jpg\0PNG Texture (*.png)\0*.png\0JPG Texture (*.jpg)\0*.jpg\0");
-
+		
 			if (!texture_file.empty())
-				m_AttachedMaterial->SetTexture(texture_file);
+				m_AttachedMaterial->SetTexture(MATERIAL_TEXTURES::ALBEDO, texture_file);
 		}
-
+		
 		KaimosUI::UIFunctionalities::PopButton(false);
-
+		
 		ImGui::PushID(0);
 		ImGui::SameLine();
 		if (KaimosUI::UIFunctionalities::DrawColoredButton("X", { 20.0f, 50.0f }, glm::vec3(0.15f), true))
-			m_AttachedMaterial->RemoveTexture();
-
+			m_AttachedMaterial->RemoveTexture(MATERIAL_TEXTURES::ALBEDO);
+		
 		KaimosUI::UIFunctionalities::PopButton(true);
 		ImGui::PopID();
 		ImGui::PopStyleVar();
 
 		if (m_AttachedMaterial->HasAlbedo())
 		{
-			std::string tex_path = m_AttachedMaterial->GetTexturePath();
+			std::string tex_path = m_AttachedMaterial->GetTextureFilepath(MATERIAL_TEXTURES::ALBEDO);
 			std::string tex_name = tex_path;
 
 			if (!tex_path.empty())
@@ -341,7 +372,7 @@ namespace Kaimos::MaterialEditor {
 			ImGui::Indent(-text_pos);
 
 			char texture_info[24];
-			sprintf_s(texture_info, 24, "%ix%i (ID %i)", m_AttachedMaterial->GetTexture()->GetWidth(), m_AttachedMaterial->GetTexture()->GetHeight(), id);
+			sprintf_s(texture_info, 24, "%ix%i (ID %i)", m_AttachedMaterial->GetTextureWidth(MATERIAL_TEXTURES::ALBEDO), m_AttachedMaterial->GetTextureHeight(MATERIAL_TEXTURES::ALBEDO), id);
 			text_pos = 100.0f - ImGui::CalcTextSize(texture_info).x * 0.5f;
 			ImGui::Indent(text_pos); ImGui::Text(texture_info); ImGui::Indent(-text_pos);
 		}
@@ -353,7 +384,9 @@ namespace Kaimos::MaterialEditor {
 		m_BumpinessPin->DrawUI(set_node_draggable, false, true, bumpiness_vec, 0.01f, 0.05f, FLT_MAX, "%.2f");
 		m_AttachedMaterial->Bumpiness = bumpiness_vec.x;
 
-		uint norm_id = m_AttachedMaterial->GetNormalTexture() == nullptr ? 0 : m_AttachedMaterial->GetNormalTexture()->GetTextureID();
+		uint norm_id = m_AttachedMaterial->GetTextureID(MATERIAL_TEXTURES::NORMAL);
+		//DrawTextureButton(id, "Normal", "###mt_normal_btn", &m_AttachedMaterial->SetNormalTexture, &m_AttachedMaterial->RemoveNormalTexture);
+		
 		ImGui::Text("Normal");
 		ImGui::SameLine(65.0f);
 		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { 0.0f, 0.0f });
@@ -362,7 +395,7 @@ namespace Kaimos::MaterialEditor {
 		{
 			std::string texture_file = FileDialogs::OpenFile("Texture (*.png;*.jpg)\0*.png;*.jpg\0PNG Texture (*.png)\0*.png\0JPG Texture (*.jpg)\0*.jpg\0");
 			if (!texture_file.empty())
-				m_AttachedMaterial->SetNormalTexture(texture_file);
+				m_AttachedMaterial->SetTexture(MATERIAL_TEXTURES::NORMAL, texture_file);
 		}
 
 		KaimosUI::UIFunctionalities::PopButton(false);
@@ -370,7 +403,7 @@ namespace Kaimos::MaterialEditor {
 		ImGui::PushID(1);
 		ImGui::SameLine();
 		if (KaimosUI::UIFunctionalities::DrawColoredButton("X", { 20.0f, 50.0f }, glm::vec3(0.15f), true))
-			m_AttachedMaterial->RemoveNormalTexture();
+			m_AttachedMaterial->RemoveTexture(MATERIAL_TEXTURES::NORMAL);
 
 		KaimosUI::UIFunctionalities::PopButton(true);
 		ImGui::PopID();
@@ -378,7 +411,7 @@ namespace Kaimos::MaterialEditor {
 
 		if (m_AttachedMaterial->HasNormal())
 		{
-			std::string tex_path = m_AttachedMaterial->GetNormalTexturePath();
+			std::string tex_path = m_AttachedMaterial->GetTextureFilepath(MATERIAL_TEXTURES::NORMAL);
 			std::string tex_name = tex_path;
 
 			if (!tex_path.empty())
@@ -390,7 +423,7 @@ namespace Kaimos::MaterialEditor {
 			ImGui::Indent(-text_pos);
 
 			char texture_info[24];
-			sprintf_s(texture_info, 24, "%ix%i (ID %i)", m_AttachedMaterial->GetNormalTexture()->GetWidth(), m_AttachedMaterial->GetNormalTexture()->GetHeight(), norm_id);
+			sprintf_s(texture_info, 24, "%ix%i (ID %i)", m_AttachedMaterial->GetTextureWidth(MATERIAL_TEXTURES::NORMAL), m_AttachedMaterial->GetTextureHeight(MATERIAL_TEXTURES::NORMAL), norm_id);
 			text_pos = 100.0f - ImGui::CalcTextSize(texture_info).x * 0.5f;
 			ImGui::Indent(text_pos); ImGui::Text(texture_info); ImGui::Indent(-text_pos);
 		}
@@ -404,7 +437,7 @@ namespace Kaimos::MaterialEditor {
 			m_SpecularityPin->DrawUI(set_node_draggable, false, true, specularity_vec, 0.01f, 0.01f, FLT_MAX, "%.2f");
 			m_AttachedMaterial->Specularity = specularity_vec.x;
 
-			uint spec_id = m_AttachedMaterial->GetSpecularTexture() == nullptr ? 0 : m_AttachedMaterial->GetSpecularTexture()->GetTextureID();
+			uint spec_id = m_AttachedMaterial->GetTextureID(MATERIAL_TEXTURES::SPECULAR);
 			ImGui::Text("Specular");
 			ImGui::SameLine(65.0f);
 			ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { 0.0f, 0.0f });
@@ -413,7 +446,7 @@ namespace Kaimos::MaterialEditor {
 			{
 				std::string texture_file = FileDialogs::OpenFile("Texture (*.png;*.jpg)\0*.png;*.jpg\0PNG Texture (*.png)\0*.png\0JPG Texture (*.jpg)\0*.jpg\0");
 				if (!texture_file.empty())
-					m_AttachedMaterial->SetSpecularTexture(texture_file);
+					m_AttachedMaterial->SetTexture(MATERIAL_TEXTURES::SPECULAR, texture_file);
 			}
 
 			KaimosUI::UIFunctionalities::PopButton(false);
@@ -421,7 +454,7 @@ namespace Kaimos::MaterialEditor {
 			ImGui::PushID(2);
 			ImGui::SameLine();
 			if (KaimosUI::UIFunctionalities::DrawColoredButton("X", { 20.0f, 50.0f }, glm::vec3(0.15f), true))
-				m_AttachedMaterial->RemoveSpecularTexture();
+				m_AttachedMaterial->RemoveTexture(MATERIAL_TEXTURES::SPECULAR);
 
 			KaimosUI::UIFunctionalities::PopButton(true);
 			ImGui::PopID();
@@ -429,7 +462,7 @@ namespace Kaimos::MaterialEditor {
 
 			if (m_AttachedMaterial->HasSpecular())
 			{
-				std::string tex_path = m_AttachedMaterial->GetSpecularTexturePath();
+				std::string tex_path = m_AttachedMaterial->GetTextureFilepath(MATERIAL_TEXTURES::SPECULAR);
 				std::string tex_name = tex_path;
 
 				if (!tex_path.empty())
@@ -441,7 +474,7 @@ namespace Kaimos::MaterialEditor {
 				ImGui::Indent(-text_pos);
 
 				char texture_info[24];
-				sprintf_s(texture_info, 24, "%ix%i (ID %i)", m_AttachedMaterial->GetSpecularTexture()->GetWidth(), m_AttachedMaterial->GetSpecularTexture()->GetHeight(), spec_id);
+				sprintf_s(texture_info, 24, "%ix%i (ID %i)", m_AttachedMaterial->GetTextureWidth(MATERIAL_TEXTURES::SPECULAR), m_AttachedMaterial->GetTextureHeight(MATERIAL_TEXTURES::SPECULAR), spec_id);
 				text_pos = 100.0f - ImGui::CalcTextSize(texture_info).x * 0.5f;
 				ImGui::Indent(text_pos); ImGui::Text(texture_info); ImGui::Indent(-text_pos);
 			}
@@ -492,9 +525,9 @@ namespace Kaimos::MaterialEditor {
 	void MainMaterialNode::SerializeNode(YAML::Emitter& output_emitter) const
 	{
 		// -- Serialize Base Node --
-		output_emitter << YAML::Key << "TextureFile" << YAML::Value << m_AttachedMaterial->GetTexturePath();
-		output_emitter << YAML::Key << "NormalTextureFile" << YAML::Value << m_AttachedMaterial->GetNormalTexturePath();
-		output_emitter << YAML::Key << "SpecularTextureFile" << YAML::Value << m_AttachedMaterial->GetSpecularTexturePath();
+		output_emitter << YAML::Key << "TextureFile" << YAML::Value << m_AttachedMaterial->GetTextureFilepath(MATERIAL_TEXTURES::ALBEDO);
+		output_emitter << YAML::Key << "NormalTextureFile" << YAML::Value << m_AttachedMaterial->GetTextureFilepath(MATERIAL_TEXTURES::NORMAL);
+		output_emitter << YAML::Key << "SpecularTextureFile" << YAML::Value << m_AttachedMaterial->GetTextureFilepath(MATERIAL_TEXTURES::SPECULAR);
 		SerializeBaseNode(output_emitter);
 	}
 

@@ -197,10 +197,10 @@ namespace Kaimos::Importers
 		mat->SyncGraphValuesWithMaterial();
 
 		if (ai_material->GetTextureCount(aiTextureType_DIFFUSE) > 0)
-			mat->SetTexture(GetMaterialTextureFilename(ai_material, aiTextureType_DIFFUSE, directory));
+			mat->SetTexture(MATERIAL_TEXTURES::ALBEDO, GetMaterialTextureFilename(ai_material, aiTextureType_DIFFUSE, directory));
 
 		if (ai_material->GetTextureCount(aiTextureType_NORMALS) > 0)
-			mat->SetNormalTexture(GetMaterialTextureFilename(ai_material, aiTextureType_NORMALS, directory));
+			mat->SetTexture(MATERIAL_TEXTURES::NORMAL, GetMaterialTextureFilename(ai_material, aiTextureType_NORMALS, directory));
 
 		// Also:
 		// aiTextureType_EMISSIVE, aiTextureType_SPECULAR, aiTextureType_HEIGHT, aiTextureType_DISPLACEMENT

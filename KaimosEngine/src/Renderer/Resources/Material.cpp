@@ -16,75 +16,123 @@ namespace Kaimos {
 
 	Material::~Material()
 	{
-		RemoveTexture();
+		RemoveTexture(MATERIAL_TEXTURES::ALBEDO);
+		RemoveTexture(MATERIAL_TEXTURES::NORMAL);
+		RemoveTexture(MATERIAL_TEXTURES::SPECULAR);
+		//RemoveTexture(MATERIAL_TEXTURES::ROUGHNESS);
+		//RemoveTexture(MATERIAL_TEXTURES::METALLIC);
+		//RemoveTexture(MATERIAL_TEXTURES::AMBIENT_OC);
+
 		if (m_AttachedGraph)
 			m_AttachedGraph.reset();
 	}
 
 
 	
+	// ----------------------- Private Texture Methods ----------------------------------------------------
+	Ref<Texture2D>& Material::GetMaterialTexture(MATERIAL_TEXTURES texture_type)
+	{
+		switch (texture_type)
+		{
+			case MATERIAL_TEXTURES::ALBEDO:			return m_Texture;
+			case MATERIAL_TEXTURES::NORMAL:			return m_NormalTexture;
+			case MATERIAL_TEXTURES::SPECULAR:		return m_SpecularTexture;
+			//case MATERIAL_TEXTURES::ROUGHNESS:
+			//case MATERIAL_TEXTURES::METALLIC:
+			//case MATERIAL_TEXTURES::AMBIENT_OC:
+			default:								KS_FATAL_ERROR("[Error] Material: Tried to retrieve a texture from a non-existing texture type!");
+		}
+
+		Ref<Texture2D> ret = nullptr;
+		return ret;
+	}
+
+	std::string& Material::GetMaterialTextureFilepath(MATERIAL_TEXTURES texture_type)
+	{
+		switch (texture_type)
+		{
+			case MATERIAL_TEXTURES::ALBEDO:			return m_TextureFilepath;
+			case MATERIAL_TEXTURES::NORMAL:			return m_NormalTextureFilepath;
+			case MATERIAL_TEXTURES::SPECULAR:		return m_SpecularTexturePath;
+			//case MATERIAL_TEXTURES::ROUGHNESS:
+			//case MATERIAL_TEXTURES::METALLIC:
+			//case MATERIAL_TEXTURES::AMBIENT_OC:
+			default:								KS_FATAL_ERROR("[Error] Material: Tried to retrieve a string from a non-existing texture type!");
+		}
+
+		std::string ret = "";
+		return ret;
+	}
+
+
+
 	// ----------------------- Public Texture Methods -----------------------------------------------------
-	void Material::SetTexture(const std::string& filepath)
+	void Material::SetTexture(MATERIAL_TEXTURES texture_type, const std::string& filepath)
 	{
-		Ref<Texture2D> texture = Texture2D::Create(filepath);
-		if (texture)
+		Ref<Texture2D>* texture = &GetMaterialTexture(texture_type);
+		std::string* texture_filepath = &GetMaterialTextureFilepath(texture_type);
+
+		Ref<Texture2D> new_texture = Texture2D::Create(filepath);
+		if (new_texture)
 		{
-			RemoveTexture();
-			m_Texture = texture;
-			m_TextureFilepath = filepath.substr(filepath.find("assets"), filepath.size());
+			RemoveTexture(texture_type);
+			*texture = new_texture;
+			*texture_filepath = filepath.substr(filepath.find("assets"), filepath.size());
 		}
 		else
-			KS_EDITOR_WARN("Couldn't Load Diffuse/Albedo Texture from '{0}'", filepath);
+			KS_EDITOR_WARN("Couldn't load Texture from '{0}'", filepath);
 	}
 
-	void Material::RemoveTexture()
+	void Material::RemoveTexture(MATERIAL_TEXTURES texture_type)
 	{
-		if (m_Texture)
-			m_Texture.reset();
+		Ref<Texture2D>* texture = &GetMaterialTexture(texture_type);
+		std::string* texture_filepath = &GetMaterialTextureFilepath(texture_type);
 
-		m_TextureFilepath.clear();
+		if (texture && texture->get())
+			texture->reset();
+
+		texture_filepath->clear();
 	}
 
-	void Material::SetNormalTexture(const std::string& filepath)
+
+
+	// ----------------------- Texture Getters ------------------------------------------------------------
+	uint Material::GetTextureID(MATERIAL_TEXTURES texture_type)
 	{
-		Ref<Texture2D> texture = Texture2D::Create(filepath);
+		Ref<Texture2D> texture = GetMaterialTexture(texture_type);
 		if (texture)
-		{
-			RemoveNormalTexture();
-			m_NormalTexture = texture;
-			m_NormalTextureFilepath = filepath.substr(filepath.find("assets"), filepath.size());
-		}
-		else
-			KS_EDITOR_WARN("Couldn't Load Normal Texture from '{0}'", filepath);
+			return texture->GetTextureID();
+
+		return 0;
 	}
 
-	void Material::RemoveNormalTexture()
-	{
-		if (m_NormalTexture)
-			m_NormalTexture.reset();
 
-		m_NormalTextureFilepath.clear();
-	}
-
-	void Material::SetSpecularTexture(const std::string& filepath)
+	uint Material::GetTextureWidth(MATERIAL_TEXTURES texture_type)
 	{
-		Ref<Texture2D> texture = Texture2D::Create(filepath);
+		Ref<Texture2D> texture = GetMaterialTexture(texture_type);
 		if (texture)
-		{
-			RemoveSpecularTexture();
-			m_SpecularTexture = texture;
-			m_SpecularTexturePath = filepath.substr(filepath.find("assets"), filepath.size());
-		}
-		else
-			KS_EDITOR_WARN("Couldn't Load Specular Texture from '{0}'", filepath);
+			return texture->GetWidth();
+
+		return 0;
 	}
 
-	void Material::RemoveSpecularTexture()
+	uint Material::GetTextureHeight(MATERIAL_TEXTURES texture_type)
 	{
-		if (m_SpecularTexture)
-			m_SpecularTexture.reset();
+		Ref<Texture2D> texture = GetMaterialTexture(texture_type);
+		if (texture)
+			return texture->GetHeight();
 
-		m_SpecularTexturePath.clear();
+		return 0;
+	}
+
+	const Ref<Texture2D>& Material::GetTexture(MATERIAL_TEXTURES texture_type)
+	{
+		return GetMaterialTexture(texture_type);
+	}
+
+	const std::string& Material::GetTextureFilepath(MATERIAL_TEXTURES texture_type)
+	{
+		return GetMaterialTextureFilepath(texture_type);
 	}
 
 

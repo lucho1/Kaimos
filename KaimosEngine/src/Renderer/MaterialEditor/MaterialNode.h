@@ -126,6 +126,8 @@ namespace Kaimos::MaterialEditor {
 	private:
 
 		// --- Private Node Methods ---
+		void DrawTextureButton(uint tex_id, const std::string& tex_name, const std::string& ui_label, std::function<void(const std::string&)> SetTexFunc, std::function<void()> RemoveTexFunc);
+
 		void SyncValuesWithMaterial();
 		void SyncMaterialValues();
 

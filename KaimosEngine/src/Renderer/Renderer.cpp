@@ -284,12 +284,15 @@ namespace Kaimos {
 
 					// Finally, assign graph & texture to material
 					material->SetGraphUniqueRef(mat_graph);
+
 					if(!mat_texture_file.empty())
-						material->SetTexture(mat_texture_file);
+						material->SetTexture(MATERIAL_TEXTURES::ALBEDO, mat_texture_file);
+					
 					if (!mat_normtexture_file.empty())
-						material->SetNormalTexture(mat_normtexture_file);
+						material->SetTexture(MATERIAL_TEXTURES::NORMAL, mat_normtexture_file);
+					
 					if (!mat_spectexture_file.empty())
-						material->SetSpecularTexture(mat_spectexture_file);
+						material->SetTexture(MATERIAL_TEXTURES::SPECULAR, mat_spectexture_file);
 				}
 			}
 		}

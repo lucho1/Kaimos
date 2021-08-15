@@ -7,6 +7,8 @@
 namespace Kaimos {
 
 	class Texture2D;
+	enum class MATERIAL_TEXTURES { ALBEDO = 0, NORMAL, SPECULAR/*, ROUGHNESS, METALLIC, AMBIENT_OC*/ };
+
 	class Material
 	{
 		friend class MaterialEditorPanel;
@@ -24,15 +26,32 @@ namespace Kaimos {
 		// It is thought to deserialize a material
 		Material(uint id, const std::string& name) : m_Name(name) { m_ID = id; }
 
+	private:
+
+		// --- Private Texture Methods ---
+		Ref<Texture2D>& GetMaterialTexture(MATERIAL_TEXTURES texture_type);
+		std::string& GetMaterialTextureFilepath(MATERIAL_TEXTURES texture_type);
+
 	public:
 
 		// --- Public Texture Methods ---
-		void SetTexture(const std::string& filepath);
-		void RemoveTexture();
-		void SetNormalTexture(const std::string& filepath);
-		void RemoveNormalTexture();
-		void SetSpecularTexture(const std::string& filepath);
-		void RemoveSpecularTexture();
+		void SetTexture(MATERIAL_TEXTURES texture_type, const std::string& filepath);
+		void RemoveTexture(MATERIAL_TEXTURES texture_type);
+
+		// --- Texture Getters ---
+		uint GetTextureID(MATERIAL_TEXTURES texture_type);
+		uint GetTextureWidth(MATERIAL_TEXTURES texture_type);
+		uint GetTextureHeight(MATERIAL_TEXTURES texture_type);
+
+		const Ref<Texture2D>& GetTexture(MATERIAL_TEXTURES texture_type);
+		const std::string& GetTextureFilepath(MATERIAL_TEXTURES texture_type);
+
+		bool HasAlbedo()	const { return m_Texture != nullptr; }
+		bool HasNormal()	const { return m_NormalTexture != nullptr; }
+		bool HasSpecular()	const { return m_SpecularTexture != nullptr; }
+		
+
+	public:
 
 		// --- Public Graph Methods ---
 		bool IsVertexAttributeTimed(MaterialEditor::VertexParameterNodeType vtxpm_node_type) const;
@@ -56,19 +75,6 @@ namespace Kaimos {
 		uint GetID()								const { return m_ID; }
 		uint GetAttachedGraphID()					const { return m_AttachedGraph->GetID(); }
 		const std::string& GetName()				const { return m_Name; }
-
-		// --- Texture Getters ---
-		const Ref<Texture2D>& GetTexture()			const { return m_Texture; }
-		const std::string& GetTexturePath()			const { return m_TextureFilepath; }
-		const Ref<Texture2D>& GetNormalTexture()	const { return m_NormalTexture; }
-		const std::string& GetNormalTexturePath()	const { return m_NormalTextureFilepath; }
-		const Ref<Texture2D>& GetSpecularTexture()	const { return m_SpecularTexture; }
-		const std::string& GetSpecularTexturePath()	const { return m_SpecularTexturePath; }
-
-		bool HasAlbedo() const		{ return m_Texture != nullptr; }
-		bool HasNormal() const		{ return m_NormalTexture != nullptr; }
-		bool HasSpecular() const	{ return m_SpecularTexture != nullptr; }
-
 		
 	public:
 
