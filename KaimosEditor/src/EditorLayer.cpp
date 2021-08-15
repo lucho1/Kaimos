@@ -27,9 +27,6 @@ namespace Kaimos {
 	{
 		KS_PROFILE_FUNCTION();
 
-		m_CheckerTexture = Texture2D::Create("assets/textures/Checkerboard.png");
-		m_LogoTexture = Texture2D::Create("assets/textures/ChernoLogo.png");
-
 		m_IconsArray[0] = Texture2D::Create(INTERNAL_ICONS_PATH + std::string("selection_icon.png"));
 		m_IconsArray[1] = Texture2D::Create(INTERNAL_ICONS_PATH + std::string("transform_icon.png"));
 		m_IconsArray[2] = Texture2D::Create(INTERNAL_ICONS_PATH + std::string("rotation_icon.png"));

@@ -57,6 +57,7 @@ namespace Kaimos {
 		CameraController m_EditorCamera;
 		Ref<Scene> m_CurrentScene = nullptr;
 
+		// Panels
 		SettingsPanel m_SettingsPanel = {};
 		ProjectPanel m_ProjectPanel = {};
 		ToolbarPanel m_ToolbarPanel = {};
@@ -72,18 +73,15 @@ namespace Kaimos {
 
 		// Rendering
 		Ref<VertexArray> m_VArray = nullptr;
+		Ref<Shader> m_Shader = nullptr;
 		
+		Ref<Framebuffer> m_EnvironmentCubemapFBO = nullptr;		
 		Ref<Framebuffer> m_Framebuffer = nullptr;
 		Ref<Framebuffer> m_GameFramebuffer = nullptr;
 		bool m_RenderGamePanel = true, m_RenderViewport = true;
+
 		Ref<Framebuffer> m_PrimaryCameraFramebuffer = nullptr;
 		glm::ivec2 m_DefaultViewportResolution = glm::ivec2(1280, 720); // Default res 1280x720 (TODO: Make this a thing of the system itself, not hardcoded)
-
-		Ref<Shader> m_Shader = nullptr;
-		Ref<Texture2D> m_CheckerTexture = nullptr;
-		Ref<Texture2D> m_LogoTexture = nullptr;
-		float m_BackgroundTiling = 10.0f;
-		glm::vec4 m_Color = { 1.0f, 0.9f, 0.8f, 1.0f };
 
 		// Viewport
 		glm::vec2 m_ViewportSize = glm::vec2(0.0f);
