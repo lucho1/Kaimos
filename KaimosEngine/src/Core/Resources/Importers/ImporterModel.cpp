@@ -180,20 +180,39 @@ namespace Kaimos::Importers
 			return 0;
 
 		// -- Load Material Variables --
-		aiColor3D diffuse = aiColor3D(1.0);
-		ai_real opacity = 1.0;
+		aiColor3D diffuse = aiColor3D(1.0f);
+		ai_real opacity = 1.0f, bumpiness = 1.0f;											// Mtl Base Values
+		ai_real shininess = 1.0f, specularity = 1.0f, metallic = 0.5f, ambient_occ = 0.0f;	// Mtl PBR/NonPBR Values
 
-		ai_material->Get(AI_MATKEY_COLOR_DIFFUSE, diffuse);	// Kd
-		ai_material->Get(AI_MATKEY_OPACITY, opacity);		// d
+		ai_material->Get(AI_MATKEY_COLOR_DIFFUSE, diffuse);				// Kd
+		ai_material->Get(AI_MATKEY_OPACITY, opacity);					// d
+		ai_material->Get(AI_MATKEY_BUMPSCALING, bumpiness);				// ?
+
+		ai_material->Get(AI_MATKEY_SHININESS, shininess);				// Ns
+		ai_material->Get(AI_MATKEY_SHININESS_STRENGTH, specularity);	// ?
+
+		// This is just a guess, not sure if these should be the values
+		ai_material->Get(AI_MATKEY_REFLECTIVITY, metallic);				// ? - By now, metallic will be reflectivity
+		ai_material->Get(AI_MATKEY_SHININESS_STRENGTH, ambient_occ);	// ?
 
 		// Also:
-		// AI_MATKEY_COLOR_SPECULAR (Ks), AI_MATKEY_COLOR_EMISSIVE (Ke), AI_MATKEY_SHININESS (Ns), AI_MATKEY_BUMPSCALING (?),
-		// AI_MATKEY_TWOSIDED (?), AI_MATKEY_COLOR_AMBIENT (Ka), AI_MATKEY_COLOR_TRANSPARENT (?), AI_MATKEY_REFRACTI (Ni -> Maybe the "Metallic" value?),
-		// AI_MATKEY_REFLECTIVITY (? -> Also a reflectivity color, wtf), AI_MATKEY_SHININESS_STRENGTH (?)
+		// AI_MATKEY_COLOR_SPECULAR (Ks), AI_MATKEY_COLOR_EMISSIVE (Ke)
+		// AI_MATKEY_TWOSIDED (?), AI_MATKEY_COLOR_AMBIENT (Ka), AI_MATKEY_COLOR_TRANSPARENT (?)
+		// AI_MATKEY_REFRACTI (Ni -> Index of Refraction)
 
 		// -- Create Material & Set Variables --
 		const Ref<Material>& mat = Renderer::CreateMaterial(name.C_Str());
+
 		mat->Color = glm::vec4(diffuse.r, diffuse.g, diffuse.b, opacity);
+		mat->Bumpiness = bumpiness;
+		mat->Smoothness = shininess / 256.0f;
+		mat->Metallic = metallic;
+		mat->AmbientOcclusion = ambient_occ;
+
+		// Phong Shininess -> Beckmann BRDF Roughness conversion
+		// https://simonstechblog.blogspot.com/2011/12/microfacet-brdf.html
+		// https://computergraphics.stackexchange.com/questions/1515/what-is-the-accepted-method-of-converting-shininess-to-roughness-and-vice-versa
+		mat->Roughness = sqrtf(2.0f / (2.0f + shininess));
 		mat->SyncGraphValuesWithMaterial();
 
 		if (ai_material->GetTextureCount(aiTextureType_DIFFUSE) > 0)
@@ -202,8 +221,20 @@ namespace Kaimos::Importers
 		if (ai_material->GetTextureCount(aiTextureType_NORMALS) > 0)
 			mat->SetTexture(MATERIAL_TEXTURES::NORMAL, GetMaterialTextureFilename(ai_material, aiTextureType_NORMALS, directory));
 
+		if (ai_material->GetTextureCount(aiTextureType_SPECULAR) > 0)
+			mat->SetTexture(MATERIAL_TEXTURES::SPECULAR, GetMaterialTextureFilename(ai_material, aiTextureType_SPECULAR, directory));
+		
+		if (ai_material->GetTextureCount(aiTextureType_DIFFUSE_ROUGHNESS) > 0)
+			mat->SetTexture(MATERIAL_TEXTURES::ROUGHNESS, GetMaterialTextureFilename(ai_material, aiTextureType_DIFFUSE_ROUGHNESS, directory));
+		
+		if (ai_material->GetTextureCount(aiTextureType_METALNESS) > 0)
+			mat->SetTexture(MATERIAL_TEXTURES::METALLIC, GetMaterialTextureFilename(ai_material, aiTextureType_METALNESS, directory));
+
+		if (ai_material->GetTextureCount(aiTextureType_AMBIENT_OCCLUSION) > 0)
+			mat->SetTexture(MATERIAL_TEXTURES::AMBIENT_OC, GetMaterialTextureFilename(ai_material, aiTextureType_AMBIENT_OCCLUSION, directory));
+
 		// Also:
-		// aiTextureType_EMISSIVE, aiTextureType_SPECULAR, aiTextureType_HEIGHT, aiTextureType_DISPLACEMENT
+		// aiTextureType_EMISSIVE, aiTextureType_HEIGHT, aiTextureType_DISPLACEMENT
 
 		// -- Return Material --
 		return mat->GetID();

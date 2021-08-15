@@ -57,7 +57,7 @@ namespace Kaimos {
 	{
 		for (auto& it = m_Submeshes.begin(); it != m_Submeshes.end(); ++it) //URGENT TODO: Change this to a reverse iterator, it's crashing sometimes
 		{
-			if ((*it)->m_ID == submesh_to_delete->m_ID)
+			if ((*it) && (*it)->m_ID == submesh_to_delete->m_ID)
 				m_Submeshes.erase(it);
 		}
 	}

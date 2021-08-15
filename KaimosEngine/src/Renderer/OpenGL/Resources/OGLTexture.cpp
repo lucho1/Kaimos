@@ -75,6 +75,11 @@ namespace Kaimos {
 			m_InternalFormat = GL_RGB8;
 			m_DataFormat = GL_RGB;
 		}
+		else if (channels == 1)
+		{
+			m_InternalFormat = GL_R8;
+			m_DataFormat = GL_RED;
+		}
 
 		KS_ENGINE_ASSERT(m_InternalFormat & m_DataFormat, "Image Format not Supported!"); // It'll be false (0) if either of them is 0 (what we want)
 
