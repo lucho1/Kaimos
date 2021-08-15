@@ -180,21 +180,21 @@ void main()
 			continue;
 
 		// External Attenuation (from MinRad to MaxRad)
-		//float outer_attenuation = 1.0;
-		//if(dist > u_PointLights[i].MinRadius && dist <= u_PointLights[i].MaxRadius)
-		//{
-		//	float diff_rad = u_PointLights[i].MaxRadius - u_PointLights[i].MinRadius;
-		//	float diff_d = dist - u_PointLights[i].MinRadius;
-		//	outer_attenuation = 1.0 - (diff_d/diff_rad);
-		//}
+		float outer_attenuation = 1.0;
+		if(dist > u_PointLights[i].MinRadius && dist <= u_PointLights[i].MaxRadius)
+		{
+			float diff_rad = u_PointLights[i].MaxRadius - u_PointLights[i].MinRadius;
+			float diff_d = dist - u_PointLights[i].MinRadius;
+			outer_attenuation = 1.0 - (diff_d/diff_rad);
+		}
 
 		// Light Attenuation (within MinRad)
-		//float falloff = 1.0 - pow(dist/u_PointLights[i].MinRadius, 4.0);
-		//falloff = falloff*falloff;
-		//float attenuation = falloff/(dist*dist + 1.0);
+		float falloff = clamp(1.0 - pow(dist/u_PointLights[i].MinRadius, 4.0), 0.0, 1.0);
+		falloff = falloff*falloff;
+		float attenuation = (falloff/(dist*dist + 1.0)) * 100;
 
 		//float attenuation = (1.0/(dist*dist)) * u_PointLights[i].FalloffFactor;
-		vec3 radiance = u_PointLights[i].Radiance.rgb * u_PointLights[i].Intensity;// * attenuation;
+		vec3 radiance = u_PointLights[i].Radiance.rgb * attenuation * outer_attenuation * u_PointLights[i].Intensity;
 
 		vec3 ck_specular = CalculateCookTorranceSpecular(F0, V, N, dir, roughness, NdotV, NdotL, F) * u_PointLights[i].SpecularStrength;
 		vec3 lambert_diffuse = CalculateLambertDiffuse(F, metallic, albedo.rgb);
