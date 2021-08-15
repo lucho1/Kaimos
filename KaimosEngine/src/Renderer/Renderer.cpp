@@ -34,6 +34,8 @@ namespace Kaimos {
 		static const uint MaxTextureSlots = 32;						// TODO: RenderCapabilities - Variables based on what the hardware can do
 		std::array<Ref<Texture2D>, MaxTextureSlots> TextureSlots;
 		Ref<Texture2D> WhiteTexture = nullptr, NormalTexture = nullptr;
+
+		Ref<HDRTexture2D> m_EnvironmentCubemap = nullptr;
 	};
 
 	static RendererData* s_RendererData = nullptr;
@@ -341,6 +343,53 @@ namespace Kaimos {
 			for (auto& mat : s_RendererData->Materials)
 				mat.second->InPBRPipeline = pbr_pipeline;
 		}
+	}
+
+	bool Renderer::ExistsEnvironmentMap()
+	{
+		return s_RendererData->m_EnvironmentCubemap != nullptr;
+	}
+
+	uint Renderer::GetEnvironmentMapID()
+	{
+		if (s_RendererData->m_EnvironmentCubemap)
+			return s_RendererData->m_EnvironmentCubemap->GetTextureID();
+
+		return 0;
+	}
+
+	std::string Renderer::GetEnvironmentMapFilepath()
+	{
+		if (s_RendererData->m_EnvironmentCubemap)
+			return s_RendererData->m_EnvironmentCubemap->GetFilepath();
+
+		return "";
+	}
+
+	glm::ivec2 Renderer::GetEnvironmentMapSize()
+	{
+		if (s_RendererData->m_EnvironmentCubemap)
+			return glm::ivec2(s_RendererData->m_EnvironmentCubemap->GetWidth(), s_RendererData->m_EnvironmentCubemap->GetHeight());
+
+		return glm::ivec2(0);
+	}
+
+	void Renderer::SetEnvironmentMap(const std::string& filepath)
+	{
+		Ref<HDRTexture2D> new_texture = HDRTexture2D::Create(filepath);
+		if (new_texture && new_texture.get() && !new_texture->GetFilepath().empty())
+		{
+			RemoveEnvironmentMap();
+			s_RendererData->m_EnvironmentCubemap = new_texture;
+		}
+		else
+			KS_ENGINE_WARN("Renderer: Tried to set an invalid Environment Map!");
+	}
+
+	void Renderer::RemoveEnvironmentMap()
+	{
+		if (s_RendererData->m_EnvironmentCubemap)
+			s_RendererData->m_EnvironmentCubemap.reset();
 	}
 
 	Ref<Shader> Renderer::GetShader(const std::string& name)

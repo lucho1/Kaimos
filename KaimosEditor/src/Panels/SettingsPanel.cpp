@@ -4,6 +4,7 @@
 #include "Renderer/Renderer.h"
 
 #include "ImGui/ImGuiUtils.h"
+#include "Core/Utils/PlatformUtils.h"
 
 #include <ImGui/imgui.h>
 #include <glm/glm.hpp>
@@ -66,6 +67,37 @@ namespace Kaimos {
 			glm::vec3 scene_color = Renderer::GetSceneColor();
 			if (ImGui::ColorEdit3("###scene_color", glm::value_ptr(scene_color), ImGuiColorEditFlags_Float | ImGuiColorEditFlags_NoInputs))
 				Renderer::SetSceneColor(scene_color);
+
+			// Environment Map
+			ImGui::NewLine();
+			uint enviromap_id = Renderer::GetEnvironmentMapID();
+			glm::ivec2 enviromap_size = Renderer::GetEnvironmentMapSize();
+			std::string enviromap_path = Renderer::GetEnvironmentMapFilepath();
+			std::string enviromap_name = enviromap_path;
+
+			if (!enviromap_path.empty())
+				enviromap_name = enviromap_path.substr(enviromap_path.find_last_of("/\\" + 1, enviromap_path.size() - 1) + 1);
+
+			ImGui::Text("Environment Map: %s", enviromap_name.c_str());
+			ImGui::Text("Size (ID): %ix%i (%i)", enviromap_size.x, enviromap_size.y, enviromap_id);
+
+			ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { 0.0f, 0.0f });
+			if (KaimosUI::UIFunctionalities::DrawTexturedButton("###enviromap", enviromap_id, glm::vec2(50.0f), glm::vec3(0.1f)))
+			{
+				std::string texture_file = FileDialogs::OpenFile("HDR Textures (*.hdr;*.exr)\0*.hdr;*.exr\0HDR Texture (*.hdr)\0*.hdr\0EXR Texture (*.exr)\0*.exr\0");
+				if (!texture_file.empty())
+					Renderer::SetEnvironmentMap(texture_file);
+			}
+
+			KaimosUI::UIFunctionalities::PopButton(false);
+			ImGui::SameLine();
+
+			// "X" Btn (to remove texture)
+			if (KaimosUI::UIFunctionalities::DrawColoredButton("X", { 20.0f, 50.0f }, glm::vec3(0.15f), true))
+				Renderer::RemoveEnvironmentMap();
+
+			KaimosUI::UIFunctionalities::PopButton(true);
+			ImGui::PopStyleVar();
 
 			ImGui::End();
 		}

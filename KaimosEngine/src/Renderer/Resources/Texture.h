@@ -20,6 +20,7 @@ namespace Kaimos {
 		virtual uint GetWidth()		const = 0;
 		virtual uint GetHeight()	const = 0;
 		virtual uint GetTextureID()	const = 0;
+		virtual const std::string& GetFilepath() const = 0;
 
 		// --- Operators ---
 		virtual bool operator==(const Texture& texture) const = 0;
@@ -30,9 +31,14 @@ namespace Kaimos {
 	class Texture2D : public Texture
 	{
 	public:
-		// --- Public Texture2D Methods ---
 		static Ref<Texture2D> Create(const std::string& filepath);	//TODO/OJU: We might want to create textures from other things (colors, gradients...)
 		static Ref<Texture2D> Create(uint width, uint height);
+	};
+
+	class HDRTexture2D : public Texture
+	{
+	public:
+		static Ref<HDRTexture2D> Create(const std::string& filepath);
 	};
 }
 

@@ -6,7 +6,6 @@
 
 namespace Kaimos {
 
-	// ----------------------- Public Texture2D Methods ---------------------------------------------------
 	Ref<Texture2D> Texture2D::Create(uint width, uint height)
 	{
 		switch (Renderer::GetRendererAPI())
@@ -24,6 +23,18 @@ namespace Kaimos {
 		switch (Renderer::GetRendererAPI())
 		{
 			case RendererAPI::API::OPENGL:		return CreateRef<OGLTexture2D>(filepath);
+			case RendererAPI::API::NONE:		KS_FATAL_ERROR("RendererAPI is set to NONE (unsupported)!"); return nullptr;
+		}
+
+		KS_FATAL_ERROR("RendererAPI is unknown, not selected or failed!");
+		return nullptr;
+	}
+
+	Ref<HDRTexture2D> HDRTexture2D::Create(const std::string& filepath)
+	{
+		switch (Renderer::GetRendererAPI())
+		{
+			case RendererAPI::API::OPENGL:		return CreateRef<OGL_HDRTexture2D>(filepath);
 			case RendererAPI::API::NONE:		KS_FATAL_ERROR("RendererAPI is set to NONE (unsupported)!"); return nullptr;
 		}
 

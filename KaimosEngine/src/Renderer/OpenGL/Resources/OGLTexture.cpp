@@ -5,6 +5,7 @@
 
 namespace Kaimos {
 
+	// ----------------------- TEXTURE 2D -----------------------------------------------------------------
 	// ----------------------- Public Class Methods -------------------------------------------------------
 	OGLTexture2D::OGLTexture2D(uint width, uint height) : m_Width(width), m_Height(height)
 	{
@@ -27,7 +28,7 @@ namespace Kaimos {
 	}
 
 
-	OGLTexture2D::OGLTexture2D(const std::string& filepath) : m_Filepath(filepath)
+	OGLTexture2D::OGLTexture2D(const std::string& filepath)
 	{
 		// -- Check Paths --
 		// In this case we check "assets" for textures and "internal" for icons
@@ -62,7 +63,7 @@ namespace Kaimos {
 			return;
 		}
 
-		m_Width = w; m_Height = h;
+		m_Width = w; m_Height = h, m_Filepath = filepath;
 
 		// -- Image channels (RGBA) processing --
 		if (channels == 4)
@@ -126,5 +127,85 @@ namespace Kaimos {
 	{
 		KS_PROFILE_FUNCTION();
 		glBindTextureUnit(slot, m_ID); //Slot/Unit refers to the (opengl) slot in which the texture is bound, in case we bind +1 textures at a time
+	}
+
+
+
+
+	// ----------------------- HDR TEXTURE ----------------------------------------------------------------
+	// ----------------------- Public Class Methods -------------------------------------------------------
+	OGL_HDRTexture2D::OGL_HDRTexture2D(const std::string& filepath)
+	{
+		// -- Check Paths --
+		if (filepath.find("assets") == std::string::npos)
+		{
+			KS_ERROR("Cannot load an out-of-project texture! Try moving it inside 'assets/' folder.\nCurrent Filepath: {0}", filepath);
+			return;
+		}
+
+		// In this case we check also the extension
+		std::filesystem::path path = filepath;
+		if (!std::filesystem::exists(path) || (path.extension() != ".hdr" && path.extension() != ".exr"))
+		{
+			KS_ERROR("Unexisting or Invalid Path or Extension Loading HDR Texture: {0}", filepath);
+			return;
+		}
+
+		// -- Texture Load --
+		KS_PROFILE_FUNCTION();
+		int w, h, channels;
+		stbi_set_flip_vertically_on_load(1);
+		float* texture_data = nullptr;
+
+		{
+			KS_PROFILE_SCOPE("HDR TEXTURE STBI LOAD - OGL_HDRTexture2D::OGL_HDRTexture2D(const std::string& path)");
+			texture_data = stbi_loadf(filepath.c_str(), &w, &h, &channels, 0);
+		}
+
+		// -- Check for Failure --
+		if (!texture_data)
+		{
+			KS_ERROR("Failed to load HDR texture data from path: {0}", filepath);
+			return;
+		}
+
+		// -- Texture Creation --
+		m_Width = w; m_Height = h, m_Filepath = filepath;
+		glCreateTextures(GL_TEXTURE_2D, 1, &m_ID);
+		glTextureStorage2D(m_ID, 1, GL_RGB16F, m_Width, m_Height);
+
+		// --- Texture Parameters Setup ---
+		// Texture filters to minificate and magnificate textures when they are smaller than geometry's pixels to fill
+		glTextureParameteri(m_ID, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTextureParameteri(m_ID, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTextureParameteri(m_ID, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTextureParameteri(m_ID, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+		glTextureSubImage2D(m_ID, 0, 0, 0, m_Width, m_Height, GL_RGB, GL_FLOAT, texture_data);
+		stbi_image_free(texture_data);
+	}
+
+	OGL_HDRTexture2D::~OGL_HDRTexture2D()
+	{
+		KS_PROFILE_FUNCTION();
+		glDeleteTextures(1, &m_ID);
+	}
+
+
+
+	// ----------------------- Public Texture Methods -----------------------------------------------------
+	void OGL_HDRTexture2D::SetData(void* data, uint size)
+	{
+		KS_PROFILE_FUNCTION();
+
+		//uint bpp = m_DataFormat == GL_RGBA ? 4 : 3; // Bytes per pixel
+		//KS_ENGINE_ASSERT(size == m_Width * m_Height * bpp, "Data passed must be the same size than the entire texture size");
+		glTextureSubImage2D(m_ID, 0, 0, 0, m_Width, m_Height, GL_RGB16F, GL_FLOAT, data);
+	}
+
+	void OGL_HDRTexture2D::Bind(uint slot) const
+	{
+		KS_PROFILE_FUNCTION();
+		glBindTextureUnit(slot, m_ID);
 	}
 }

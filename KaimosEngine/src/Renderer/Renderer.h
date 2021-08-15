@@ -45,8 +45,16 @@ namespace Kaimos {
 		static void SetSceneColor(const glm::vec3& color);
 		static const uint GetMaxDirLights();
 		static const uint GetMaxPointLights();
+
 		static bool IsSceneInPBRPipeline();
 		static void SetPBRPipeline(bool pbr_pipeline);
+
+		static bool ExistsEnvironmentMap();
+		static uint GetEnvironmentMapID();
+		static std::string GetEnvironmentMapFilepath();
+		static glm::ivec2 GetEnvironmentMapSize();
+		static void SetEnvironmentMap(const std::string& filepath);
+		static void RemoveEnvironmentMap();
 
 
 		// --- Event Methods ---

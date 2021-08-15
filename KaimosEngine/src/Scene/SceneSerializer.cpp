@@ -155,13 +155,15 @@ namespace Kaimos {
 		
 		YAML::Emitter output;
 		output << YAML::BeginMap;
-		output << YAML::Key << "KaimosScene" << YAML::Value << m_Scene->GetName().c_str();			// Save Scene as Key + SceneName as value
-		output << YAML::Key << "SceneColor" << YAML::Value << Renderer::GetSceneColor();			// Save Scene Color
-		output << YAML::Key << "PBRPipeline" << YAML::Value << Renderer::IsSceneInPBRPipeline();	// Save if scene is PBR or not
-		output << YAML::Key << "CameraPos" << YAML::Value << scene_cam.GetPosition();				// Save Scene Camera Position
-		output << YAML::Key << "CameraRot" << YAML::Value << scene_cam.GetOrientationAngles();		// Save Scene Camera Orientation
-		output << YAML::Key << "Entities" << YAML::Value << YAML::BeginSeq;							// Save Entities as a sequence (like an array)
+		output << YAML::Key << "KaimosScene" << YAML::Value << m_Scene->GetName().c_str();							// Save Scene as Key + SceneName as value
+		output << YAML::Key << "SceneColor" << YAML::Value << Renderer::GetSceneColor();							// Save Scene Color
+		output << YAML::Key << "PBRPipeline" << YAML::Value << Renderer::IsSceneInPBRPipeline();					// Save if scene is PBR or not
+		output << YAML::Key << "CameraPos" << YAML::Value << scene_cam.GetPosition();								// Save Scene Camera Position
+		output << YAML::Key << "CameraRot" << YAML::Value << scene_cam.GetOrientationAngles();						// Save Scene Camera Orientation
+		output << YAML::Key << "EnvironmentMapTexture" << YAML::Value << Renderer::GetEnvironmentMapFilepath();		// Save Scene Camera Orientation
 
+		// Save Entities as a sequence (like an array)
+		output << YAML::Key << "Entities" << YAML::Value << YAML::BeginSeq;
 		m_Scene->m_Registry.each([&](auto entityID)
 			{
 				Entity entity = { entityID, m_Scene.get() };
@@ -213,12 +215,21 @@ namespace Kaimos {
 
 		if (data["PBRPipeline"])
 			Renderer::SetPBRPipeline(data["PBRPipeline"].as<bool>());
-			
+
 		if (data["CameraPos"])
 			scene_cam.SetPosition(data["CameraPos"].as<glm::vec3>());
-		
+
 		if (data["CameraRot"])
 			scene_cam.SetOrientation(data["CameraRot"].as<glm::vec2>());
+
+		if (data["EnvironmentMapTexture"])
+		{
+			std::string filepath = data["EnvironmentMapTexture"].as<std::string>();
+			if (!filepath.empty())
+				Renderer::SetEnvironmentMap(filepath);
+			else
+				KS_ENGINE_TRACE("Scene has no Environment Map to load");
+		}
 
 		// -- Entities Load --
 		uint entities_deserialized = 0;
