@@ -30,7 +30,7 @@ out vec2 v_TexCoord;
 out vec4 v_Color;
 
 out flat float v_NormalStrength, v_Roughness, v_Metallic, v_AmbientOcclusionValue;
-out flat int v_TexIndex, v_NormTexIndex, v_MetalTexIndex, v_RoughTexIndex, v_AOTexIndex;
+out flat int v_TexIndex, v_NormTexIndex, v_RoughTexIndex, v_MetalTexIndex, v_AOTexIndex;
 
 out flat int v_EntityID;
 
@@ -53,8 +53,8 @@ void main()
 
 	v_TexIndex = a_TexIndex;
 	v_NormTexIndex = a_NormTexIndex;
-	v_MetalTexIndex = a_MetalTexIndex;
 	v_RoughTexIndex = a_RoughTexIndex;
+	v_MetalTexIndex = a_MetalTexIndex;
 	v_AOTexIndex = a_AOTexIndex;
 	
 	v_EntityID = a_EntityID;
@@ -89,7 +89,7 @@ in vec2 v_TexCoord;
 in vec4 v_Color;
 
 in flat float v_NormalStrength, v_Roughness, v_Metallic, v_AmbientOcclusionValue;
-in flat int v_TexIndex, v_NormTexIndex, v_MetalTexIndex, v_RoughTexIndex, v_AOTexIndex;
+in flat int v_TexIndex, v_NormTexIndex, v_RoughTexIndex, v_MetalTexIndex, v_AOTexIndex;
 
 in flat int v_EntityID;
 
@@ -136,7 +136,14 @@ float GeometrySmith(float NdotV, float NdotL, float roughness);
 void main()
 {
 	// PBR Variables
-	vec4 albedo = texture(u_Textures[v_TexIndex], v_TexCoord) * v_Color;
+	float roughness = texture(u_Textures[v_RoughTexIndex], v_TexCoord).r * v_Roughness;
+	float metallic = texture(u_Textures[v_MetalTexIndex], v_TexCoord).r * v_Metallic;
+	float ao = v_AmbientOcclusionValue;
+	if(v_AOTexIndex != 0)
+		ao *= texture(u_Textures[v_AOTexIndex], v_TexCoord).r;
+	
+	vec4 albedo = pow(texture(u_Textures[v_TexIndex], v_TexCoord), vec4(2.2)) * v_Color;
+	albedo.rgb *= ao;
 
 	// Normal Calculation
 	vec3 normal = texture(u_Textures[v_NormTexIndex], v_TexCoord).xyz * 2.0 - 1.0;
@@ -147,7 +154,7 @@ void main()
 	vec3 V = normalize(u_ViewPos - v_FragPos);
 	float NdotL, NdotV = max(dot(N, V), 0.0);
 
-	vec3 F, F0 = mix(vec3(0.04), albedo.rgb, v_Metallic);
+	vec3 F, F0 = mix(vec3(0.04), albedo.rgb, metallic);
 	vec3 L0 = vec3(0.0);
 	
 	// Directional Lights
@@ -156,8 +163,8 @@ void main()
 		vec3 dir = normalize(u_DirectionalLights[i].Direction);
 		vec3 radiance = u_DirectionalLights[i].Radiance.rgb * u_DirectionalLights[i].Intensity;
 
-		vec3 ck_specular = CalculateCookTorranceSpecular(F0, V, N, dir, v_Roughness, NdotV, NdotL, F) * u_DirectionalLights[i].SpecularStrength;
-		vec3 lambert_diffuse = CalculateLambertDiffuse(F, v_Metallic, albedo.rgb);
+		vec3 ck_specular = CalculateCookTorranceSpecular(F0, V, N, dir, roughness, NdotV, NdotL, F) * u_DirectionalLights[i].SpecularStrength;
+		vec3 lambert_diffuse = CalculateLambertDiffuse(F, metallic, albedo.rgb);
 
 		L0 += (lambert_diffuse + ck_specular) * radiance * NdotL;
 	}
@@ -189,14 +196,14 @@ void main()
 		//float attenuation = (1.0/(dist*dist)) * u_PointLights[i].FalloffFactor;
 		vec3 radiance = u_PointLights[i].Radiance.rgb * u_PointLights[i].Intensity;// * attenuation;
 
-		vec3 ck_specular = CalculateCookTorranceSpecular(F0, V, N, dir, v_Roughness, NdotV, NdotL, F) * u_PointLights[i].SpecularStrength;
-		vec3 lambert_diffuse = CalculateLambertDiffuse(F, v_Metallic, albedo.rgb);
+		vec3 ck_specular = CalculateCookTorranceSpecular(F0, V, N, dir, roughness, NdotV, NdotL, F) * u_PointLights[i].SpecularStrength;
+		vec3 lambert_diffuse = CalculateLambertDiffuse(F, metallic, albedo.rgb);
 
 		L0 += (lambert_diffuse + ck_specular) * radiance * NdotL;
 	}
 	
 	// Final Result Calculation (scene_color*object_color*ao + light) + ToneMapping/GammaCorrection
-	vec3 result = u_SceneColor * albedo.rgb * v_AmbientOcclusionValue + L0;
+	vec3 result = u_SceneColor * albedo.rgb + L0;
 	result = result/(result + vec3(1.0));
 	result = pow(result, vec3(1.0/2.2));
 
