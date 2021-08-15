@@ -21,8 +21,8 @@ namespace Kaimos {
 		glm::vec4 Color		= glm::vec4(1.0f);
 		float Bumpiness		= 0.5f;
 
-		float TexIndex		= 0.0f;
-		float NormTexIndex	= 0.0f;
+		int TexIndex		= 0.0f;
+		int NormTexIndex	= 0.0f;
 
 		// --- Editor Variables ---
 		int EntityID		= 0;
@@ -33,7 +33,7 @@ namespace Kaimos {
 		float Shininess		= 0.5f;
 		float Specularity	= 0.5f;
 
-		float SpecTexIndex	= 0.0f;
+		int SpecTexIndex	= 0.0f;
 	};
 
 	struct PBRQuadVertex : QuadVertex
@@ -42,9 +42,9 @@ namespace Kaimos {
 		float Metallic		= 0.5f;
 		float AmbientOcc	= 0.5f;
 
-		float MetalTexIndex	= 0.0f;
-		float RoughTexIndex	= 0.0f;
-		float AOTexIndex	= 0.0f;
+		int MetalTexIndex	= 0.0f;
+		int RoughTexIndex	= 0.0f;
+		int AOTexIndex		= 0.0f;
 	};
 
 

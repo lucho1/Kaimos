@@ -89,13 +89,13 @@ namespace Kaimos {
 			{ SHADER_DATATYPE::FLOAT2,	"a_TexCoord" },
 			{ SHADER_DATATYPE::FLOAT4,	"a_Color" },
 			{ SHADER_DATATYPE::FLOAT ,	"a_NormalStrength" },
-			{ SHADER_DATATYPE::FLOAT ,	"a_TexIndex" },
-			{ SHADER_DATATYPE::FLOAT ,	"a_NormTexIndex" },
-			{ SHADER_DATATYPE::INT ,	"a_EntityID" },
+			{ SHADER_DATATYPE::INT,		"a_TexIndex" },
+			{ SHADER_DATATYPE::INT,		"a_NormTexIndex" },
+			{ SHADER_DATATYPE::INT,		"a_EntityID" },
 
-			{ SHADER_DATATYPE::FLOAT ,	"a_Shininess" },
-			{ SHADER_DATATYPE::FLOAT ,	"a_SpecularStrength" },
-			{ SHADER_DATATYPE::FLOAT ,	"a_SpecTexIndex" }
+			{ SHADER_DATATYPE::FLOAT,	"a_Shininess" },
+			{ SHADER_DATATYPE::FLOAT,	"a_SpecularStrength" },
+			{ SHADER_DATATYPE::INT,		"a_SpecTexIndex" }
 		};
 
 		BufferLayout pbr_layout = {
@@ -105,16 +105,16 @@ namespace Kaimos {
 			{ SHADER_DATATYPE::FLOAT2,	"a_TexCoord" },
 			{ SHADER_DATATYPE::FLOAT4,	"a_Color" },
 			{ SHADER_DATATYPE::FLOAT ,	"a_NormalStrength" },
-			{ SHADER_DATATYPE::FLOAT ,	"a_TexIndex" },
-			{ SHADER_DATATYPE::FLOAT ,	"a_NormTexIndex" },
-			{ SHADER_DATATYPE::INT ,	"a_EntityID" },
+			{ SHADER_DATATYPE::INT,		"a_TexIndex" },
+			{ SHADER_DATATYPE::INT,		"a_NormTexIndex" },
+			{ SHADER_DATATYPE::INT,		"a_EntityID" },
 
 			{ SHADER_DATATYPE::FLOAT,	"a_Roughness" },
 			{ SHADER_DATATYPE::FLOAT,	"a_Metallic" },
 			{ SHADER_DATATYPE::FLOAT,	"a_AmbientOcclusionValue" },
-			{ SHADER_DATATYPE::FLOAT,	"a_MetalTexIndex" },
-			{ SHADER_DATATYPE::FLOAT,	"a_RoughTexIndex" },
-			{ SHADER_DATATYPE::FLOAT,	"a_AOTexIndex" }
+			{ SHADER_DATATYPE::INT,		"a_MetalTexIndex" },
+			{ SHADER_DATATYPE::INT,		"a_RoughTexIndex" },
+			{ SHADER_DATATYPE::INT,		"a_AOTexIndex" }
 		};
 
 		// -- Vertex Array Filling --
@@ -228,9 +228,9 @@ namespace Kaimos {
 		dynamic_vertex->Color = material->Color;
 		dynamic_vertex->Bumpiness = material->Bumpiness;
 		
-		dynamic_vertex->TexIndex = albedo_ix;
-		dynamic_vertex->NormTexIndex = norm_ix;
-		dynamic_vertex->EntityID = ent_id;
+		dynamic_vertex->TexIndex = (int)albedo_ix;
+		dynamic_vertex->NormTexIndex = (int)(norm_ix);
+		dynamic_vertex->EntityID = (int)ent_id;
 	}
 
 
@@ -289,9 +289,9 @@ namespace Kaimos {
 					s_3DData->PBR_VBufferPtr->Metallic = material->Metallic;
 					s_3DData->PBR_VBufferPtr->AmbientOcc = material->AmbientOcclusion;
 
-					s_3DData->PBR_VBufferPtr->MetalTexIndex = met_ix;
-					s_3DData->PBR_VBufferPtr->RoughTexIndex = rough_ix;
-					s_3DData->PBR_VBufferPtr->AOTexIndex = ao_ix;
+					s_3DData->PBR_VBufferPtr->MetalTexIndex = (int)met_ix;
+					s_3DData->PBR_VBufferPtr->RoughTexIndex = (int)rough_ix;
+					s_3DData->PBR_VBufferPtr->AOTexIndex = (int)ao_ix;
 
 					++s_3DData->PBR_VBufferPtr;
 				}
@@ -301,7 +301,7 @@ namespace Kaimos {
 
 					s_3DData->NonPBR_VBufferPtr->Shininess = material->Smoothness * 256.0f;
 					s_3DData->NonPBR_VBufferPtr->Specularity = material->Specularity;
-					s_3DData->NonPBR_VBufferPtr->SpecTexIndex = spec_ix;
+					s_3DData->NonPBR_VBufferPtr->SpecTexIndex = (int)spec_ix;
 
 					++s_3DData->NonPBR_VBufferPtr;
 				}

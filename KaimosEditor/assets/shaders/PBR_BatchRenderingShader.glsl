@@ -9,8 +9,8 @@ layout(location = 3) in vec2 a_TexCoord;
 layout(location = 4) in vec4 a_Color;
 
 layout(location = 5) in float a_NormalStrength;
-layout(location = 6) in float a_TexIndex;
-layout(location = 7) in float a_NormTexIndex;
+layout(location = 6) in int a_TexIndex;
+layout(location = 7) in int a_NormTexIndex;
 
 layout(location = 8) in int a_EntityID;
 
@@ -18,9 +18,9 @@ layout(location = 8) in int a_EntityID;
 layout(location = 9) in float a_Roughness;
 layout(location = 10) in float a_Metallic;
 layout(location = 11) in float a_AmbientOcclusionValue;
-layout(location = 12) in float a_MetalTexIndex;
-layout(location = 13) in float a_RoughTexIndex;
-layout(location = 14) in float a_AOTexIndex;
+layout(location = 12) in int a_MetalTexIndex;
+layout(location = 13) in int a_RoughTexIndex;
+layout(location = 14) in int a_AOTexIndex;
 
 
 // --- Varyings ---
@@ -30,7 +30,7 @@ out vec2 v_TexCoord;
 out vec4 v_Color;
 
 out flat float v_NormalStrength, v_Roughness, v_Metallic, v_AmbientOcclusionValue;
-out flat float v_TexIndex, v_NormTexIndex, v_MetalTexIndex, v_RoughTexIndex, v_AOTexIndex;
+out flat int v_TexIndex, v_NormTexIndex, v_MetalTexIndex, v_RoughTexIndex, v_AOTexIndex;
 
 out flat int v_EntityID;
 
@@ -89,7 +89,7 @@ in vec2 v_TexCoord;
 in vec4 v_Color;
 
 in flat float v_NormalStrength, v_Roughness, v_Metallic, v_AmbientOcclusionValue;
-in flat float v_TexIndex, v_NormTexIndex, v_MetalTexIndex, v_RoughTexIndex, v_AOTexIndex;
+in flat int v_TexIndex, v_NormTexIndex, v_MetalTexIndex, v_RoughTexIndex, v_AOTexIndex;
 
 in flat int v_EntityID;
 
@@ -136,10 +136,10 @@ float GeometrySmith(float NdotV, float NdotL, float roughness);
 void main()
 {
 	// PBR Variables
-	vec4 albedo = texture(u_Textures[int(v_TexIndex)], v_TexCoord) * v_Color;
+	vec4 albedo = texture(u_Textures[v_TexIndex], v_TexCoord) * v_Color;
 
 	// Normal Calculation
-	vec3 normal = texture(u_Textures[int(v_NormTexIndex)], v_TexCoord).xyz * 2.0 - 1.0;
+	vec3 normal = texture(u_Textures[v_NormTexIndex], v_TexCoord).xyz * 2.0 - 1.0;
 	normal.z *= v_NormalStrength;
 
 	// Lighting Calculations

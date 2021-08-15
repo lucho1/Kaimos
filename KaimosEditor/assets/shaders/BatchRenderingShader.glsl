@@ -9,15 +9,15 @@ layout(location = 3) in vec2 a_TexCoord;
 layout(location = 4) in vec4 a_Color;
 
 layout(location = 5) in float a_NormalStrength;
-layout(location = 6) in float a_TexIndex;
-layout(location = 7) in float a_NormTexIndex;
+layout(location = 6) in int a_TexIndex;
+layout(location = 7) in int a_NormTexIndex;
 
 layout(location = 8) in int a_EntityID;
 
 // Non-PBR Attributes
 layout(location = 9) in float a_Shininess;
 layout(location = 10) in float a_SpecularStrength;
-layout(location = 11) in float a_SpecTexIndex;
+layout(location = 11) in int a_SpecTexIndex;
 
 
 // --- Varyings ---
@@ -27,7 +27,7 @@ out vec2 v_TexCoord;
 out vec4 v_Color;
 
 out flat float v_Shininess, v_NormalStrength, v_SpecularStrength;
-out flat float v_TexIndex, v_NormTexIndex, v_SpecTexIndex;
+out flat int v_TexIndex, v_NormTexIndex, v_SpecTexIndex;
 
 out flat int v_EntityID;
 
@@ -81,7 +81,7 @@ in vec2 v_TexCoord;
 in vec4 v_Color;
 
 in flat float v_Shininess, v_NormalStrength, v_SpecularStrength;
-in flat float v_TexIndex, v_NormTexIndex, v_SpecTexIndex;
+in flat int v_TexIndex, v_NormTexIndex, v_SpecTexIndex;
 
 in flat int v_EntityID;
 
@@ -129,14 +129,14 @@ float GetLightSpecularFactor(vec3 normal, vec3 norm_light_dir, float light_specu
 void main()
 {
 	// - Normal Vec -
-	vec3 normal = texture(u_Textures[int(v_NormTexIndex)], v_TexCoord).rgb;
+	vec3 normal = texture(u_Textures[v_NormTexIndex], v_TexCoord).rgb;
     normal = normal * 2.0 - 1.0;
 	normal.z *= v_NormalStrength;
 	normal = normalize(v_TBN * normal);
 
 	// - Ligting Calculations -
 	vec3 lighting_result = vec3(0.0);
-	vec3 specular_map = texture(u_Textures[int(v_SpecTexIndex)], v_TexCoord).rgb;
+	vec3 specular_map = texture(u_Textures[v_SpecTexIndex], v_TexCoord).rgb;
 
 	// Directional Lights
 	for(int i = 0; i < u_DirectionalLightsNum; ++i)
@@ -187,7 +187,7 @@ void main()
 	}
 	
 	// - Final Color Output Calculation (scene_color*light*object_color*texture) -
-	color = texture(u_Textures[int(v_TexIndex)], v_TexCoord) * vec4(lighting_result, 1.0) * v_Color;
+	color = texture(u_Textures[v_TexIndex], v_TexCoord) * vec4(lighting_result, 1.0) * v_Color;
 
 	// - Color Output 2, Entity ID float value for Mouse Picking -
 	color2 = v_EntityID;
