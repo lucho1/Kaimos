@@ -9,7 +9,7 @@
 
 
 namespace YAML { class Emitter; class Node; }
-namespace Kaimos { class Material; }
+namespace Kaimos { enum class MATERIAL_TEXTURES; class Material; }
 
 
 namespace Kaimos::MaterialEditor {
@@ -126,7 +126,8 @@ namespace Kaimos::MaterialEditor {
 	private:
 
 		// --- Private Node Methods ---
-		void DrawTextureButton(uint tex_id, const std::string& tex_name, const std::string& ui_label, std::function<void(const std::string&)> SetTexFunc, std::function<void()> RemoveTexFunc);
+		void DrawTextureButton(uint tex_id, MATERIAL_TEXTURES tex_type, const std::string& tex_name, const std::string& ui_label);
+		void DrawTextureInfo(MATERIAL_TEXTURES texture_type, uint tex_id);
 
 		void SyncValuesWithMaterial();
 		void SyncMaterialValues();

@@ -9,6 +9,7 @@
 #include "Imgui/ImGuiUtils.h"
 #include "Core/Utils/PlatformUtils.h"
 #include "Renderer/Resources/Texture.h"
+#include "Renderer/Resources/Material.h"
 
 #include <imgui.h>
 #include <imnodes.h>
@@ -256,8 +257,9 @@ namespace Kaimos::MaterialEditor {
 
 
 
-	void MainMaterialNode::DrawTextureButton(uint tex_id, const std::string& tex_name, const std::string& ui_label, std::function<void(const std::string&)> SetTexFunc, std::function<void()> RemoveTextFunc)
+	void MainMaterialNode::DrawTextureButton(uint tex_id, MATERIAL_TEXTURES tex_type, const std::string& tex_name, const std::string& ui_label)
 	{
+		ImGui::PushID(tex_id);
 		ImGui::Text(tex_name.c_str());
 		ImGui::SameLine(65.0f);
 		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { 0.0f, 0.0f });
@@ -267,20 +269,38 @@ namespace Kaimos::MaterialEditor {
 		{
 			std::string texture_file = FileDialogs::OpenFile("Texture (*.png;*.jpg)\0*.png;*.jpg\0PNG Texture (*.png)\0*.png\0JPG Texture (*.jpg)\0*.jpg\0");
 			if (!texture_file.empty())
-				SetTexFunc(texture_file);
+				m_AttachedMaterial->SetTexture(tex_type, texture_file);
 		}
 
 		KaimosUI::UIFunctionalities::PopButton(false);
-		ImGui::PushID(0);
 		ImGui::SameLine();
 
 		// "X" Btn (to remove texture)
 		if (KaimosUI::UIFunctionalities::DrawColoredButton("X", { 20.0f, 50.0f }, glm::vec3(0.15f), true))
-			RemoveTextFunc();
+			m_AttachedMaterial->RemoveTexture(tex_type);
 
 		KaimosUI::UIFunctionalities::PopButton(true);
-		ImGui::PopID();
 		ImGui::PopStyleVar();
+		ImGui::PopID();
+	}
+
+	void MainMaterialNode::DrawTextureInfo(MATERIAL_TEXTURES texture_type, uint tex_id)
+	{
+		std::string tex_path = m_AttachedMaterial->GetTextureFilepath(texture_type);
+		std::string tex_name = tex_path;
+
+		if (!tex_path.empty())
+			tex_name = tex_path.substr(tex_path.find_last_of("/\\" + 1, tex_path.size() - 1) + 1);
+
+		float text_pos = 100.0f - ImGui::CalcTextSize(tex_name.c_str()).x * 0.5f;
+		ImGui::Indent(text_pos);
+		ImGui::Text("%s", tex_name.c_str());
+		ImGui::Indent(-text_pos);
+
+		char texture_info[24];
+		sprintf_s(texture_info, 24, "%ix%i (ID %i)", m_AttachedMaterial->GetTextureWidth(texture_type), m_AttachedMaterial->GetTextureHeight(texture_type), tex_id);
+		text_pos = 100.0f - ImGui::CalcTextSize(texture_info).x * 0.5f;
+		ImGui::Indent(text_pos); ImGui::Text(texture_info); ImGui::Indent(-text_pos);
 	}
 
 
@@ -298,15 +318,14 @@ namespace Kaimos::MaterialEditor {
 		ImGui::Text(m_Name.c_str());
 		ImNodes::EndNodeTitleBar();
 
-		// -- Draw Vertex Attribute Input Pins --
 		bool set_node_draggable = true;
 
+		// -- Draw Vertex Attribute Input Pins --
 		m_VertexPositionPin->DrawUI(set_node_draggable, true);
 		m_VertexNormalPin->DrawUI(set_node_draggable, true);
 		m_TextureCoordinatesPin->DrawUI(set_node_draggable, true);
 
-
-		// -- Draw Texture "Input" (Button) & Pins --
+		// -- Draw Albedo Texture Button & Pins --
 		ImGui::NewLine();
 		m_ColorPin->DrawUI(set_node_draggable, false, true, m_AttachedMaterial->Color);
 
@@ -333,151 +352,37 @@ namespace Kaimos::MaterialEditor {
 		}		
 
 		uint id = m_AttachedMaterial->GetTextureID(MATERIAL_TEXTURES::ALBEDO);
-		//DrawTextureButton(id, "Albedo", "###mt_albedo_btn", &m_AttachedMaterial->SetTexture, &m_AttachedMaterial->RemoveTexture);
-
-		ImGui::Text("Texture");
-		ImGui::SameLine(65.0f);
-		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { 0.0f, 0.0f });
-		
-		if (KaimosUI::UIFunctionalities::DrawTexturedButton("###mttexture_btn", id, glm::vec2(50.0f), glm::vec3(0.1f)))
-		{
-			std::string texture_file = FileDialogs::OpenFile("Texture (*.png;*.jpg)\0*.png;*.jpg\0PNG Texture (*.png)\0*.png\0JPG Texture (*.jpg)\0*.jpg\0");
-		
-			if (!texture_file.empty())
-				m_AttachedMaterial->SetTexture(MATERIAL_TEXTURES::ALBEDO, texture_file);
-		}
-		
-		KaimosUI::UIFunctionalities::PopButton(false);
-		
-		ImGui::PushID(0);
-		ImGui::SameLine();
-		if (KaimosUI::UIFunctionalities::DrawColoredButton("X", { 20.0f, 50.0f }, glm::vec3(0.15f), true))
-			m_AttachedMaterial->RemoveTexture(MATERIAL_TEXTURES::ALBEDO);
-		
-		KaimosUI::UIFunctionalities::PopButton(true);
-		ImGui::PopID();
-		ImGui::PopStyleVar();
+		DrawTextureButton(id, MATERIAL_TEXTURES::ALBEDO, "Albedo", "###mt_albedo_btn");
 
 		if (m_AttachedMaterial->HasAlbedo())
-		{
-			std::string tex_path = m_AttachedMaterial->GetTextureFilepath(MATERIAL_TEXTURES::ALBEDO);
-			std::string tex_name = tex_path;
+			DrawTextureInfo(MATERIAL_TEXTURES::ALBEDO, id);
 
-			if (!tex_path.empty())
-				tex_name = tex_path.substr(tex_path.find_last_of("/\\" + 1, tex_path.size() - 1) + 1);
-
-			float text_pos = 100.0f - ImGui::CalcTextSize(tex_name.c_str()).x * 0.5f;
-			ImGui::Indent(text_pos);
-			ImGui::Text("%s", tex_name.c_str());
-			ImGui::Indent(-text_pos);
-
-			char texture_info[24];
-			sprintf_s(texture_info, 24, "%ix%i (ID %i)", m_AttachedMaterial->GetTextureWidth(MATERIAL_TEXTURES::ALBEDO), m_AttachedMaterial->GetTextureHeight(MATERIAL_TEXTURES::ALBEDO), id);
-			text_pos = 100.0f - ImGui::CalcTextSize(texture_info).x * 0.5f;
-			ImGui::Indent(text_pos); ImGui::Text(texture_info); ImGui::Indent(-text_pos);
-		}
-
-
-		// -- Draw Normal Texture "Input" (Button) & Pins --
+		// -- Draw Normal Texture Button & Pins --
 		ImGui::NewLine();
 		glm::vec4 bumpiness_vec = glm::vec4(m_AttachedMaterial->Bumpiness);
 		m_BumpinessPin->DrawUI(set_node_draggable, false, true, bumpiness_vec, 0.01f, 0.05f, FLT_MAX, "%.2f");
 		m_AttachedMaterial->Bumpiness = bumpiness_vec.x;
 
 		uint norm_id = m_AttachedMaterial->GetTextureID(MATERIAL_TEXTURES::NORMAL);
-		//DrawTextureButton(id, "Normal", "###mt_normal_btn", &m_AttachedMaterial->SetNormalTexture, &m_AttachedMaterial->RemoveNormalTexture);
-		
-		ImGui::Text("Normal");
-		ImGui::SameLine(65.0f);
-		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { 0.0f, 0.0f });
-
-		if (KaimosUI::UIFunctionalities::DrawTexturedButton("###mtnormtexture_btn", norm_id, glm::vec2(50.0f), glm::vec3(0.1f)))
-		{
-			std::string texture_file = FileDialogs::OpenFile("Texture (*.png;*.jpg)\0*.png;*.jpg\0PNG Texture (*.png)\0*.png\0JPG Texture (*.jpg)\0*.jpg\0");
-			if (!texture_file.empty())
-				m_AttachedMaterial->SetTexture(MATERIAL_TEXTURES::NORMAL, texture_file);
-		}
-
-		KaimosUI::UIFunctionalities::PopButton(false);
-
-		ImGui::PushID(1);
-		ImGui::SameLine();
-		if (KaimosUI::UIFunctionalities::DrawColoredButton("X", { 20.0f, 50.0f }, glm::vec3(0.15f), true))
-			m_AttachedMaterial->RemoveTexture(MATERIAL_TEXTURES::NORMAL);
-
-		KaimosUI::UIFunctionalities::PopButton(true);
-		ImGui::PopID();
-		ImGui::PopStyleVar();
+		DrawTextureButton(norm_id, MATERIAL_TEXTURES::NORMAL, "Normal", "###mt_normal_btn");
 
 		if (m_AttachedMaterial->HasNormal())
-		{
-			std::string tex_path = m_AttachedMaterial->GetTextureFilepath(MATERIAL_TEXTURES::NORMAL);
-			std::string tex_name = tex_path;
-
-			if (!tex_path.empty())
-				tex_name = tex_path.substr(tex_path.find_last_of("/\\" + 1, tex_path.size() - 1) + 1);
-
-			float text_pos = 100.0f - ImGui::CalcTextSize(tex_name.c_str()).x * 0.5f;
-			ImGui::Indent(text_pos);
-			ImGui::Text("%s", tex_name.c_str());
-			ImGui::Indent(-text_pos);
-
-			char texture_info[24];
-			sprintf_s(texture_info, 24, "%ix%i (ID %i)", m_AttachedMaterial->GetTextureWidth(MATERIAL_TEXTURES::NORMAL), m_AttachedMaterial->GetTextureHeight(MATERIAL_TEXTURES::NORMAL), norm_id);
-			text_pos = 100.0f - ImGui::CalcTextSize(texture_info).x * 0.5f;
-			ImGui::Indent(text_pos); ImGui::Text(texture_info); ImGui::Indent(-text_pos);
-		}
+			DrawTextureInfo(MATERIAL_TEXTURES::NORMAL, norm_id);
 
 
-		// -- Draw Specular Texture "Input" (Button) & Pins --
 		if (!PBR_Pipeline)
 		{
+			// -- Draw Specular Texture Button & Pins --
 			ImGui::NewLine();
 			glm::vec4 specularity_vec = glm::vec4(m_AttachedMaterial->Specularity);
 			m_SpecularityPin->DrawUI(set_node_draggable, false, true, specularity_vec, 0.01f, 0.01f, FLT_MAX, "%.2f");
 			m_AttachedMaterial->Specularity = specularity_vec.x;
 
 			uint spec_id = m_AttachedMaterial->GetTextureID(MATERIAL_TEXTURES::SPECULAR);
-			ImGui::Text("Specular");
-			ImGui::SameLine(65.0f);
-			ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { 0.0f, 0.0f });
-
-			if (KaimosUI::UIFunctionalities::DrawTexturedButton("###mtspectexture_btn", spec_id, glm::vec2(50.0f), glm::vec3(0.1f)))
-			{
-				std::string texture_file = FileDialogs::OpenFile("Texture (*.png;*.jpg)\0*.png;*.jpg\0PNG Texture (*.png)\0*.png\0JPG Texture (*.jpg)\0*.jpg\0");
-				if (!texture_file.empty())
-					m_AttachedMaterial->SetTexture(MATERIAL_TEXTURES::SPECULAR, texture_file);
-			}
-
-			KaimosUI::UIFunctionalities::PopButton(false);
-
-			ImGui::PushID(2);
-			ImGui::SameLine();
-			if (KaimosUI::UIFunctionalities::DrawColoredButton("X", { 20.0f, 50.0f }, glm::vec3(0.15f), true))
-				m_AttachedMaterial->RemoveTexture(MATERIAL_TEXTURES::SPECULAR);
-
-			KaimosUI::UIFunctionalities::PopButton(true);
-			ImGui::PopID();
-			ImGui::PopStyleVar();
+			DrawTextureButton(spec_id, MATERIAL_TEXTURES::SPECULAR, "Specular", "###mt_spec_btn");
 
 			if (m_AttachedMaterial->HasSpecular())
-			{
-				std::string tex_path = m_AttachedMaterial->GetTextureFilepath(MATERIAL_TEXTURES::SPECULAR);
-				std::string tex_name = tex_path;
-
-				if (!tex_path.empty())
-					tex_name = tex_path.substr(tex_path.find_last_of("/\\" + 1, tex_path.size() - 1) + 1);
-
-				float text_pos = 100.0f - ImGui::CalcTextSize(tex_name.c_str()).x * 0.5f;
-				ImGui::Indent(text_pos);
-				ImGui::Text("%s", tex_name.c_str());
-				ImGui::Indent(-text_pos);
-
-				char texture_info[24];
-				sprintf_s(texture_info, 24, "%ix%i (ID %i)", m_AttachedMaterial->GetTextureWidth(MATERIAL_TEXTURES::SPECULAR), m_AttachedMaterial->GetTextureHeight(MATERIAL_TEXTURES::SPECULAR), spec_id);
-				text_pos = 100.0f - ImGui::CalcTextSize(texture_info).x * 0.5f;
-				ImGui::Indent(text_pos); ImGui::Text(texture_info); ImGui::Indent(-text_pos);
-			}
+				DrawTextureInfo(MATERIAL_TEXTURES::SPECULAR, spec_id);
 		}
 		
 
