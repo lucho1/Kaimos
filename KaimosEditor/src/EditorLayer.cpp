@@ -56,7 +56,7 @@ namespace Kaimos {
 		// -- Create & Load Scene --
 		NewScene(false);
 		SceneSerializer m_Serializer(m_CurrentScene);
-		m_Serializer.Deserialize("assets/scenes/CubeScene.kaimos");
+		m_Serializer.Deserialize("assets/scenes/CubeScene.kaimos", m_EditorCamera);
 		m_KMEPanel = MaterialEditorPanel(m_CurrentScene);
 		m_ScenePanel = ScenePanel(m_CurrentScene, &m_KMEPanel);
 	}
@@ -653,9 +653,9 @@ namespace Kaimos {
 
 		// TODO: This should be handled by a filepath class/assets class or something
 		if(m_CurrentScene->GetPath().empty())
-			m_Serializer.Serialize("assets/scenes/" + m_CurrentScene->GetName() + ".kaimos");
+			m_Serializer.Serialize("assets/scenes/" + m_CurrentScene->GetName() + ".kaimos", m_EditorCamera);
 		else
-			m_Serializer.Serialize(m_CurrentScene->GetPath());
+			m_Serializer.Serialize(m_CurrentScene->GetPath(), m_EditorCamera);
 
 		// -- Save Editor Settings (ini files) --
 		ImGui::SaveIniSettingsToDisk("imgui.ini");
@@ -687,7 +687,7 @@ namespace Kaimos {
 			// -- Save Graphs & Scene --
 			m_KMEPanel.SerializeGraphs();
 			SceneSerializer m_Serializer(m_CurrentScene);
-			m_Serializer.Serialize(filepath);
+			m_Serializer.Serialize(filepath, m_EditorCamera);
 
 			// -- Save Editor Settings (ini file) --
 			ImGui::SaveIniSettingsToDisk("imgui.ini");
@@ -702,7 +702,7 @@ namespace Kaimos {
 		{
 			NewScene();
 			SceneSerializer m_Serializer(m_CurrentScene);
-			m_Serializer.Deserialize(filepath);
+			m_Serializer.Deserialize(filepath, m_EditorCamera);
 		}
 	}
 }
