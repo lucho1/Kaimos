@@ -19,9 +19,9 @@ namespace Kaimos {
 		RemoveTexture(MATERIAL_TEXTURES::ALBEDO);
 		RemoveTexture(MATERIAL_TEXTURES::NORMAL);
 		RemoveTexture(MATERIAL_TEXTURES::SPECULAR);
-		//RemoveTexture(MATERIAL_TEXTURES::ROUGHNESS);
-		//RemoveTexture(MATERIAL_TEXTURES::METALLIC);
-		//RemoveTexture(MATERIAL_TEXTURES::AMBIENT_OC);
+		RemoveTexture(MATERIAL_TEXTURES::ROUGHNESS);
+		RemoveTexture(MATERIAL_TEXTURES::METALLIC);
+		RemoveTexture(MATERIAL_TEXTURES::AMBIENT_OC);
 
 		if (m_AttachedGraph)
 			m_AttachedGraph.reset();
@@ -37,9 +37,9 @@ namespace Kaimos {
 			case MATERIAL_TEXTURES::ALBEDO:			return m_Texture;
 			case MATERIAL_TEXTURES::NORMAL:			return m_NormalTexture;
 			case MATERIAL_TEXTURES::SPECULAR:		return m_SpecularTexture;
-			//case MATERIAL_TEXTURES::ROUGHNESS:
-			//case MATERIAL_TEXTURES::METALLIC:
-			//case MATERIAL_TEXTURES::AMBIENT_OC:
+			case MATERIAL_TEXTURES::ROUGHNESS:		return m_RoughnessTexture;
+			case MATERIAL_TEXTURES::METALLIC:		return m_MetallicTexture;
+			case MATERIAL_TEXTURES::AMBIENT_OC:		return m_AmbientOccTexture;
 			default:								KS_FATAL_ERROR("[Error] Material: Tried to retrieve a texture from a non-existing texture type!");
 		}
 
@@ -54,9 +54,9 @@ namespace Kaimos {
 			case MATERIAL_TEXTURES::ALBEDO:			return m_TextureFilepath;
 			case MATERIAL_TEXTURES::NORMAL:			return m_NormalTextureFilepath;
 			case MATERIAL_TEXTURES::SPECULAR:		return m_SpecularTexturePath;
-			//case MATERIAL_TEXTURES::ROUGHNESS:
-			//case MATERIAL_TEXTURES::METALLIC:
-			//case MATERIAL_TEXTURES::AMBIENT_OC:
+			case MATERIAL_TEXTURES::ROUGHNESS:		return m_RoughnessTextureFilepath;
+			case MATERIAL_TEXTURES::METALLIC:		return m_MetallicTextureFilepath;
+			case MATERIAL_TEXTURES::AMBIENT_OC:		return m_AmbientOccTexturePath;
 			default:								KS_FATAL_ERROR("[Error] Material: Tried to retrieve a string from a non-existing texture type!");
 		}
 
@@ -69,15 +69,20 @@ namespace Kaimos {
 	// ----------------------- Public Texture Methods -----------------------------------------------------
 	void Material::SetTexture(MATERIAL_TEXTURES texture_type, const std::string& filepath)
 	{
-		Ref<Texture2D>* texture = &GetMaterialTexture(texture_type);
-		std::string* texture_filepath = &GetMaterialTextureFilepath(texture_type);
-
 		Ref<Texture2D> new_texture = Texture2D::Create(filepath);
 		if (new_texture)
 		{
+			Ref<Texture2D>* texture = &GetMaterialTexture(texture_type);
+			std::string* texture_filepath = &GetMaterialTextureFilepath(texture_type);
+
 			RemoveTexture(texture_type);
 			*texture = new_texture;
-			*texture_filepath = filepath.substr(filepath.find("assets"), filepath.size());
+
+			size_t assets_pos = filepath.find("assets");
+			if (assets_pos != filepath.npos)
+				*texture_filepath = filepath.substr(assets_pos, filepath.size());
+			else
+				*texture_filepath = filepath;
 		}
 		else
 			KS_EDITOR_WARN("Couldn't load Texture from '{0}'", filepath);

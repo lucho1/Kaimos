@@ -123,8 +123,8 @@ namespace Kaimos {
 			{ SHADER_DATATYPE::FLOAT,	"a_Roughness" },
 			{ SHADER_DATATYPE::FLOAT,	"a_Metallic" },
 			{ SHADER_DATATYPE::FLOAT,	"a_AmbientOcclusionValue" },
-			{ SHADER_DATATYPE::INT,		"a_MetalTexIndex" },
 			{ SHADER_DATATYPE::INT,		"a_RoughTexIndex" },
+			{ SHADER_DATATYPE::INT,		"a_MetalTexIndex" },
 			{ SHADER_DATATYPE::INT,		"a_AOTexIndex" }
 		};
 
@@ -269,15 +269,15 @@ namespace Kaimos {
 		bool pbr = Renderer::IsSceneInPBRPipeline();
 		Renderer::CheckMaterialFitsInBatch(material, &NextBatch);
 
-		uint tex_ix, norm_ix, spec_ix, met_ix, rough_ix, ao_ix;
+		uint tex_ix, norm_ix, spec_ix, rough_ix, met_ix, ao_ix;
 		tex_ix = Renderer::GetTextureIndex(material->GetTexture(MATERIAL_TEXTURES::ALBEDO), false, &NextBatch);
 		norm_ix = Renderer::GetTextureIndex(material->GetTexture(MATERIAL_TEXTURES::NORMAL), true, &NextBatch);
 
 		if (pbr)
 		{
-			met_ix = 0;
-			rough_ix = 0;
-			ao_ix = 0;
+			rough_ix = Renderer::GetTextureIndex(material->GetTexture(MATERIAL_TEXTURES::ROUGHNESS), false, &NextBatch);
+			met_ix = Renderer::GetTextureIndex(material->GetTexture(MATERIAL_TEXTURES::METALLIC), false, &NextBatch);
+			ao_ix = Renderer::GetTextureIndex(material->GetTexture(MATERIAL_TEXTURES::AMBIENT_OC), false, &NextBatch);
 		}
 		else
 			spec_ix = Renderer::GetTextureIndex(material->GetTexture(MATERIAL_TEXTURES::SPECULAR), false, &NextBatch);
@@ -296,8 +296,8 @@ namespace Kaimos {
 				s_Data->PBR_QuadVBufferPtr->Metallic = material->Metallic;
 				s_Data->PBR_QuadVBufferPtr->AmbientOcc = material->AmbientOcclusion;
 
-				s_Data->PBR_QuadVBufferPtr->MetalTexIndex = (int)met_ix;
 				s_Data->PBR_QuadVBufferPtr->RoughTexIndex = (int)rough_ix;
+				s_Data->PBR_QuadVBufferPtr->MetalTexIndex = (int)met_ix;
 				s_Data->PBR_QuadVBufferPtr->AOTexIndex = (int)ao_ix;
 
 				++s_Data->PBR_QuadVBufferPtr;

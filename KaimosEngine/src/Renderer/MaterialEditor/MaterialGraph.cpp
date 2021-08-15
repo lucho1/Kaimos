@@ -179,25 +179,56 @@ namespace Kaimos::MaterialEditor {
 
 
 	// ----------------------- Public Serialization Methods ----------------------------------------------
-	void MaterialGraph::DeserializeGraph(const YAML::Node& yaml_graph_node, Ref<Material> attached_material, std::string& texture_path, std::string& normal_texture_path, std::string& specular_texture_path)
+	void MaterialGraph::DeserializeGraph(const YAML::Node& yaml_graph_node, Ref<Material> attached_material)
 	{
-		texture_path = normal_texture_path = specular_texture_path = "";
 		auto main_node = yaml_graph_node["MainRootNode"];
-
 		if (main_node)
 		{
-			if(main_node["TextureFile"])
-				texture_path = main_node["TextureFile"].as<std::string>();
-
-			if (main_node["NormalTextureFile"])
-				normal_texture_path = main_node["NormalTextureFile"].as<std::string>();
-
-			if (main_node["SpecularTextureFile"])
-				specular_texture_path = main_node["SpecularTextureFile"].as<std::string>();
-
 			m_MainMatNode = CreateRef<MainMaterialNode>(attached_material.get(), main_node["Node"].as<uint>());
 			m_MainMatNode->DeserializeMainNode(main_node["InputPins"]);
 			m_Nodes.push_back(m_MainMatNode);
+
+			if (main_node["TextureFile"])
+			{
+				std::string path = main_node["TextureFile"].as<std::string>();
+				if(!path.empty())
+					attached_material->SetTexture(MATERIAL_TEXTURES::ALBEDO, path);
+			}
+
+			if (main_node["NormalTextureFile"])
+			{
+				std::string path = main_node["NormalTextureFile"].as<std::string>();
+				if (!path.empty())
+					attached_material->SetTexture(MATERIAL_TEXTURES::NORMAL, path);
+			}
+
+			if (main_node["SpecularTextureFile"])
+			{
+				std::string path = main_node["SpecularTextureFile"].as<std::string>();
+				if (!path.empty())
+					attached_material->SetTexture(MATERIAL_TEXTURES::SPECULAR, path);
+			}
+
+			if (main_node["RoughnessTextureFile"])
+			{
+				std::string path = main_node["RoughnessTextureFile"].as<std::string>();
+				if (!path.empty())
+					attached_material->SetTexture(MATERIAL_TEXTURES::ROUGHNESS, path);
+			}
+
+			if (main_node["MetallicTextureFile"])
+			{
+				std::string path = main_node["MetallicTextureFile"].as<std::string>();
+				if (!path.empty())
+					attached_material->SetTexture(MATERIAL_TEXTURES::METALLIC, path);
+			}
+
+			if (main_node["AmbientOccTextureFile"])
+			{
+				std::string path = main_node["AmbientOccTextureFile"].as<std::string>();
+				if (!path.empty())
+					attached_material->SetTexture(MATERIAL_TEXTURES::AMBIENT_OC, path);
+			}
 		}
 		else
 			m_MainMatNode = CreateRef<MainMaterialNode>(attached_material.get());

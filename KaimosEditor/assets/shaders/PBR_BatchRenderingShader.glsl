@@ -18,8 +18,8 @@ layout(location = 8) in int a_EntityID;
 layout(location = 9) in float a_Roughness;
 layout(location = 10) in float a_Metallic;
 layout(location = 11) in float a_AmbientOcclusionValue;
-layout(location = 12) in int a_MetalTexIndex;
-layout(location = 13) in int a_RoughTexIndex;
+layout(location = 12) in int a_RoughTexIndex;
+layout(location = 13) in int a_MetalTexIndex;
 layout(location = 14) in int a_AOTexIndex;
 
 

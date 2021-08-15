@@ -42,8 +42,8 @@ namespace Kaimos {
 		float Metallic		= 0.5f;
 		float AmbientOcc	= 0.5f;
 
-		int MetalTexIndex	= 0.0f;
 		int RoughTexIndex	= 0.0f;
+		int MetalTexIndex	= 0.0f;
 		int AOTexIndex		= 0.0f;
 	};
 

@@ -7,7 +7,7 @@
 namespace Kaimos {
 
 	class Texture2D;
-	enum class MATERIAL_TEXTURES { ALBEDO = 0, NORMAL, SPECULAR/*, ROUGHNESS, METALLIC, AMBIENT_OC*/ };
+	enum class MATERIAL_TEXTURES { ALBEDO = 0, NORMAL, SPECULAR, ROUGHNESS, METALLIC, AMBIENT_OC };
 
 	class Material
 	{
@@ -46,9 +46,12 @@ namespace Kaimos {
 		const Ref<Texture2D>& GetTexture(MATERIAL_TEXTURES texture_type);
 		const std::string& GetTextureFilepath(MATERIAL_TEXTURES texture_type);
 
-		bool HasAlbedo()	const { return m_Texture != nullptr; }
-		bool HasNormal()	const { return m_NormalTexture != nullptr; }
-		bool HasSpecular()	const { return m_SpecularTexture != nullptr; }
+		bool HasAlbedo()		const { return m_Texture != nullptr; }
+		bool HasNormal()		const { return m_NormalTexture != nullptr; }
+		bool HasSpecular()		const { return m_SpecularTexture != nullptr; }
+		bool HasRoughness()		const { return m_RoughnessTexture != nullptr; }
+		bool HasMetallic()		const { return m_MetallicTexture != nullptr; }
+		bool HasAmbientOcc()	const { return m_AmbientOccTexture != nullptr; }
 		
 
 	public:
@@ -91,7 +94,10 @@ namespace Kaimos {
 		ScopePtr<MaterialEditor::MaterialGraph> m_AttachedGraph = nullptr;
 
 		Ref<Texture2D> m_Texture = nullptr, m_NormalTexture = nullptr, m_SpecularTexture = nullptr;
+		Ref<Texture2D> m_RoughnessTexture = nullptr, m_MetallicTexture = nullptr, m_AmbientOccTexture = nullptr;
+
 		std::string m_TextureFilepath = "", m_NormalTextureFilepath = "", m_SpecularTexturePath = "";
+		std::string m_RoughnessTextureFilepath = "", m_MetallicTextureFilepath = "", m_AmbientOccTexturePath = "";
 		std::string m_Name = "Unnamed";
 	};
 }

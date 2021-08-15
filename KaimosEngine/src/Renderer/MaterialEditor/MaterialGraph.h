@@ -47,7 +47,7 @@ namespace Kaimos::MaterialEditor {
 	public:
 
 		// --- Public Serialization Methods ---
-		void DeserializeGraph(const YAML::Node& yaml_graph_node, Ref<Material> attached_material, std::string& texture_path, std::string& normal_texture_path, std::string& specular_texture_path);
+		void DeserializeGraph(const YAML::Node& yaml_graph_node, Ref<Material> attached_material);
 		void SerializeGraph(YAML::Emitter& output_emitter) const;
 		void SaveEditorSettings() const;
 		void LoadEditorSettings() const;

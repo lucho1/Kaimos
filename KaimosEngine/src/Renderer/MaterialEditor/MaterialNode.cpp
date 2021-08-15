@@ -169,7 +169,7 @@ namespace Kaimos::MaterialEditor {
 
 		m_RoughnessPin =			CreateRef<NodeInputPin>(this, PinDataType::FLOAT, false, "Roughness (Float)", 0.5f);
 		m_MetallicPin =				CreateRef<NodeInputPin>(this, PinDataType::FLOAT, false, "Metallic (Float)", 0.5f);
-		m_AmbientOcclusionPin =		CreateRef<NodeInputPin>(this, PinDataType::FLOAT, false, "Ambient Occlusion (Float)", 0.2f);
+		m_AmbientOcclusionPin =		CreateRef<NodeInputPin>(this, PinDataType::FLOAT, false, "Amb. Occ. (Float)", 0.2f);
 		
 
 		m_NodeInputPins.push_back(m_VertexPositionPin);
@@ -233,7 +233,7 @@ namespace Kaimos::MaterialEditor {
 				m_RoughnessPin = pin;
 			else if (pin_name == "Metallic (Float)")
 				m_MetallicPin = pin;
-			else if (pin_name == "Ambient Occlusion (Float)")
+			else if (pin_name == "Amb. Occ. (Float)")
 				m_AmbientOcclusionPin = pin;
 		}
 	}
@@ -261,7 +261,7 @@ namespace Kaimos::MaterialEditor {
 	{
 		ImGui::PushID(tex_id);
 		ImGui::Text(tex_name.c_str());
-		ImGui::SameLine(65.0f);
+		ImGui::SameLine(90.0f);
 		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { 0.0f, 0.0f });
 
 		// Texture Btn
@@ -362,13 +362,30 @@ namespace Kaimos::MaterialEditor {
 		if (PBR_Pipeline)
 		{
 			// Roughness Pin & Texture
+			uint rough_id = m_AttachedMaterial->GetTextureID(MATERIAL_TEXTURES::ROUGHNESS);
 			DrawFloatPin(set_node_draggable, m_RoughnessPin, m_AttachedMaterial->Roughness, 0.03f, 1.0f);
+			DrawTextureButton(rough_id, MATERIAL_TEXTURES::ROUGHNESS, "Roughness", "###mt_rough_btn");
+
+			if (m_AttachedMaterial->HasRoughness())
+				DrawTextureInfo(MATERIAL_TEXTURES::ROUGHNESS, rough_id);
 
 			// Metallic Pin & Texture
+			ImGui::NewLine();
+			uint met_id = m_AttachedMaterial->GetTextureID(MATERIAL_TEXTURES::METALLIC);
 			DrawFloatPin(set_node_draggable, m_MetallicPin, m_AttachedMaterial->Metallic, 0.01f, 1.0f);
+			DrawTextureButton(met_id, MATERIAL_TEXTURES::METALLIC, "Metallic", "###mt_met_btn");
+
+			if (m_AttachedMaterial->HasMetallic())
+				DrawTextureInfo(MATERIAL_TEXTURES::METALLIC, met_id);
 
 			// Ambient Occlusion Pin & Texture
+			ImGui::NewLine();
+			uint aocc_id = m_AttachedMaterial->GetTextureID(MATERIAL_TEXTURES::AMBIENT_OC);
 			DrawFloatPin(set_node_draggable, m_AmbientOcclusionPin, m_AttachedMaterial->AmbientOcclusion, 0.0f, 1.0f);
+			DrawTextureButton(aocc_id, MATERIAL_TEXTURES::AMBIENT_OC, "AO Texture", "###mt_aocc_btn");
+
+			if (m_AttachedMaterial->HasAmbientOcc())
+				DrawTextureInfo(MATERIAL_TEXTURES::AMBIENT_OC, aocc_id);
 		}
 		else
 		{
@@ -429,6 +446,10 @@ namespace Kaimos::MaterialEditor {
 		output_emitter << YAML::Key << "TextureFile" << YAML::Value << m_AttachedMaterial->GetTextureFilepath(MATERIAL_TEXTURES::ALBEDO);
 		output_emitter << YAML::Key << "NormalTextureFile" << YAML::Value << m_AttachedMaterial->GetTextureFilepath(MATERIAL_TEXTURES::NORMAL);
 		output_emitter << YAML::Key << "SpecularTextureFile" << YAML::Value << m_AttachedMaterial->GetTextureFilepath(MATERIAL_TEXTURES::SPECULAR);
+		output_emitter << YAML::Key << "RoughnessTextureFile" << YAML::Value << m_AttachedMaterial->GetTextureFilepath(MATERIAL_TEXTURES::ROUGHNESS);
+		output_emitter << YAML::Key << "MetallicTextureFile" << YAML::Value << m_AttachedMaterial->GetTextureFilepath(MATERIAL_TEXTURES::METALLIC);
+		output_emitter << YAML::Key << "AmbientOccTextureFile" << YAML::Value << m_AttachedMaterial->GetTextureFilepath(MATERIAL_TEXTURES::AMBIENT_OC);
+
 		SerializeBaseNode(output_emitter);
 	}
 
