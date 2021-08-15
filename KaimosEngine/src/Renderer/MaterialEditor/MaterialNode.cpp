@@ -303,9 +303,19 @@ namespace Kaimos::MaterialEditor {
 		ImGui::Indent(text_pos); ImGui::Text(texture_info); ImGui::Indent(-text_pos);
 	}
 
+	void MainMaterialNode::DrawFloatPin(bool& set_draggable, const Ref<NodeInputPin>& pin, float& value, float min, float max)
+	{
+		glm::vec4 vec = glm::vec4(value);
+		pin->DrawUI(set_draggable, false, true, vec, 0.01f, min, max, "%.2f");
+		value = vec.x;
+	}
+
 
 	void MainMaterialNode::DrawNodeUI()
 	{
+		bool set_node_draggable = true;
+		bool PBR_Pipeline = Renderer::IsSceneInPBRPipeline();
+
 		// -- Push Node Colors --
 		ImNodes::PushColorStyle(ImNodesCol_TitleBar, IM_COL32(179, 51, 51, 255));
 		ImNodes::PushColorStyle(ImNodesCol_TitleBarHovered, IM_COL32(230, 76, 76, 255));
@@ -316,41 +326,21 @@ namespace Kaimos::MaterialEditor {
 
 		ImNodes::BeginNodeTitleBar();
 		ImGui::Text(m_Name.c_str());
-		ImNodes::EndNodeTitleBar();
-
-		bool set_node_draggable = true;
+		ImNodes::EndNodeTitleBar();		
 
 		// -- Draw Vertex Attribute Input Pins --
 		m_VertexPositionPin->DrawUI(set_node_draggable, true);
 		m_VertexNormalPin->DrawUI(set_node_draggable, true);
 		m_TextureCoordinatesPin->DrawUI(set_node_draggable, true);
 
-		// -- Draw Albedo Texture Button & Pins --
+		// -- Draw Color & Smoothness (if !PBR) Pins --
 		ImGui::NewLine();
 		m_ColorPin->DrawUI(set_node_draggable, false, true, m_AttachedMaterial->Color);
 
-		bool PBR_Pipeline = Renderer::IsSceneInPBRPipeline();
-		if (PBR_Pipeline)
-		{
-			glm::vec4 roughness_vec = glm::vec4(m_AttachedMaterial->Roughness);
-			m_RoughnessPin->DrawUI(set_node_draggable, false, true, roughness_vec, 0.01f, 0.02f, 1.0f, "%.2f");
-			m_AttachedMaterial->Roughness = roughness_vec.x;
-		
-			glm::vec4 metallic_vec = glm::vec4(m_AttachedMaterial->Metallic);
-			m_MetallicPin->DrawUI(set_node_draggable, false, true, metallic_vec, 0.01f, 0.01f, 1.0f, "%.2f");
-			m_AttachedMaterial->Metallic = metallic_vec.x;
-		
-			glm::vec4 ao_vec = glm::vec4(m_AttachedMaterial->AmbientOcclusion);
-			m_AmbientOcclusionPin->DrawUI(set_node_draggable, false, true, ao_vec, 0.01f, 0.0f, 1.0f, "%.2f");
-			m_AttachedMaterial->AmbientOcclusion = ao_vec.x;
-		}
-		else
-		{
-			glm::vec4 smoothness_vec = glm::vec4(m_AttachedMaterial->Smoothness);
-			m_SmoothnessPin->DrawUI(set_node_draggable, false, true, smoothness_vec, 0.01f, 0.01f, 4.0f, "%.2f");
-			m_AttachedMaterial->Smoothness = smoothness_vec.x;
-		}		
+		if (!PBR_Pipeline)
+			DrawFloatPin(set_node_draggable, m_SmoothnessPin, m_AttachedMaterial->Smoothness, 0.01f, 4.0f);
 
+		// -- Draw Albedo Texture Button & Pins --
 		uint id = m_AttachedMaterial->GetTextureID(MATERIAL_TEXTURES::ALBEDO);
 		DrawTextureButton(id, MATERIAL_TEXTURES::ALBEDO, "Albedo", "###mt_albedo_btn");
 
@@ -359,32 +349,38 @@ namespace Kaimos::MaterialEditor {
 
 		// -- Draw Normal Texture Button & Pins --
 		ImGui::NewLine();
-		glm::vec4 bumpiness_vec = glm::vec4(m_AttachedMaterial->Bumpiness);
-		m_BumpinessPin->DrawUI(set_node_draggable, false, true, bumpiness_vec, 0.01f, 0.05f, FLT_MAX, "%.2f");
-		m_AttachedMaterial->Bumpiness = bumpiness_vec.x;
-
 		uint norm_id = m_AttachedMaterial->GetTextureID(MATERIAL_TEXTURES::NORMAL);
+
+		DrawFloatPin(set_node_draggable, m_BumpinessPin, m_AttachedMaterial->Bumpiness, 0.05f, FLT_MAX);
 		DrawTextureButton(norm_id, MATERIAL_TEXTURES::NORMAL, "Normal", "###mt_normal_btn");
 
 		if (m_AttachedMaterial->HasNormal())
 			DrawTextureInfo(MATERIAL_TEXTURES::NORMAL, norm_id);
 
-
-		if (!PBR_Pipeline)
+		// -- Draw PBR/NonPBR Pins & Textures --
+		ImGui::NewLine();
+		if (PBR_Pipeline)
 		{
-			// -- Draw Specular Texture Button & Pins --
-			ImGui::NewLine();
-			glm::vec4 specularity_vec = glm::vec4(m_AttachedMaterial->Specularity);
-			m_SpecularityPin->DrawUI(set_node_draggable, false, true, specularity_vec, 0.01f, 0.01f, FLT_MAX, "%.2f");
-			m_AttachedMaterial->Specularity = specularity_vec.x;
+			// Roughness Pin & Texture
+			DrawFloatPin(set_node_draggable, m_RoughnessPin, m_AttachedMaterial->Roughness, 0.03f, 1.0f);
 
+			// Metallic Pin & Texture
+			DrawFloatPin(set_node_draggable, m_MetallicPin, m_AttachedMaterial->Metallic, 0.01f, 1.0f);
+
+			// Ambient Occlusion Pin & Texture
+			DrawFloatPin(set_node_draggable, m_AmbientOcclusionPin, m_AttachedMaterial->AmbientOcclusion, 0.0f, 1.0f);
+		}
+		else
+		{
+			// Specular Pin & Texture
 			uint spec_id = m_AttachedMaterial->GetTextureID(MATERIAL_TEXTURES::SPECULAR);
+
+			DrawFloatPin(set_node_draggable, m_SpecularityPin, m_AttachedMaterial->Specularity, 0.01f, FLT_MAX);
 			DrawTextureButton(spec_id, MATERIAL_TEXTURES::SPECULAR, "Specular", "###mt_spec_btn");
 
 			if (m_AttachedMaterial->HasSpecular())
 				DrawTextureInfo(MATERIAL_TEXTURES::SPECULAR, spec_id);
-		}
-		
+		}		
 
 		// -- End Node Draw --
 		ImNodes::SetNodeDraggable(m_ID, set_node_draggable);

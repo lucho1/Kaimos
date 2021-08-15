@@ -128,6 +128,7 @@ namespace Kaimos::MaterialEditor {
 		// --- Private Node Methods ---
 		void DrawTextureButton(uint tex_id, MATERIAL_TEXTURES tex_type, const std::string& tex_name, const std::string& ui_label);
 		void DrawTextureInfo(MATERIAL_TEXTURES texture_type, uint tex_id);
+		void DrawFloatPin(bool& set_draggable, const Ref<NodeInputPin>& pin, float& value, float min, float max);
 
 		void SyncValuesWithMaterial();
 		void SyncMaterialValues();
