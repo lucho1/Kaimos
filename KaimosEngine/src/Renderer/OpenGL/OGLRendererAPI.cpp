@@ -75,6 +75,11 @@ namespace Kaimos {
 		glBindTexture(GL_TEXTURE_2D, 0); // TODO/OJU: Should we actually do this? Take it into account on materials system/3D Renderer
 	}
 
+	void OGLRendererAPI::DrawUnindexed(const Ref<VertexArray>& vertex_array, uint count) const
+	{
+		glDrawArrays(GL_TRIANGLES, 0, count);
+	}
+
 	void OGLRendererAPI::SetViewport(uint x, uint y, uint width, uint height)
 	{
 		glViewport(x, y, width, height);

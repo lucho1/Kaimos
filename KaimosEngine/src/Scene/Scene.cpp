@@ -93,8 +93,7 @@ namespace Kaimos {
 		std::vector<std::pair<Ref<Light>, glm::vec3>> dir_lights = GetSceneDirLights();
 		std::vector<std::pair<Ref<PointLight>, glm::vec3>> plights = GetScenePointLights();
 
-		glm::mat4 view_proj = camera.GetViewProjection();
-		Renderer::BeginScene(view_proj, camera_pos, dir_lights, plights);
+		Renderer::BeginScene(camera.GetViewProjection(), camera_pos, dir_lights, plights);
 		scene3D ? Renderer3D::BeginScene() : Renderer2D::BeginScene();
 	}
 
@@ -148,6 +147,8 @@ namespace Kaimos {
 		BeginScene(camera, camera_pos, false);
 		RenderSprites(dt);
 		Renderer2D::EndScene();
+
+		Renderer::EndScene(camera.GetViewProjection());
 	}
 
 
@@ -172,14 +173,20 @@ namespace Kaimos {
 		static bool primary_camera_warn = false;
 		if (m_PrimaryCamera)
 		{
-			BeginScene(m_PrimaryCamera.GetComponent<CameraComponent>(), m_PrimaryCamera.GetComponent<TransformComponent>(), true);
+			CameraComponent& camera_comp = m_PrimaryCamera.GetComponent<CameraComponent>();
+			TransformComponent& trans_comp = m_PrimaryCamera.GetComponent<TransformComponent>();
+
+			BeginScene(camera_comp, trans_comp, true);
 			RenderMeshes(dt);
 			Renderer3D::EndScene();
 
-			BeginScene(m_PrimaryCamera.GetComponent<CameraComponent>(), m_PrimaryCamera.GetComponent<TransformComponent>(), false);
+			BeginScene(camera_comp, trans_comp, false);
 			RenderSprites(dt);
 			Renderer2D::EndScene();
 			primary_camera_warn = false;
+
+			glm::mat4 view_proj = camera_comp.Camera.GetProjection() * glm::inverse(trans_comp.GetTransform());
+			Renderer::EndScene(view_proj);
 		}
 		else if(!primary_camera_warn)
 		{
@@ -194,13 +201,19 @@ namespace Kaimos {
 		// -- Render --
 		if (camera_entity && camera_entity.HasComponent<CameraComponent>())
 		{
-			BeginScene(m_PrimaryCamera.GetComponent<CameraComponent>(), m_PrimaryCamera.GetComponent<TransformComponent>(), true);
+			CameraComponent& camera_comp = m_PrimaryCamera.GetComponent<CameraComponent>();
+			TransformComponent& trans_comp = m_PrimaryCamera.GetComponent<TransformComponent>();
+
+			BeginScene(camera_comp, trans_comp, true);
 			RenderMeshes(dt);
 			Renderer3D::EndScene();
 
-			BeginScene(camera_entity.GetComponent<CameraComponent>(), camera_entity.GetComponent<TransformComponent>(), false);
+			BeginScene(camera_comp, trans_comp, false);
 			RenderSprites(dt);
 			Renderer2D::EndScene();
+
+			glm::mat4 view_proj = camera_comp.Camera.GetProjection() * glm::inverse(trans_comp.GetTransform());
+			Renderer::EndScene(view_proj);
 		}
 	}
 

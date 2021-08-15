@@ -36,6 +36,8 @@ namespace Kaimos {
 		Ref<Texture2D> WhiteTexture = nullptr, NormalTexture = nullptr;
 
 		Ref<HDRTexture2D> m_EnvironmentCubemap = nullptr;
+		Ref<VertexArray> CubeVArray = nullptr;
+		Ref<VertexBuffer> CubeVBuffer = nullptr;
 	};
 
 	static RendererData* s_RendererData = nullptr;
@@ -47,6 +49,7 @@ namespace Kaimos {
 		KS_PROFILE_FUNCTION();
 		KS_INFO("\n\n--- CREATING KAIMOS RENDERER ---");
 		s_RendererData = new RendererData();
+		SetCubemapVertices();
 
 		// -- Default Textures Creation --
 		uint white_data = 0xffffffff; // Full Fs for every channel there (2x4 channels - rgba -)
@@ -68,6 +71,7 @@ namespace Kaimos {
 		// -- Shaders Creation --
 		s_RendererData->Shaders.Load("BatchedShader", "assets/shaders/BatchRenderingShader.glsl");
 		s_RendererData->Shaders.Load("PBR_BatchedShader", "assets/shaders/PBR_BatchRenderingShader.glsl");
+		s_RendererData->Shaders.Load("EquirectangularToCubemap", "assets/shaders/EquirectangularToCubemap.glsl");
 
 		// -- Shaders Uniform of Texture Slots --
 		s_RendererData->Shaders.ForEachShader([&](const Ref<Shader>& shader)
@@ -169,8 +173,21 @@ namespace Kaimos {
 			KS_FATAL_ERROR("Renderer: Tried to Render with a null Shader!");
 	}
 
-	void Renderer::EndScene()
+	void Renderer::EndScene(const glm::mat4& view_projection_matrix)
 	{
+		Ref<Shader> equitorect_shader = GetShader("EquirectangularToCubemap");
+		if (equitorect_shader)
+		{
+			equitorect_shader->Bind();
+			equitorect_shader->SetUMat4("u_ViewProjection", view_projection_matrix);
+			
+			s_RendererData->m_EnvironmentCubemap->Bind();
+			equitorect_shader->SetUInt("u_EquirectangularMap", 0);
+
+			s_RendererData->CubeVArray->Bind();
+			RenderCommand::DrawUnindexed(s_RendererData->CubeVArray, 36);
+			s_RendererData->CubeVArray->Unbind();
+		}
 	}
 
 	void Renderer::Submit(const Ref<Shader>& shader, const Ref<VertexArray>& vertex_array, const glm::mat4& transformation)
@@ -606,5 +623,62 @@ namespace Kaimos {
 			return s_RendererData->Materials.size();
 
 		return 0;
+	}
+
+	void Renderer::SetCubemapVertices()
+	{
+		float vertices[] = {
+			// back face
+			-1.0f, -1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 0.0f, 0.0f, // bottom-left
+			 1.0f,  1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 1.0f, 1.0f, // top-right
+			 1.0f, -1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 1.0f, 0.0f, // bottom-right         
+			 1.0f,  1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 1.0f, 1.0f, // top-right
+			-1.0f, -1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 0.0f, 0.0f, // bottom-left
+			-1.0f,  1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 0.0f, 1.0f, // top-left
+			// front face
+			-1.0f, -1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f, 0.0f, // bottom-left
+			 1.0f, -1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f, 0.0f, // bottom-right
+			 1.0f,  1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f, 1.0f, // top-right
+			 1.0f,  1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f, 1.0f, // top-right
+			-1.0f,  1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f, 1.0f, // top-left
+			-1.0f, -1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f, 0.0f, // bottom-left
+			// left face
+			-1.0f,  1.0f,  1.0f, -1.0f,  0.0f,  0.0f, 1.0f, 0.0f, // top-right
+			-1.0f,  1.0f, -1.0f, -1.0f,  0.0f,  0.0f, 1.0f, 1.0f, // top-left
+			-1.0f, -1.0f, -1.0f, -1.0f,  0.0f,  0.0f, 0.0f, 1.0f, // bottom-left
+			-1.0f, -1.0f, -1.0f, -1.0f,  0.0f,  0.0f, 0.0f, 1.0f, // bottom-left
+			-1.0f, -1.0f,  1.0f, -1.0f,  0.0f,  0.0f, 0.0f, 0.0f, // bottom-right
+			-1.0f,  1.0f,  1.0f, -1.0f,  0.0f,  0.0f, 1.0f, 0.0f, // top-right
+			// right face
+			 1.0f,  1.0f,  1.0f,  1.0f,  0.0f,  0.0f, 1.0f, 0.0f, // top-left
+			 1.0f, -1.0f, -1.0f,  1.0f,  0.0f,  0.0f, 0.0f, 1.0f, // bottom-right
+			 1.0f,  1.0f, -1.0f,  1.0f,  0.0f,  0.0f, 1.0f, 1.0f, // top-right         
+			 1.0f, -1.0f, -1.0f,  1.0f,  0.0f,  0.0f, 0.0f, 1.0f, // bottom-right
+			 1.0f,  1.0f,  1.0f,  1.0f,  0.0f,  0.0f, 1.0f, 0.0f, // top-left
+			 1.0f, -1.0f,  1.0f,  1.0f,  0.0f,  0.0f, 0.0f, 0.0f, // bottom-left     
+			// bottom face
+			-1.0f, -1.0f, -1.0f,  0.0f, -1.0f,  0.0f, 0.0f, 1.0f, // top-right
+			 1.0f, -1.0f, -1.0f,  0.0f, -1.0f,  0.0f, 1.0f, 1.0f, // top-left
+			 1.0f, -1.0f,  1.0f,  0.0f, -1.0f,  0.0f, 1.0f, 0.0f, // bottom-left
+			 1.0f, -1.0f,  1.0f,  0.0f, -1.0f,  0.0f, 1.0f, 0.0f, // bottom-left
+			-1.0f, -1.0f,  1.0f,  0.0f, -1.0f,  0.0f, 0.0f, 0.0f, // bottom-right
+			-1.0f, -1.0f, -1.0f,  0.0f, -1.0f,  0.0f, 0.0f, 1.0f, // top-right
+			// top face
+			-1.0f,  1.0f, -1.0f,  0.0f,  1.0f,  0.0f, 0.0f, 1.0f, // top-left
+			 1.0f,  1.0f , 1.0f,  0.0f,  1.0f,  0.0f, 1.0f, 0.0f, // bottom-right
+			 1.0f,  1.0f, -1.0f,  0.0f,  1.0f,  0.0f, 1.0f, 1.0f, // top-right     
+			 1.0f,  1.0f,  1.0f,  0.0f,  1.0f,  0.0f, 1.0f, 0.0f, // bottom-right
+			-1.0f,  1.0f, -1.0f,  0.0f,  1.0f,  0.0f, 0.0f, 1.0f, // top-left
+			-1.0f,  1.0f,  1.0f,  0.0f,  1.0f,  0.0f, 0.0f, 0.0f  // bottom-left        
+		};
+
+		BufferLayout cube_layout = {{ SHADER_DATATYPE::FLOAT3, "a_Position" }, { SHADER_DATATYPE::FLOAT2, "a_TexCoord" }, { SHADER_DATATYPE::FLOAT3, "a_Normal" }};
+		s_RendererData->CubeVArray = VertexArray::Create();
+		s_RendererData->CubeVBuffer = VertexBuffer::Create(vertices, sizeof(vertices));
+		s_RendererData->CubeVBuffer->SetLayout(cube_layout);
+		s_RendererData->CubeVArray->AddVertexBuffer(s_RendererData->CubeVBuffer);
+		
+		s_RendererData->CubeVBuffer->Unbind();
+		s_RendererData->CubeVArray->Unbind();
 	}
 }

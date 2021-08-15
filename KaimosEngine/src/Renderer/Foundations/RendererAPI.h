@@ -24,6 +24,7 @@ namespace Kaimos {
 		virtual void Clear() const = 0;
 		
 		virtual void DrawIndexed(const Ref<VertexArray>& vertex_array, uint index_count = 0) const = 0;
+		virtual void DrawUnindexed(const Ref<VertexArray>& vertex_array, uint count) const = 0;
 		virtual void SetViewport(uint x, uint y, uint width, uint height) = 0;
 
 
