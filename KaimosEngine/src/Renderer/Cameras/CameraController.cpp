@@ -110,6 +110,11 @@ namespace Kaimos {
 
 
 	// ----------------------- Camera Getters/Setters -----------------------------------------------------	
+	void CameraController::SetOrientation(const glm::vec2& angles)
+	{
+		SetOrientation(angles.x, angles.y);
+	}
+
 	void CameraController::SetOrientation(float x_angle, float y_angle)
 	{
 		if (!m_LockRotation)

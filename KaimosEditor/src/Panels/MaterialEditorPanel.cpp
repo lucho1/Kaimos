@@ -248,6 +248,8 @@ namespace Kaimos {
 
 		if (material_modifying != 0)
 			SetGraphToModifyFromMaterial(material_modifying);
+		else
+			UnsetGraphToModify();
 	}
 
 }
