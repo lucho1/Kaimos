@@ -1,12 +1,15 @@
 #include "kspch.h"
 #include "Renderer.h"
 
+#include "Core/Resources/ResourceManager.h"
+
 #include "OpenGL/Resources/OGLShader.h"
 #include "Resources/Mesh.h"
 #include "Resources/Material.h"
 #include "Resources/Shader.h"
 #include "Resources/Texture.h"
 #include "Resources/Light.h"
+#include "Resources/Framebuffer.h"
 
 #include "Renderer2D.h"
 #include "Renderer3D.h"
@@ -35,9 +38,10 @@ namespace Kaimos {
 		std::array<Ref<Texture2D>, MaxTextureSlots> TextureSlots;
 		Ref<Texture2D> WhiteTexture = nullptr, NormalTexture = nullptr;
 
-		Ref<HDRTexture2D> m_EnvironmentCubemap = nullptr;
 		Ref<VertexArray> CubeVArray = nullptr;
 		Ref<VertexBuffer> CubeVBuffer = nullptr;
+		Ref<HDRTexture2D> EnvironmentHDRMap = nullptr;
+		Ref<Framebuffer> EnvironmentMapFBO = nullptr;
 	};
 
 	static RendererData* s_RendererData = nullptr;
@@ -94,6 +98,8 @@ namespace Kaimos {
 		RenderCommand::Init();
 		Renderer2D::Init();
 		Renderer3D::Init();
+
+		RenderCommand::EnableDepth();
 	}
 
 	void Renderer::Shutdown()
@@ -121,6 +127,7 @@ namespace Kaimos {
 	// Takes all scene parameters & makes sure shaders we use get the right uniforms
 	void Renderer::BeginScene(const glm::mat4& view_projection_matrix, const glm::vec3& camera_pos, const std::vector<std::pair<Ref<Light>, glm::vec3>>& dir_lights, const std::vector<std::pair<Ref<PointLight>, glm::vec3>>& point_lights)
 	{
+		KS_PROFILE_FUNCTION();
 		bool pbr_pipeline = s_RendererData->PBR_Pipeline;
 		Ref<Shader> shader = pbr_pipeline ? GetShader("PBR_BatchedShader") : GetShader("BatchedShader");
 
@@ -175,13 +182,14 @@ namespace Kaimos {
 
 	void Renderer::EndScene(const glm::mat4& view_projection_matrix)
 	{
+		KS_PROFILE_FUNCTION();
 		Ref<Shader> equitorect_shader = GetShader("EquirectangularToCubemap");
 		if (equitorect_shader)
 		{
 			equitorect_shader->Bind();
 			equitorect_shader->SetUMat4("u_ViewProjection", view_projection_matrix);
 			
-			s_RendererData->m_EnvironmentCubemap->Bind();
+			s_RendererData->EnvironmentHDRMap->Bind();
 			equitorect_shader->SetUInt("u_EquirectangularMap", 0);
 
 			s_RendererData->CubeVArray->Bind();
@@ -362,51 +370,53 @@ namespace Kaimos {
 		}
 	}
 
-	bool Renderer::ExistsEnvironmentMap()
-	{
-		return s_RendererData->m_EnvironmentCubemap != nullptr;
-	}
-
 	uint Renderer::GetEnvironmentMapID()
 	{
-		if (s_RendererData->m_EnvironmentCubemap)
-			return s_RendererData->m_EnvironmentCubemap->GetTextureID();
+		if (s_RendererData->EnvironmentHDRMap)
+			return s_RendererData->EnvironmentHDRMap->GetTextureID();
 
 		return 0;
 	}
 
 	std::string Renderer::GetEnvironmentMapFilepath()
 	{
-		if (s_RendererData->m_EnvironmentCubemap)
-			return s_RendererData->m_EnvironmentCubemap->GetFilepath();
+		if (s_RendererData->EnvironmentHDRMap)
+			return s_RendererData->EnvironmentHDRMap->GetFilepath();
 
 		return "";
 	}
 
 	glm::ivec2 Renderer::GetEnvironmentMapSize()
 	{
-		if (s_RendererData->m_EnvironmentCubemap)
-			return glm::ivec2(s_RendererData->m_EnvironmentCubemap->GetWidth(), s_RendererData->m_EnvironmentCubemap->GetHeight());
+		if (s_RendererData->EnvironmentHDRMap)
+			return glm::ivec2(s_RendererData->EnvironmentHDRMap->GetWidth(), s_RendererData->EnvironmentHDRMap->GetHeight());
 
 		return glm::ivec2(0);
 	}
 
 	void Renderer::SetEnvironmentMap(const std::string& filepath)
 	{
-		Ref<HDRTexture2D> new_texture = HDRTexture2D::Create(filepath);
-		if (new_texture && new_texture.get() && !new_texture->GetFilepath().empty())
+		if (!Resources::ResourceManager::CheckValidPathForHDRTexture(filepath))
 		{
-			RemoveEnvironmentMap();
-			s_RendererData->m_EnvironmentCubemap = new_texture;
+			KS_ERROR("Renderer Error: Couldn't load HDR texture file: {0}", filepath);
+			return;
 		}
-		else
-			KS_ENGINE_WARN("Renderer: Tried to set an invalid Environment Map!");
+
+		RemoveEnvironmentMap();
+		s_RendererData->EnvironmentMapFBO = Framebuffer::CreateEmptyAndBind(0, 0, true); // URGENT TODO: width, height
+		Ref<HDRTexture2D> new_texture = HDRTexture2D::Create(filepath);
+		s_RendererData->EnvironmentHDRMap = new_texture;
+
+		s_RendererData->EnvironmentMapFBO->Unbind();
 	}
 
 	void Renderer::RemoveEnvironmentMap()
 	{
-		if (s_RendererData->m_EnvironmentCubemap)
-			s_RendererData->m_EnvironmentCubemap.reset();
+		if (s_RendererData->EnvironmentHDRMap)
+		{
+			s_RendererData->EnvironmentHDRMap.reset();
+			s_RendererData->EnvironmentMapFBO.reset();
+		}
 	}
 
 	Ref<Shader> Renderer::GetShader(const std::string& name)

@@ -13,6 +13,8 @@ namespace Kaimos {
 		virtual void Init() override;
 
 		// --- Public RendererAPI Methods ---
+		virtual void EnableDepth() const override;
+
 		virtual void SetClearColor(const glm::vec4& color) const override;
 		virtual void Clear() const override;
 

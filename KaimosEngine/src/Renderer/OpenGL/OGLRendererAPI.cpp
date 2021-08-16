@@ -58,6 +58,12 @@ namespace Kaimos {
 
 	
 	// ----------------------- Public RendererAPI Methods -------------------------------------------------
+	void OGLRendererAPI::EnableDepth() const
+	{
+		glEnable(GL_DEPTH_TEST);
+		glDepthFunc(GL_LEQUAL);
+	}
+
 	void OGLRendererAPI::SetClearColor(const glm::vec4& color) const
 	{
 		glClearColor(color.r, color.g, color.b, color.a);

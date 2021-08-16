@@ -39,6 +39,29 @@ namespace Kaimos::Resources {
 	}
 
 
+	
+	// ----------------------- Public Generic Resources Methods -------------------------------------------
+	bool ResourceManager::CheckValidPathForHDRTexture(const std::string& filepath)
+	{
+		// -- Check file is within project files --
+		if (filepath.find("assets") == std::string::npos)
+		{
+			KS_ERROR("Cannot load an out-of-project texture! Try moving it inside 'assets/' folder.\nCurrent Filepath: {0}", filepath);
+			return false;
+		}
+
+		// -- Check valid extension --
+		std::filesystem::path path = filepath;
+		if (!std::filesystem::exists(path) || (path.extension() != ".hdr"))
+		{
+			KS_ERROR("Unexisting/Invalid Path or Extension on HDR Texture Load: {0}", filepath);
+			return false;
+		}
+
+		return true;
+	}
+
+
 
 	// ----------------------- Public Resources Methods ---------------------------------------------------
 	Ref<ResourceModel> ResourceManager::CreateModel(const std::string& filepath)

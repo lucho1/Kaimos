@@ -52,10 +52,11 @@ namespace Kaimos {
 		virtual void Bind() = 0;
 		virtual void Unbind() = 0;
 
-		virtual void Resize(uint width, uint height) = 0;
+		virtual void Resize(uint width, uint height, bool generate_depth_renderbuffer = false) = 0;
 		virtual void ClearFBOTexture(uint index, int value) = 0;
 		
-		static Ref<Framebuffer> Create(const FramebufferSettings& settings);
+		static Ref<Framebuffer> Create(const FramebufferSettings& settings, bool generate_depth_renderbuffer = false);
+		static Ref<Framebuffer> CreateEmptyAndBind(uint width, uint height, bool generate_depth_renderbuffer = false);
 		
 	public:
 

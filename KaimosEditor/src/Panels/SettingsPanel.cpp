@@ -84,7 +84,7 @@ namespace Kaimos {
 			ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { 0.0f, 0.0f });
 			if (KaimosUI::UIFunctionalities::DrawTexturedButton("###enviromap", enviromap_id, glm::vec2(50.0f), glm::vec3(0.1f)))
 			{
-				std::string texture_file = FileDialogs::OpenFile("HDR Textures (*.hdr;*.exr)\0*.hdr;*.exr\0HDR Texture (*.hdr)\0*.hdr\0EXR Texture (*.exr)\0*.exr\0");
+				std::string texture_file = FileDialogs::OpenFile("HDR Textures (*.hdr)\0*.hdr\0");
 				if (!texture_file.empty())
 					Renderer::SetEnvironmentMap(texture_file);
 			}

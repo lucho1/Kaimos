@@ -14,6 +14,13 @@ namespace Kaimos::Resources {
 		// --- Public Class Methods ---
 		static void CleanUp();
 
+	public:
+
+		// --- Public Generic Resources Methods ---
+		static bool CheckValidPathForHDRTexture(const std::string& filepath);
+
+	public:
+
 		// --- Public Resources Methods ---
 		static Ref<ResourceModel> CreateModel(const std::string& filepath);
 		static bool ModelExists(uint model_id);

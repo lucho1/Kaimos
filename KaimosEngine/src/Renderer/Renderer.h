@@ -49,7 +49,6 @@ namespace Kaimos {
 		static bool IsSceneInPBRPipeline();
 		static void SetPBRPipeline(bool pbr_pipeline);
 
-		static bool ExistsEnvironmentMap();
 		static uint GetEnvironmentMapID();
 		static std::string GetEnvironmentMapFilepath();
 		static glm::ivec2 GetEnvironmentMapSize();

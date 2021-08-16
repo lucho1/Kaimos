@@ -33,7 +33,7 @@ namespace Kaimos {
 
 	
 	// ----------------------- Public Class Methods -------------------------------------------------------
-	OGLFramebuffer::OGLFramebuffer(const FramebufferSettings& settings) : m_FBOSettings(settings)
+	OGLFramebuffer::OGLFramebuffer(const FramebufferSettings& settings, bool generate_depth_renderbuffer) : m_FBOSettings(settings)
 	{
 		KS_PROFILE_FUNCTION();
 		for (FramebufferTextureSettings settings : m_FBOSettings.FBOAttachments.TextureAttachments)
@@ -44,7 +44,17 @@ namespace Kaimos {
 				m_ColorAttachmentSettings.push_back(settings);
 		}
 
-		Resize(settings.Width, settings.Height);
+		Resize(settings.Width, settings.Height, generate_depth_renderbuffer);
+	}
+
+	OGLFramebuffer::OGLFramebuffer(uint width, uint height, bool generate_depth_renderbuffer)
+	{
+		FramebufferSettings settings;
+		settings.Width = width;
+		settings.Height = height;
+
+		m_FBOSettings = settings;
+		Generate(generate_depth_renderbuffer);
 	}
 	
 	OGLFramebuffer::~OGLFramebuffer()
@@ -78,8 +88,7 @@ namespace Kaimos {
 		glClearTexImage(m_ColorTextures[index], 0, GLTextureFormat(m_ColorAttachmentSettings[index].TextureFormat), GL_INT, &value);
 	}
 
-
-	void OGLFramebuffer::Resize(uint width, uint height)
+	void OGLFramebuffer::Resize(uint width, uint height, bool generate_depth_renderbuffer)
 	{
 		KS_PROFILE_FUNCTION();
 		if (width == 0 || height == 0 || width > s_MaxFBOSize || height > s_MaxFBOSize)
@@ -88,25 +97,12 @@ namespace Kaimos {
 			return;
 		}
 
-		if (m_ID != 0)
-		{
-			glDeleteFramebuffers(1, &m_ID);
-			glDeleteTextures(m_ColorTextures.size(), m_ColorTextures.data());
-			glDeleteTextures(1, &m_DepthTexture);
-
-			m_ColorTextures.clear();
-			m_DepthTexture = 0;
-		}
-
 		m_FBOSettings.Width = width;
 		m_FBOSettings.Height = height;
-
-		// -- Create FBO --
-		GLenum FBOsampling = m_FBOSettings.Samples > 1 ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D;
-		glCreateFramebuffers(1, &m_ID);
-		glBindFramebuffer(GL_FRAMEBUFFER, m_ID);
+		Generate(generate_depth_renderbuffer);
 
 		// -- FBO Color Attachments --
+		GLenum FBOsampling = m_FBOSettings.Samples > 1 ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D;
 		if (m_ColorAttachmentSettings.size() > 0)
 		{
 			m_ColorTextures.resize(m_ColorAttachmentSettings.size());
@@ -191,6 +187,33 @@ namespace Kaimos {
 
 
 	// ----------------------- Private FBO Methods --------------------------------------------------------
+	void OGLFramebuffer::Generate(bool generate_depth_renderbuffer)
+	{
+		// -- Delete Previous FBO (if any) --
+		KS_PROFILE_FUNCTION();
+		if (m_ID != 0)
+		{
+			glDeleteFramebuffers(1, &m_ID);
+			glDeleteTextures(m_ColorTextures.size(), m_ColorTextures.data());
+			glDeleteTextures(1, &m_DepthTexture);
+			m_ColorTextures.clear();
+			m_DepthTexture = 0;
+		}		
+
+		// -- Create FBO --
+		glCreateFramebuffers(1, &m_ID);
+		glBindFramebuffer(GL_FRAMEBUFFER, m_ID);
+
+		if (generate_depth_renderbuffer)
+		{
+			glCreateRenderbuffers(1, &m_RBOID);
+			glBindRenderbuffer(GL_RENDERBUFFER, m_RBOID);
+			glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, m_FBOSettings.Width, m_FBOSettings.Height);
+			glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_RBOID);
+		}
+	}
+
+
 	void OGLFramebuffer::SetTexture(bool depth_texture, GLenum internal_format, GLenum format, uint width, uint height, uint samples)
 	{
 		KS_PROFILE_FUNCTION();

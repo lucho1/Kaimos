@@ -75,7 +75,6 @@ namespace Kaimos {
 		Ref<VertexArray> m_VArray = nullptr;
 		Ref<Shader> m_Shader = nullptr;
 		
-		Ref<Framebuffer> m_EnvironmentCubemapFBO = nullptr;		
 		Ref<Framebuffer> m_Framebuffer = nullptr;
 		Ref<Framebuffer> m_GameFramebuffer = nullptr;
 		bool m_RenderGamePanel = true, m_RenderViewport = true;

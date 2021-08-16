@@ -145,7 +145,7 @@ namespace Kaimos {
 
 		// In this case we check also the extension
 		std::filesystem::path path = filepath;
-		if (!std::filesystem::exists(path) || (path.extension() != ".hdr" && path.extension() != ".exr"))
+		if (!std::filesystem::exists(path) || (path.extension() != ".hdr"))
 		{
 			KS_ERROR("Unexisting or Invalid Path or Extension Loading HDR Texture: {0}", filepath);
 			return;
