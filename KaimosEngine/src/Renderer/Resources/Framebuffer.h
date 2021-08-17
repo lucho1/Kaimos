@@ -56,7 +56,7 @@ namespace Kaimos {
 		virtual ~Framebuffer() = default;
 
 		// --- Public FBO Methods ---
-		virtual void Bind() = 0;
+		virtual void Bind(uint width = 0, uint height = 0) = 0;
 		virtual void Unbind() = 0;
 
 		virtual void Resize(uint width, uint height, bool generate_depth_renderbuffer = false) = 0;
@@ -64,6 +64,8 @@ namespace Kaimos {
 
 		virtual void AttachColorTexture(TEXTURE_TARGET target, uint target_index, uint texture_id) = 0;
 		virtual void CreateAndAttachRedTexture(uint target_index, uint width, uint height) = 0;
+
+		virtual void ResizeAndBindRenderBuffer(uint width, uint height) = 0;
 		
 		static Ref<Framebuffer> Create(const FramebufferSettings& settings, bool generate_depth_renderbuffer = false);
 		static Ref<Framebuffer> CreateEmptyAndBind(uint width, uint height, bool generate_depth_renderbuffer = false);

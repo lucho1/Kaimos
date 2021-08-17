@@ -17,13 +17,15 @@ namespace Kaimos {
 		virtual ~OGLFramebuffer();
 
 		// --- Public FBO Methods ---
-		virtual void Bind() override;
+		virtual void Bind(uint width = 0, uint height = 0) override;
 		virtual void Unbind() override;
 		
 		virtual void Resize(uint width, uint height, bool generate_depth_renderbuffer = false) override;
 		virtual void ClearFBOTexture(uint index, int value) override;
 		virtual void AttachColorTexture(TEXTURE_TARGET target, uint target_index, uint texture_id) override;
 		virtual void CreateAndAttachRedTexture(uint target_index, uint width, uint height) override;
+
+		virtual void ResizeAndBindRenderBuffer(uint width, uint height) override;
 
 	public:
 

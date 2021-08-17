@@ -89,6 +89,7 @@ namespace Kaimos {
 		static Ref<Shader> GetShader(const std::string& name);
 
 		static void SetCubemapVertices();
+		static void RenderCube();
 	};
 }
 

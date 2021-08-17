@@ -68,10 +68,13 @@ namespace Kaimos {
 
 	
 	// ----------------------- Public FBO Methods ---------------------------------------------------------
-	void OGLFramebuffer::Bind()
+	void OGLFramebuffer::Bind(uint width, uint height)
 	{
 		KS_PROFILE_FUNCTION();
-		glViewport(0, 0, m_FBOSettings.Width, m_FBOSettings.Height);
+		uint w = width == 0 ? m_FBOSettings.Width : width;
+		uint h = height == 0 ? m_FBOSettings.Height : height;
+
+		glViewport(0, 0, w, h);
 		glBindFramebuffer(GL_FRAMEBUFFER, m_ID);
 
 		bool fbo_status = glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE;
@@ -102,6 +105,8 @@ namespace Kaimos {
 		}
 
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, gl_target + target_index, texture_id, 0);
+
+		bool fbo_status = glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE;
 	}
 
 	void OGLFramebuffer::CreateAndAttachRedTexture(uint target_index, uint width, uint height)
@@ -119,6 +124,14 @@ namespace Kaimos {
 		GLenum buffer = GL_COLOR_ATTACHMENT0 + target_index;
 		glFramebufferTexture2D(GL_FRAMEBUFFER, buffer, GL_TEXTURE_2D, m_RedID, 0);
 		glDrawBuffers(1, &buffer);
+	}
+
+	void OGLFramebuffer::ResizeAndBindRenderBuffer(uint width, uint height)
+	{
+		glBindFramebuffer(GL_FRAMEBUFFER, m_ID);
+		glBindRenderbuffer(GL_RENDERBUFFER, m_RBOID);
+		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, width, height);
+		bool fbo_status = glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE;
 	}
 
 	void OGLFramebuffer::Resize(uint width, uint height, bool generate_depth_renderbuffer)
@@ -234,15 +247,12 @@ namespace Kaimos {
 		}
 
 		// -- Create FBO --
-		//glCreateFramebuffers(1, &m_ID);
-		glGenFramebuffers(1, &m_ID);
-		if(generate_depth_renderbuffer)
-			glGenRenderbuffers(1, &m_RBOID);
-
+		glCreateFramebuffers(1, &m_ID);
 		glBindFramebuffer(GL_FRAMEBUFFER, m_ID);
+
 		if (generate_depth_renderbuffer)
 		{
-			//glCreateRenderbuffers(1, &m_RBOID);
+			glCreateRenderbuffers(1, &m_RBOID);
 			glBindRenderbuffer(GL_RENDERBUFFER, m_RBOID);
 			glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, m_FBOSettings.Width, m_FBOSettings.Height);
 			glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_RBOID);
