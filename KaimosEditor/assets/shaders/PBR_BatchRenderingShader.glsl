@@ -191,10 +191,10 @@ void main()
 		// Light Attenuation (within MinRad)
 		float falloff = clamp(1.0 - pow(dist/u_PointLights[i].MinRadius, 4.0), 0.0, 1.0);
 		falloff = falloff*falloff;
-		float attenuation = (falloff/(dist*dist + 1.0)) * 100;
+		float attenuation = (falloff/(dist*dist + 1.0)) * u_PointLights[i].FalloffFactor;
 
 		//float attenuation = (1.0/(dist*dist)) * u_PointLights[i].FalloffFactor;
-		vec3 radiance = u_PointLights[i].Radiance.rgb * attenuation * outer_attenuation * u_PointLights[i].Intensity;
+		vec3 radiance = u_PointLights[i].Radiance.rgb * attenuation * u_PointLights[i].Intensity; //* outer_attenuation
 
 		vec3 ck_specular = CalculateCookTorranceSpecular(F0, V, N, dir, roughness, NdotV, NdotL, F) * u_PointLights[i].SpecularStrength;
 		vec3 lambert_diffuse = CalculateLambertDiffuse(F, metallic, albedo.rgb);
