@@ -148,7 +148,7 @@ namespace Kaimos {
 		RenderSprites(dt);
 		Renderer2D::EndScene();
 
-		Renderer::EndScene(camera.GetViewProjection());
+		Renderer::EndScene(camera.GetView(), camera.GetProjection());
 	}
 
 
@@ -185,8 +185,7 @@ namespace Kaimos {
 			Renderer2D::EndScene();
 			primary_camera_warn = false;
 
-			glm::mat4 view_proj = camera_comp.Camera.GetProjection() * glm::inverse(trans_comp.GetTransform());
-			Renderer::EndScene(view_proj);
+			Renderer::EndScene(glm::inverse(trans_comp.GetTransform()), camera_comp.Camera.GetProjection());
 		}
 		else if(!primary_camera_warn)
 		{
@@ -212,8 +211,7 @@ namespace Kaimos {
 			RenderSprites(dt);
 			Renderer2D::EndScene();
 
-			glm::mat4 view_proj = camera_comp.Camera.GetProjection() * glm::inverse(trans_comp.GetTransform());
-			Renderer::EndScene(view_proj);
+			Renderer::EndScene(trans_comp.GetTransform(), camera_comp.Camera.GetProjection());
 		}
 	}
 

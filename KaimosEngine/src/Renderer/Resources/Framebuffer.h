@@ -3,6 +3,13 @@
 
 namespace Kaimos {
 
+	enum class TEXTURE_TARGET
+	{
+		NONE = 0,
+		TEXTURE_2D,
+		TEXTURE_CUBEMAP
+	};
+
 	enum class TEXTURE_FORMAT
 	{
 		NONE = 0,
@@ -54,6 +61,9 @@ namespace Kaimos {
 
 		virtual void Resize(uint width, uint height, bool generate_depth_renderbuffer = false) = 0;
 		virtual void ClearFBOTexture(uint index, int value) = 0;
+
+		virtual void AttachColorTexture(TEXTURE_TARGET target, uint target_index, uint texture_id) = 0;
+		virtual void CreateAndAttachRedTexture(uint target_index, uint width, uint height) = 0;
 		
 		static Ref<Framebuffer> Create(const FramebufferSettings& settings, bool generate_depth_renderbuffer = false);
 		static Ref<Framebuffer> CreateEmptyAndBind(uint width, uint height, bool generate_depth_renderbuffer = false);

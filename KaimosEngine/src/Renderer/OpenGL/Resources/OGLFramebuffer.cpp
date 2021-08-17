@@ -71,8 +71,10 @@ namespace Kaimos {
 	void OGLFramebuffer::Bind()
 	{
 		KS_PROFILE_FUNCTION();
-		glBindFramebuffer(GL_FRAMEBUFFER, m_ID);
 		glViewport(0, 0, m_FBOSettings.Width, m_FBOSettings.Height);
+		glBindFramebuffer(GL_FRAMEBUFFER, m_ID);
+
+		bool fbo_status = glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE;
 	}
 
 	void OGLFramebuffer::Unbind()
@@ -86,6 +88,37 @@ namespace Kaimos {
 		KS_PROFILE_FUNCTION();
 		KS_ENGINE_ASSERT(index < m_ColorTextures.size(), "FBO: Index out of bounds");
 		glClearTexImage(m_ColorTextures[index], 0, GLTextureFormat(m_ColorAttachmentSettings[index].TextureFormat), GL_INT, &value);
+	}
+
+	void OGLFramebuffer::AttachColorTexture(TEXTURE_TARGET target, uint target_index, uint texture_id)
+	{
+		KS_PROFILE_FUNCTION();
+		GLenum gl_target;
+		switch (target)
+		{
+			case TEXTURE_TARGET::TEXTURE_2D:		gl_target = GL_TEXTURE_2D; break;
+			case TEXTURE_TARGET::TEXTURE_CUBEMAP:	gl_target = GL_TEXTURE_CUBE_MAP_POSITIVE_X; break;
+			default: KS_FATAL_ERROR("Invalid Texture Target Attached to FBO!");
+		}
+
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, gl_target + target_index, texture_id, 0);
+	}
+
+	void OGLFramebuffer::CreateAndAttachRedTexture(uint target_index, uint width, uint height)
+	{
+		glCreateTextures(GL_TEXTURE_2D, 1, &m_RedID);
+		glBindTexture(GL_TEXTURE_2D, m_RedID);
+
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_R32I, width, height, 0, GL_RED_INTEGER, GL_UNSIGNED_BYTE, nullptr);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+		GLenum buffer = GL_COLOR_ATTACHMENT0 + target_index;
+		glFramebufferTexture2D(GL_FRAMEBUFFER, buffer, GL_TEXTURE_2D, m_RedID, 0);
+		glDrawBuffers(1, &buffer);
 	}
 
 	void OGLFramebuffer::Resize(uint width, uint height, bool generate_depth_renderbuffer)
@@ -198,19 +231,24 @@ namespace Kaimos {
 			glDeleteTextures(1, &m_DepthTexture);
 			m_ColorTextures.clear();
 			m_DepthTexture = 0;
-		}		
+		}
 
 		// -- Create FBO --
-		glCreateFramebuffers(1, &m_ID);
-		glBindFramebuffer(GL_FRAMEBUFFER, m_ID);
+		//glCreateFramebuffers(1, &m_ID);
+		glGenFramebuffers(1, &m_ID);
+		if(generate_depth_renderbuffer)
+			glGenRenderbuffers(1, &m_RBOID);
 
+		glBindFramebuffer(GL_FRAMEBUFFER, m_ID);
 		if (generate_depth_renderbuffer)
 		{
-			glCreateRenderbuffers(1, &m_RBOID);
+			//glCreateRenderbuffers(1, &m_RBOID);
 			glBindRenderbuffer(GL_RENDERBUFFER, m_RBOID);
 			glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, m_FBOSettings.Width, m_FBOSettings.Height);
 			glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_RBOID);
 		}
+
+		bool fbo_status = glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE;
 	}
 
 

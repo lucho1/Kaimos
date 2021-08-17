@@ -41,4 +41,16 @@ namespace Kaimos {
 		KS_FATAL_ERROR("RendererAPI is unknown, not selected or failed!");
 		return nullptr;
 	}
+
+	Ref<CubemapTexture> CubemapTexture::Create(uint width, uint height)
+	{
+		switch (Renderer::GetRendererAPI())
+		{
+			case RendererAPI::API::OPENGL:		return CreateRef<OGL_CubemapTexture>(width, height);
+			case RendererAPI::API::NONE:		KS_FATAL_ERROR("RendererAPI is set to NONE (unsupported)!"); return nullptr;
+		}
+
+		KS_FATAL_ERROR("RendererAPI is unknown, not selected or failed!");
+		return nullptr;
+	}
 }

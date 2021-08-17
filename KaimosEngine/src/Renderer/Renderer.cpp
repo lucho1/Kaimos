@@ -41,6 +41,7 @@ namespace Kaimos {
 		Ref<VertexArray> CubeVArray = nullptr;
 		Ref<VertexBuffer> CubeVBuffer = nullptr;
 		Ref<HDRTexture2D> EnvironmentHDRMap = nullptr;
+		Ref<CubemapTexture> EnvironmentCubemap = nullptr;
 		Ref<Framebuffer> EnvironmentMapFBO = nullptr;
 	};
 
@@ -75,7 +76,8 @@ namespace Kaimos {
 		// -- Shaders Creation --
 		s_RendererData->Shaders.Load("BatchedShader", "assets/shaders/BatchRenderingShader.glsl");
 		s_RendererData->Shaders.Load("PBR_BatchedShader", "assets/shaders/PBR_BatchRenderingShader.glsl");
-		s_RendererData->Shaders.Load("EquirectangularToCubemap", "assets/shaders/EquirectangularToCubemap.glsl");
+		s_RendererData->Shaders.Load("EquirectangularToCubemap", "assets/shaders/EquirectangularToCubemapShader.glsl");
+		s_RendererData->Shaders.Load("SkyboxShader", "assets/shaders/SkyboxShader.glsl");
 
 		// -- Shaders Uniform of Texture Slots --
 		s_RendererData->Shaders.ForEachShader([&](const Ref<Shader>& shader)
@@ -180,17 +182,18 @@ namespace Kaimos {
 			KS_FATAL_ERROR("Renderer: Tried to Render with a null Shader!");
 	}
 
-	void Renderer::EndScene(const glm::mat4& view_projection_matrix)
+	void Renderer::EndScene(const glm::mat4& view_matrix, const glm::mat4& projection_matrix)
 	{
 		KS_PROFILE_FUNCTION();
-		Ref<Shader> equitorect_shader = GetShader("EquirectangularToCubemap");
-		if (equitorect_shader)
+		Ref<Shader> skybox_shader = GetShader("SkyboxShader");
+		if (skybox_shader)
 		{
-			equitorect_shader->Bind();
-			equitorect_shader->SetUMat4("u_ViewProjection", view_projection_matrix);
-			
-			s_RendererData->EnvironmentHDRMap->Bind();
-			equitorect_shader->SetUInt("u_EquirectangularMap", 0);
+			skybox_shader->Bind();
+			glm::mat4 view_proj = projection_matrix * glm::mat4(glm::mat3(view_matrix));
+			skybox_shader->SetUMat4("u_ViewProjection", view_proj);
+
+			s_RendererData->EnvironmentCubemap->Bind();
+			skybox_shader->SetUInt("u_Cubemap", 0);
 
 			s_RendererData->CubeVArray->Bind();
 			RenderCommand::DrawUnindexed(s_RendererData->CubeVArray, 36);
@@ -396,18 +399,60 @@ namespace Kaimos {
 
 	void Renderer::SetEnvironmentMap(const std::string& filepath)
 	{
+		KS_PROFILE_FUNCTION();
 		if (!Resources::ResourceManager::CheckValidPathForHDRTexture(filepath))
 		{
 			KS_ERROR("Renderer Error: Couldn't load HDR texture file: {0}", filepath);
 			return;
 		}
 
-		RemoveEnvironmentMap();
-		s_RendererData->EnvironmentMapFBO = Framebuffer::CreateEmptyAndBind(0, 0, true); // URGENT TODO: width, height
-		Ref<HDRTexture2D> new_texture = HDRTexture2D::Create(filepath);
-		s_RendererData->EnvironmentHDRMap = new_texture;
+		if (s_RendererData->EnvironmentHDRMap && s_RendererData->EnvironmentHDRMap->GetFilepath() == filepath)
+			return;
 
+		RemoveEnvironmentMap();
+
+		uint w = 1920, h = 1920;
+		s_RendererData->EnvironmentMapFBO = Framebuffer::CreateEmptyAndBind(w, h, true); // URGENT TODO: width, height
+		s_RendererData->EnvironmentMapFBO->Bind();
+		s_RendererData->EnvironmentHDRMap = HDRTexture2D::Create(filepath);
+		s_RendererData->EnvironmentCubemap = CubemapTexture::Create(w, h);
+
+		Ref<Shader> equitorect_shader = GetShader("EquirectangularToCubemap");
+		if (equitorect_shader)
+		{
+			glm::mat4 capture_projection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
+			glm::mat4 capture_views[] =
+			{
+			   glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f),	glm::vec3(1.0f,  0.0f,  0.0f),	glm::vec3(0.0f, -1.0f,  0.0f)),
+			   glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f),	glm::vec3(-1.0f,  0.0f,  0.0f),	glm::vec3(0.0f, -1.0f,  0.0f)),
+			   glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f),	glm::vec3(0.0f,  1.0f,  0.0f),	glm::vec3(0.0f,  0.0f,  1.0f)),
+			   glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f),	glm::vec3(0.0f, -1.0f,  0.0f),	glm::vec3(0.0f,  0.0f, -1.0f)),
+			   glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f),	glm::vec3(0.0f,  0.0f,  1.0f),	glm::vec3(0.0f, -1.0f,  0.0f)),
+			   glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f),	glm::vec3(0.0f,  0.0f, -1.0f),	glm::vec3(0.0f, -1.0f,  0.0f))
+			};
+
+			equitorect_shader->Bind();
+			equitorect_shader->SetUMat4("u_Projection", capture_projection);
+			equitorect_shader->SetUInt("u_EquirectangularMap", 0);
+			s_RendererData->EnvironmentHDRMap->Bind();
+
+			uint env_cubemap_id = s_RendererData->EnvironmentCubemap->GetTextureID();
+			s_RendererData->EnvironmentMapFBO->Bind();
+			for (uint i = 0; i < 6; ++i)
+			{
+				equitorect_shader->SetUMat4("u_ViewProjection", capture_projection * capture_views[i]);
+				s_RendererData->EnvironmentMapFBO->AttachColorTexture(TEXTURE_TARGET::TEXTURE_CUBEMAP, i, env_cubemap_id);
+				RenderCommand::Clear();
+
+				s_RendererData->CubeVArray->Bind();
+				RenderCommand::DrawUnindexed(s_RendererData->CubeVArray, 36);
+				s_RendererData->CubeVArray->Unbind();
+			}
+		}
+
+		s_RendererData->EnvironmentMapFBO->CreateAndAttachRedTexture(1, w, h);
 		s_RendererData->EnvironmentMapFBO->Unbind();
+		equitorect_shader->Unbind();
 	}
 
 	void Renderer::RemoveEnvironmentMap()

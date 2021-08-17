@@ -25,7 +25,7 @@ namespace Kaimos {
 
 		// --- Public Renderer Methods ---
 		static void BeginScene(const glm::mat4& view_projection_matrix, const glm::vec3& camera_pos, const std::vector<std::pair<Ref<Light>, glm::vec3>>& dir_lights, const std::vector<std::pair<Ref<PointLight>, glm::vec3>>& point_lights);
-		static void EndScene(const glm::mat4& view_projection_matrix);
+		static void EndScene(const glm::mat4& view_matrix, const glm::mat4& projection_matrix);
 
 		static void Submit(const Ref<Shader>& shader, const Ref<VertexArray>& vertex_array, const glm::mat4& transformation = glm::mat4(1.0f));
 		

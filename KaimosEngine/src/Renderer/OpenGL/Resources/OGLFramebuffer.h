@@ -22,6 +22,8 @@ namespace Kaimos {
 		
 		virtual void Resize(uint width, uint height, bool generate_depth_renderbuffer = false) override;
 		virtual void ClearFBOTexture(uint index, int value) override;
+		virtual void AttachColorTexture(TEXTURE_TARGET target, uint target_index, uint texture_id) override;
+		virtual void CreateAndAttachRedTexture(uint target_index, uint width, uint height) override;
 
 	public:
 
@@ -39,7 +41,7 @@ namespace Kaimos {
 
 	private:
 
-		uint m_ID = 0, m_RBOID = 0;
+		uint m_ID = 0, m_RBOID = 0, m_RedID = 0;
 		FramebufferSettings m_FBOSettings;
 
 		// --- Attachments ---

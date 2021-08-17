@@ -37,7 +37,7 @@ namespace Kaimos {
 		m_IconsArray[7] = Texture2D::Create(INTERNAL_ICONS_PATH + std::string("camera_icon.png"));
 
 		FramebufferSettings fbo_settings;
-		fbo_settings.FBOAttachments = { TEXTURE_FORMAT::RGBA8, TEXTURE_FORMAT::RED_INTEGER, TEXTURE_FORMAT::DEPTH};
+		fbo_settings.FBOAttachments = { TEXTURE_FORMAT::RGBA8, TEXTURE_FORMAT::RED_INTEGER, TEXTURE_FORMAT::DEPTH };
 		fbo_settings.Width = m_DefaultViewportResolution.x;
 		fbo_settings.Height = m_DefaultViewportResolution.y;
 		m_Framebuffer = Framebuffer::Create(fbo_settings);
