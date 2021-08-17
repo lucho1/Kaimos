@@ -116,6 +116,7 @@ struct PointLight
 // --- Uniforms ---
 uniform vec3 u_ViewPos;
 uniform vec3 u_SceneColor = vec3(1.0);
+uniform samplerCube u_IrradianceMap;
 uniform sampler2D u_Textures[32];
 
 uniform const int u_DirectionalLightsNum = 0, u_PointLightsNum = 0;
@@ -126,7 +127,7 @@ uniform PointLight u_PointLights[MAX_POINT_LIGHTS] = PointLight[MAX_POINT_LIGHTS
 vec3 CalculateCookTorranceSpecular(vec3 F0, vec3 V, vec3 N, vec3 light_dir, float roughness, float NdotV, inout float NdotL, inout vec3 F);
 vec3 CalculateLambertDiffuse(vec3 F, float metallic, vec3 albedo_color);
 
-vec3 FresnelSchlick(float cos_theta, vec3 F0);
+vec3 FresnelSchlick(float cos_theta, vec3 F0, float roughness);
 float DistributionGGX(vec3 N, vec3 H, float roughness);
 float GeometrySchlickGGX(float NdotV, float roughness);
 float GeometrySmith(float NdotV, float NdotL, float roughness);
@@ -143,7 +144,7 @@ void main()
 		ao *= texture(u_Textures[v_AOTexIndex], v_TexCoord).r;
 	
 	vec4 albedo = pow(texture(u_Textures[v_TexIndex], v_TexCoord), vec4(2.2)) * v_Color;
-	albedo.rgb *= ao;
+	//albedo.rgb *= ao;
 
 	// Normal Calculation
 	vec3 normal = texture(u_Textures[v_NormTexIndex], v_TexCoord).xyz * 2.0 - 1.0;
@@ -203,7 +204,12 @@ void main()
 	}
 	
 	// Final Result Calculation (scene_color*object_color*ao + light) + ToneMapping/GammaCorrection
-	vec3 result = u_SceneColor * albedo.rgb + L0;
+	vec3 irr_kS = FresnelSchlick(max(dot(N, V), 0.0), F0, roughness);
+	vec3 irr_kD = 1.0 - irr_kS;
+	vec3 irr_map_kD = texture(u_IrradianceMap, N).rgb;
+	vec3 ambient = irr_kD * irr_map_kD * albedo.rgb * ao * u_SceneColor;
+
+	vec3 result = ambient * albedo.rgb + L0;
 	result = result/(result + vec3(1.0));
 	result = pow(result, vec3(1.0/2.2));
 
@@ -224,7 +230,7 @@ vec3 CalculateCookTorranceSpecular(vec3 F0, vec3 V, vec3 N, vec3 light_dir, floa
 
 	float NDF = DistributionGGX(N, H, roughness);
 	float G = GeometrySmith(NdotV, NdotL, roughness);
-	F = FresnelSchlick(clamp(dot(H, V), 0.0, 1.0), F0);
+	F = FresnelSchlick(clamp(dot(H, V), 0.0, 1.0), F0, roughness);
 
 	vec3 ret = (NDF*G*F)/max(4.0 * NdotV * NdotL, 0.001);
 	return ret;
@@ -238,9 +244,10 @@ vec3 CalculateLambertDiffuse(vec3 F, float metallic, vec3 albedo_color)
 }
 
 
-vec3 FresnelSchlick(float cos_theta, vec3 F0)
+vec3 FresnelSchlick(float cos_theta, vec3 F0, float roughness)
 {
-	return F0 + (1.0 - F0) * pow(max(1.0 - cos_theta, 0.0), 5.0);
+	//return F0 + (1.0 - F0) * pow(max(1.0 - cos_theta, 0.0), 5.0);
+	return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(max(1.0 - cos_theta, 0.0), 5.0);
 }
 
 float DistributionGGX(vec3 N, vec3 H, float roughness)

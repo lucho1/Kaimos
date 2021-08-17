@@ -142,6 +142,9 @@ namespace Kaimos {
 			shader->SetUFloat3("u_ViewPos", camera_pos);
 			shader->SetUFloat3("u_SceneColor", s_RendererData->SceneColor);
 
+			s_RendererData->IrradianceCubemap->Bind(30);
+			shader->SetUInt("u_IrradianceMap", 30);
+
 			// Set Directional Lights Uniforms
 			uint dir_lights_num = dir_lights.size() >= s_RendererData->MaxDirLights ? s_RendererData->MaxDirLights : dir_lights.size();
 			shader->SetUInt("u_DirectionalLightsNum", dir_lights_num);
@@ -469,7 +472,7 @@ namespace Kaimos {
 			if (irradiance_shader)
 			{
 				// Create Irradiance Map
-				uint irradiance_w = 32, irradiance_h = 32;
+				uint irradiance_w = 120, irradiance_h = 120;
 				s_RendererData->IrradianceCubemap = CubemapTexture::Create(irradiance_w, irradiance_h);
 				s_RendererData->EnvironmentMapFBO->ResizeAndBindRenderBuffer(irradiance_w, irradiance_h);
 
