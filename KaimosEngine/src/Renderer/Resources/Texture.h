@@ -53,7 +53,9 @@ namespace Kaimos {
 	class CubemapTexture : public Texture
 	{
 	public:
-		static Ref<CubemapTexture> Create(uint width, uint height);
+		static Ref<CubemapTexture> Create(uint width, uint height, bool linear_mipmap_filtering = false);
+
+		virtual void GenerateMipMap() const = 0;
 	};
 }
 

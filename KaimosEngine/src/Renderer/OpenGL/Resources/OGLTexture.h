@@ -52,10 +52,11 @@ namespace Kaimos {
 	class OGL_CubemapTexture : public CubemapTexture
 	{
 	public:
-		OGL_CubemapTexture(uint width, uint height);
+		OGL_CubemapTexture(uint width, uint height, bool linear_mipmap_filtering = false);
 		virtual ~OGL_CubemapTexture();
 
 		virtual void Bind(uint slot = 0) const override;
+		virtual void GenerateMipMap() const override;
 	};
 }
 

@@ -62,7 +62,7 @@ namespace Kaimos {
 		virtual void Resize(uint width, uint height, bool generate_depth_renderbuffer = false) = 0;
 		virtual void ClearFBOTexture(uint index, int value) = 0;
 
-		virtual void AttachColorTexture(TEXTURE_TARGET target, uint target_index, uint texture_id) = 0;
+		virtual void AttachColorTexture(TEXTURE_TARGET target, uint target_index, uint texture_id, uint mip_level = 0) = 0;
 		virtual void CreateAndAttachRedTexture(uint target_index, uint width, uint height) = 0;
 
 		virtual void ResizeAndBindRenderBuffer(uint width, uint height) = 0;

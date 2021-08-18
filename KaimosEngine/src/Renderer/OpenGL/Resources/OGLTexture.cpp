@@ -204,7 +204,7 @@ namespace Kaimos {
 
 	// ----------------------- CUBEMAP TEXTURE ------------------------------------------------------------
 	// ----------------------- Public Class Methods -------------------------------------------------------
-	OGL_CubemapTexture::OGL_CubemapTexture(uint width, uint height)
+	OGL_CubemapTexture::OGL_CubemapTexture(uint width, uint height, bool linear_mipmap_filtering)
 	{
 		// -- Texture Creation --
 		m_Width = width;
@@ -217,7 +217,7 @@ namespace Kaimos {
 			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F, m_Width, m_Height, 0, GL_RGB, GL_FLOAT, nullptr);
 
 		// --- Texture Parameters Setup ---
-		glTextureParameteri(m_ID, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTextureParameteri(m_ID, GL_TEXTURE_MIN_FILTER, linear_mipmap_filtering ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR);
 		glTextureParameteri(m_ID, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTextureParameteri(m_ID, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTextureParameteri(m_ID, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -234,5 +234,11 @@ namespace Kaimos {
 	{
 		KS_PROFILE_FUNCTION();
 		glBindTextureUnit(slot, m_ID);
+	}
+
+	void OGL_CubemapTexture::GenerateMipMap() const
+	{
+		KS_PROFILE_FUNCTION();
+		glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 	}
 }

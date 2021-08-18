@@ -93,7 +93,7 @@ namespace Kaimos {
 		glClearTexImage(m_ColorTextures[index], 0, GLTextureFormat(m_ColorAttachmentSettings[index].TextureFormat), GL_INT, &value);
 	}
 
-	void OGLFramebuffer::AttachColorTexture(TEXTURE_TARGET target, uint target_index, uint texture_id)
+	void OGLFramebuffer::AttachColorTexture(TEXTURE_TARGET target, uint target_index, uint texture_id, uint mip_level)
 	{
 		KS_PROFILE_FUNCTION();
 		GLenum gl_target;
@@ -104,7 +104,7 @@ namespace Kaimos {
 			default: KS_FATAL_ERROR("Invalid Texture Target Attached to FBO!");
 		}
 
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, gl_target + target_index, texture_id, 0);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, gl_target + target_index, texture_id, mip_level);
 
 		bool fbo_status = glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE;
 	}

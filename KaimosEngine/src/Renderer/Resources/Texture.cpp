@@ -42,11 +42,11 @@ namespace Kaimos {
 		return nullptr;
 	}
 
-	Ref<CubemapTexture> CubemapTexture::Create(uint width, uint height)
+	Ref<CubemapTexture> CubemapTexture::Create(uint width, uint height, bool linear_mipmap_filtering)
 	{
 		switch (Renderer::GetRendererAPI())
 		{
-			case RendererAPI::API::OPENGL:		return CreateRef<OGL_CubemapTexture>(width, height);
+			case RendererAPI::API::OPENGL:		return CreateRef<OGL_CubemapTexture>(width, height, linear_mipmap_filtering);
 			case RendererAPI::API::NONE:		KS_FATAL_ERROR("RendererAPI is set to NONE (unsupported)!"); return nullptr;
 		}
 

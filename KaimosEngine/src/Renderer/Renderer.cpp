@@ -41,7 +41,7 @@ namespace Kaimos {
 		Ref<VertexArray> CubeVArray = nullptr;
 		Ref<VertexBuffer> CubeVBuffer = nullptr;
 		Ref<HDRTexture2D> EnvironmentHDRMap = nullptr;
-		Ref<CubemapTexture> EnvironmentCubemap = nullptr, IrradianceCubemap = nullptr;
+		Ref<CubemapTexture> EnvironmentCubemap = nullptr, IrradianceCubemap = nullptr, PrefilterCubemap = nullptr;
 		Ref<Framebuffer> EnvironmentMapFBO = nullptr;
 	};
 
@@ -78,6 +78,7 @@ namespace Kaimos {
 		s_RendererData->Shaders.Load("PBR_BatchedShader", "assets/shaders/PBR_BatchRenderingShader.glsl");
 		s_RendererData->Shaders.Load("EquirectangularToCubemap", "assets/shaders/EquirectangularToCubemapShader.glsl");
 		s_RendererData->Shaders.Load("CubemapConvolution", "assets/shaders/CubemapConvolutionShader.glsl");
+		s_RendererData->Shaders.Load("IBL_Prefiltered", "assets/shaders/IBL_PrefilteringShader.glsl");
 		s_RendererData->Shaders.Load("SkyboxShader", "assets/shaders/SkyboxShader.glsl");
 
 		// -- Shaders Uniform of Texture Slots --
@@ -198,6 +199,7 @@ namespace Kaimos {
 
 			s_RendererData->EnvironmentCubemap->Bind();
 			//s_RendererData->IrradianceCubemap->Bind();
+			//s_RendererData->PrefilterCubemap->Bind();
 			skybox_shader->SetUInt("u_Cubemap", 0);
 
 			s_RendererData->CubeVArray->Bind();
@@ -413,7 +415,10 @@ namespace Kaimos {
 		}
 
 		if (s_RendererData->EnvironmentHDRMap && s_RendererData->EnvironmentHDRMap->GetFilepath() == filepath)
+		{
+			KS_TRACE("The selected Environment Map is already in use!");
 			return;
+		}
 
 		// Remove Previous Environment Map
 		RemoveEnvironmentMap();
@@ -429,22 +434,22 @@ namespace Kaimos {
 		s_RendererData->EnvironmentHDRMap = HDRTexture2D::Create(filepath);
 		s_RendererData->EnvironmentCubemap = CubemapTexture::Create(w, h);
 
-		// Get Shader
+		// Set Capture variables for Shaders
+		glm::mat4 capture_projection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
+		glm::mat4 capture_views[] =
+		{
+		   glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f),	glm::vec3(1.0f,  0.0f,  0.0f),	glm::vec3(0.0f, -1.0f,  0.0f)),
+		   glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f),	glm::vec3(-1.0f,  0.0f,  0.0f),	glm::vec3(0.0f, -1.0f,  0.0f)),
+		   glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f),	glm::vec3(0.0f,  1.0f,  0.0f),	glm::vec3(0.0f,  0.0f,  1.0f)),
+		   glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f),	glm::vec3(0.0f, -1.0f,  0.0f),	glm::vec3(0.0f,  0.0f, -1.0f)),
+		   glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f),	glm::vec3(0.0f,  0.0f,  1.0f),	glm::vec3(0.0f, -1.0f,  0.0f)),
+		   glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f),	glm::vec3(0.0f,  0.0f, -1.0f),	glm::vec3(0.0f, -1.0f,  0.0f))
+		};
+
+		// Get Equitectangular-Cubemap Shader
 		Ref<Shader> equitorect_shader = GetShader("EquirectangularToCubemap");
 		if (equitorect_shader)
 		{
-			// Set Variables for Shader
-			glm::mat4 capture_projection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
-			glm::mat4 capture_views[] =
-			{
-			   glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f),	glm::vec3(1.0f,  0.0f,  0.0f),	glm::vec3(0.0f, -1.0f,  0.0f)),
-			   glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f),	glm::vec3(-1.0f,  0.0f,  0.0f),	glm::vec3(0.0f, -1.0f,  0.0f)),
-			   glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f),	glm::vec3(0.0f,  1.0f,  0.0f),	glm::vec3(0.0f,  0.0f,  1.0f)),
-			   glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f),	glm::vec3(0.0f, -1.0f,  0.0f),	glm::vec3(0.0f,  0.0f, -1.0f)),
-			   glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f),	glm::vec3(0.0f,  0.0f,  1.0f),	glm::vec3(0.0f, -1.0f,  0.0f)),
-			   glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f),	glm::vec3(0.0f,  0.0f, -1.0f),	glm::vec3(0.0f, -1.0f,  0.0f))
-			};
-
 			// Bind Shader
 			equitorect_shader->Bind();
 			equitorect_shader->SetUInt("u_EquirectangularMap", 0);
@@ -481,7 +486,8 @@ namespace Kaimos {
 				irradiance_shader->SetUInt("u_Cubemap", 0);
 				s_RendererData->EnvironmentCubemap->Bind();
 				s_RendererData->EnvironmentMapFBO->Bind(irradiance_w, irradiance_h);
-
+				
+				// Render from 6 perspectives
 				uint irr_cubemap_id = s_RendererData->IrradianceCubemap->GetTextureID();
 				for (uint i = 0; i < 6; ++i)
 				{
@@ -491,11 +497,55 @@ namespace Kaimos {
 					RenderCube();
 				}
 
-				// Create FBO Red Texture(for mouse picking) + Unbind
-				s_RendererData->EnvironmentMapFBO->CreateAndAttachRedTexture(1, w, h);
+				// Unbind
 				s_RendererData->EnvironmentMapFBO->Unbind();
 				irradiance_shader->Unbind();
 			}
+		}
+
+		// IBL Specular Prefilter
+		Ref<Shader> prefilter_shader = GetShader("IBL_Prefiltered");
+		if (prefilter_shader)
+		{
+			// Create Prefilter Map
+			uint prefilter_w = 128, prefilter_h = 128;
+			s_RendererData->PrefilterCubemap = CubemapTexture::Create(prefilter_w, prefilter_h, true);
+			s_RendererData->PrefilterCubemap->GenerateMipMap();
+
+			// Bind Shader
+			prefilter_shader->Bind();
+			prefilter_shader->SetUInt("u_EnvironmentMap", 0);
+			s_RendererData->EnvironmentCubemap->Bind();
+			s_RendererData->EnvironmentMapFBO->Bind();
+
+			//u_Roughness
+			uint mip_levels = 5;
+			for (uint mip = 0; mip < mip_levels; ++mip)
+			{
+				uint mip_w = 128 * glm::pow(0.5f, mip), mip_h = mip_w;
+
+				s_RendererData->EnvironmentMapFBO->ResizeAndBindRenderBuffer(mip_w, mip_h);
+				s_RendererData->EnvironmentMapFBO->Bind(mip_w, mip_h);
+
+				float roughness = (float)mip / (float)(mip_levels - 1);
+				prefilter_shader->SetUFloat("u_Roughness", roughness);
+
+				uint prefiltermap_id = s_RendererData->PrefilterCubemap->GetTextureID();
+				for (uint i = 0; i < 6; ++i)
+				{
+					prefilter_shader->SetUMat4("u_ViewProjection", capture_projection * capture_views[i]);
+					s_RendererData->EnvironmentMapFBO->AttachColorTexture(TEXTURE_TARGET::TEXTURE_CUBEMAP, i, prefiltermap_id, mip);
+					RenderCommand::Clear();
+					RenderCube();
+				}
+
+			}
+
+			// Create FBO Red Texture(for mouse picking) + Unbind
+			s_RendererData->EnvironmentMapFBO->CreateAndAttachRedTexture(1, w, h);
+			s_RendererData->EnvironmentMapFBO->Unbind();
+			prefilter_shader->Unbind();
+			KS_TRACE("Successfully Changed the Environment Map");
 		}
 	}
 
