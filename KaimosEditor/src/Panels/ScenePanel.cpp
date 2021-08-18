@@ -176,6 +176,9 @@ namespace Kaimos {
 			if (m_SelectedEntity == entity)
 				m_SelectedEntity = {};
 
+			if (entity.HasComponent<CameraComponent>() && entity.GetComponent<CameraComponent>().Primary)
+				m_SceneContext->UnsetPrimaryCamera();
+
 			m_SceneContext->DestroyEntity(entity);
 		}
 	}
@@ -218,7 +221,7 @@ namespace Kaimos {
 			bool remove_component = false;
 			if (ImGui::BeginPopup("ComponentSettings"))
 			{
-				if (!std::is_same<T, TransformComponent>::value)
+				if (!std::is_same<T, TransformComponent>::value && !std::is_same<T, TagComponent>::value)
 				{
 					if (ImGui::MenuItem("Remove Component"))
 						remove_component = true;
@@ -236,7 +239,12 @@ namespace Kaimos {
 
 			// -- Remove Component --
 			if (remove_component)
+			{
+				if (entity.HasComponent<CameraComponent>() && entity.GetComponent<CameraComponent>().Primary)
+					m_SceneContext->UnsetPrimaryCamera();
+
 				entity.RemoveComponent<T>();
+			}
 		}
 	}
 
