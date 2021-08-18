@@ -16,6 +16,7 @@ namespace Kaimos {
 
 		// --- Public RendererAPI Methods ---
 		inline static void EnableDepth()																{ s_RendererAPI->EnableDepth(); }
+		inline static void EnableCubemapFiltering()														{ s_RendererAPI->EnableCubemapFiltering(); }
 
 		inline static void Clear()																		{ s_RendererAPI->Clear(); }
 		inline static void SetClearColor(const glm::vec4& color)										{ s_RendererAPI->SetClearColor(color); }

@@ -104,6 +104,7 @@ namespace Kaimos {
 		Renderer3D::Init();
 
 		RenderCommand::EnableDepth();
+		RenderCommand::EnableCubemapFiltering();
 	}
 
 	void Renderer::Shutdown()

@@ -21,6 +21,7 @@ namespace Kaimos {
 
 		// --- Public RendererAPI Methods ---
 		virtual void EnableDepth() const = 0;
+		virtual void EnableCubemapFiltering() const = 0;
 
 		virtual void SetClearColor(const glm::vec4& color) const = 0;
 		virtual void Clear() const = 0;

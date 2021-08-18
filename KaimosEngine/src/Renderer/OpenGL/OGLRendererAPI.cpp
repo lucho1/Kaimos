@@ -64,6 +64,11 @@ namespace Kaimos {
 		glDepthFunc(GL_LEQUAL);
 	}
 
+	void OGLRendererAPI::EnableCubemapFiltering() const
+	{
+		glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+	}
+
 	void OGLRendererAPI::SetClearColor(const glm::vec4& color) const
 	{
 		glClearColor(color.r, color.g, color.b, color.a);
