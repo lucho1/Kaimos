@@ -304,8 +304,12 @@ namespace Kaimos {
 		// -- Game Panels --
 		if (show_game_panel)
 		{
-			m_RenderGamePanel = true;
-			ImGui::Begin("Game", &show_game_panel, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+			if (ImGui::Begin("Game", &show_game_panel, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse))
+				m_RenderGamePanel = true;
+			else
+				m_RenderGamePanel = false;
+
+
 			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0.0f, 0.0f));
 
 			Entity camera = m_CurrentScene->GetPrimaryCamera();
@@ -329,9 +333,6 @@ namespace Kaimos {
 				ImGui::Image(reinterpret_cast<void*>(m_GameFramebuffer->GetFBOTextureID()), { size.x, size.y }, ImVec2(0, 1), ImVec2(1, 0));
 			}
 
-			if (!ImGui::IsItemVisible())
-				m_RenderGamePanel = false;
-
 			ImGui::PopStyleVar();
 			ImGui::End();
 		}
@@ -341,9 +342,18 @@ namespace Kaimos {
 		// -- Viewport --
 		if (show_viewport_panel)
 		{
-			ImGui::Begin("Viewport", &show_viewport_panel, ImGuiWindowFlags_NoScrollbar);
-			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0.0f, 0.0f));
+			// -- Primary Camera Mini-Screen --
+			if (ImGui::Begin("Viewport", &show_viewport_panel, ImGuiWindowFlags_NoScrollbar))
+			{
+				m_RenderViewport = true;
+				ShowPrimaryCameraDisplay();
+			}
+			else
+				m_RenderViewport = false;
 
+
+			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0.0f, 0.0f));
+						
 			m_ViewportFocused = ImGui::IsWindowFocused();
 			m_ViewportHovered = ImGui::IsWindowHovered();
 			Application::Get().GetImGuiLayer()->SetBlockEvents(!m_ViewportFocused && !m_ViewportHovered);
@@ -363,15 +373,6 @@ namespace Kaimos {
 			ImVec2 viewportpanel_size = ImGui::GetContentRegionAvail();
 			m_ViewportSize = glm::vec2(viewportpanel_size.x, viewportpanel_size.y);
 			ImGui::Image(reinterpret_cast<void*>(m_Framebuffer->GetFBOTextureID()), viewportpanel_size, ImVec2(0, 1), ImVec2(1, 0));
-
-			// -- Primary Camera Mini-Screen --
-			if (ImGui::IsItemVisible())
-			{
-				m_RenderViewport = true;
-				ShowPrimaryCameraDisplay();
-			}
-			else
-				m_RenderViewport = false;
 
 			// -- Camera Speed Multiplier Modification --
 			ShowCameraSpeedMultiplier();
