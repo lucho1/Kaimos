@@ -76,8 +76,6 @@ namespace Kaimos {
 
 		glViewport(0, 0, w, h);
 		glBindFramebuffer(GL_FRAMEBUFFER, m_ID);
-
-		bool fbo_status = glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE;
 	}
 
 	void OGLFramebuffer::Unbind()
@@ -105,8 +103,6 @@ namespace Kaimos {
 		}
 
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, gl_target + target_index, texture_id, mip_level);
-
-		bool fbo_status = glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE;
 	}
 
 	void OGLFramebuffer::CreateAndAttachRedTexture(uint target_index, uint width, uint height)
@@ -131,7 +127,6 @@ namespace Kaimos {
 		glBindFramebuffer(GL_FRAMEBUFFER, m_ID);
 		glBindRenderbuffer(GL_RENDERBUFFER, m_RBOID);
 		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, width, height);
-		bool fbo_status = glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE;
 	}
 
 	void OGLFramebuffer::Resize(uint width, uint height, bool generate_depth_renderbuffer)
@@ -257,8 +252,6 @@ namespace Kaimos {
 			glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, m_FBOSettings.Width, m_FBOSettings.Height);
 			glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_RBOID);
 		}
-
-		bool fbo_status = glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE;
 	}
 
 
