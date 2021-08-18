@@ -627,7 +627,6 @@ namespace Kaimos {
 		if (material->HasNormal())
 			++tex_count;
 
-		//bool start_new_batch = false;
 		if (s_RendererData->PBR_Pipeline)
 		{
 			if (material->HasMetallic())
@@ -637,11 +636,8 @@ namespace Kaimos {
 			if (material->HasAmbientOcc())
 				++tex_count;
 		}
-		else
-		{
-			if (material->HasSpecular())
+		else if (material->HasSpecular())
 				++tex_count;
-		}
 
 		if (s_RendererData->TextureSlotIndex >= (s_RendererData->MaxTextureSlots - tex_count - 1))
 		{
