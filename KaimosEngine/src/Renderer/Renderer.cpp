@@ -433,7 +433,7 @@ namespace Kaimos {
 
 		// Create Maps
 		s_RendererData->EnvironmentHDRMap = HDRTexture2D::Create(filepath);
-		s_RendererData->EnvironmentCubemap = CubemapTexture::Create(w, h);
+		s_RendererData->EnvironmentCubemap = CubemapTexture::Create(w, h, true);
 
 		// Set Capture variables for Shaders
 		glm::mat4 capture_projection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
@@ -471,6 +471,7 @@ namespace Kaimos {
 
 			// Unbind
 			s_RendererData->EnvironmentMapFBO->Unbind();
+			s_RendererData->EnvironmentCubemap->GenerateMipMap();
 			equitorect_shader->Unbind();
 
 			// Irradiance Cubemap Convolution
@@ -478,7 +479,7 @@ namespace Kaimos {
 			if (irradiance_shader)
 			{
 				// Create Irradiance Map
-				uint irradiance_w = 120, irradiance_h = 120;
+				uint irradiance_w = 32, irradiance_h = 32;
 				s_RendererData->IrradianceCubemap = CubemapTexture::Create(irradiance_w, irradiance_h);
 				s_RendererData->EnvironmentMapFBO->ResizeAndBindRenderBuffer(irradiance_w, irradiance_h);
 
@@ -515,6 +516,7 @@ namespace Kaimos {
 
 			// Bind Shader
 			prefilter_shader->Bind();
+			prefilter_shader->SetUInt("u_EnvironmentMapResolution", w);
 			prefilter_shader->SetUInt("u_EnvironmentMap", 0);
 			s_RendererData->EnvironmentCubemap->Bind();
 			s_RendererData->EnvironmentMapFBO->Bind();
