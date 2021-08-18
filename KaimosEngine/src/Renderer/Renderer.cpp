@@ -38,10 +38,9 @@ namespace Kaimos {
 		std::array<Ref<Texture2D>, MaxTextureSlots> TextureSlots;
 		Ref<Texture2D> WhiteTexture = nullptr, NormalTexture = nullptr;
 
+		// Environment Mapping
 		Ref<VertexArray> CubeVArray = nullptr;
-		Ref<VertexBuffer> CubeVBuffer = nullptr;
 		Ref<VertexArray> QuadVArray = nullptr;
-		Ref<VertexBuffer> QuadVBuffer = nullptr;
 
 		Ref<HDRTexture2D> EnvironmentHDRMap = nullptr;
 		Ref<CubemapTexture> EnvironmentCubemap = nullptr, IrradianceCubemap = nullptr, PrefilterCubemap = nullptr;
@@ -593,14 +592,6 @@ namespace Kaimos {
 		}
 	}
 
-	uint Renderer::GetEnvironmentMapLUTTexture()
-	{
-		if(s_RendererData->BRDF_LutTexture)
-			return s_RendererData->BRDF_LutTexture->GetTextureID();
-		
-		return 0;
-	}
-
 	Ref<Shader> Renderer::GetShader(const std::string& name)
 	{
 		if (s_RendererData->Shaders.Exists(name))
@@ -866,12 +857,12 @@ namespace Kaimos {
 
 		BufferLayout cube_layout = {{ SHADER_DATATYPE::FLOAT3, "a_Position" }, { SHADER_DATATYPE::FLOAT2, "a_TexCoord" }, { SHADER_DATATYPE::FLOAT3, "a_Normal" }};
 		s_RendererData->CubeVArray = VertexArray::Create();
-		s_RendererData->CubeVBuffer = VertexBuffer::Create(vertices, sizeof(vertices));
-		s_RendererData->CubeVBuffer->SetLayout(cube_layout);
-		s_RendererData->CubeVArray->AddVertexBuffer(s_RendererData->CubeVBuffer);
+		Ref<VertexBuffer> cube_vbuffer = VertexBuffer::Create(vertices, sizeof(vertices));
+		cube_vbuffer->SetLayout(cube_layout);
+		s_RendererData->CubeVArray->AddVertexBuffer(cube_vbuffer);
 		
-		s_RendererData->CubeVBuffer->Unbind();
 		s_RendererData->CubeVArray->Unbind();
+		cube_vbuffer->Unbind();
 	}
 
 	void Renderer::SetQuadVertices()
@@ -890,17 +881,17 @@ namespace Kaimos {
 		};
 
 		s_RendererData->QuadVArray = VertexArray::Create();
-		s_RendererData->QuadVBuffer = VertexBuffer::Create(vertices, sizeof(vertices));
+		Ref<VertexBuffer> quad_vbuffer = VertexBuffer::Create(vertices, sizeof(vertices));
 		
 		Ref<IndexBuffer> index_buffer = IndexBuffer::Create(indices, 6);
 		BufferLayout quad_layout = { { SHADER_DATATYPE::FLOAT3, "a_Position" }, { SHADER_DATATYPE::FLOAT2, "a_TexCoord" } };
 
-		s_RendererData->QuadVBuffer->SetLayout(quad_layout);
-		s_RendererData->QuadVArray->AddVertexBuffer(s_RendererData->QuadVBuffer);
+		quad_vbuffer->SetLayout(quad_layout);
+		s_RendererData->QuadVArray->AddVertexBuffer(quad_vbuffer);
 		s_RendererData->QuadVArray->SetIndexBuffer(index_buffer);
 
-		s_RendererData->QuadVBuffer->Unbind();
 		s_RendererData->QuadVArray->Unbind();
+		quad_vbuffer->Unbind();
 		index_buffer->Unbind();
 	}
 
