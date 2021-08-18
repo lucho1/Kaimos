@@ -116,7 +116,8 @@ struct PointLight
 // --- Uniforms ---
 uniform vec3 u_ViewPos;
 uniform vec3 u_SceneColor = vec3(1.0);
-uniform samplerCube u_IrradianceMap;
+uniform samplerCube u_IrradianceMap, u_PrefilterSpecularMap;
+uniform sampler2D u_BRDF_LUTMap;
 uniform sampler2D u_Textures[32];
 
 uniform const int u_DirectionalLightsNum = 0, u_PointLightsNum = 0;
@@ -128,6 +129,7 @@ vec3 CalculateCookTorranceSpecular(vec3 F0, vec3 V, vec3 N, vec3 light_dir, floa
 vec3 CalculateLambertDiffuse(vec3 F, float metallic, vec3 albedo_color);
 
 vec3 FresnelSchlick(float cos_theta, vec3 F0, float roughness);
+vec3 FresnelSchlickRoughness(float cos_theta, vec3 F0, float roughness);
 float DistributionGGX(vec3 N, vec3 H, float roughness);
 float GeometrySchlickGGX(float NdotV, float roughness);
 float GeometrySmith(float NdotV, float NdotL, float roughness);
@@ -202,20 +204,42 @@ void main()
 
 		L0 += (lambert_diffuse + ck_specular) * radiance * NdotL;
 	}
-	
-	// Final Result Calculation (scene_color*object_color*ao + light) + ToneMapping/GammaCorrection
-	vec3 irr_kS = FresnelSchlick(max(dot(N, V), 0.0), F0, roughness);
-	vec3 irr_kD = 1.0 - irr_kS;
-	vec3 irr_map_kD = texture(u_IrradianceMap, N).rgb;
-	vec3 ambient = irr_kD * irr_map_kD * albedo.rgb * ao * u_SceneColor;
 
-	vec3 result = ambient * albedo.rgb + L0;
+	// Ambient Lighting
+	//u_PrefilterSpecularMap;u_BRDF_LUTMap
+	vec3 R = reflect(-V, N);
+	vec3 FAmbient = FresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness);
+
+	vec3 amb_kS = FAmbient;
+	vec3 amb_kD = (1.0 - amb_kS) * (1.0 - metallic);
+	vec3 irr_map = texture(u_IrradianceMap, N).rgb;
+
+	const float MAX_REFLECTION_LOD = 4.0;
+	vec3 prefiltered_color = textureLod(u_PrefilterSpecularMap, R, roughness*MAX_REFLECTION_LOD).rgb;
+	vec2 brdf = texture(u_BRDF_LUTMap, vec2(max(dot(N, V), 0.0), roughness)).rg;
+	
+	vec3 amb_diff = irr_map * albedo.rgb;
+	vec3 amb_specular = prefiltered_color * (FAmbient * brdf.x + brdf.y);
+
+	vec3 ambient = (amb_kD * amb_diff + amb_specular) * ao;
+	
+	//vec3 irr_kS = FresnelSchlick(max(dot(N, V), 0.0), F0, roughness);
+	//vec3 irr_kD = 1.0 - irr_kS;
+	//vec3 irr_map_kD = texture(u_IrradianceMap, N).rgb;
+	//vec3 ambient = irr_kD * irr_map_kD * albedo.rgb * ao * u_SceneColor;
+
+	// Final Result Calculation (scene_color*object_color*ao + light) + ToneMapping/GammaCorrection
+	//vec3 result = ambient * albedo.rgb + L0;
+	vec3 result = ambient + L0;
 	result = result/(result + vec3(1.0));
 	result = pow(result, vec3(1.0/2.2));
 
 
 	// Color Outputs, Final Color & Entity ID float value for Mouse Picking
 	color = vec4(result, albedo.a);
+	//color = vec4(brdf.x, brdf.y, 0.0, 1.0);
+	//color = vec4(texture(u_BRDF_LUTMap, vec2(max(dot(N, V), 0.0), roughness)).rg, 0.0, 1.0);
+	//color = vec4(textureLod(u_PrefilterSpecularMap, R, roughness*MAX_REFLECTION_LOD).rgb, 1.0);
 	color2 = v_EntityID;
 }
 
@@ -246,7 +270,11 @@ vec3 CalculateLambertDiffuse(vec3 F, float metallic, vec3 albedo_color)
 
 vec3 FresnelSchlick(float cos_theta, vec3 F0, float roughness)
 {
-	//return F0 + (1.0 - F0) * pow(max(1.0 - cos_theta, 0.0), 5.0);
+	return F0 + (1.0 - F0) * pow(max(1.0 - cos_theta, 0.0), 5.0);
+}
+
+vec3 FresnelSchlickRoughness(float cos_theta, vec3 F0, float roughness)
+{
 	return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(max(1.0 - cos_theta, 0.0), 5.0);
 }
 
