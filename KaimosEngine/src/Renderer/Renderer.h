@@ -54,6 +54,7 @@ namespace Kaimos {
 		static glm::ivec2 GetEnvironmentMapSize();
 		static void SetEnvironmentMap(const std::string& filepath);
 		static void RemoveEnvironmentMap();
+		static uint GetEnvironmentMapLUTTexture();
 
 
 		// --- Event Methods ---
@@ -89,6 +90,8 @@ namespace Kaimos {
 		static Ref<Shader> GetShader(const std::string& name);
 
 		static void SetCubemapVertices();
+		static void SetQuadVertices();
+		static void RenderQuad();
 		static void RenderCube();
 	};
 }

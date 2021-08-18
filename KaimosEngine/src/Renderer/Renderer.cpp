@@ -40,8 +40,12 @@ namespace Kaimos {
 
 		Ref<VertexArray> CubeVArray = nullptr;
 		Ref<VertexBuffer> CubeVBuffer = nullptr;
+		Ref<VertexArray> QuadVArray = nullptr;
+		Ref<VertexBuffer> QuadVBuffer = nullptr;
+
 		Ref<HDRTexture2D> EnvironmentHDRMap = nullptr;
 		Ref<CubemapTexture> EnvironmentCubemap = nullptr, IrradianceCubemap = nullptr, PrefilterCubemap = nullptr;
+		Ref<LUTTexture> BRDF_LutTexture = nullptr;
 		Ref<Framebuffer> EnvironmentMapFBO = nullptr;
 	};
 
@@ -55,6 +59,7 @@ namespace Kaimos {
 		KS_INFO("\n\n--- CREATING KAIMOS RENDERER ---");
 		s_RendererData = new RendererData();
 		SetCubemapVertices();
+		SetQuadVertices();
 
 		// -- Default Textures Creation --
 		uint white_data = 0xffffffff; // Full Fs for every channel there (2x4 channels - rgba -)
@@ -79,6 +84,7 @@ namespace Kaimos {
 		s_RendererData->Shaders.Load("EquirectangularToCubemap", "assets/shaders/EquirectangularToCubemapShader.glsl");
 		s_RendererData->Shaders.Load("CubemapConvolution", "assets/shaders/CubemapConvolutionShader.glsl");
 		s_RendererData->Shaders.Load("IBL_Prefiltered", "assets/shaders/IBL_PrefilteringShader.glsl");
+		s_RendererData->Shaders.Load("BRDF_Integration", "assets/shaders/BRDFConvolutionShader.glsl");
 		s_RendererData->Shaders.Load("SkyboxShader", "assets/shaders/SkyboxShader.glsl");
 
 		// -- Shaders Uniform of Texture Slots --
@@ -144,8 +150,12 @@ namespace Kaimos {
 			shader->SetUFloat3("u_ViewPos", camera_pos);
 			shader->SetUFloat3("u_SceneColor", s_RendererData->SceneColor);
 
-			s_RendererData->IrradianceCubemap->Bind(30);
-			shader->SetUInt("u_IrradianceMap", 30);
+			s_RendererData->IrradianceCubemap->Bind(29);
+			s_RendererData->PrefilterCubemap->Bind(30);
+			s_RendererData->BRDF_LutTexture->Bind(31);
+			shader->SetUInt("u_IrradianceMap", 29);
+			shader->SetUInt("u_PrefilterSpecularMap", 30);
+			shader->SetUInt("u_BRDF_LUTMap", 31);
 
 			// Set Directional Lights Uniforms
 			uint dir_lights_num = dir_lights.size() >= s_RendererData->MaxDirLights ? s_RendererData->MaxDirLights : dir_lights.size();
@@ -201,11 +211,9 @@ namespace Kaimos {
 			s_RendererData->EnvironmentCubemap->Bind();
 			//s_RendererData->IrradianceCubemap->Bind();
 			//s_RendererData->PrefilterCubemap->Bind();
-			skybox_shader->SetUInt("u_Cubemap", 0);
-
-			s_RendererData->CubeVArray->Bind();
-			RenderCommand::DrawUnindexed(s_RendererData->CubeVArray, 36);
-			s_RendererData->CubeVArray->Unbind();
+			skybox_shader->SetUInt("u_Cubemap", 0);			
+			RenderCube();
+			skybox_shader->Unbind();
 		}
 	}
 
@@ -454,7 +462,7 @@ namespace Kaimos {
 			// Bind Shader
 			equitorect_shader->Bind();
 			equitorect_shader->SetUInt("u_EquirectangularMap", 0);
-			
+
 			// Bind HDRMap + FBO
 			s_RendererData->EnvironmentHDRMap->Bind();
 			s_RendererData->EnvironmentMapFBO->Bind();
@@ -488,7 +496,7 @@ namespace Kaimos {
 				irradiance_shader->SetUInt("u_Cubemap", 0);
 				s_RendererData->EnvironmentCubemap->Bind();
 				s_RendererData->EnvironmentMapFBO->Bind(irradiance_w, irradiance_h);
-				
+
 				// Render from 6 perspectives
 				uint irr_cubemap_id = s_RendererData->IrradianceCubemap->GetTextureID();
 				for (uint i = 0; i < 6; ++i)
@@ -541,15 +549,39 @@ namespace Kaimos {
 					RenderCommand::Clear();
 					RenderCube();
 				}
-
 			}
 
-			// Create FBO Red Texture(for mouse picking) + Unbind
-			s_RendererData->EnvironmentMapFBO->CreateAndAttachRedTexture(1, w, h);
+			// Unbind
 			s_RendererData->EnvironmentMapFBO->Unbind();
 			prefilter_shader->Unbind();
-			KS_TRACE("Successfully Changed the Environment Map");
 		}
+
+		// BRDF Convolution
+		Ref<Shader> brdf_integration_shader = GetShader("BRDF_Integration");
+		if (brdf_integration_shader)
+		{
+			uint lut_size = 512;
+			s_RendererData->BRDF_LutTexture = LUTTexture::Create(lut_size);
+
+			// Bind & Resize FBO/RBO
+			s_RendererData->EnvironmentMapFBO->ResizeAndBindRenderBuffer(lut_size, lut_size);
+			s_RendererData->EnvironmentMapFBO->AttachColorTexture(TEXTURE_TARGET::TEXTURE_2D, 0, s_RendererData->BRDF_LutTexture->GetTextureID());
+			s_RendererData->EnvironmentMapFBO->Bind(lut_size, lut_size);
+
+			// Bind Shader & Draw Plane/Quad
+			brdf_integration_shader->Bind();
+			RenderCommand::Clear();
+			RenderQuad();
+
+			// Unbind
+			brdf_integration_shader->Unbind();
+		}
+
+		// Create FBO Red Texture(for mouse picking) + Unbind
+		s_RendererData->EnvironmentMapFBO->CreateAndAttachRedTexture(1, w, h);
+		s_RendererData->EnvironmentMapFBO->Unbind();
+		KS_TRACE("Successfully Changed the Environment Map");
+
 	}
 
 	void Renderer::RemoveEnvironmentMap()
@@ -559,6 +591,14 @@ namespace Kaimos {
 			s_RendererData->EnvironmentHDRMap.reset();
 			s_RendererData->EnvironmentMapFBO.reset();
 		}
+	}
+
+	uint Renderer::GetEnvironmentMapLUTTexture()
+	{
+		if(s_RendererData->BRDF_LutTexture)
+			return s_RendererData->BRDF_LutTexture->GetTextureID();
+		
+		return 0;
 	}
 
 	Ref<Shader> Renderer::GetShader(const std::string& name)
@@ -832,6 +872,43 @@ namespace Kaimos {
 		
 		s_RendererData->CubeVBuffer->Unbind();
 		s_RendererData->CubeVArray->Unbind();
+	}
+
+	void Renderer::SetQuadVertices()
+	{
+		float vertices[] = {
+			// Pos				// TCoords
+			 1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
+			 1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
+			-1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
+			-1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
+		};
+		
+		uint indices[] = {
+			0, 1, 3,
+			1, 2, 3
+		};
+
+		s_RendererData->QuadVArray = VertexArray::Create();
+		s_RendererData->QuadVBuffer = VertexBuffer::Create(vertices, sizeof(vertices));
+		
+		Ref<IndexBuffer> index_buffer = IndexBuffer::Create(indices, 6);
+		BufferLayout quad_layout = { { SHADER_DATATYPE::FLOAT3, "a_Position" }, { SHADER_DATATYPE::FLOAT2, "a_TexCoord" } };
+
+		s_RendererData->QuadVBuffer->SetLayout(quad_layout);
+		s_RendererData->QuadVArray->AddVertexBuffer(s_RendererData->QuadVBuffer);
+		s_RendererData->QuadVArray->SetIndexBuffer(index_buffer);
+
+		s_RendererData->QuadVBuffer->Unbind();
+		s_RendererData->QuadVArray->Unbind();
+		index_buffer->Unbind();
+	}
+
+	void Renderer::RenderQuad()
+	{
+		s_RendererData->QuadVArray->Bind();
+		RenderCommand::DrawIndexed(s_RendererData->QuadVArray);
+		s_RendererData->QuadVArray->Unbind();
 	}
 
 	void Renderer::RenderCube()

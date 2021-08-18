@@ -41,20 +41,28 @@ namespace Kaimos {
 	};
 
 
+
+	class LUTTexture : public Texture
+	{
+	public:
+		static Ref<LUTTexture> Create(uint size);
+	};
+
+
+
 	class HDRTexture2D : public Texture
 	{
 	public:
 		static Ref<HDRTexture2D> Create(const std::string& filepath);
-
 		virtual const std::string& GetFilepath() const = 0;
 	};
+
 
 
 	class CubemapTexture : public Texture
 	{
 	public:
 		static Ref<CubemapTexture> Create(uint width, uint height, bool linear_mipmap_filtering = false);
-
 		virtual void GenerateMipMap() const = 0;
 	};
 }

@@ -202,6 +202,32 @@ namespace Kaimos {
 
 
 
+	// ----------------------- HDR TEXTURE ----------------------------------------------------------------
+	// ----------------------- Public Class Methods -------------------------------------------------------
+	OGL_LUTTexture::OGL_LUTTexture(uint size)
+	{
+		// -- Texture Creation --
+		m_Width = m_Height = size;
+		glGenTextures(1, &m_ID);
+		glBindTexture(GL_TEXTURE_2D, m_ID);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RG16F, size, size, 0, GL_RG, GL_FLOAT, 0);
+
+		// --- Texture Parameters Setup ---
+		glTextureParameteri(m_ID, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTextureParameteri(m_ID, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTextureParameteri(m_ID, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTextureParameteri(m_ID, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	}
+
+	void OGL_LUTTexture::Bind(uint slot) const
+	{
+		KS_PROFILE_FUNCTION();
+		glBindTextureUnit(slot, m_ID);
+	}
+
+
+
+
 	// ----------------------- CUBEMAP TEXTURE ------------------------------------------------------------
 	// ----------------------- Public Class Methods -------------------------------------------------------
 	OGL_CubemapTexture::OGL_CubemapTexture(uint width, uint height, bool linear_mipmap_filtering)

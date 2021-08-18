@@ -49,6 +49,15 @@ namespace Kaimos {
 
 
 
+	class OGL_LUTTexture : public LUTTexture
+	{
+	public:
+		OGL_LUTTexture(uint size);
+		virtual void Bind(uint slot = 0) const override;
+	};
+
+
+
 	class OGL_CubemapTexture : public CubemapTexture
 	{
 	public:

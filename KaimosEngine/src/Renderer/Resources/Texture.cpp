@@ -30,6 +30,8 @@ namespace Kaimos {
 		return nullptr;
 	}
 
+
+
 	Ref<HDRTexture2D> HDRTexture2D::Create(const std::string& filepath)
 	{
 		switch (Renderer::GetRendererAPI())
@@ -41,6 +43,22 @@ namespace Kaimos {
 		KS_FATAL_ERROR("RendererAPI is unknown, not selected or failed!");
 		return nullptr;
 	}
+
+
+	
+	Ref<LUTTexture> LUTTexture::Create(uint size)
+	{
+		switch (Renderer::GetRendererAPI())
+		{
+			case RendererAPI::API::OPENGL:		return CreateRef<OGL_LUTTexture>(size);
+			case RendererAPI::API::NONE:		KS_FATAL_ERROR("RendererAPI is set to NONE (unsupported)!"); return nullptr;
+		}
+
+		KS_FATAL_ERROR("RendererAPI is unknown, not selected or failed!");
+		return nullptr;
+	}
+
+
 
 	Ref<CubemapTexture> CubemapTexture::Create(uint width, uint height, bool linear_mipmap_filtering)
 	{
