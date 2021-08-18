@@ -33,8 +33,9 @@ namespace Kaimos {
 		std::unordered_map<uint, Ref<Material>> Materials;
 
 		// Textures
+		// Although 32 is MaxTextures on OpenGL, the last ones must be for Environment Mapping
 		uint TextureSlotIndex = 2;									// Slot 0 -> White Texture, Slot 1 -> Normal Texture
-		static const uint MaxTextureSlots = 32;						// TODO: RenderCapabilities - Variables based on what the hardware can do
+		static const uint MaxTextureSlots = 29;						// TODO: RenderCapabilities - Variables based on what the hardware can do
 		std::array<Ref<Texture2D>, MaxTextureSlots> TextureSlots;
 		Ref<Texture2D> WhiteTexture = nullptr, NormalTexture = nullptr;
 
@@ -56,9 +57,20 @@ namespace Kaimos {
 	{
 		KS_PROFILE_FUNCTION();
 		KS_INFO("\n\n--- CREATING KAIMOS RENDERER ---");
+
+		// -- Setup --
 		s_RendererData = new RendererData();
 		SetCubemapVertices();
 		SetQuadVertices();
+
+		// -- Shaders Creation --
+		s_RendererData->Shaders.Load("BatchedShader", "assets/shaders/BatchRenderingShader.glsl");
+		s_RendererData->Shaders.Load("PBR_BatchedShader", "assets/shaders/PBR_BatchRenderingShader.glsl");
+		s_RendererData->Shaders.Load("EquirectangularToCubemap", "assets/shaders/EquirectangularToCubemapShader.glsl");
+		s_RendererData->Shaders.Load("CubemapConvolution", "assets/shaders/CubemapConvolutionShader.glsl");
+		s_RendererData->Shaders.Load("IBL_Prefiltered", "assets/shaders/IBL_PrefilteringShader.glsl");
+		s_RendererData->Shaders.Load("BRDF_Integration", "assets/shaders/BRDFConvolutionShader.glsl");
+		s_RendererData->Shaders.Load("SkyboxShader", "assets/shaders/SkyboxShader.glsl");
 
 		// -- Default Textures Creation --
 		uint white_data = 0xffffffff; // Full Fs for every channel there (2x4 channels - rgba -)
@@ -76,15 +88,6 @@ namespace Kaimos {
 
 		for (uint i = 0; i < s_RendererData->MaxTextureSlots; ++i)
 			texture_samplers[i] = i;
-
-		// -- Shaders Creation --
-		s_RendererData->Shaders.Load("BatchedShader", "assets/shaders/BatchRenderingShader.glsl");
-		s_RendererData->Shaders.Load("PBR_BatchedShader", "assets/shaders/PBR_BatchRenderingShader.glsl");
-		s_RendererData->Shaders.Load("EquirectangularToCubemap", "assets/shaders/EquirectangularToCubemapShader.glsl");
-		s_RendererData->Shaders.Load("CubemapConvolution", "assets/shaders/CubemapConvolutionShader.glsl");
-		s_RendererData->Shaders.Load("IBL_Prefiltered", "assets/shaders/IBL_PrefilteringShader.glsl");
-		s_RendererData->Shaders.Load("BRDF_Integration", "assets/shaders/BRDFConvolutionShader.glsl");
-		s_RendererData->Shaders.Load("SkyboxShader", "assets/shaders/SkyboxShader.glsl");
 
 		// -- Shaders Uniform of Texture Slots --
 		s_RendererData->Shaders.ForEachShader([&](const Ref<Shader>& shader)
@@ -149,6 +152,7 @@ namespace Kaimos {
 			shader->SetUFloat3("u_ViewPos", camera_pos);
 			shader->SetUFloat3("u_SceneColor", s_RendererData->SceneColor);
 
+			// Bind Environment Textures
 			s_RendererData->IrradianceCubemap->Bind(29);
 			s_RendererData->PrefilterCubemap->Bind(30);
 			s_RendererData->BRDF_LutTexture->Bind(31);
@@ -571,6 +575,7 @@ namespace Kaimos {
 			brdf_integration_shader->Bind();
 			RenderCommand::Clear();
 			RenderQuad();
+			//RenderCube();
 
 			// Unbind
 			brdf_integration_shader->Unbind();
@@ -616,9 +621,6 @@ namespace Kaimos {
 
 	void Renderer::CheckMaterialFitsInBatch(const Ref<Material>& material, std::function<void()> NextBatchFunction)
 	{
-		//bool alb = material->HasAlbedo(), norm = material->HasNormal();
-		//uint index = s_RendererData->TextureSlotIndex, max_index = s_RendererData->MaxTextureSlots;
-
 		uint tex_count = 0;
 		if (material->HasAlbedo())
 			++tex_count;
@@ -628,23 +630,17 @@ namespace Kaimos {
 		//bool start_new_batch = false;
 		if (s_RendererData->PBR_Pipeline)
 		{
-			//if (material->HasMetallicMap())
-			//	++count;
-			//if (material->HasRoughnessMap())
-			//	++count;
-			//if (material->HasAOMap())
-			//	++count;
+			if (material->HasMetallic())
+				++tex_count;
+			if (material->HasRoughness())
+				++tex_count;
+			if (material->HasAmbientOcc())
+				++tex_count;
 		}
 		else
 		{
 			if (material->HasSpecular())
 				++tex_count;
-
-			//bool spec = material->HasSpecular();
-			//if (alb && norm && spec && index == (max_index - 2))
-			//	start_new_batch = true;
-			//else if (index == (max_index - 1) && (alb && norm || alb && spec || norm && spec))
-			//	start_new_batch = true;
 		}
 
 		if (s_RendererData->TextureSlotIndex >= (s_RendererData->MaxTextureSlots - tex_count - 1))
@@ -652,20 +648,6 @@ namespace Kaimos {
 			NextBatchFunction();
 			s_RendererData->TextureSlotIndex = 2; // 0 is white texture, 1 is normal texture
 		}
-		
-
-		//if (s_RendererData->TextureSlotIndex == (s_RendererData->MaxTextureSlots - 2))
-		//	if (material->HasAlbedo() && material->HasNormal() && material->HasSpecular())
-		//		start_new_batch = true;
-		//else if (s_RendererData->TextureSlotIndex == (s_RendererData->MaxTextureSlots - 1))
-		//	if ((material->HasAlbedo() && material->HasNormal()) || (material->HasAlbedo() && material->HasSpecular()) || (material->HasNormal() && material->HasSpecular()))
-		//		start_new_batch = true;
-
-		//if (start_new_batch)
-		//{
-		//	NextBatchFunction();
-		//	s_RendererData->TextureSlotIndex = 2; // 0 is white texture, 1 is normal texture
-		//}
 	}
 
 	uint Renderer::GetTextureIndex(const Ref<Texture2D>& texture, bool is_normal, std::function<void()> NextBatchFunction)
