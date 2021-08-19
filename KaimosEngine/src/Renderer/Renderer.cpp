@@ -210,6 +210,7 @@ namespace Kaimos {
 			skybox_shader->Bind();
 			glm::mat4 view_proj = projection_matrix * glm::mat4(glm::mat3(view_matrix));
 			skybox_shader->SetUMat4("u_ViewProjection", view_proj);
+			skybox_shader->SetUFloat3("u_SceneColor", s_RendererData->SceneColor);
 
 			s_RendererData->EnvironmentCubemap->Bind();
 			//s_RendererData->IrradianceCubemap->Bind();

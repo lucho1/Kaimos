@@ -23,10 +23,11 @@ layout(location = 1) out int color2;
 
 in vec3 v_LocalPos;
 uniform samplerCube u_Cubemap;
+uniform vec3 u_SceneColor;
 
 void main()
 {
-	vec3 env_color = texture(u_Cubemap, v_LocalPos).rgb;
+	vec3 env_color = texture(u_Cubemap, v_LocalPos).rgb * u_SceneColor;
 	//vec3 env_color = textureLod(u_Cubemap, v_LocalPos, 2.2).rgb;
 
 	env_color = env_color/(env_color + vec3(1.0));
