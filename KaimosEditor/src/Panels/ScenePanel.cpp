@@ -363,7 +363,15 @@ namespace Kaimos {
 				ImGui::NewLine();
 				KaimosUI::UIFunctionalities::SetTextCursorAndWidth("Radiance");
 				ImGui::ColorEdit4("###light_radiance", glm::value_ptr(light->Radiance), flags);
-				Kaimos::KaimosUI::UIFunctionalities::DrawInlineSlider("Intensity", "###light_intensity", &light->Intensity);
+				
+				float light_int_max = 1000.0f, light_int_pow = 1.5f;
+				if (Renderer::IsSceneInPBRPipeline())
+				{
+					light_int_max = 10.0f;
+					light_int_pow = 1.0f;
+				}
+
+				Kaimos::KaimosUI::UIFunctionalities::DrawInlineSlider("Intensity", "###light_intensity", &light->Intensity, 0.0f, 2.0, light_int_max, 0.01f, "%.2f", light_int_pow);
 				Kaimos::KaimosUI::UIFunctionalities::DrawInlineDragFloat("Specular Strength", "###light_specstrength", &light->SpecularStrength, 0.01f, 0.0f, 2.0f, 0.0f, FLT_MAX);
 
 				// Light Switch
@@ -392,15 +400,28 @@ namespace Kaimos {
 				ImGui::NewLine();
 				KaimosUI::UIFunctionalities::SetTextCursorAndWidth("Radiance");
 				ImGui::ColorEdit4("###light_radiance", glm::value_ptr(light->Radiance), flags);
-				Kaimos::KaimosUI::UIFunctionalities::DrawInlineSlider("Intensity", "###light_intensity", &light->Intensity);
 
-				// Point Light Stuff
-				float plight_minradius = light->GetMinRadius(), plight_maxradius = light->GetMaxRadius();
-				if (Kaimos::KaimosUI::UIFunctionalities::DrawInlineDragFloat("Min Radius", "###plight_minradius", &plight_minradius, 0.1f, 0.0f, 2.0f, 0.0f, plight_maxradius))
-					light->SetMinRadius(plight_minradius);
+				if (Renderer::IsSceneInPBRPipeline())
+				{
+					Kaimos::KaimosUI::UIFunctionalities::DrawInlineSlider("Intensity", "###light_intensity", &light->Intensity, 0.0f, 2.0f, 100000.0f, 0.01f, "%.2f", 2.5f);
 
-				if (Kaimos::KaimosUI::UIFunctionalities::DrawInlineDragFloat("Max Radius", "###plight_maxradius", &plight_maxradius, 0.1f, 0.0f, 2.0f, plight_minradius, FLT_MAX))
-					light->SetMaxRadius(plight_maxradius);
+					// Point Light Stuff
+					float plight_minradius = light->GetMinRadius();
+					if (Kaimos::KaimosUI::UIFunctionalities::DrawInlineDragFloat("Radius", "###plight_minradius", &plight_minradius, 1.0f, 0.0f, 2.0f, 0.1f, FLT_MAX))
+						light->SetMinRadius(plight_minradius);
+				}
+				else
+				{
+					Kaimos::KaimosUI::UIFunctionalities::DrawInlineSlider("Intensity", "###light_intensity", &light->Intensity, 0.0f, 2.0f, 100.0f, 0.0f, "%.2f", 0.8f);
+
+					// Point Light Stuff
+					float plight_minradius = light->GetMinRadius(), plight_maxradius = light->GetMaxRadius();
+					if (Kaimos::KaimosUI::UIFunctionalities::DrawInlineDragFloat("Min Radius", "###plight_minradius", &plight_minradius, 0.1f, 0.0f, 2.0f, 0.0f, plight_maxradius))
+						light->SetMinRadius(plight_minradius);
+
+					if (Kaimos::KaimosUI::UIFunctionalities::DrawInlineDragFloat("Max Radius", "###plight_maxradius", &plight_maxradius, 0.1f, 0.0f, 2.0f, plight_minradius, FLT_MAX))
+						light->SetMaxRadius(plight_maxradius);
+				}
 
 				Kaimos::KaimosUI::UIFunctionalities::DrawInlineDragFloat("Falloff Intensity", "###plight_falloff", &light->FalloffMultiplier, 0.01f, 0.0f, 2.0f, 0.0f, FLT_MAX);
 				Kaimos::KaimosUI::UIFunctionalities::DrawInlineDragFloat("Specular Strength", "###light_specstrength", &light->SpecularStrength, 0.01f, 0.0f, 2.0f, 0.0f, FLT_MAX);

@@ -66,10 +66,10 @@ namespace Kaimos {
 		// -- Shaders Creation --
 		s_RendererData->Shaders.Load("BatchedShader", "assets/shaders/BatchRenderingShader.glsl");
 		s_RendererData->Shaders.Load("PBR_BatchedShader", "assets/shaders/PBR_BatchRenderingShader.glsl");
-		s_RendererData->Shaders.Load("EquirectangularToCubemap", "assets/shaders/EquirectangularToCubemapShader.glsl");
-		s_RendererData->Shaders.Load("CubemapConvolution", "assets/shaders/CubemapConvolutionShader.glsl");
-		s_RendererData->Shaders.Load("IBL_Prefiltered", "assets/shaders/IBL_PrefilteringShader.glsl");
-		s_RendererData->Shaders.Load("BRDF_Integration", "assets/shaders/BRDFConvolutionShader.glsl");
+		s_RendererData->Shaders.Load("EquirectangularToCubemap", "assets/shaders/ibl/EquirectangularToCubemapShader.glsl");
+		s_RendererData->Shaders.Load("CubemapConvolution", "assets/shaders/ibl/CubemapConvolutionShader.glsl");
+		s_RendererData->Shaders.Load("IBL_Prefiltered", "assets/shaders/ibl/IBL_PrefilteringShader.glsl");
+		s_RendererData->Shaders.Load("BRDF_Integration", "assets/shaders/ibl/BRDFConvolutionShader.glsl");
 		s_RendererData->Shaders.Load("SkyboxShader", "assets/shaders/SkyboxShader.glsl");
 
 		// -- Default Textures Creation --
@@ -188,13 +188,18 @@ namespace Kaimos {
 				shader->SetUFloat4(light_array_uniform + "Radiance", light->Radiance);
 				shader->SetUFloat3(light_array_uniform + "Position", point_lights[i].second);
 				shader->SetUFloat(light_array_uniform + "Intensity", light->Intensity);
+				shader->SetUFloat(light_array_uniform + "FalloffFactor", light->FalloffMultiplier);
 				shader->SetUFloat(light_array_uniform + "SpecularStrength", light->SpecularStrength);
 
-				shader->SetUFloat(light_array_uniform + "MinRadius", light->GetMinRadius());
-				shader->SetUFloat(light_array_uniform + "MaxRadius", light->GetMaxRadius());
-				shader->SetUFloat(light_array_uniform + "FalloffFactor", light->FalloffMultiplier);
-				shader->SetUFloat(light_array_uniform + "AttL", light->GetLinearAttenuationFactor());
-				shader->SetUFloat(light_array_uniform + "AttQ", light->GetQuadraticAttenuationFactor());
+				if (s_RendererData->PBR_Pipeline)
+					shader->SetUFloat(light_array_uniform + "Radius", light->GetMinRadius());
+				else
+				{
+					shader->SetUFloat(light_array_uniform + "MinRadius", light->GetMinRadius());
+					shader->SetUFloat(light_array_uniform + "MaxRadius", light->GetMaxRadius());
+					shader->SetUFloat(light_array_uniform + "AttL", light->GetLinearAttenuationFactor());
+					shader->SetUFloat(light_array_uniform + "AttQ", light->GetQuadraticAttenuationFactor());
+				}
 			}
 		}
 		else
