@@ -381,7 +381,7 @@ namespace Kaimos::MaterialEditor {
 			// Ambient Occlusion Pin & Texture
 			ImGui::NewLine();
 			uint aocc_id = m_AttachedMaterial->GetTextureID(MATERIAL_TEXTURES::AMBIENT_OC);
-			DrawFloatPin(set_node_draggable, m_AmbientOcclusionPin, m_AttachedMaterial->AmbientOcclusion, 0.0f, 1.0f);
+			DrawFloatPin(set_node_draggable, m_AmbientOcclusionPin, m_AttachedMaterial->AmbientOcclusion, 0.03f, 1.0f);
 			DrawTextureButton(aocc_id, MATERIAL_TEXTURES::AMBIENT_OC, "AO Texture", "###mt_aocc_btn");
 
 			if (m_AttachedMaterial->HasAmbientOcc())
