@@ -83,7 +83,7 @@ namespace Kaimos {
 	{
 		uint count = index_count ? index_count : vertex_array->GetIndexBuffer()->GetCount();
 		glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, nullptr);
-		glBindTexture(GL_TEXTURE_2D, 0); // TODO/OJU: Should we actually do this? Take it into account on materials system/3D Renderer
+		//glBindTexture(GL_TEXTURE_2D, 0); // TODO/OJU: Should we actually do this? Take it into account on materials system/3D Renderer
 	}
 
 	void OGLRendererAPI::DrawUnindexed(const Ref<VertexArray>& vertex_array, uint count) const
