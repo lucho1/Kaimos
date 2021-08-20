@@ -597,10 +597,22 @@ namespace Kaimos {
 	void Renderer::RemoveEnvironmentMap()
 	{
 		if (s_RendererData->EnvironmentHDRMap)
-		{
 			s_RendererData->EnvironmentHDRMap.reset();
+
+		if (s_RendererData->EnvironmentMapFBO)
 			s_RendererData->EnvironmentMapFBO.reset();
-		}
+		
+		if (s_RendererData->EnvironmentCubemap)
+			s_RendererData->EnvironmentCubemap.reset();
+
+		if (s_RendererData->IrradianceCubemap)
+			s_RendererData->IrradianceCubemap.reset();
+
+		if (s_RendererData->PrefilterCubemap)
+			s_RendererData->PrefilterCubemap.reset();
+
+		if (s_RendererData->BRDF_LutTexture)
+			s_RendererData->BRDF_LutTexture.reset();
 	}
 
 	Ref<Shader> Renderer::GetShader(const std::string& name)
