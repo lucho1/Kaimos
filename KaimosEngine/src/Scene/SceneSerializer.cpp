@@ -367,6 +367,7 @@ namespace Kaimos {
 		}
 
 		KS_TRACE("Finished Deserializing {0} Entities", entities_deserialized);
+		KS_TRACE("Finished Deserializing {0} Scene", scene_name);
 		return true;
 	}
 }
