@@ -52,7 +52,8 @@ namespace Kaimos {
 		static uint GetEnvironmentMapID();
 		static std::string GetEnvironmentMapFilepath();
 		static glm::ivec2 GetEnvironmentMapSize();
-		static void SetEnvironmentMap(const std::string& filepath);
+		static void ForceEnvironmentMapRecompile();
+		static void SetEnvironmentMap(const std::string& filepath, bool force_reset = false);
 		static void RemoveEnvironmentMap();
 
 

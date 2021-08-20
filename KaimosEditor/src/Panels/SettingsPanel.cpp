@@ -99,6 +99,9 @@ namespace Kaimos {
 			KaimosUI::UIFunctionalities::PopButton(true);
 			ImGui::PopStyleVar();
 
+			if (ImGui::Button("Recompile Environment Map"))
+				Renderer::ForceEnvironmentMapRecompile();
+
 			ImGui::End();
 		}
 		

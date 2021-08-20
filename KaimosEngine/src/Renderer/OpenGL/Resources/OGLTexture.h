@@ -20,7 +20,7 @@ namespace Kaimos {
 		virtual void Bind(uint slot = 0)			const override;
 
 		// --- Getters ---
-		virtual const std::string& GetFilepath()	const override { return m_Filepath; }
+		virtual const std::string GetFilepath()	const override { return m_Filepath; }
 
 	private:
 
@@ -40,7 +40,7 @@ namespace Kaimos {
 
 		// --- Public Texture Methods ---
 		virtual void Bind(uint slot = 0)			const override;
-		virtual const std::string& GetFilepath()	const override { return m_Filepath; }
+		virtual const std::string GetFilepath()	const override { return m_Filepath; }
 
 	private:
 

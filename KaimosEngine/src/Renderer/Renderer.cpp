@@ -120,6 +120,7 @@ namespace Kaimos {
 		KS_INFO("\n\n--- SHUTTING DOWN KAIMOS RENDERER ---");
 		Renderer2D::Shutdown();
 		Renderer3D::Shutdown();
+		RemoveEnvironmentMap();
 
 		// Not sure if this is necessary since maybe delete s_RendererData is enough
 		for (auto& mat : s_RendererData->Materials)
@@ -141,6 +142,12 @@ namespace Kaimos {
 	void Renderer::BeginScene(const glm::mat4& view_projection_matrix, const glm::vec3& camera_pos, const std::vector<std::pair<Ref<Light>, glm::vec3>>& dir_lights, const std::vector<std::pair<Ref<PointLight>, glm::vec3>>& point_lights)
 	{
 		KS_PROFILE_FUNCTION();
+		if (static bool recompile_map = true; recompile_map)
+		{
+			ForceEnvironmentMapRecompile();
+			recompile_map = false;
+		}
+
 		bool pbr_pipeline = s_RendererData->PBR_Pipeline;
 		Ref<Shader> shader = pbr_pipeline ? GetShader("PBR_BatchedShader") : GetShader("BatchedShader");
 
@@ -422,7 +429,16 @@ namespace Kaimos {
 		return glm::ivec2(0);
 	}
 
-	void Renderer::SetEnvironmentMap(const std::string& filepath)
+	void Renderer::ForceEnvironmentMapRecompile()
+	{
+		KS_TRACE("Recompiling Environment Map, please wait...");
+		if (s_RendererData->EnvironmentHDRMap)
+			SetEnvironmentMap(s_RendererData->EnvironmentHDRMap->GetFilepath(), true);
+		else
+			KS_WARN("Unexisting Environment Map, couldn't recompile it");
+	}
+
+	void Renderer::SetEnvironmentMap(const std::string& filepath, bool force_reset)
 	{
 		// Check Path Validity
 		KS_PROFILE_FUNCTION();
@@ -432,13 +448,14 @@ namespace Kaimos {
 			return;
 		}
 
-		if (s_RendererData->EnvironmentHDRMap && s_RendererData->EnvironmentHDRMap->GetFilepath() == filepath)
+		if (s_RendererData->EnvironmentHDRMap && !force_reset && s_RendererData->EnvironmentHDRMap->GetFilepath() == filepath)
 		{
-			KS_TRACE("The selected Environment Map is already in use!");
+			KS_WARN("The selected Environment Map is already in use!");
 			return;
 		}
 
 		// Remove Previous Environment Map
+		KS_TRACE("Setting Environment Map, please wait...");
 		RemoveEnvironmentMap();
 
 		// Setup Variables

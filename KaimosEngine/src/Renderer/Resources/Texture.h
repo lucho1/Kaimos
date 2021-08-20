@@ -37,7 +37,7 @@ namespace Kaimos {
 		static Ref<Texture2D> Create(uint width, uint height);
 
 		virtual void SetData(void* data, uint size) = 0;
-		virtual const std::string& GetFilepath() const = 0;
+		virtual const std::string GetFilepath() const = 0;
 	};
 
 
@@ -54,7 +54,7 @@ namespace Kaimos {
 	{
 	public:
 		static Ref<HDRTexture2D> Create(const std::string& filepath);
-		virtual const std::string& GetFilepath() const = 0;
+		virtual const std::string GetFilepath() const = 0;
 	};
 
 
