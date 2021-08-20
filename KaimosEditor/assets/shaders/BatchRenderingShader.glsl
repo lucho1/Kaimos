@@ -70,6 +70,7 @@ void main()
 
 #define MAX_DIR_LIGHTS 0
 #define MAX_POINT_LIGHTS 0
+#define MAX_TEXTURES 0
 
 layout(location = 0) out vec4 color;
 layout(location = 1) out int color2;
@@ -107,7 +108,7 @@ struct PointLight
 
 // --- Uniforms ---
 uniform vec3 u_ViewPos;
-uniform sampler2D u_Textures[32];
+uniform sampler2D u_Textures[MAX_TEXTURES];
 
 uniform const int u_DirectionalLightsNum = 0, u_PointLightsNum = 0;
 uniform DirectionalLight u_DirectionalLights[MAX_DIR_LIGHTS] = DirectionalLight[MAX_DIR_LIGHTS](DirectionalLight(vec4(1.0), vec3(0.0), 1.0, 1.0));

@@ -149,9 +149,11 @@ namespace Kaimos {
 		// Lighting Defines
 		std::string dirlights_define = "#define MAX_DIR_LIGHTS ";
 		std::string pointlights_define = "#define MAX_POINT_LIGHTS ";
+		std::string maxtextures_define = "#define MAX_TEXTURES ";
 
 		size_t define_dir_pos = source.find(dirlights_define, 0);
 		size_t define_point_pos = source.find(pointlights_define, 0);
+		size_t define_maxtex_pos = source.find(maxtextures_define, 0);
 
 		if (define_dir_pos != std::string::npos)
 		{
@@ -163,6 +165,13 @@ namespace Kaimos {
 		{
 			std::string new_point_define = pointlights_define + std::to_string(Renderer::GetMaxPointLights()) + "\n";
 			source.replace(define_point_pos, pointlights_define.size() + 3, new_point_define);
+		}
+
+		if (define_maxtex_pos != std::string::npos)
+		{
+			// Magic numbers here are because of the offsets created by this replaces
+			std::string new_maxtex_define = maxtextures_define + std::to_string(Renderer::GetMaxTextureSlots()) + "\n";
+			source.replace(define_maxtex_pos + 2, maxtextures_define.size() + 3, new_maxtex_define);
 		}
 
 		// Shader Type Token

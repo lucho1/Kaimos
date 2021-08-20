@@ -32,6 +32,8 @@ void main()
 #type FRAGMENT_SHADER
 #version 460 core
 
+#define MAX_TEXTURES 0
+
 layout(location = 0) out vec4 color;
 layout(location = 1) out int color2;
 
@@ -42,7 +44,7 @@ in flat float v_TexIndex;
 in flat int v_EntityID;
 
 // Uniforms
-uniform sampler2D u_Textures[32];
+uniform sampler2D u_Textures[MAX_TEXTURES];
 
 
 void main()
