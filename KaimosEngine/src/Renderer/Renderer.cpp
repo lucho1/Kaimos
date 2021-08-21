@@ -440,7 +440,7 @@ namespace Kaimos {
 
 	void Renderer::SetEnvironmentMap(const std::string& filepath, bool force_reset)
 	{
-		// Check Path Validity
+		// -- Check Path Validity --
 		KS_PROFILE_FUNCTION();
 		if (!Resources::ResourceManager::CheckValidPathForHDRTexture(filepath))
 		{
@@ -454,22 +454,27 @@ namespace Kaimos {
 			return;
 		}
 
-		// Remove Previous Environment Map
+		// -- Get Needed Shaders --
+		Ref<Shader> recttocube_shader		= GetShader("EquirectangularToCubemap");
+		Ref<Shader> irradiance_shader		= GetShader("CubemapConvolution");
+		Ref<Shader> prefilter_shader		= GetShader("IBL_Prefiltered");
+		Ref<Shader> brdf_integration_shader	= GetShader("BRDF_Integration");
+
+		if (!recttocube_shader || !irradiance_shader || !prefilter_shader || !brdf_integration_shader)
+		{
+			KS_WARN("Couldn't find or get the necessary Shaders to setup the Environment Map, aborting...");
+			return;
+		}
+
+		// -- Remove Previous Environment Map --
 		KS_TRACE("Setting Environment Map, please wait...");
 		RemoveEnvironmentMap();
 
-		// Setup Variables
-		uint w = 1920, h = 1920;
 
-		// Create Environment FBO
-		s_RendererData->EnvironmentMapFBO = Framebuffer::CreateEmptyAndBind(w, h, true); // URGENT TODO: width, height
-		s_RendererData->EnvironmentMapFBO->Bind();
+		// -- Setup Variables --
+		// We're dealing with cubes, so all faces have = size or resolution
+		uint envmap_res = 1920, irradiancemap_res = 32, prefiltermap_res = 128, lut_res = envmap_res;
 
-		// Create Maps
-		s_RendererData->EnvironmentHDRMap = HDRTexture2D::Create(filepath);
-		s_RendererData->EnvironmentCubemap = CubemapTexture::Create(w, h, true);
-
-		// Set Capture variables for Shaders
 		glm::mat4 capture_projection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
 		glm::mat4 capture_views[] =
 		{
@@ -481,131 +486,129 @@ namespace Kaimos {
 		   glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f),	glm::vec3(0.0f,  0.0f, -1.0f),	glm::vec3(0.0f, -1.0f,  0.0f))
 		};
 
-		// Get Equitectangular-Cubemap Shader
-		Ref<Shader> equitorect_shader = GetShader("EquirectangularToCubemap");
-		if (equitorect_shader)
+
+		// -- Create Environment FBO, HDR Map & Cubemap --
+		s_RendererData->EnvironmentMapFBO = Framebuffer::CreateEmptyAndBind(envmap_res, envmap_res, true); // URGENT TODO: width, height
+		s_RendererData->EnvironmentMapFBO->Bind();
+		s_RendererData->EnvironmentHDRMap = HDRTexture2D::Create(filepath);
+		s_RendererData->EnvironmentCubemap = CubemapTexture::Create(envmap_res, envmap_res, true);
+
+
+		// -- Equirectangular to Cubemap Step --
+		recttocube_shader->Bind();
+		recttocube_shader->SetUInt("u_EquirectangularMap", 0);
+
+		// Bind HDRMap + FBO & Draw from 6 Perspectives
+		uint env_cubemap_id = s_RendererData->EnvironmentCubemap->GetTextureID();
+		s_RendererData->EnvironmentHDRMap->Bind();
+		s_RendererData->EnvironmentMapFBO->Bind();
+
+		for (uint i = 0; i < 6; ++i)
 		{
-			// Bind Shader
-			equitorect_shader->Bind();
-			equitorect_shader->SetUInt("u_EquirectangularMap", 0);
+			recttocube_shader->SetUMat4("u_ViewProjection", capture_projection * capture_views[i]);
+			s_RendererData->EnvironmentMapFBO->AttachColorTexture(TEXTURE_TARGET::TEXTURE_CUBEMAP, i, env_cubemap_id);
+			RenderCommand::Clear();
+			RenderCube();
+		}
 
-			// Bind HDRMap + FBO
-			s_RendererData->EnvironmentHDRMap->Bind();
-			s_RendererData->EnvironmentMapFBO->Bind();
+		// Unbind
+		s_RendererData->EnvironmentMapFBO->Unbind();
+		s_RendererData->EnvironmentCubemap->GenerateMipMap();
+		recttocube_shader->Unbind();
 
-			// Render from 6 Perspectives
-			uint env_cubemap_id = s_RendererData->EnvironmentCubemap->GetTextureID();
+
+		// -- Irradiance Convolution Step --
+		// Create Map
+		s_RendererData->IrradianceCubemap = CubemapTexture::Create(irradiancemap_res, irradiancemap_res);
+		s_RendererData->EnvironmentMapFBO->ResizeAndBindRenderBuffer(irradiancemap_res, irradiancemap_res);
+
+		// Bind Shader, Cubemap & FBO + Render from 6 perspectives
+		uint irr_cubemap_id = s_RendererData->IrradianceCubemap->GetTextureID();
+
+		irradiance_shader->Bind();
+		irradiance_shader->SetUInt("u_Cubemap", 0);
+		s_RendererData->EnvironmentCubemap->Bind();
+		s_RendererData->EnvironmentMapFBO->Bind(irradiancemap_res, irradiancemap_res);
+
+		for (uint i = 0; i < 6; ++i)
+		{
+			irradiance_shader->SetUMat4("u_ViewProjection", capture_projection * capture_views[i]);
+			s_RendererData->EnvironmentMapFBO->AttachColorTexture(TEXTURE_TARGET::TEXTURE_CUBEMAP, i, irr_cubemap_id);
+			RenderCommand::Clear();
+			RenderCube();
+		}
+
+		// Unbind
+		s_RendererData->EnvironmentMapFBO->Unbind();
+		irradiance_shader->Unbind();
+
+
+		// -- IBL Specular Prefilter Step --
+		// Create Map & Mipmaps
+		s_RendererData->PrefilterCubemap = CubemapTexture::Create(prefiltermap_res, prefiltermap_res, true);
+		s_RendererData->PrefilterCubemap->GenerateMipMap();
+
+		// Bind Shader, Cubemap & FBO
+		prefilter_shader->Bind();
+		prefilter_shader->SetUInt("u_EnvironmentMapResolution", envmap_res);
+		prefilter_shader->SetUInt("u_EnvironmentMap", 0);
+
+		s_RendererData->EnvironmentCubemap->Bind();
+		s_RendererData->EnvironmentMapFBO->Bind();
+
+		// Render from 6 perspectives for each mip-level to generate
+		uint prefiltermap_id = s_RendererData->PrefilterCubemap->GetTextureID();
+		uint mip_levels = 5;
+
+		for (uint mip = 0; mip < mip_levels; ++mip)
+		{
+			// Calculate mip resolution
+			uint mip_res = prefiltermap_res * glm::pow(0.5f, mip);
+
+			// Resize & Bind FBO to match mip resolution
+			s_RendererData->EnvironmentMapFBO->ResizeAndBindRenderBuffer(mip_res, mip_res);
+			s_RendererData->EnvironmentMapFBO->Bind(mip_res, mip_res);
+
+			// Set roughness
+			float roughness = (float)mip / (float)(mip_levels - 1);
+			prefilter_shader->SetUFloat("u_Roughness", roughness);
+
+			// Render 6 perspectives
 			for (uint i = 0; i < 6; ++i)
 			{
-				equitorect_shader->SetUMat4("u_ViewProjection", capture_projection * capture_views[i]);
-				s_RendererData->EnvironmentMapFBO->AttachColorTexture(TEXTURE_TARGET::TEXTURE_CUBEMAP, i, env_cubemap_id);
+				prefilter_shader->SetUMat4("u_ViewProjection", capture_projection * capture_views[i]);
+				s_RendererData->EnvironmentMapFBO->AttachColorTexture(TEXTURE_TARGET::TEXTURE_CUBEMAP, i, prefiltermap_id, mip);
 				RenderCommand::Clear();
 				RenderCube();
 			}
-
-			// Unbind
-			s_RendererData->EnvironmentMapFBO->Unbind();
-			s_RendererData->EnvironmentCubemap->GenerateMipMap();
-			equitorect_shader->Unbind();
-
-			// Irradiance Cubemap Convolution
-			Ref<Shader> irradiance_shader = GetShader("CubemapConvolution");
-			if (irradiance_shader)
-			{
-				// Create Irradiance Map
-				uint irradiance_w = 32, irradiance_h = 32;
-				s_RendererData->IrradianceCubemap = CubemapTexture::Create(irradiance_w, irradiance_h);
-				s_RendererData->EnvironmentMapFBO->ResizeAndBindRenderBuffer(irradiance_w, irradiance_h);
-
-				//capture_projection
-				irradiance_shader->Bind();
-				irradiance_shader->SetUInt("u_Cubemap", 0);
-				s_RendererData->EnvironmentCubemap->Bind();
-				s_RendererData->EnvironmentMapFBO->Bind(irradiance_w, irradiance_h);
-
-				// Render from 6 perspectives
-				uint irr_cubemap_id = s_RendererData->IrradianceCubemap->GetTextureID();
-				for (uint i = 0; i < 6; ++i)
-				{
-					irradiance_shader->SetUMat4("u_ViewProjection", capture_projection * capture_views[i]);
-					s_RendererData->EnvironmentMapFBO->AttachColorTexture(TEXTURE_TARGET::TEXTURE_CUBEMAP, i, irr_cubemap_id);
-					RenderCommand::Clear();
-					RenderCube();
-				}
-
-				// Unbind
-				s_RendererData->EnvironmentMapFBO->Unbind();
-				irradiance_shader->Unbind();
-			}
 		}
 
-		// IBL Specular Prefilter
-		Ref<Shader> prefilter_shader = GetShader("IBL_Prefiltered");
-		if (prefilter_shader)
-		{
-			// Create Prefilter Map
-			uint prefilter_w = 128, prefilter_h = 128;
-			s_RendererData->PrefilterCubemap = CubemapTexture::Create(prefilter_w, prefilter_h, true);
-			s_RendererData->PrefilterCubemap->GenerateMipMap();
+		// Unbind
+		s_RendererData->EnvironmentMapFBO->Unbind();
+		prefilter_shader->Unbind();
 
-			// Bind Shader
-			prefilter_shader->Bind();
-			prefilter_shader->SetUInt("u_EnvironmentMapResolution", w);
-			prefilter_shader->SetUInt("u_EnvironmentMap", 0);
-			s_RendererData->EnvironmentCubemap->Bind();
-			s_RendererData->EnvironmentMapFBO->Bind();
 
-			//u_Roughness
-			uint mip_levels = 5;
-			for (uint mip = 0; mip < mip_levels; ++mip)
-			{
-				uint mip_w = 128 * glm::pow(0.5f, mip), mip_h = mip_w;
+		// -- BRDF Convolution Step --
+		s_RendererData->BRDF_LutTexture = LUTTexture::Create(lut_res);
 
-				s_RendererData->EnvironmentMapFBO->ResizeAndBindRenderBuffer(mip_w, mip_h);
-				s_RendererData->EnvironmentMapFBO->Bind(mip_w, mip_h);
+		// Bind & Resize FBO/RBO & Attach Texture
+		s_RendererData->EnvironmentMapFBO->ResizeAndBindRenderBuffer(lut_res, lut_res);
+		s_RendererData->EnvironmentMapFBO->AttachColorTexture(TEXTURE_TARGET::TEXTURE_2D, 0, s_RendererData->BRDF_LutTexture->GetTextureID());
+		s_RendererData->EnvironmentMapFBO->Bind(lut_res, lut_res);
 
-				float roughness = (float)mip / (float)(mip_levels - 1);
-				prefilter_shader->SetUFloat("u_Roughness", roughness);
+		// Render Quad
+		brdf_integration_shader->Bind();
+		RenderCommand::Clear();
+		RenderQuad();
 
-				uint prefiltermap_id = s_RendererData->PrefilterCubemap->GetTextureID();
-				for (uint i = 0; i < 6; ++i)
-				{
-					prefilter_shader->SetUMat4("u_ViewProjection", capture_projection * capture_views[i]);
-					s_RendererData->EnvironmentMapFBO->AttachColorTexture(TEXTURE_TARGET::TEXTURE_CUBEMAP, i, prefiltermap_id, mip);
-					RenderCommand::Clear();
-					RenderCube();
-				}
-			}
+		// Unbind
+		brdf_integration_shader->Unbind();
 
-			// Unbind
-			s_RendererData->EnvironmentMapFBO->Unbind();
-			prefilter_shader->Unbind();
-		}
 
-		// BRDF Convolution
-		Ref<Shader> brdf_integration_shader = GetShader("BRDF_Integration");
-		if (brdf_integration_shader)
-		{
-			uint lut_size = 512;
-			s_RendererData->BRDF_LutTexture = LUTTexture::Create(lut_size);
+		// -- Create FBO Red Texture (for mouse picking) --
+		s_RendererData->EnvironmentMapFBO->CreateAndAttachRedTexture(1, envmap_res, envmap_res);
 
-			// Bind & Resize FBO/RBO
-			s_RendererData->EnvironmentMapFBO->ResizeAndBindRenderBuffer(lut_size, lut_size);
-			s_RendererData->EnvironmentMapFBO->AttachColorTexture(TEXTURE_TARGET::TEXTURE_2D, 0, s_RendererData->BRDF_LutTexture->GetTextureID());
-			s_RendererData->EnvironmentMapFBO->Bind(lut_size, lut_size);
-
-			// Bind Shader & Draw Plane/Quad
-			brdf_integration_shader->Bind();
-			RenderCommand::Clear();
-			RenderQuad();
-			//RenderCube();
-
-			// Unbind
-			brdf_integration_shader->Unbind();
-		}
-
-		// Create FBO Red Texture(for mouse picking) + Unbind
-		s_RendererData->EnvironmentMapFBO->CreateAndAttachRedTexture(1, w, h);
+		// -- Final Unbind + LOG --
 		s_RendererData->EnvironmentMapFBO->Unbind();
 		KS_TRACE("Successfully Changed the Environment Map");
 
