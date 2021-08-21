@@ -429,16 +429,16 @@ namespace Kaimos {
 		return glm::ivec2(0);
 	}
 
-	void Renderer::ForceEnvironmentMapRecompile()
+	void Renderer::ForceEnvironmentMapRecompile(uint environment_map_resolution)
 	{
 		KS_TRACE("Recompiling Environment Map, please wait...");
 		if (s_RendererData->EnvironmentHDRMap)
-			SetEnvironmentMap(s_RendererData->EnvironmentHDRMap->GetFilepath(), true);
+			SetEnvironmentMap(s_RendererData->EnvironmentHDRMap->GetFilepath(), true, environment_map_resolution);
 		else
 			KS_WARN("Unexisting Environment Map, couldn't recompile it");
 	}
 
-	void Renderer::SetEnvironmentMap(const std::string& filepath, bool force_reset)
+	void Renderer::SetEnvironmentMap(const std::string& filepath, bool force_reset, uint environment_map_resolution)
 	{
 		// -- Check Path Validity --
 		KS_PROFILE_FUNCTION();
@@ -473,7 +473,8 @@ namespace Kaimos {
 
 		// -- Setup Variables --
 		// We're dealing with cubes, so all faces have = size or resolution
-		uint envmap_res = 1920, irradiancemap_res = 32, prefiltermap_res = 128, lut_res = envmap_res;
+		uint envmap_res = environment_map_resolution;
+		uint irradiancemap_res = 32, prefiltermap_res = 128, lut_res = envmap_res;
 
 		glm::mat4 capture_projection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
 		glm::mat4 capture_views[] =
