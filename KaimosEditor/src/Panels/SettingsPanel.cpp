@@ -101,18 +101,15 @@ namespace Kaimos {
 
 			// Cubemap Resolution Picker
 			ImGui::NewLine();
-			static int enviromap_res_ix = 2;
-			const char* resolution_items[] = { "256", "512", "1024", "2048", "4096", "8192" };
+			static int res_ix = 2;
+			const char* resolution_items[] = { "256", "512", "1024", "2048"/*, "4096", "8192"*/ };
 			KaimosUI::UIFunctionalities::SetTextCursorAndWidth("Environment Map Resolution");
-			ImGui::Combo("###environment_map_res", &enviromap_res_ix, resolution_items, IM_ARRAYSIZE(resolution_items));
+			ImGui::Combo("###environment_map_res", &res_ix, resolution_items, IM_ARRAYSIZE(resolution_items));
 
 			if (ImGui::Button("Recompile Environment Map"))
 			{
-				uint enviromap_res = 1024;
-				uint environmentmap_resolutions[6] = { 256, 512, 1024, 2048, 4096, 8192 };
-
-				if (enviromap_res_ix >= 0 && enviromap_res_ix < 6)
-					enviromap_res = environmentmap_resolutions[enviromap_res_ix];
+				uint environmentmap_resolutions[4] = { 256, 512, 1024, 2048/*, 4096, 8192*/ };
+				uint enviromap_res = (res_ix >= 0 && res_ix < 4) ? environmentmap_resolutions[res_ix] : 1024;
 
 				Renderer::ForceEnvironmentMapRecompile(enviromap_res);
 			}
