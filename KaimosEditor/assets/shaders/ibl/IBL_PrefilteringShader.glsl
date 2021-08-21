@@ -1,11 +1,16 @@
+// VERTEX SHADER ------------------------------------------------------
+// --------------------------------------------------------------------
 #type VERTEX_SHADER
 #version 460 core
 
+// --- Attributes ---
 layout(location = 0) in vec3 a_Position;
 
+// --- Varyings & Uniforms ---
 out vec3 v_LocalPos;
 uniform mat4 u_ViewProjection;
 
+// --- Main ---
 void main()
 {
 	v_LocalPos = a_Position;
@@ -14,26 +19,33 @@ void main()
 
 
 
+// FRAGMENT SHADER ----------------------------------------------------
+// --------------------------------------------------------------------
 #type FRAGMENT_SHADER
 #version 460 core
 
+// --- Outputs ---
 layout(location = 0) out vec4 color;
 
+// --- Varyings & Uniforms ---
 in vec3 v_LocalPos;
+
 uniform float u_Roughness;
 uniform int u_EnvironmentMapResolution = 512;
 uniform samplerCube u_EnvironmentMap;
 
-// - Functions declaration -
+// --- Functions Declaration ---
 float VdCRadicalInverse(uint bits);
 vec2 Hammersley(uint i, uint N);
 vec3 ImportanceSamplingGGX(vec2 xi, vec3 N, float roughness);
 float DistributionGGX(vec3 N, vec3 H, float roughness);
 
 
-// - Main -
-const float PI = 3.14159265359, PI_2 = PI*2.0;
-const uint SAMPLE_COUNT = 4096u;
+// --- Main ---
+#define PI 3.14159265359
+#define PI_2 6.28318530718 //3.14159265359 * 2.0
+#define SAMPLE_COUNT 4096u;
+
 void main()
 {
 	vec3 N = normalize(v_LocalPos);
@@ -72,7 +84,8 @@ void main()
 }
 
 
-// - Functions definition -
+
+// --- Functions Definition ---
 // Van der Corput Sequence (low-discrepancy sequence generator)
 float VdCRadicalInverse(uint bits)
 {

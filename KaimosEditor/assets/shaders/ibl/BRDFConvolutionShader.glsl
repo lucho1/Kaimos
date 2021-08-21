@@ -1,11 +1,16 @@
+// VERTEX SHADER ------------------------------------------------------
+// --------------------------------------------------------------------
 #type VERTEX_SHADER
 #version 460 core
 
+// --- Attributes ---
 layout(location = 0) in vec3 a_Position;
 layout(location = 3) in vec2 a_TexCoord;
 
+// --- Varyings ---
 out vec2 v_TexCoord;
 
+// --- Main ---
 void main()
 {
 	v_TexCoord = a_TexCoord;
@@ -14,16 +19,20 @@ void main()
 
 
 
+// FRAGMENT SHADER ----------------------------------------------------
+// --------------------------------------------------------------------
 #type FRAGMENT_SHADER
 #version 460 core
 
+// --- Defines ---
+#define SAMPLE_COUNT 1024u
+#define PI_2 6.28318530718 //3.14159265359 * 2.0
+
+// --- Outputs & Varyings ---
 layout(location = 0) out vec2 color;
 in vec2 v_TexCoord;
 
-const uint SAMPLE_COUNT = 1024u;
-const float PI_2 = 3.14159265359 * 2.0;
-
-// - Functions declaration -
+// --- Functions Declaration ---
 float VdCRadicalInverse(uint bits);
 vec2 Hammersley(uint i, uint N);
 vec3 ImportanceSamplingGGX(vec2 xi, vec3 N, float roughness);
@@ -32,7 +41,7 @@ float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness);
 vec2 IntegrateBRDF(float NdotV, float roughness);
 
 
-// - Main -
+// --- Main ---
 void main()
 {
 	vec2 integrated_BRDF = IntegrateBRDF(v_TexCoord.x, v_TexCoord.y);
@@ -40,7 +49,7 @@ void main()
 }
 
 
-// - Functions definition -
+// --- Functions definition ---
 // Van der Corput Sequence (low-discrepancy sequence generator)
 float VdCRadicalInverse(uint bits)
 {

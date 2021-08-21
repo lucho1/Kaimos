@@ -1,11 +1,16 @@
+// VERTEX SHADER ------------------------------------------------------
+// --------------------------------------------------------------------
 #type VERTEX_SHADER
 #version 460 core
 
+// --- Attributes ---
 layout(location = 0) in vec3 a_Position;
 
+// --- Varyings & Uniforms ---
 out vec3 v_LocalPos;
 uniform mat4 u_ViewProjection;
 
+// --- Main ---
 void main()
 {
 	v_LocalPos = a_Position;
@@ -14,15 +19,24 @@ void main()
 
 
 
+// FRAGMENT SHADER ----------------------------------------------------
+// --------------------------------------------------------------------
 #type FRAGMENT_SHADER
 #version 460 core
 
+// --- Defines ---
+#define PI 3.14159265359
+#define HALF_PI 1.57079632679	//PI*0.5 or PI/2
+#define PI_2 6.28318530718		//3.14159265359 * 2.0
+
+// --- Outputs ---
 layout(location = 0) out vec4 color;
 
+// --- Varyings & Uniforms ---
 in vec3 v_LocalPos;
 uniform samplerCube u_Cubemap;
 
-const float PI = 3.14159265359, HALF_PI = PI*0.5, PI_2 = PI*2.0;
+// --- Main ---
 void main()
 {
 	vec3 N = normalize(v_LocalPos);

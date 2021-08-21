@@ -1,11 +1,16 @@
+// VERTEX SHADER ------------------------------------------------------
+// --------------------------------------------------------------------
 #type VERTEX_SHADER
 #version 460 core
 
+// --- Attributes ---
 layout(location = 0) in vec3 a_Position;
 
+// --- Varyings & Uniforms ---
 out vec3 v_LocalPos;
 uniform mat4 u_ViewProjection;
 
+// --- Main ---
 void main()
 {
 	v_LocalPos = a_Position;
@@ -15,16 +20,21 @@ void main()
 
 
 
+// FRAGMENT SHADER ----------------------------------------------------
+// --------------------------------------------------------------------
 #type FRAGMENT_SHADER
 #version 460 core
 
+// --- Outputs ---
 layout(location = 0) out vec4 color;
 layout(location = 1) out int color2;
 
+// --- Varyings & Uniforms ---
 in vec3 v_LocalPos;
 uniform samplerCube u_Cubemap;
 uniform vec3 u_SceneColor;
 
+// --- Main ---
 void main()
 {
 	vec3 env_color = texture(u_Cubemap, v_LocalPos).rgb * u_SceneColor;

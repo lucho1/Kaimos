@@ -1,3 +1,5 @@
+// VERTEX SHADER ------------------------------------------------------
+// --------------------------------------------------------------------
 #type VERTEX_SHADER
 #version 460 core
 
@@ -21,7 +23,6 @@ layout(location = 11) in float a_AmbientOcclusionValue;
 layout(location = 12) in int a_RoughTexIndex;
 layout(location = 13) in int a_MetalTexIndex;
 layout(location = 14) in int a_AOTexIndex;
-
 
 // --- Varyings ---
 out vec3 v_FragPos;
@@ -70,14 +71,18 @@ void main()
 
 
 
+// FRAGMENT SHADER ----------------------------------------------------
+// --------------------------------------------------------------------
 #type FRAGMENT_SHADER
 #version 460 core
 
-// --- PreDefinitions ---
+// --- Defines ---
 #define MAX_DIR_LIGHTS 0
 #define MAX_POINT_LIGHTS 0
 #define MAX_TEXTURES 0
-const float PI = 3.14159265359;
+
+#define PI 3.14159265359
+#define MAX_REFLECTION_LOD 4.0
 
 // --- Outputs ---
 layout(location = 0) out vec4 color;
@@ -197,7 +202,6 @@ void main()
 	}
 
 	// Ambient Lighting
-	//u_PrefilterSpecularMap;u_BRDF_LUTMap
 	vec3 R = reflect(-V, N);
 	vec3 FAmbient = FresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness);
 
@@ -205,12 +209,11 @@ void main()
 	vec3 amb_kD = (1.0 - amb_kS) * (1.0 - metallic);
 	vec3 irr_map = texture(u_IrradianceMap, N).rgb * u_SceneColor;
 
-	const float MAX_REFLECTION_LOD = 4.0;
 	vec3 prefiltered_color = textureLod(u_PrefilterSpecularMap, R, roughness*MAX_REFLECTION_LOD).rgb;
 	vec2 brdf = texture(u_BRDF_LUTMap, vec2(max(dot(N, V), 0.0), roughness)).rg;
 	
 	vec3 amb_diff = irr_map * albedo.rgb;
-	vec3 amb_specular = prefiltered_color * (FAmbient * brdf.x + brdf.y) * u_SceneColor;
+	vec3 amb_specular = prefiltered_color * (FAmbient * brdf.x + brdf.y) * u_SceneColor;// * albedo.rgb;
 
 	vec3 ambient = (amb_kD * amb_diff + amb_specular) * ao;
 	
@@ -228,14 +231,13 @@ void main()
 
 	// Color Outputs, Final Color & Entity ID float value for Mouse Picking
 	color = vec4(result, albedo.a);
+	color2 = v_EntityID;
 	
-	//vec4 brdfcol = texture(u_BRDF_LUTMap, vec2(max(dot(N, V), 0.0), roughness));
+	//vec4 brdfcol = texture(u_BRDF_LUTMap, v_TexCoord);
 	//color = vec4(brdfcol.r, brdfcol.g, 0.0, 1.0);
-	
 	//color = vec4(brdf.x, brdf.y, 0.0, 1.0);
 	//color = vec4(texture(u_BRDF_LUTMap, vec2(max(dot(N, V), 0.0), roughness)).rg, 0.0, 1.0);
 	//color = vec4(textureLod(u_PrefilterSpecularMap, R, roughness*MAX_REFLECTION_LOD).rgb, 1.0);
-	color2 = v_EntityID;
 }
 
 

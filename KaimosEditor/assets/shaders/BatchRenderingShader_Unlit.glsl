@@ -1,22 +1,25 @@
+// VERTEX SHADER ------------------------------------------------------
+// --------------------------------------------------------------------
 #type VERTEX_SHADER
 #version 460 core
 
+// --- Attributes ---
 layout(location = 0) in vec3 a_Position;
 layout(location = 3) in vec2 a_TexCoord;
 layout(location = 4) in vec4 a_Color;
 layout(location = 6) in float a_TexIndex;
 layout(location = 8) in int a_EntityID;
 
-// Varyings
+// --- Varyings ---
 out vec2 v_TexCoord;
 out vec4 v_Color;
 out flat float v_TexIndex;
 out flat int v_EntityID;
 
-// Uniforms
+// --- Uniforms ---
 uniform mat4 u_ViewProjection;
 
-
+// --- Main ---
 void main()
 {
 	v_TexCoord = a_TexCoord;
@@ -29,24 +32,28 @@ void main()
 
 
 
+// FRAGMENT SHADER ----------------------------------------------------
+// --------------------------------------------------------------------
 #type FRAGMENT_SHADER
 #version 460 core
 
+// --- Defines ---
 #define MAX_TEXTURES 0
 
+// --- Outputs ---
 layout(location = 0) out vec4 color;
 layout(location = 1) out int color2;
 
-// Varyings
+// --- Varyings ---
 in vec2 v_TexCoord;
 in vec4 v_Color;
 in flat float v_TexIndex;
 in flat int v_EntityID;
 
-// Uniforms
+// --- Uniforms ---
 uniform sampler2D u_Textures[MAX_TEXTURES];
 
-
+// --- Main ---
 void main()
 {
 	color = texture(u_Textures[int(v_TexIndex)], v_TexCoord) * v_Color;

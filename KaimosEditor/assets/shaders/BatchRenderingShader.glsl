@@ -1,3 +1,5 @@
+// VERTEX SHADER ------------------------------------------------------
+// --------------------------------------------------------------------
 #type VERTEX_SHADER
 #version 460 core
 
@@ -18,7 +20,6 @@ layout(location = 8) in int a_EntityID;
 layout(location = 9) in float a_Shininess;
 layout(location = 10) in float a_SpecularStrength;
 layout(location = 11) in int a_SpecTexIndex;
-
 
 // --- Varyings ---
 out vec3 v_FragPos;
@@ -65,13 +66,17 @@ void main()
 
 
 
+// FRAGMENT SHADER ----------------------------------------------------
+// --------------------------------------------------------------------
 #type FRAGMENT_SHADER
 #version 460 core
 
+// --- Defines ---
 #define MAX_DIR_LIGHTS 0
 #define MAX_POINT_LIGHTS 0
 #define MAX_TEXTURES 0
 
+// --- Outputs ---
 layout(location = 0) out vec4 color;
 layout(location = 1) out int color2;
 
