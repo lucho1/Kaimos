@@ -23,6 +23,9 @@ namespace Kaimos::KaimosUI {
 		// Draw a Help Marker with a Text as popup
 		static void DrawHelpMarker(const std::string& help_text);
 
+		// Draw a Tooltip with a Text as popup
+		static void DrawTooltip(const std::string& text);
+
 		// - Drag Floats/Sliders -
 		// Draw a Drag Float in the same line than 'text' - label is the "widget id"
 		static bool DrawInlineDragFloat(const char* text, const char* label, float* value, float speed = 1.0f, float width = 0.0f, float spacing = 2.0f, float min = 0.0f, float max = 0.0f, const char* fmt = "%.2f", float pow = 1.0f);

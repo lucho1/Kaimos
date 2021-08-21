@@ -62,56 +62,78 @@ namespace Kaimos {
 			ImGui::PopFont();
 
 			// Scene Color
-			KaimosUI::UIFunctionalities::SetTextCursorAndWidth("Scene Color");
-
+			//KaimosUI::UIFunctionalities::SetTextCursorAndWidth("Scene Color");
+			ImGui::Text("Scene Color"); ImGui::SameLine();
 			glm::vec3 scene_color = Renderer::GetSceneColor();
 			if (ImGui::ColorEdit3("###scene_color", glm::value_ptr(scene_color), ImGuiColorEditFlags_Float | ImGuiColorEditFlags_NoInputs))
 				Renderer::SetSceneColor(scene_color);
 
-			// Environment Map
+			// Environment Map TreeNode
 			ImGui::NewLine();
-			uint enviromap_id = Renderer::GetEnvironmentMapID();
-			uint enviromap_res = Renderer::GetEnvironmentMapResolution();
-			glm::ivec2 enviromap_size = Renderer::GetEnvironmentMapSize();
-			std::string enviromap_path = Renderer::GetEnvironmentMapFilepath();
-			std::string enviromap_name = enviromap_path;
 
-			if (!enviromap_path.empty())
-				enviromap_name = enviromap_path.substr(enviromap_path.find_last_of("/\\" + 1, enviromap_path.size() - 1) + 1);
-
-			ImGui::Text("Environment Map: %s", enviromap_name.c_str());
-			ImGui::Text("Size (ID): %ix%i (%i)", enviromap_size.x, enviromap_size.y, enviromap_id);
-
-			ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { 0.0f, 0.0f });
-			if (KaimosUI::UIFunctionalities::DrawTexturedButton("###enviromap", enviromap_id, glm::vec2(50.0f), glm::vec3(0.1f)))
+			
+			// ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_FramePadding
+			if (ImGui::TreeNodeEx("Environment Map", ImGuiTreeNodeFlags_DefaultOpen))
 			{
-				std::string texture_file = FileDialogs::OpenFile("HDR Textures (*.hdr)\0*.hdr\0");
-				if (!texture_file.empty())
-					Renderer::SetEnvironmentMapFilepath(texture_file, enviromap_res);
-			}
+				// Get Data
+				uint enviromap_id = Renderer::GetEnvironmentMapID();
+				uint enviromap_res = Renderer::GetEnvironmentMapResolution();
+				glm::ivec2 enviromap_size = Renderer::GetEnvironmentMapSize();
+				std::string enviromap_path = Renderer::GetEnvironmentMapFilepath();
+				std::string enviromap_name = enviromap_path;
 
-			KaimosUI::UIFunctionalities::PopButton(false);
-			ImGui::SameLine();
+				if (!enviromap_path.empty())
+				{
+					enviromap_name = enviromap_path.substr(enviromap_path.find_last_of("/\\" + 1, enviromap_path.size() - 1) + 1);
+					enviromap_path = enviromap_path.substr(enviromap_path.find("assets"), enviromap_path.size() - 1);
+				}
 
-			// "X" Btn (to remove texture)
-			if (KaimosUI::UIFunctionalities::DrawColoredButton("X", { 20.0f, 50.0f }, glm::vec3(0.15f), true))
-				Renderer::RemoveEnvironmentMap();
+				// Texture Button (to change enviro. map)
+				ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { 0.0f, 0.0f });
+				if (KaimosUI::UIFunctionalities::DrawTexturedButton("###enviromap", enviromap_id, glm::vec2(50.0f), glm::vec3(0.1f)))
+				{
+					std::string texture_file = FileDialogs::OpenFile("HDR Textures (*.hdr)\0*.hdr\0");
+					if (!texture_file.empty())
+						Renderer::SetEnvironmentMapFilepath(texture_file, enviromap_res);
+				}
 
-			KaimosUI::UIFunctionalities::PopButton(true);
-			ImGui::PopStyleVar();
+				KaimosUI::UIFunctionalities::PopButton(false);
+				ImGui::SameLine();
 
-			// Cubemap Resolution Picker
-			ImGui::NewLine();
-			static int res_ix = 2;
-			const char* resolution_items[] = { "256", "512", "1024", "2048"/*, "4096", "8192"*/ };
-			KaimosUI::UIFunctionalities::SetTextCursorAndWidth("Environment Map Resolution");
-			ImGui::Combo("###environment_map_res", &res_ix, resolution_items, IM_ARRAYSIZE(resolution_items));
+				// "X" Btn (to remove Enviro. Map)
+				if (KaimosUI::UIFunctionalities::DrawColoredButton("X", { 20.0f, 50.0f }, glm::vec3(0.15f), true))
+					Renderer::RemoveEnvironmentMap();
 
-			if (ImGui::Button("Recompile Environment Map"))
-			{
-				uint environmentmap_resolutions[4] = { 256, 512, 1024, 2048, /*4096, 8192*/ };
-				enviromap_res = (res_ix >= 0 && res_ix < 4) ? environmentmap_resolutions[res_ix] : 1024;
-				Renderer::ForceEnvironmentMapRecompile(enviromap_res);
+				KaimosUI::UIFunctionalities::PopButton(true);
+				ImGui::PopStyleVar();
+
+				// Cubemap Resolution Picker
+				ImGui::NewLine();
+				static int res_ix = 2;
+				const char* resolution_items[] = { "256", "512", "1024", "2048"/*, "4096", "8192"*/ };
+
+				ImGui::Text("Map Resolution"); ImGui::SameLine();
+				ImGui::SetNextItemWidth(75.0f);
+				ImGui::Combo("###environment_map_res", &res_ix, resolution_items, IM_ARRAYSIZE(resolution_items));
+				ImGui::SameLine();
+
+				if (ImGui::Button("Recompile Map"))
+				{
+					uint environmentmap_resolutions[4] = { 256, 512, 1024, 2048 /*4096, 8192*/ };
+					enviromap_res = (res_ix >= 0 && res_ix < 4) ? environmentmap_resolutions[res_ix] : 1024;
+					Renderer::ForceEnvironmentMapRecompile(enviromap_res);
+				}
+
+				if (ImGui::IsItemHovered())
+					KaimosUI::UIFunctionalities::DrawTooltip("Press to apply resolution changes");
+
+				// Display Texture Data
+				//ImGui::NewLine();
+				ImGui::Text("Texture Name: %s", enviromap_name.c_str());
+				ImGui::Text("Texture Filepath: %s", enviromap_path.c_str());
+				ImGui::Text("Texture Size (ID): %ix%i (%i)", enviromap_size.x, enviromap_size.y, enviromap_id);
+				
+				ImGui::TreePop();
 			}
 
 			// End

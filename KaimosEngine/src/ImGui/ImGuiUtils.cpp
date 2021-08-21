@@ -89,16 +89,18 @@ namespace Kaimos::KaimosUI {
 		// - Help Text + Hover -
 		ImGui::TextDisabled("(?)");
 		if (ImGui::IsItemHovered())
-		{
-			// - Tooltip + Text Wrap -
-			ImGui::BeginTooltip();
-			ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+			DrawTooltip(help_text);
+	}
 
-			ImGui::TextUnformatted(help_text.c_str());
+	void UIFunctionalities::DrawTooltip(const std::string& text)
+	{
+		// - Tooltip + Text Wrap -
+		ImGui::BeginTooltip();
+		ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+		ImGui::TextUnformatted(text.c_str());
 
-			ImGui::PopTextWrapPos();
-			ImGui::EndTooltip();
-		}
+		ImGui::PopTextWrapPos();
+		ImGui::EndTooltip();
 	}
 
 
