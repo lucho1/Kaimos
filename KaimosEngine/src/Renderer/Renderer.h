@@ -24,7 +24,7 @@ namespace Kaimos {
 		static void Shutdown();
 
 		// --- Public Renderer Methods ---
-		static void BeginScene(const glm::mat4& view_projection_matrix, const glm::vec3& camera_pos, const std::vector<std::pair<Ref<Light>, glm::vec3>>& dir_lights, const std::vector<std::pair<Ref<PointLight>, glm::vec3>>& point_lights);
+		static bool BeginScene(const glm::mat4& view_projection_matrix, const glm::vec3& camera_pos, const std::vector<std::pair<Ref<Light>, glm::vec3>>& dir_lights, const std::vector<std::pair<Ref<PointLight>, glm::vec3>>& point_lights);
 		static void EndScene(const glm::mat4& view_matrix, const glm::mat4& projection_matrix);
 
 		static void Submit(const Ref<Shader>& shader, const Ref<VertexArray>& vertex_array, const glm::mat4& transformation = glm::mat4(1.0f));
@@ -50,10 +50,11 @@ namespace Kaimos {
 		static void SetPBRPipeline(bool pbr_pipeline);
 
 		static uint GetEnvironmentMapID();
-		static std::string GetEnvironmentMapFilepath();
 		static glm::ivec2 GetEnvironmentMapSize();
+		static uint GetEnvironmentMapResolution();
+		static std::string GetEnvironmentMapFilepath();
+		static void SetEnvironmentMapFilepath(const std::string& filepath, uint environment_map_resolution);
 		static void ForceEnvironmentMapRecompile(uint environment_map_resolution = 1024);
-		static void SetEnvironmentMap(const std::string& filepath, bool force_reset = false, uint environment_map_resolution = 1024);
 		static void RemoveEnvironmentMap();
 
 
@@ -81,6 +82,9 @@ namespace Kaimos {
 		static uint GetDefaultMaterialID();
 
 	private:
+
+		// --- Private Environment Map Methods ---
+		static void CompileEnvironmentMap();
 
 		// --- Private Renderer Materials & Shaders Methods ---
 		inline static bool MaterialExists(uint material_id);

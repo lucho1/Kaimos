@@ -3,16 +3,25 @@
 #type VERTEX_SHADER
 #version 460 core
 
+// --- Defines ---
+#define PI_4 12.56637061436 //3.14159265359 * 4.0
+
 // --- Attributes ---
 layout(location = 0) in vec3 a_Position;
 
 // --- Varyings & Uniforms ---
 out vec3 v_LocalPos;
+out flat float v_SaTexel;
+
 uniform mat4 u_ViewProjection;
+uniform int u_EnvironmentMapResolution = 512;
 
 // --- Main ---
 void main()
 {
+	float res = float(u_EnvironmentMapResolution);
+	v_SaTexel = PI_4/(6.0*res*res);
+
 	v_LocalPos = a_Position;
 	gl_Position = u_ViewProjection * vec4(v_LocalPos, 1.0);
 }
@@ -24,36 +33,36 @@ void main()
 #type FRAGMENT_SHADER
 #version 460 core
 
+// --- Defines ---
+#define SAMPLE_COUNT 3000u // 4096 or so gives a NVIDIA TDR Exception
+#define PI 3.14159265359
+#define PI_2 6.28318530718 //3.14159265359 * 2.0
+
 // --- Outputs ---
 layout(location = 0) out vec4 color;
 
 // --- Varyings & Uniforms ---
 in vec3 v_LocalPos;
+in flat float v_SaTexel;
 
 uniform float u_Roughness;
-uniform int u_EnvironmentMapResolution = 512;
 uniform samplerCube u_EnvironmentMap;
 
 // --- Functions Declaration ---
 float VdCRadicalInverse(uint bits);
 vec2 Hammersley(uint i, uint N);
 vec3 ImportanceSamplingGGX(vec2 xi, vec3 N, float roughness);
-float DistributionGGX(vec3 N, vec3 H, float roughness);
+float DistributionGGX(float NdotH, float roughness);
 
 
 // --- Main ---
-#define PI 3.14159265359
-#define PI_2 6.28318530718 //3.14159265359 * 2.0
-#define SAMPLE_COUNT 4096u
-
 void main()
 {
+	vec3 prefiltered_color = vec3(0.0);
 	vec3 N = normalize(v_LocalPos);
-	vec3 R = N;
-	vec3 V = R;
+	vec3 R = N, V = R;
 
 	float total_weight = 0.0;
-	vec3 prefiltered_color = vec3(0.0);
 	for(uint i = 0u; i < SAMPLE_COUNT; ++i)
 	{
 		vec2 xi = Hammersley(i, SAMPLE_COUNT);
@@ -63,16 +72,14 @@ void main()
 		float NdotL = max(dot(N, L), 0.0);
 		if(NdotL > 0.0)
 		{
-			float D = DistributionGGX(N, H, u_Roughness);
 			float NdotH = max(dot(N, H), 0.0);
 			float HdotV = max(dot(H, V), 0.0);
-			float pdf = D*NdotH/(4.0*HdotV) + 0.0001;
 
-			float resolution = float(u_EnvironmentMapResolution);
-			float sa_texel = 4.0*PI/(6.0*resolution*resolution);
-			float sa_sample = 1.0/(float(SAMPLE_COUNT) * pdf + 0.0001);
+			float D = DistributionGGX(NdotH, u_Roughness);
+			float pdf = D*NdotH/(4.0*HdotV) + 0.0001;
 			
-			float mip_level = u_Roughness == 0.0 ? 0.0 : 0.5 * log2(sa_sample/sa_texel);
+			float sa_sample = 1.0/(float(SAMPLE_COUNT) * pdf + 0.0001);
+			float mip_level = u_Roughness == 0.0 ? 0.0 : 0.5 * log2(sa_sample/v_SaTexel);
 
 			prefiltered_color += textureLod(u_EnvironmentMap, L, mip_level).rgb * NdotL;
 			total_weight += NdotL;
@@ -124,11 +131,10 @@ vec3 ImportanceSamplingGGX(vec2 xi, vec3 N, float roughness)
 }
 
 // Distribution GGX
-float DistributionGGX(vec3 N, vec3 H, float roughness)
+float DistributionGGX(float NdotH, float roughness)
 {
 	float a = roughness*roughness;
 	float a_sq = a*a;
-	float NdotH = max(dot(N, H), 0.0);
 	
 	float denom = (NdotH*NdotH * (a_sq - 1.0) + 1.0);
 	return a_sq/(PI*denom*denom);

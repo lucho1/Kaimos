@@ -161,6 +161,7 @@ namespace Kaimos {
 		output << YAML::Key << "CameraPos" << YAML::Value << scene_cam.GetPosition();								// Save Scene Camera Position
 		output << YAML::Key << "CameraRot" << YAML::Value << scene_cam.GetOrientationAngles();						// Save Scene Camera Orientation
 		output << YAML::Key << "EnvironmentMapTexture" << YAML::Value << Renderer::GetEnvironmentMapFilepath();		// Save Scene Camera Orientation
+		output << YAML::Key << "EnviroMapRes" << YAML::Value << Renderer::GetEnvironmentMapResolution();
 
 		// Save Entities as a sequence (like an array)
 		output << YAML::Key << "Entities" << YAML::Value << YAML::BeginSeq;
@@ -224,9 +225,11 @@ namespace Kaimos {
 
 		if (data["EnvironmentMapTexture"])
 		{
+			uint map_res = data["EnviroMapRes"] ? data["EnviroMapRes"].as<uint>() : 1024;
 			std::string filepath = data["EnvironmentMapTexture"].as<std::string>();
+
 			if (!filepath.empty())
-				Renderer::SetEnvironmentMap(filepath);
+				Renderer::SetEnvironmentMapFilepath(filepath, map_res);
 			else
 				KS_ENGINE_TRACE("Scene has no Environment Map to load");
 		}

@@ -88,23 +88,33 @@ namespace Kaimos {
 
 
 	// ----------------------- Private Scene Rendering Methods --------------------------------------------
-	void Scene::BeginScene(const Camera& camera, const glm::vec3& camera_pos, bool scene3D)
+	bool Scene::BeginScene(const Camera& camera, const glm::vec3& camera_pos, bool scene3D)
 	{
 		std::vector<std::pair<Ref<Light>, glm::vec3>> dir_lights = GetSceneDirLights();
 		std::vector<std::pair<Ref<PointLight>, glm::vec3>> plights = GetScenePointLights();
 
-		Renderer::BeginScene(camera.GetViewProjection(), camera_pos, dir_lights, plights);
-		scene3D ? Renderer3D::BeginScene() : Renderer2D::BeginScene();
+		if (Renderer::BeginScene(camera.GetViewProjection(), camera_pos, dir_lights, plights))
+		{
+			scene3D ? Renderer3D::BeginScene() : Renderer2D::BeginScene();
+			return true;
+		}
+
+		return false;
 	}
 
-	void Scene::BeginScene(const CameraComponent& camera_component, const TransformComponent& transform_component, bool scene3D)
+	bool Scene::BeginScene(const CameraComponent& camera_component, const TransformComponent& transform_component, bool scene3D)
 	{
 		std::vector<std::pair<Ref<Light>, glm::vec3>> dir_lights = GetSceneDirLights();
 		std::vector<std::pair<Ref<PointLight>, glm::vec3>> plights = GetScenePointLights();
 
 		glm::mat4 view_proj = camera_component.Camera.GetProjection() * glm::inverse(transform_component.GetTransform());
-		Renderer::BeginScene(view_proj, transform_component.Translation, dir_lights, plights);
-		scene3D ? Renderer3D::BeginScene() : Renderer2D::BeginScene();
+		if (Renderer::BeginScene(view_proj, transform_component.Translation, dir_lights, plights))
+		{
+			scene3D ? Renderer3D::BeginScene() : Renderer2D::BeginScene();
+			return true;
+		}
+
+		return false;
 	}
 
 	void Scene::RenderSprites(Timestep dt)
@@ -139,7 +149,9 @@ namespace Kaimos {
 		KS_PROFILE_FUNCTION();
 
 		// -- Render Meshes --
-		BeginScene(camera, camera_pos, true);
+		if (!BeginScene(camera, camera_pos, true))
+			return;
+
 		RenderMeshes(dt);
 		Renderer3D::EndScene();
 
@@ -176,7 +188,9 @@ namespace Kaimos {
 			CameraComponent& camera_comp = m_PrimaryCamera.GetComponent<CameraComponent>();
 			TransformComponent& trans_comp = m_PrimaryCamera.GetComponent<TransformComponent>();
 
-			BeginScene(camera_comp, trans_comp, true);
+			if (!BeginScene(camera_comp, trans_comp, true))
+				return;
+
 			RenderMeshes(dt);
 			Renderer3D::EndScene();
 
@@ -203,7 +217,9 @@ namespace Kaimos {
 			CameraComponent& camera_comp = m_PrimaryCamera.GetComponent<CameraComponent>();
 			TransformComponent& trans_comp = m_PrimaryCamera.GetComponent<TransformComponent>();
 
-			BeginScene(camera_comp, trans_comp, true);
+			if (!BeginScene(camera_comp, trans_comp, true))
+				return;
+
 			RenderMeshes(dt);
 			Renderer3D::EndScene();
 

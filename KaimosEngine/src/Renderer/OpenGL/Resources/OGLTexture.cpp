@@ -171,7 +171,7 @@ namespace Kaimos {
 		// -- Texture Creation --
 		m_Width = w; m_Height = h, m_Filepath = filepath;
 		glCreateTextures(GL_TEXTURE_2D, 1, &m_ID);
-		glTextureStorage2D(m_ID, 1, GL_RGB16F, m_Width, m_Height);
+		glTextureStorage2D(m_ID, 1, GL_RGB32F, m_Width, m_Height);
 
 		// --- Texture Parameters Setup ---
 		// Texture filters to minificate and magnificate textures when they are smaller than geometry's pixels to fill
@@ -210,7 +210,7 @@ namespace Kaimos {
 		m_Width = m_Height = size;
 		glGenTextures(1, &m_ID);
 		glBindTexture(GL_TEXTURE_2D, m_ID);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RG16F, size, size, 0, GL_RG, GL_FLOAT, 0);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, size, size, 0, GL_RG, GL_FLOAT, 0);
 
 		// --- Texture Parameters Setup ---
 		glTextureParameteri(m_ID, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -240,7 +240,7 @@ namespace Kaimos {
 		glBindTexture(GL_TEXTURE_CUBE_MAP, m_ID);
 
 		for (uint i = 0; i < 6; ++i)
-			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F, m_Width, m_Height, 0, GL_RGB, GL_FLOAT, nullptr);
+			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB32F, m_Width, m_Height, 0, GL_RGB, GL_FLOAT, nullptr);
 
 		// --- Texture Parameters Setup ---
 		glTextureParameteri(m_ID, GL_TEXTURE_MIN_FILTER, linear_mipmap_filtering ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR);

@@ -43,6 +43,8 @@ namespace Kaimos {
 		Ref<VertexArray> CubeVArray = nullptr;
 		Ref<VertexArray> QuadVArray = nullptr;
 
+		uint EnvironmentMapResolution = 1024;
+		std::string EnvironmentMapFilepath = "";
 		Ref<HDRTexture2D> EnvironmentHDRMap = nullptr;
 		Ref<CubemapTexture> EnvironmentCubemap = nullptr, IrradianceCubemap = nullptr, PrefilterCubemap = nullptr;
 		Ref<LUTTexture> BRDF_LutTexture = nullptr;
@@ -50,6 +52,7 @@ namespace Kaimos {
 	};
 
 	static RendererData* s_RendererData = nullptr;
+	static bool s_CompileEnvironmentMap = false;
 
 
 	// ----------------------- Public Class Methods -------------------------------------------------------
@@ -139,18 +142,17 @@ namespace Kaimos {
 
 	// ----------------------- Public Renderer Methods -------------------------------------------------------
 	// Takes all scene parameters & makes sure shaders we use get the right uniforms
-	void Renderer::BeginScene(const glm::mat4& view_projection_matrix, const glm::vec3& camera_pos, const std::vector<std::pair<Ref<Light>, glm::vec3>>& dir_lights, const std::vector<std::pair<Ref<PointLight>, glm::vec3>>& point_lights)
+	bool Renderer::BeginScene(const glm::mat4& view_projection_matrix, const glm::vec3& camera_pos, const std::vector<std::pair<Ref<Light>, glm::vec3>>& dir_lights, const std::vector<std::pair<Ref<PointLight>, glm::vec3>>& point_lights)
 	{
 		KS_PROFILE_FUNCTION();
-		if (static bool recompile_map = true; recompile_map)
+		if (s_CompileEnvironmentMap)
 		{
-			ForceEnvironmentMapRecompile();
-			recompile_map = false;
+			CompileEnvironmentMap();
+			s_CompileEnvironmentMap = false;
+			return false;
 		}
 
-		bool pbr_pipeline = s_RendererData->PBR_Pipeline;
-		Ref<Shader> shader = pbr_pipeline ? GetShader("PBR_BatchedShader") : GetShader("BatchedShader");
-
+		Ref<Shader> shader = s_RendererData->PBR_Pipeline ? GetShader("PBR_BatchedShader") : GetShader("BatchedShader");
 		if (shader)
 		{
 			// Set Common Shader Uniforms
@@ -211,6 +213,8 @@ namespace Kaimos {
 		}
 		else
 			KS_FATAL_ERROR("Renderer: Tried to Render with a null Shader!");
+
+		return true;
 	}
 
 	void Renderer::EndScene(const glm::mat4& view_matrix, const glm::mat4& projection_matrix)
@@ -413,14 +417,6 @@ namespace Kaimos {
 		return 0;
 	}
 
-	std::string Renderer::GetEnvironmentMapFilepath()
-	{
-		if (s_RendererData->EnvironmentHDRMap)
-			return s_RendererData->EnvironmentHDRMap->GetFilepath();
-
-		return "";
-	}
-
 	glm::ivec2 Renderer::GetEnvironmentMapSize()
 	{
 		if (s_RendererData->EnvironmentHDRMap)
@@ -429,16 +425,20 @@ namespace Kaimos {
 		return glm::ivec2(0);
 	}
 
-	void Renderer::ForceEnvironmentMapRecompile(uint environment_map_resolution)
+	uint Renderer::GetEnvironmentMapResolution()
 	{
-		KS_TRACE("Recompiling Environment Map, please wait...");
-		if (s_RendererData->EnvironmentHDRMap)
-			SetEnvironmentMap(s_RendererData->EnvironmentHDRMap->GetFilepath(), true, environment_map_resolution);
-		else
-			KS_WARN("Unexisting Environment Map, couldn't recompile it");
+		return s_RendererData->EnvironmentMapResolution;
 	}
 
-	void Renderer::SetEnvironmentMap(const std::string& filepath, bool force_reset, uint environment_map_resolution)
+	std::string Renderer::GetEnvironmentMapFilepath()
+	{
+		if (s_RendererData->EnvironmentHDRMap)
+			return s_RendererData->EnvironmentHDRMap->GetFilepath();
+
+		return "";
+	}
+
+	void Renderer::SetEnvironmentMapFilepath(const std::string& filepath, uint environment_map_resolution)
 	{
 		// -- Check Path Validity --
 		KS_PROFILE_FUNCTION();
@@ -448,12 +448,35 @@ namespace Kaimos {
 			return;
 		}
 
-		if (s_RendererData->EnvironmentHDRMap && !force_reset && s_RendererData->EnvironmentHDRMap->GetFilepath() == filepath)
+		// -- Check is not the same Path --
+		if (s_RendererData->EnvironmentHDRMap && s_RendererData->EnvironmentMapFilepath == filepath)
 		{
 			KS_WARN("The selected Environment Map is already in use!");
 			return;
 		}
 
+		// -- Set Data & Recompile --
+		KS_TRACE("Compiling Environment Map, please wait...");
+		s_RendererData->EnvironmentMapResolution = environment_map_resolution;
+		s_RendererData->EnvironmentMapFilepath = filepath;
+		s_CompileEnvironmentMap = true;
+	}
+
+	void Renderer::ForceEnvironmentMapRecompile(uint environment_map_resolution)
+	{
+		// -- Check Map, Set Data & Recompile --
+		if (s_RendererData->EnvironmentHDRMap && Resources::ResourceManager::CheckValidPathForHDRTexture(s_RendererData->EnvironmentMapFilepath))
+		{
+			KS_TRACE("Recompiling Environment Map, please wait...");
+			s_RendererData->EnvironmentMapResolution = environment_map_resolution;
+			s_CompileEnvironmentMap = true;
+		}
+		else
+			KS_WARN("Unexisting or Invalid Environment Map, couldn't recompile it");
+	}
+
+	void Renderer::CompileEnvironmentMap()
+	{
 		// -- Get Needed Shaders --
 		Ref<Shader> recttocube_shader		= GetShader("EquirectangularToCubemap");
 		Ref<Shader> irradiance_shader		= GetShader("CubemapConvolution");
@@ -467,14 +490,13 @@ namespace Kaimos {
 		}
 
 		// -- Remove Previous Environment Map --
-		KS_TRACE("Setting Environment Map, please wait...");
+		Sleep(2000);
 		RemoveEnvironmentMap();
-
 
 		// -- Setup Variables --
 		// We're dealing with cubes, so all faces have = size or resolution
-		uint envmap_res = environment_map_resolution;
-		uint irradiancemap_res = 32, prefiltermap_res = 128, lut_res = envmap_res;
+		uint envmap_res = s_RendererData->EnvironmentMapResolution;
+		uint irradiancemap_res = 32, prefiltermap_res = 256, lut_res = 128;
 
 		glm::mat4 capture_projection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
 		glm::mat4 capture_views[] =
@@ -491,7 +513,7 @@ namespace Kaimos {
 		// -- Create Environment FBO, HDR Map & Cubemap --
 		s_RendererData->EnvironmentMapFBO = Framebuffer::CreateEmptyAndBind(envmap_res, envmap_res, true); // URGENT TODO: width, height
 		s_RendererData->EnvironmentMapFBO->Bind();
-		s_RendererData->EnvironmentHDRMap = HDRTexture2D::Create(filepath);
+		s_RendererData->EnvironmentHDRMap = HDRTexture2D::Create(s_RendererData->EnvironmentMapFilepath);
 		s_RendererData->EnvironmentCubemap = CubemapTexture::Create(envmap_res, envmap_res, true);
 
 
@@ -527,6 +549,7 @@ namespace Kaimos {
 		uint irr_cubemap_id = s_RendererData->IrradianceCubemap->GetTextureID();
 
 		irradiance_shader->Bind();
+		irradiance_shader->SetUInt("u_EnvironmentMapResolution", envmap_res);
 		irradiance_shader->SetUInt("u_Cubemap", 0);
 		s_RendererData->EnvironmentCubemap->Bind();
 		s_RendererData->EnvironmentMapFBO->Bind(irradiancemap_res, irradiancemap_res);
@@ -559,7 +582,7 @@ namespace Kaimos {
 
 		// Render from 6 perspectives for each mip-level to generate
 		uint prefiltermap_id = s_RendererData->PrefilterCubemap->GetTextureID();
-		uint mip_levels = 5;
+		uint mip_levels = 13;
 
 		for (uint mip = 0; mip < mip_levels; ++mip)
 		{

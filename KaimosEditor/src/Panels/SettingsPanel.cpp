@@ -71,6 +71,7 @@ namespace Kaimos {
 			// Environment Map
 			ImGui::NewLine();
 			uint enviromap_id = Renderer::GetEnvironmentMapID();
+			uint enviromap_res = Renderer::GetEnvironmentMapResolution();
 			glm::ivec2 enviromap_size = Renderer::GetEnvironmentMapSize();
 			std::string enviromap_path = Renderer::GetEnvironmentMapFilepath();
 			std::string enviromap_name = enviromap_path;
@@ -86,7 +87,7 @@ namespace Kaimos {
 			{
 				std::string texture_file = FileDialogs::OpenFile("HDR Textures (*.hdr)\0*.hdr\0");
 				if (!texture_file.empty())
-					Renderer::SetEnvironmentMap(texture_file);
+					Renderer::SetEnvironmentMapFilepath(texture_file, enviromap_res);
 			}
 
 			KaimosUI::UIFunctionalities::PopButton(false);
@@ -108,9 +109,8 @@ namespace Kaimos {
 
 			if (ImGui::Button("Recompile Environment Map"))
 			{
-				uint environmentmap_resolutions[4] = { 256, 512, 1024, 2048/*, 4096, 8192*/ };
-				uint enviromap_res = (res_ix >= 0 && res_ix < 4) ? environmentmap_resolutions[res_ix] : 1024;
-
+				uint environmentmap_resolutions[4] = { 256, 512, 1024, 2048, /*4096, 8192*/ };
+				enviromap_res = (res_ix >= 0 && res_ix < 4) ? environmentmap_resolutions[res_ix] : 1024;
 				Renderer::ForceEnvironmentMapRecompile(enviromap_res);
 			}
 
