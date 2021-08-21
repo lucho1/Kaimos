@@ -44,7 +44,7 @@ float DistributionGGX(vec3 N, vec3 H, float roughness);
 // --- Main ---
 #define PI 3.14159265359
 #define PI_2 6.28318530718 //3.14159265359 * 2.0
-#define SAMPLE_COUNT 4096u;
+#define SAMPLE_COUNT 4096u
 
 void main()
 {
