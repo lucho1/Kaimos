@@ -35,6 +35,8 @@ namespace Kaimos {
 
 		ImNodes::PushColorStyle(ImNodesCol_NodeOutline, IM_COL32(0.0f, 142.0f, 255.0f, 40.0f));
 		ImNodes::PushStyleVar(ImNodesStyleVar_NodeBorderThickness, 2.0f);
+		ImNodes::PushStyleVar(ImNodesStyleVar_PinCircleRadius, 4.5f);
+		ImNodes::PushStyleVar(ImNodesStyleVar_PinHoverRadius, 4.5f);
 		
 
 		// -- Nodes Creation Right-Click Popup --
@@ -154,6 +156,8 @@ namespace Kaimos {
 		}
 
 		// -- End Editor --
+		ImNodes::PopStyleVar();
+		ImNodes::PopStyleVar();
 		ImGui::End();
 	}
 
