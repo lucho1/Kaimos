@@ -215,7 +215,7 @@ namespace Kaimos {
 					ImGui::EndMenu();
 				}
 
-				if (ImGui::BeginMenu("Subtraction"))
+				if (ImGui::BeginMenu("Subtract"))
 				{
 					if (ImGui::MenuItem("Float - Float"))
 						m_CurrentGraph->CreateNode(MaterialEditor::OperationNodeType::SUBTRACTION, MaterialEditor::PinDataType::FLOAT, popup_pos);
@@ -285,6 +285,80 @@ namespace Kaimos {
 
 					if (ImGui::MenuItem("Float * Vec4"))
 						m_CurrentGraph->CreateNode(MaterialEditor::OperationNodeType::FLOATVEC4_MULTIPLY, MaterialEditor::PinDataType::FLOAT, popup_pos);
+
+					ImGui::EndMenu();
+				}
+
+				if (ImGui::BeginMenu("Vec / Float"))
+				{
+					if (ImGui::MenuItem("Vec2 / Float"))
+						m_CurrentGraph->CreateNode(MaterialEditor::OperationNodeType::FLOATVEC2_DIVIDE, MaterialEditor::PinDataType::FLOAT, popup_pos);
+
+					if (ImGui::MenuItem("Vec3 / Float"))
+						m_CurrentGraph->CreateNode(MaterialEditor::OperationNodeType::FLOATVEC3_DIVIDE, MaterialEditor::PinDataType::FLOAT, popup_pos);
+
+					if (ImGui::MenuItem("Vec4 / Float"))
+						m_CurrentGraph->CreateNode(MaterialEditor::OperationNodeType::FLOATVEC4_DIVIDE, MaterialEditor::PinDataType::FLOAT, popup_pos);
+
+					ImGui::EndMenu();
+				}
+
+				if (ImGui::BeginMenu("Power"))
+				{
+					if (ImGui::MenuItem("Int"))
+						m_CurrentGraph->CreateNode(MaterialEditor::OperationNodeType::POWER, MaterialEditor::PinDataType::INT, popup_pos);
+
+					if (ImGui::MenuItem("Float"))
+						m_CurrentGraph->CreateNode(MaterialEditor::OperationNodeType::POWER, MaterialEditor::PinDataType::FLOAT, popup_pos);
+
+					if (ImGui::MenuItem("Vec2"))
+						m_CurrentGraph->CreateNode(MaterialEditor::OperationNodeType::POWER, MaterialEditor::PinDataType::VEC2, popup_pos);
+
+					if (ImGui::MenuItem("Vec3"))
+						m_CurrentGraph->CreateNode(MaterialEditor::OperationNodeType::POWER, MaterialEditor::PinDataType::VEC3, popup_pos);
+
+					if (ImGui::MenuItem("Vec4"))
+						m_CurrentGraph->CreateNode(MaterialEditor::OperationNodeType::POWER, MaterialEditor::PinDataType::VEC4, popup_pos);
+
+					ImGui::EndMenu();
+				}
+
+				if (ImGui::BeginMenu("Sqrt"))
+				{
+					if (ImGui::MenuItem("Int"))
+						m_CurrentGraph->CreateNode(MaterialEditor::OperationNodeType::SQUARE_ROOT, MaterialEditor::PinDataType::INT, popup_pos);
+
+					if (ImGui::MenuItem("Float"))
+						m_CurrentGraph->CreateNode(MaterialEditor::OperationNodeType::SQUARE_ROOT, MaterialEditor::PinDataType::FLOAT, popup_pos);
+
+					if (ImGui::MenuItem("Vec2"))
+						m_CurrentGraph->CreateNode(MaterialEditor::OperationNodeType::SQUARE_ROOT, MaterialEditor::PinDataType::VEC2, popup_pos);
+
+					if (ImGui::MenuItem("Vec3"))
+						m_CurrentGraph->CreateNode(MaterialEditor::OperationNodeType::SQUARE_ROOT, MaterialEditor::PinDataType::VEC3, popup_pos);
+
+					if (ImGui::MenuItem("Vec4"))
+						m_CurrentGraph->CreateNode(MaterialEditor::OperationNodeType::SQUARE_ROOT, MaterialEditor::PinDataType::VEC4, popup_pos);
+
+					ImGui::EndMenu();
+				}
+
+				if (ImGui::BeginMenu("Inv. Sqrt"))
+				{
+					if (ImGui::MenuItem("Int"))
+						m_CurrentGraph->CreateNode(MaterialEditor::OperationNodeType::INVERSE_SQUARE_ROOT, MaterialEditor::PinDataType::INT, popup_pos);
+
+					if (ImGui::MenuItem("Float"))
+						m_CurrentGraph->CreateNode(MaterialEditor::OperationNodeType::INVERSE_SQUARE_ROOT, MaterialEditor::PinDataType::FLOAT, popup_pos);
+
+					if (ImGui::MenuItem("Vec2"))
+						m_CurrentGraph->CreateNode(MaterialEditor::OperationNodeType::INVERSE_SQUARE_ROOT, MaterialEditor::PinDataType::VEC2, popup_pos);
+
+					if (ImGui::MenuItem("Vec3"))
+						m_CurrentGraph->CreateNode(MaterialEditor::OperationNodeType::INVERSE_SQUARE_ROOT, MaterialEditor::PinDataType::VEC3, popup_pos);
+
+					if (ImGui::MenuItem("Vec4"))
+						m_CurrentGraph->CreateNode(MaterialEditor::OperationNodeType::INVERSE_SQUARE_ROOT, MaterialEditor::PinDataType::VEC4, popup_pos);
 
 					ImGui::EndMenu();
 				}

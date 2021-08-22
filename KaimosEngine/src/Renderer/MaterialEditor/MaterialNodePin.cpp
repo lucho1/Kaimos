@@ -254,15 +254,28 @@ namespace Kaimos::MaterialEditor {
 			PinDataType datatype_to_check = PinDataType::VEC2;
 			OperationNodeType optype_to_check = OperationNodeType::FLOATVEC2_MULTIPLY;
 
-			if (op_type == OperationNodeType::FLOATVEC3_MULTIPLY)
+			switch (op_type)
 			{
-				datatype_to_check = PinDataType::VEC3;
-				optype_to_check = OperationNodeType::FLOATVEC3_MULTIPLY;
-			}
-			else if (op_type == OperationNodeType::FLOATVEC4_MULTIPLY)
-			{
-				datatype_to_check = PinDataType::VEC4;
-				optype_to_check = OperationNodeType::FLOATVEC4_MULTIPLY;
+				case OperationNodeType::FLOATVEC3_MULTIPLY:
+					datatype_to_check = PinDataType::VEC3;
+					optype_to_check = OperationNodeType::FLOATVEC3_MULTIPLY;
+					break;
+				case OperationNodeType::FLOATVEC4_MULTIPLY:
+					datatype_to_check = PinDataType::VEC4;
+					optype_to_check = OperationNodeType::FLOATVEC4_MULTIPLY;
+					break;
+				case OperationNodeType::FLOATVEC2_DIVIDE:
+					datatype_to_check = PinDataType::VEC2;
+					optype_to_check = OperationNodeType::FLOATVEC2_DIVIDE;
+					break;
+				case OperationNodeType::FLOATVEC3_DIVIDE:
+					datatype_to_check = PinDataType::VEC3;
+					optype_to_check = OperationNodeType::FLOATVEC3_DIVIDE;
+					break;
+				case OperationNodeType::FLOATVEC4_DIVIDE:
+					datatype_to_check = PinDataType::VEC4;
+					optype_to_check = OperationNodeType::FLOATVEC4_DIVIDE;
+					break;
 			}
 
 
@@ -316,14 +329,18 @@ namespace Kaimos::MaterialEditor {
 			if (m_OwnerNode->GetType() == MaterialNodeType::OPERATION && !is_destroying)
 			{
 				OperationNodeType op_type = ((OperationMaterialNode*)m_OwnerNode)->GetOperationType();
-				if (op_type == OperationNodeType::FLOATVEC2_MULTIPLY || op_type == OperationNodeType::FLOATVEC3_MULTIPLY || op_type == OperationNodeType::FLOATVEC4_MULTIPLY)
+
+				if (op_type == OperationNodeType::FLOATVEC2_MULTIPLY || op_type == OperationNodeType::FLOATVEC3_MULTIPLY || op_type == OperationNodeType::FLOATVEC4_MULTIPLY
+					|| op_type == OperationNodeType::FLOATVEC2_DIVIDE || op_type == OperationNodeType::FLOATVEC3_DIVIDE || op_type == OperationNodeType::FLOATVEC4_DIVIDE)
 				{
 					m_PinDataType = PinDataType::FLOAT;
-
 					PinDataType datatype_check = PinDataType::VEC2;
-					if(op_type == OperationNodeType::FLOATVEC3_MULTIPLY)
+
+					if(op_type == OperationNodeType::FLOATVEC3_MULTIPLY || op_type == OperationNodeType::FLOATVEC3_DIVIDE)
 						datatype_check = PinDataType::VEC3;
-					else if(op_type == OperationNodeType::FLOATVEC4_MULTIPLY)
+					else if(op_type == OperationNodeType::FLOATVEC4_MULTIPLY || op_type == OperationNodeType::FLOATVEC4_DIVIDE)
+						datatype_check = PinDataType::VEC4;
+					else if (op_type == OperationNodeType::FLOATVEC2_DIVIDE)
 						datatype_check = PinDataType::VEC4;
 
 					m_OwnerNode->CheckOutputType(datatype_check);

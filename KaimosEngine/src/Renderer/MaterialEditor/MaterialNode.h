@@ -33,7 +33,9 @@ namespace Kaimos::MaterialEditor {
 	enum class OperationNodeType
 	{
 		NONE, ADDITION, SUBTRACTION, DIVISION, MULTIPLICATION,				// Basic Operations (with same types)
-		FLOATVEC2_MULTIPLY, FLOATVEC3_MULTIPLY, FLOATVEC4_MULTIPLY			// Different-Types Multiplication
+		FLOATVEC2_MULTIPLY, FLOATVEC3_MULTIPLY, FLOATVEC4_MULTIPLY,			// Different-Types Multiplication
+		FLOATVEC2_DIVIDE, FLOATVEC3_DIVIDE, FLOATVEC4_DIVIDE,				// Different-Types Division
+		POWER, SQUARE_ROOT, INVERSE_SQUARE_ROOT								// Powers
 	};
 
 

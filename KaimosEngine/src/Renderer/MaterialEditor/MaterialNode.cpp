@@ -772,7 +772,7 @@ namespace Kaimos::MaterialEditor {
 	OperationMaterialNode::OperationMaterialNode(OperationNodeType operation_type, PinDataType operation_data_type) : MaterialNode("Operation Node", MaterialNodeType::OPERATION), m_OperationType(operation_type)
 	{
 		PinDataType op_datatype = operation_data_type;
-		bool multi_type_pin = false;
+		bool multi_type_pin = false, add_two_inputs = true;
 
 		switch (m_OperationType)
 		{
@@ -788,14 +788,23 @@ namespace Kaimos::MaterialEditor {
 
 			// Division
 			case OperationNodeType::DIVISION:			{ m_Name = "Divide Node";  break; }
+			case OperationNodeType::FLOATVEC2_DIVIDE:	{ m_Name = "Float-Vec2 Divide Node"; multi_type_pin = true; op_datatype = PinDataType::FLOAT; break; }
+			case OperationNodeType::FLOATVEC3_DIVIDE:	{ m_Name = "Float-Vec3 Divide Node"; multi_type_pin = true; op_datatype = PinDataType::FLOAT; break; }
+			case OperationNodeType::FLOATVEC4_DIVIDE:	{ m_Name = "Float-Vec4 Divide Node"; multi_type_pin = true; op_datatype = PinDataType::FLOAT; break; }
 			
+			// Powers
+			case OperationNodeType::POWER:				{ m_Name = "Power Node"; break; }
+			case OperationNodeType::SQUARE_ROOT:		{ m_Name = "Square Root Node";			add_two_inputs = false; break; }
+			case OperationNodeType::INVERSE_SQUARE_ROOT:{ m_Name = "Inverse Square Root Node";	add_two_inputs = false; break; }
 			
 			default: KS_FATAL_ERROR("Attempted to create a non-supported Operation Node");
 		}
 
 		AddInputPin(op_datatype, multi_type_pin, "Value 1");
-		AddInputPin(op_datatype, multi_type_pin, "Value 2");
 		AddOutputPin(op_datatype, "Out");
+
+		if(add_two_inputs)
+			AddInputPin(op_datatype, multi_type_pin, "Value 2");
 	}	
 
 
@@ -804,8 +813,13 @@ namespace Kaimos::MaterialEditor {
 		PinDataType data_type = m_NodeInputPins[0]->GetType();
 		glm::vec4 result = GetInputValue(0);
 
-		for (uint i = 1; i < m_NodeInputPins.size(); ++i)
-			result = ProcessOperation(result, GetInputValue(i), data_type, m_NodeInputPins[i]->GetType());
+		if(m_OperationType == OperationNodeType::SQUARE_ROOT || m_OperationType == OperationNodeType::INVERSE_SQUARE_ROOT)
+			result = ProcessOperation(result, glm::vec4(0.0f), data_type, PinDataType::NONE);
+		else
+		{
+			for (uint i = 1; i < m_NodeInputPins.size(); ++i)
+				result = ProcessOperation(result, GetInputValue(i), data_type, m_NodeInputPins[i]->GetType());
+		}
 
 		return result;
 
@@ -839,6 +853,14 @@ namespace Kaimos::MaterialEditor {
 
 			// Divide
 			case OperationNodeType::DIVISION:			return NodeUtils::DivideValues(a_data_type, a, b);
+			case OperationNodeType::FLOATVEC2_DIVIDE:	return NodeUtils::DivideFloatAndVec2(a, b, a_data_type, b_data_type);
+			case OperationNodeType::FLOATVEC3_DIVIDE:	return NodeUtils::DivideFloatAndVec3(a, b, a_data_type, b_data_type);
+			case OperationNodeType::FLOATVEC4_DIVIDE:	return NodeUtils::DivideFloatAndVec4(a, b, a_data_type, b_data_type);
+
+			// Powers
+			case OperationNodeType::POWER:				return NodeUtils::PowerValues(a_data_type, a, b);
+			case OperationNodeType::SQUARE_ROOT:		return NodeUtils::SqrtValue(a_data_type, a);
+			case OperationNodeType::INVERSE_SQUARE_ROOT:return NodeUtils::InvSqrtValue(a_data_type, a);
 		}
 
 		KS_FATAL_ERROR("Attempted to perform a non-supported operation in OperationNode!");
