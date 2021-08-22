@@ -1,5 +1,6 @@
 #include "kspch.h"
 #include "MaterialEditorPanel.h"
+#include "Core/Utils/Maths/Maths.h"
 #include "Renderer/Renderer.h"
 
 #include <ImGui/imgui.h>
@@ -12,23 +13,78 @@ namespace Kaimos {
 	// ----------------------- Public Class Methods -------------------------------------------------------
 	void MaterialEditorPanel::OnUIRender()
 	{
-		//ImGuiViewportFlags_TopMost
+		// -- Set Window Always on Top --
 		ImGuiWindowClass wnd_class;
 		wnd_class.ViewportFlagsOverrideSet = ImGuiViewportFlags_TopMost;
 		ImGui::SetNextWindowClass(&wnd_class);
 
+		
+		// -- Set size if needed --
+		static ImVec2 original_size = ImVec2(720.0f, 406.0f);
+		if (m_Resize)
+		{
+			if (m_Maximized)
+				ImGui::SetNextWindowSize(original_size);
+			else
+			{
+				ImGui::SetNextWindowSize(ImGui::GetWindowViewport()->Size);
+				ImGui::SetNextWindowPos(ImGui::GetMainViewport()->Pos);
+			}
+
+			m_Maximized = !m_Maximized;
+			m_Resize = false;
+		}
+		
+		// -- Begin Window --
 		ImGui::Begin("Kaimos Material Editor", &ShowPanel);
+		if (Maths::CompareFloats(ImGui::GetWindowViewport()->Size.x, ImGui::GetWindowWidth()) && Maths::CompareFloats(ImGui::GetWindowViewport()->Size.y, ImGui::GetWindowHeight()))
+			m_Maximized = true;
+		else
+			m_Maximized = false;
+
+
+		// -- Right Click Options --
+		if (!m_EditorHovered)
+		{
+			if (ImGui::BeginPopupContextWindow())
+			{
+				if (m_Maximized)
+				{
+					if (ImGui::MenuItem("Restore"))
+						m_Resize = true;
+				}
+				else
+				{
+					if (ImGui::MenuItem("Maximize"))
+					{
+						float x = ImGui::GetWindowPos().x + ImGui::GetWindowSize().x;
+						float y = ImGui::GetWindowPos().y + ImGui::GetWindowSize().y;
+
+						original_size = ImVec2(x, y);
+						m_Resize = true;
+					}
+				}
+
+				ImGui::EndPopup();
+			}
+		}
+
+		// -- Early Exit if !Graph --
 		if (!m_CurrentGraph)
 		{
+			m_EditorHovered = false;
 			ImGui::End();
 			return;
 		}
 
+		// -- Compile Material Button --
 		if (ImGui::Button("Compile"))
 			m_SceneContext->UpdateMeshAndSpriteComponentsVertices(m_CurrentGraph->GetMaterialAttachedID());
 
 		// -- Begin Editor --
 		ImNodes::BeginNodeEditor();
+		m_EditorHovered = ImNodes::IsEditorHovered();
+
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 10.0f);
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 4.0f);
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(20.0f, 12.0f));
