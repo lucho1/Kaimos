@@ -271,6 +271,9 @@ namespace Kaimos {
 
 		void UpdateTimedVertices()
 		{
+			if (!PositionTimed && !NormalsTimed && !TexCoordsTimed)
+				return;
+
 			// Get Mesh & Mat
 			Ref<Material> material = Renderer::GetMaterial(SpriteMaterialID);
 			if (!material)
@@ -388,6 +391,9 @@ namespace Kaimos {
 
 		void UpdateTimedVertices()
 		{
+			if (!PositionTimed && !NormalsTimed && !TexCoordsTimed)
+				return;
+
 			// Get Mesh & Mat
 			Ref<Material> material = Renderer::GetMaterial(MaterialID);
 			Ref<Mesh> mesh = Resources::ResourceManager::GetMesh(MeshID);
