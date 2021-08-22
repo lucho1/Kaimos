@@ -104,74 +104,110 @@ namespace Kaimos {
 		{
 			ImVec2 popup_pos = ImGui::GetMousePosOnOpeningCurrentPopup();
 
-			if (ImGui::MenuItem("Texture Coordinates"))
-				m_CurrentGraph->CreateNode(MaterialEditor::VertexParameterNodeType::TEX_COORDS, popup_pos);
+			if (ImGui::BeginMenu("Vertex Attributes"))
+			{
+				if (ImGui::MenuItem("Texture Coordinates"))
+					m_CurrentGraph->CreateNode(MaterialEditor::VertexParameterNodeType::TEX_COORDS, popup_pos);
 
-			if (ImGui::MenuItem("Vertex Position"))
-				m_CurrentGraph->CreateNode(MaterialEditor::VertexParameterNodeType::POSITION, popup_pos);
+				if (ImGui::MenuItem("Vertex Position"))
+					m_CurrentGraph->CreateNode(MaterialEditor::VertexParameterNodeType::POSITION, popup_pos);
 
-			if (ImGui::MenuItem("Vertex Normal"))
-				m_CurrentGraph->CreateNode(MaterialEditor::VertexParameterNodeType::NORMAL, popup_pos);
+				if (ImGui::MenuItem("Vertex Normal"))
+					m_CurrentGraph->CreateNode(MaterialEditor::VertexParameterNodeType::NORMAL, popup_pos);
 
-			if (ImGui::MenuItem("Delta Time"))
-				m_CurrentGraph->CreateNode(MaterialEditor::ConstantNodeType::DELTATIME, popup_pos);
+				ImGui::EndMenu();
+			}
 
-			if (ImGui::MenuItem("PI"))
-				m_CurrentGraph->CreateNode(MaterialEditor::ConstantNodeType::PI, popup_pos);
+			if (ImGui::BeginMenu("Constants"))
+			{
+				if (ImGui::MenuItem("Time"))
+					m_CurrentGraph->CreateNode(MaterialEditor::ConstantNodeType::DELTATIME, popup_pos);
 
-			if (ImGui::MenuItem("INT"))
-				m_CurrentGraph->CreateNode(MaterialEditor::ConstantNodeType::INT, popup_pos);
+				if (ImGui::MenuItem("PI"))
+					m_CurrentGraph->CreateNode(MaterialEditor::ConstantNodeType::PI, popup_pos);
 
-			if (ImGui::MenuItem("FLOAT"))
-				m_CurrentGraph->CreateNode(MaterialEditor::ConstantNodeType::FLOAT, popup_pos);
+				ImGui::EndMenu();
+			}
 
-			if (ImGui::MenuItem("VEC2"))
-				m_CurrentGraph->CreateNode(MaterialEditor::ConstantNodeType::VEC2, popup_pos);
+			if (ImGui::BeginMenu("Variables"))
+			{
+				if (ImGui::MenuItem("INT"))
+					m_CurrentGraph->CreateNode(MaterialEditor::ConstantNodeType::INT, popup_pos);
 
-			if (ImGui::MenuItem("VEC3"))
-				m_CurrentGraph->CreateNode(MaterialEditor::ConstantNodeType::VEC3, popup_pos);
+				if (ImGui::MenuItem("FLOAT"))
+					m_CurrentGraph->CreateNode(MaterialEditor::ConstantNodeType::FLOAT, popup_pos);
 
-			if (ImGui::MenuItem("VEC4"))
-				m_CurrentGraph->CreateNode(MaterialEditor::ConstantNodeType::VEC4, popup_pos);
+				if (ImGui::MenuItem("VEC2"))
+					m_CurrentGraph->CreateNode(MaterialEditor::ConstantNodeType::VEC2, popup_pos);
 
-			if (ImGui::MenuItem("Float + Float"))
-				m_CurrentGraph->CreateNode(MaterialEditor::OperationNodeType::ADDITION, MaterialEditor::PinDataType::FLOAT, popup_pos);
+				if (ImGui::MenuItem("VEC3"))
+					m_CurrentGraph->CreateNode(MaterialEditor::ConstantNodeType::VEC3, popup_pos);
 
-			if (ImGui::MenuItem("Int + Int"))
-				m_CurrentGraph->CreateNode(MaterialEditor::OperationNodeType::ADDITION, MaterialEditor::PinDataType::INT, popup_pos);
+				if (ImGui::MenuItem("VEC4"))
+					m_CurrentGraph->CreateNode(MaterialEditor::ConstantNodeType::VEC4, popup_pos);
 
-			if (ImGui::MenuItem("Vec2 + Vec2"))
-				m_CurrentGraph->CreateNode(MaterialEditor::OperationNodeType::ADDITION, MaterialEditor::PinDataType::VEC2, popup_pos);
+				ImGui::EndMenu();
+			}
 
-			if (ImGui::MenuItem("Vec3 + Vec3"))
-				m_CurrentGraph->CreateNode(MaterialEditor::OperationNodeType::ADDITION, MaterialEditor::PinDataType::VEC3, popup_pos);
+			ImGui::Separator();
+			if (ImGui::BeginMenu("Maths"))
+			{
+				if (ImGui::BeginMenu("Sum"))
+				{
+					if (ImGui::MenuItem("Float + Float"))
+						m_CurrentGraph->CreateNode(MaterialEditor::OperationNodeType::ADDITION, MaterialEditor::PinDataType::FLOAT, popup_pos);
 
-			if (ImGui::MenuItem("Vec4 + Vec4"))
-				m_CurrentGraph->CreateNode(MaterialEditor::OperationNodeType::ADDITION, MaterialEditor::PinDataType::VEC4, popup_pos);
+					if (ImGui::MenuItem("Int + Int"))
+						m_CurrentGraph->CreateNode(MaterialEditor::OperationNodeType::ADDITION, MaterialEditor::PinDataType::INT, popup_pos);
 
-			if (ImGui::MenuItem("Float * Float"))
-				m_CurrentGraph->CreateNode(MaterialEditor::OperationNodeType::MULTIPLICATION, MaterialEditor::PinDataType::FLOAT, popup_pos);
+					if (ImGui::MenuItem("Vec2 + Vec2"))
+						m_CurrentGraph->CreateNode(MaterialEditor::OperationNodeType::ADDITION, MaterialEditor::PinDataType::VEC2, popup_pos);
 
-			if (ImGui::MenuItem("Int * Int"))
-				m_CurrentGraph->CreateNode(MaterialEditor::OperationNodeType::MULTIPLICATION, MaterialEditor::PinDataType::INT, popup_pos);
+					if (ImGui::MenuItem("Vec3 + Vec3"))
+						m_CurrentGraph->CreateNode(MaterialEditor::OperationNodeType::ADDITION, MaterialEditor::PinDataType::VEC3, popup_pos);
 
-			if (ImGui::MenuItem("Vec2 * Vec2"))
-				m_CurrentGraph->CreateNode(MaterialEditor::OperationNodeType::MULTIPLICATION, MaterialEditor::PinDataType::VEC2, popup_pos);
+					if (ImGui::MenuItem("Vec4 + Vec4"))
+						m_CurrentGraph->CreateNode(MaterialEditor::OperationNodeType::ADDITION, MaterialEditor::PinDataType::VEC4, popup_pos);
 
-			if (ImGui::MenuItem("Float * Vec2"))
-				m_CurrentGraph->CreateNode(MaterialEditor::OperationNodeType::FLOATVEC2_MULTIPLY, MaterialEditor::PinDataType::FLOAT, popup_pos);
+					ImGui::EndMenu();
+				}
 
-			if (ImGui::MenuItem("Float * Vec3"))
-				m_CurrentGraph->CreateNode(MaterialEditor::OperationNodeType::FLOATVEC3_MULTIPLY, MaterialEditor::PinDataType::FLOAT, popup_pos);
+				if (ImGui::BeginMenu("Multiply"))
+				{
+					if (ImGui::MenuItem("Float * Float"))
+						m_CurrentGraph->CreateNode(MaterialEditor::OperationNodeType::MULTIPLICATION, MaterialEditor::PinDataType::FLOAT, popup_pos);
 
-			if (ImGui::MenuItem("Float * Vec4"))
-				m_CurrentGraph->CreateNode(MaterialEditor::OperationNodeType::FLOATVEC4_MULTIPLY, MaterialEditor::PinDataType::FLOAT, popup_pos);
+					if (ImGui::MenuItem("Int * Int"))
+						m_CurrentGraph->CreateNode(MaterialEditor::OperationNodeType::MULTIPLICATION, MaterialEditor::PinDataType::INT, popup_pos);
 
-			if (ImGui::MenuItem("Vec3 * Vec3"))
-				m_CurrentGraph->CreateNode(MaterialEditor::OperationNodeType::MULTIPLICATION, MaterialEditor::PinDataType::VEC3, popup_pos);
+					if (ImGui::MenuItem("Vec2 * Vec2"))
+						m_CurrentGraph->CreateNode(MaterialEditor::OperationNodeType::MULTIPLICATION, MaterialEditor::PinDataType::VEC2, popup_pos);
 
-			if (ImGui::MenuItem("Vec4 * Vec4"))
-				m_CurrentGraph->CreateNode(MaterialEditor::OperationNodeType::MULTIPLICATION, MaterialEditor::PinDataType::VEC4, popup_pos);
+					if (ImGui::MenuItem("Vec3 * Vec3"))
+						m_CurrentGraph->CreateNode(MaterialEditor::OperationNodeType::MULTIPLICATION, MaterialEditor::PinDataType::VEC3, popup_pos);
+
+					if (ImGui::MenuItem("Vec4 * Vec4"))
+						m_CurrentGraph->CreateNode(MaterialEditor::OperationNodeType::MULTIPLICATION, MaterialEditor::PinDataType::VEC4, popup_pos);
+
+					ImGui::EndMenu();
+				}
+
+				if (ImGui::BeginMenu("Float x Vec"))
+				{
+					if (ImGui::MenuItem("Float * Vec2"))
+						m_CurrentGraph->CreateNode(MaterialEditor::OperationNodeType::FLOATVEC2_MULTIPLY, MaterialEditor::PinDataType::FLOAT, popup_pos);
+
+					if (ImGui::MenuItem("Float * Vec3"))
+						m_CurrentGraph->CreateNode(MaterialEditor::OperationNodeType::FLOATVEC3_MULTIPLY, MaterialEditor::PinDataType::FLOAT, popup_pos);
+
+					if (ImGui::MenuItem("Float * Vec4"))
+						m_CurrentGraph->CreateNode(MaterialEditor::OperationNodeType::FLOATVEC4_MULTIPLY, MaterialEditor::PinDataType::FLOAT, popup_pos);
+
+					ImGui::EndMenu();
+				}
+
+				ImGui::EndMenu();
+			}
 		
 			ImGui::EndPopup();
 		}
