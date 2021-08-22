@@ -157,36 +157,36 @@ namespace Kaimos {
 		{
 			// Set Common Shader Uniforms
 			shader->Bind();
-			shader->SetUMat4("u_ViewProjection", view_projection_matrix);
-			shader->SetUFloat3("u_ViewPos", camera_pos);
-			shader->SetUFloat3("u_SceneColor", s_RendererData->SceneColor);
+			shader->SetUniformMat4("u_ViewProjection", view_projection_matrix);
+			shader->SetUniformFloat3("u_ViewPos", camera_pos);
+			shader->SetUniformFloat3("u_SceneColor", s_RendererData->SceneColor);
 
 			// Bind Environment Textures
 			s_RendererData->IrradianceCubemap->Bind(29);
 			s_RendererData->PrefilterCubemap->Bind(30);
 			s_RendererData->BRDF_LutTexture->Bind(31);
-			shader->SetUInt("u_IrradianceMap", 29);
-			shader->SetUInt("u_PrefilterSpecularMap", 30);
-			shader->SetUInt("u_BRDF_LUTMap", 31);
+			shader->SetUniformInt("u_IrradianceMap", 29);
+			shader->SetUniformInt("u_PrefilterSpecularMap", 30);
+			shader->SetUniformInt("u_BRDF_LUTMap", 31);
 
 			// Set Directional Lights Uniforms
 			uint dir_lights_num = dir_lights.size() >= s_RendererData->MaxDirLights ? s_RendererData->MaxDirLights : dir_lights.size();
-			shader->SetUInt("u_DirectionalLightsNum", dir_lights_num);
+			shader->SetUniformInt("u_DirectionalLightsNum", dir_lights_num);
 
 			for (uint i = 0; i < dir_lights_num; ++i)
 			{
 				Ref<Light> light = dir_lights[i].first;
 				std::string light_array_uniform = "u_DirectionalLights[" + std::to_string(i) + "].";
 
-				shader->SetUFloat4(light_array_uniform + "Radiance", light->Radiance);
-				shader->SetUFloat3(light_array_uniform + "Direction", dir_lights[i].second);
-				shader->SetUFloat(light_array_uniform + "Intensity", light->Intensity);
-				shader->SetUFloat(light_array_uniform + "SpecularStrength", light->SpecularStrength);
+				shader->SetUniformFloat4(light_array_uniform + "Radiance", light->Radiance);
+				shader->SetUniformFloat3(light_array_uniform + "Direction", dir_lights[i].second);
+				shader->SetUniformFloat(light_array_uniform + "Intensity", light->Intensity);
+				shader->SetUniformFloat(light_array_uniform + "SpecularStrength", light->SpecularStrength);
 			}
 
 			// Set Point Lights Uniforms
 			uint point_lights_num = point_lights.size() >= s_RendererData->MaxPointLights ? s_RendererData->MaxPointLights : point_lights.size();
-			shader->SetUInt("u_PointLightsNum", point_lights_num);
+			shader->SetUniformInt("u_PointLightsNum", point_lights_num);
 
 			for (uint i = 0; i < point_lights_num; ++i)
 			{
@@ -194,20 +194,20 @@ namespace Kaimos {
 				std::string light_array_uniform = "u_PointLights[" + std::to_string(i) + "].";
 
 				// if()else() with pbr_pipeline passing (or not) values to it
-				shader->SetUFloat4(light_array_uniform + "Radiance", light->Radiance);
-				shader->SetUFloat3(light_array_uniform + "Position", point_lights[i].second);
-				shader->SetUFloat(light_array_uniform + "Intensity", light->Intensity);
-				shader->SetUFloat(light_array_uniform + "FalloffFactor", light->FalloffMultiplier);
-				shader->SetUFloat(light_array_uniform + "SpecularStrength", light->SpecularStrength);
+				shader->SetUniformFloat4(light_array_uniform + "Radiance", light->Radiance);
+				shader->SetUniformFloat3(light_array_uniform + "Position", point_lights[i].second);
+				shader->SetUniformFloat(light_array_uniform + "Intensity", light->Intensity);
+				shader->SetUniformFloat(light_array_uniform + "FalloffFactor", light->FalloffMultiplier);
+				shader->SetUniformFloat(light_array_uniform + "SpecularStrength", light->SpecularStrength);
 
 				if (s_RendererData->PBR_Pipeline)
-					shader->SetUFloat(light_array_uniform + "Radius", light->GetMinRadius());
+					shader->SetUniformFloat(light_array_uniform + "Radius", light->GetMinRadius());
 				else
 				{
-					shader->SetUFloat(light_array_uniform + "MinRadius", light->GetMinRadius());
-					shader->SetUFloat(light_array_uniform + "MaxRadius", light->GetMaxRadius());
-					shader->SetUFloat(light_array_uniform + "AttL", light->GetLinearAttenuationFactor());
-					shader->SetUFloat(light_array_uniform + "AttQ", light->GetQuadraticAttenuationFactor());
+					shader->SetUniformFloat(light_array_uniform + "MinRadius", light->GetMinRadius());
+					shader->SetUniformFloat(light_array_uniform + "MaxRadius", light->GetMaxRadius());
+					shader->SetUniformFloat(light_array_uniform + "AttL", light->GetLinearAttenuationFactor());
+					shader->SetUniformFloat(light_array_uniform + "AttQ", light->GetQuadraticAttenuationFactor());
 				}
 			}
 		}
@@ -225,13 +225,13 @@ namespace Kaimos {
 		{
 			skybox_shader->Bind();
 			glm::mat4 view_proj = projection_matrix * glm::mat4(glm::mat3(view_matrix));
-			skybox_shader->SetUMat4("u_ViewProjection", view_proj);
-			skybox_shader->SetUFloat3("u_SceneColor", s_RendererData->SceneColor);
+			skybox_shader->SetUniformMat4("u_ViewProjection", view_proj);
+			skybox_shader->SetUniformFloat3("u_SceneColor", s_RendererData->SceneColor);
 
 			s_RendererData->EnvironmentCubemap->Bind();
 			//s_RendererData->IrradianceCubemap->Bind();
 			//s_RendererData->PrefilterCubemap->Bind();
-			skybox_shader->SetUInt("u_Cubemap", 0);			
+			skybox_shader->SetUniformInt("u_Cubemap", 0);
 			RenderCube();
 			skybox_shader->Unbind();
 		}
@@ -519,7 +519,7 @@ namespace Kaimos {
 
 		// -- Equirectangular to Cubemap Step --
 		recttocube_shader->Bind();
-		recttocube_shader->SetUInt("u_EquirectangularMap", 0);
+		recttocube_shader->SetUniformInt("u_EquirectangularMap", 0);
 
 		// Bind HDRMap + FBO & Draw from 6 Perspectives
 		uint env_cubemap_id = s_RendererData->EnvironmentCubemap->GetTextureID();
@@ -528,7 +528,7 @@ namespace Kaimos {
 
 		for (uint i = 0; i < 6; ++i)
 		{
-			recttocube_shader->SetUMat4("u_ViewProjection", capture_projection * capture_views[i]);
+			recttocube_shader->SetUniformMat4("u_ViewProjection", capture_projection * capture_views[i]);
 			s_RendererData->EnvironmentMapFBO->AttachColorTexture(TEXTURE_TARGET::TEXTURE_CUBEMAP, i, env_cubemap_id);
 			RenderCommand::Clear();
 			RenderCube();
@@ -549,14 +549,14 @@ namespace Kaimos {
 		uint irr_cubemap_id = s_RendererData->IrradianceCubemap->GetTextureID();
 
 		irradiance_shader->Bind();
-		irradiance_shader->SetUInt("u_EnvironmentMapResolution", envmap_res);
-		irradiance_shader->SetUInt("u_Cubemap", 0);
+		irradiance_shader->SetUniformInt("u_EnvironmentMapResolution", envmap_res);
+		irradiance_shader->SetUniformInt("u_Cubemap", 0);
 		s_RendererData->EnvironmentCubemap->Bind();
 		s_RendererData->EnvironmentMapFBO->Bind(irradiancemap_res, irradiancemap_res);
 
 		for (uint i = 0; i < 6; ++i)
 		{
-			irradiance_shader->SetUMat4("u_ViewProjection", capture_projection * capture_views[i]);
+			irradiance_shader->SetUniformMat4("u_ViewProjection", capture_projection * capture_views[i]);
 			s_RendererData->EnvironmentMapFBO->AttachColorTexture(TEXTURE_TARGET::TEXTURE_CUBEMAP, i, irr_cubemap_id);
 			RenderCommand::Clear();
 			RenderCube();
@@ -574,8 +574,8 @@ namespace Kaimos {
 
 		// Bind Shader, Cubemap & FBO
 		prefilter_shader->Bind();
-		prefilter_shader->SetUInt("u_EnvironmentMapResolution", envmap_res);
-		prefilter_shader->SetUInt("u_EnvironmentMap", 0);
+		prefilter_shader->SetUniformInt("u_EnvironmentMapResolution", envmap_res);
+		prefilter_shader->SetUniformInt("u_EnvironmentMap", 0);
 
 		s_RendererData->EnvironmentCubemap->Bind();
 		s_RendererData->EnvironmentMapFBO->Bind();
@@ -595,12 +595,12 @@ namespace Kaimos {
 
 			// Set roughness
 			float roughness = (float)mip / (float)(mip_levels - 1);
-			prefilter_shader->SetUFloat("u_Roughness", roughness);
+			prefilter_shader->SetUniformFloat("u_Roughness", roughness);
 
 			// Render 6 perspectives
 			for (uint i = 0; i < 6; ++i)
 			{
-				prefilter_shader->SetUMat4("u_ViewProjection", capture_projection * capture_views[i]);
+				prefilter_shader->SetUniformMat4("u_ViewProjection", capture_projection * capture_views[i]);
 				s_RendererData->EnvironmentMapFBO->AttachColorTexture(TEXTURE_TARGET::TEXTURE_CUBEMAP, i, prefiltermap_id, mip);
 				RenderCommand::Clear();
 				RenderCube();
