@@ -310,8 +310,6 @@ namespace Kaimos {
 			LoadCurrentGraphSettings();
 			ShowPanel = true;
 		}
-
-		m_SetFocus = true;
 	}
 
 	bool MaterialEditorPanel::IsModifyingMaterialGraph(Material* material)
