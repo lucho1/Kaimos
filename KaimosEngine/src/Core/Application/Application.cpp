@@ -114,9 +114,13 @@ namespace Kaimos {
 		//else if (e.IsInCategory(EVENT_CATEGORY_INPUT))
 		//	KS_EDITOR_TRACE(e);
 
+		float last_sec_time = (float)glfwGetTime();
+		uint frame_count = 0;
+
 		while (m_Running)
 		{
 			KS_PROFILE_SCOPE("Run Loop");
+			++frame_count;
 
 			// -- Delta Time --
 			m_Time = (float)glfwGetTime();			//QueryPerformanceFrequency(); QueryPerformanceCounter(); // Platform::GetTime() !!!!!!
@@ -148,6 +152,17 @@ namespace Kaimos {
 				KS_PROFILE_SCOPE("Window & Input Update");
 				Input::OnUpdate();
 				m_Window->OnUpdate();
+			}
+
+			// -- Debug Performance Metrics --
+			float sec = m_Time - last_sec_time;
+
+			if (sec >= 1.0f)
+			{
+				m_FPS = (uint)((float)frame_count / sec);
+				m_LastFrameMs = 1000.0f / (float)frame_count;
+				frame_count = 0;
+				last_sec_time = m_Time;
 			}
 		}
 	}

@@ -67,6 +67,10 @@ namespace Kaimos {
 		inline float GetTime()				const { return m_Time; }
 		inline Window& GetWindow()			const { return *m_Window; }
 		inline ImGuiLayer* GetImGuiLayer()	const { return m_ImGuiLayer; }
+
+		inline float GetLastFrameTime()		const { return m_LastFrameMs; }
+		inline uint GetFPS()				const { return m_FPS; }
+		inline float GetTimestep()			const { return m_Timestep.GetMilliseconds(); }
 		
 		inline static const MemoryMetrics& GetMemoryMetrics() { return s_MemoryMetrics; }
 
@@ -102,6 +106,10 @@ namespace Kaimos {
 		Timestep m_Timestep = {};
 		float m_LastFrameTime = 0.0f;
 		float m_Time = 0.0f;
+
+		// --- Performance Info ---
+		uint m_FPS = 0;
+		float m_LastFrameMs = 0.0f;
 	};
 	
 

@@ -3,7 +3,7 @@
 
 #include "Kaimos.h"
 
-#define MEMORY_ALLOCATIONS_SAMPLES 90
+#define METRICS_ALLOCATIONS_SAMPLES 90
 
 namespace Kaimos {
 
@@ -18,6 +18,8 @@ namespace Kaimos {
 	private:
 
 		// --- Private Scene Methods ---
+		void SetFPSMetrics();
+		void DisplayFPSMetrics();
 		void SetMemoryMetrics();
 		void DisplayMemoryMetrics();
 		void DisplayRenderingMetrics(bool display_3Dmetrics);
@@ -29,7 +31,13 @@ namespace Kaimos {
 
 	private:
 
-		uint m_MemoryAllocations[MEMORY_ALLOCATIONS_SAMPLES] = { 0 };
+		// Performance (FPS) Metrics
+		uint m_FPSAllocations[METRICS_ALLOCATIONS_SAMPLES] = {0};
+		uint m_FPSAllocationsIndex = 0;
+
+
+		// Memory Metrics
+		uint m_MemoryAllocations[METRICS_ALLOCATIONS_SAMPLES] = {0};
 		uint m_MemoryAllocationsIndex = 0;
 
 		MemoryMetrics m_MemoryMetrics = {};
