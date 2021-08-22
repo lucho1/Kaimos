@@ -12,6 +12,11 @@ namespace Kaimos {
 	// ----------------------- Public Class Methods -------------------------------------------------------
 	void MaterialEditorPanel::OnUIRender()
 	{
+		//ImGuiViewportFlags_TopMost
+		ImGuiWindowClass wnd_class;
+		wnd_class.ViewportFlagsOverrideSet = ImGuiViewportFlags_TopMost;
+		ImGui::SetNextWindowClass(&wnd_class);
+
 		ImGui::Begin("Kaimos Material Editor", &ShowPanel);
 		if (!m_CurrentGraph)
 		{
@@ -24,7 +29,6 @@ namespace Kaimos {
 
 		// -- Begin Editor --
 		ImNodes::BeginNodeEditor();
-
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 10.0f);
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 4.0f);
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(20.0f, 12.0f));
