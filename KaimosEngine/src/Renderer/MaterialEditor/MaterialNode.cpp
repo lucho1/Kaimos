@@ -51,7 +51,7 @@ namespace Kaimos::MaterialEditor {
 		// -- Draw Input Pins --
 		bool set_node_draggable = true;
 		for (Ref<NodeInputPin>& pin : m_NodeInputPins)
-			pin->DrawUI(set_node_draggable);		
+			pin->DrawUI(set_node_draggable);	
 
 		// -- End Node Drawing --
 		ImNodes::SetNodeDraggable(m_ID, set_node_draggable);
@@ -513,7 +513,7 @@ namespace Kaimos::MaterialEditor {
 		{
 			case ConstantNodeType::DELTATIME:
 			{
-				m_Name = "Delta Time";
+				m_Name = "Time";
 				AddOutputPin(PinDataType::FLOAT, "Time (float)");
 				break;
 			}
@@ -561,6 +561,36 @@ namespace Kaimos::MaterialEditor {
 				AddOutputPin(PinDataType::VEC4, "Value (Vec4)");
 				break;
 			}
+			case ConstantNodeType::SCENE_COLOR:
+			{
+				m_Name = "Scene Color";
+				AddOutputPin(PinDataType::VEC3, "Color (Vec3)", 1.0f);
+				break;
+			}
+			case ConstantNodeType::SCREEN_RES:
+			{
+				m_Name = "Screen Resolution";
+				AddOutputPin(PinDataType::VEC2, "Resolution (Vec2)", 0.0f);
+				break;
+			}
+			case ConstantNodeType::CAMERA_FOV:
+			{
+				m_Name = "CamFOV";
+				AddOutputPin(PinDataType::FLOAT, "FOV (float)", 0.0f);
+				break;
+			}
+			case ConstantNodeType::CAMERA_AR:
+			{
+				m_Name = "CamAR";
+				AddOutputPin(PinDataType::FLOAT, "AR (float)", 0.0f);
+				break;
+			}
+			case ConstantNodeType::CAMERA_ORTHOSIZE:
+			{
+				m_Name = "CamOrthoSize";
+				AddOutputPin(PinDataType::FLOAT, "Ortho Size (float)", 0.0f);
+				break;
+			}
 			default:
 				KS_FATAL_ERROR("Attempted to create a non-supported Constant Node");
 		}
@@ -600,6 +630,33 @@ namespace Kaimos::MaterialEditor {
 				ret.x = GetInputValue(0).x;
 				ret.y = GetInputValue(1).x;
 				ret.z = GetInputValue(2).x;
+				break;
+			}
+			case ConstantNodeType::SCENE_COLOR:
+			{
+				ret = glm::vec4(Renderer::GetSceneColor(), 1.0f);
+				break;
+			}
+			case ConstantNodeType::SCREEN_RES:
+			{
+				ret.x = Application::Get().GetWindow().GetWidth();
+				ret.y = Application::Get().GetWindow().GetHeight();
+				break;
+			}
+
+			case ConstantNodeType::CAMERA_FOV:
+			{
+				//ret.x = Application::Get().GetTime();
+				break;
+			}
+			case ConstantNodeType::CAMERA_AR:
+			{
+				//ret.x = Application::Get().GetTime();
+				break;
+			}
+			case ConstantNodeType::CAMERA_ORTHOSIZE:
+			{
+				//ret.x = Application::Get().GetTime();
 				break;
 			}
 			default:
