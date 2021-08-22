@@ -2,6 +2,8 @@
 #include "NodeUtils.h"
 #include "MaterialNode.h"
 
+#include "Core/Utils/Maths/Maths.h"
+
 #include <glm/gtc/type_ptr.hpp>
 #include <imgui.h>
 
@@ -47,6 +49,22 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 	}
 
 
+	glm::vec4 SubtractValues(PinDataType values_data_type, const glm::vec4& a, const glm::vec4& b)
+	{
+		switch (values_data_type)
+		{
+			case PinDataType::FLOAT:
+			case PinDataType::INT:		return glm::vec4(a.x - b.x, 0.0f, 0.0f, 0.0f);
+			case PinDataType::VEC2:		return glm::vec4(a.x - b.x, a.y - b.y, 0.0f, 0.0f);
+			case PinDataType::VEC3:		return glm::vec4(a.x - b.x, a.y - b.y, a.z - b.z, 0.0f);
+			case PinDataType::VEC4:		return glm::vec4(a.x - b.x, a.y - b.y, a.z - b.z, a.a - b.a);
+		}
+
+		KS_FATAL_ERROR("Tried to perform a non-supported subtraction operation!");
+		return {};
+	}
+
+
 	glm::vec4 MultiplyValues(PinDataType values_data_type, const glm::vec4& a, const glm::vec4& b)
 	{
 		switch (values_data_type)
@@ -59,6 +77,60 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 		}
 
 		KS_FATAL_ERROR("Tried to perform a non-supported multiply operation!");
+		return {};
+	}
+
+
+	glm::vec4 DivideValues(PinDataType values_data_type, const glm::vec4& a, const glm::vec4& b)
+	{
+		switch (values_data_type)
+		{
+			case PinDataType::FLOAT:
+			case PinDataType::INT:
+			{
+				if(!Maths::CompareFloats(b.x, 0.0f))
+					return glm::vec4(a.x/b.x, 0.0f, 0.0f, 0.0f);
+				return a;
+			}
+			case PinDataType::VEC2:
+			{
+				glm::vec2 div = glm::vec2(b);
+				if (Maths::CompareFloats(b.x, 0.0f))
+					div.x = 1.0f;
+				if (Maths::CompareFloats(b.y, 0.0f))
+					div.y = 1.0f;
+
+				return glm::vec4(glm::vec2(a)/div, 0.0f, 0.0f);
+			}
+			case PinDataType::VEC3:
+			{
+				glm::vec3 div = glm::vec3(b);
+				if (Maths::CompareFloats(b.x, 0.0f))
+					div.x = 1.0f;
+				if (Maths::CompareFloats(b.y, 0.0f))
+					div.y = 1.0f;
+				if (Maths::CompareFloats(b.z, 0.0f))
+					div.z = 1.0f;
+				
+				return glm::vec4(glm::vec3(a)/div, 0.0f);
+			}
+			case PinDataType::VEC4:
+			{
+				glm::vec4 div = b;
+				if (b.x < 0.001f)
+					div.x = 1.0f;
+				if (b.y < 0.001f)
+					div.y = 1.0f;
+				if (b.z < 0.001f)
+					div.z = 1.0f;
+				if (b.w < 0.001f)
+					div.w = 1.0f;
+
+				return a/div;
+			}
+		}
+
+		KS_FATAL_ERROR("Tried to perform a non-supported divide operation!");
 		return {};
 	}
 

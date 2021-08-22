@@ -215,6 +215,26 @@ namespace Kaimos {
 					ImGui::EndMenu();
 				}
 
+				if (ImGui::BeginMenu("Subtraction"))
+				{
+					if (ImGui::MenuItem("Float - Float"))
+						m_CurrentGraph->CreateNode(MaterialEditor::OperationNodeType::SUBTRACTION, MaterialEditor::PinDataType::FLOAT, popup_pos);
+
+					if (ImGui::MenuItem("Int - Int"))
+						m_CurrentGraph->CreateNode(MaterialEditor::OperationNodeType::SUBTRACTION, MaterialEditor::PinDataType::INT, popup_pos);
+
+					if (ImGui::MenuItem("Vec2 - Vec2"))
+						m_CurrentGraph->CreateNode(MaterialEditor::OperationNodeType::SUBTRACTION, MaterialEditor::PinDataType::VEC2, popup_pos);
+
+					if (ImGui::MenuItem("Vec3 - Vec3"))
+						m_CurrentGraph->CreateNode(MaterialEditor::OperationNodeType::SUBTRACTION, MaterialEditor::PinDataType::VEC3, popup_pos);
+
+					if (ImGui::MenuItem("Vec4 - Vec4"))
+						m_CurrentGraph->CreateNode(MaterialEditor::OperationNodeType::SUBTRACTION, MaterialEditor::PinDataType::VEC4, popup_pos);
+
+					ImGui::EndMenu();
+				}
+
 				if (ImGui::BeginMenu("Multiply"))
 				{
 					if (ImGui::MenuItem("Float * Float"))
@@ -231,6 +251,26 @@ namespace Kaimos {
 
 					if (ImGui::MenuItem("Vec4 * Vec4"))
 						m_CurrentGraph->CreateNode(MaterialEditor::OperationNodeType::MULTIPLICATION, MaterialEditor::PinDataType::VEC4, popup_pos);
+
+					ImGui::EndMenu();
+				}
+
+				if (ImGui::BeginMenu("Divide"))
+				{
+					if (ImGui::MenuItem("Float / Float"))
+						m_CurrentGraph->CreateNode(MaterialEditor::OperationNodeType::DIVISION, MaterialEditor::PinDataType::FLOAT, popup_pos);
+
+					if (ImGui::MenuItem("Int / Int"))
+						m_CurrentGraph->CreateNode(MaterialEditor::OperationNodeType::DIVISION, MaterialEditor::PinDataType::INT, popup_pos);
+
+					if (ImGui::MenuItem("Vec2 / Vec2"))
+						m_CurrentGraph->CreateNode(MaterialEditor::OperationNodeType::DIVISION, MaterialEditor::PinDataType::VEC2, popup_pos);
+
+					if (ImGui::MenuItem("Vec3 / Vec3"))
+						m_CurrentGraph->CreateNode(MaterialEditor::OperationNodeType::DIVISION, MaterialEditor::PinDataType::VEC3, popup_pos);
+
+					if (ImGui::MenuItem("Vec4 / Vec4"))
+						m_CurrentGraph->CreateNode(MaterialEditor::OperationNodeType::DIVISION, MaterialEditor::PinDataType::VEC4, popup_pos);
 
 					ImGui::EndMenu();
 				}

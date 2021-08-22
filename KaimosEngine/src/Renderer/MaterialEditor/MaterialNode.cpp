@@ -778,12 +778,17 @@ namespace Kaimos::MaterialEditor {
 		{
 			// Addition & Subtraction
 			case OperationNodeType::ADDITION:			{ m_Name = "Sum Node";  break; }
+			case OperationNodeType::SUBTRACTION:		{ m_Name = "Subtract Node";  break; }
 			
 			// Multiply
 			case OperationNodeType::MULTIPLICATION:		{ m_Name = "Multiply Node"; break; }
 			case OperationNodeType::FLOATVEC2_MULTIPLY:	{ m_Name = "Float-Vec2 Multiply Node"; multi_type_pin = true; op_datatype = PinDataType::FLOAT; break; }
 			case OperationNodeType::FLOATVEC3_MULTIPLY:	{ m_Name = "Float-Vec3 Multiply Node"; multi_type_pin = true; op_datatype = PinDataType::FLOAT; break; }
 			case OperationNodeType::FLOATVEC4_MULTIPLY:	{ m_Name = "Float-Vec4 Multiply Node"; multi_type_pin = true; op_datatype = PinDataType::FLOAT; break; }
+
+			// Division
+			case OperationNodeType::DIVISION:			{ m_Name = "Divide Node";  break; }
+			
 			
 			default: KS_FATAL_ERROR("Attempted to create a non-supported Operation Node");
 		}
@@ -824,12 +829,16 @@ namespace Kaimos::MaterialEditor {
 		{
 			// Addition & Subtraction
 			case OperationNodeType::ADDITION:			return NodeUtils::SumValues(a_data_type, a, b);
-			case OperationNodeType::MULTIPLICATION:		return NodeUtils::MultiplyValues(a_data_type, a, b);
+			case OperationNodeType::SUBTRACTION:		return NodeUtils::SubtractValues(a_data_type, a, b);
 			
 			// Multiply
+			case OperationNodeType::MULTIPLICATION:		return NodeUtils::MultiplyValues(a_data_type, a, b);
 			case OperationNodeType::FLOATVEC2_MULTIPLY:	return NodeUtils::MultiplyFloatAndVec2(a, b, a_data_type, b_data_type);
 			case OperationNodeType::FLOATVEC3_MULTIPLY:	return NodeUtils::MultiplyFloatAndVec3(a, b, a_data_type, b_data_type);
 			case OperationNodeType::FLOATVEC4_MULTIPLY:	return NodeUtils::MultiplyFloatAndVec4(a, b, a_data_type, b_data_type);
+
+			// Divide
+			case OperationNodeType::DIVISION:			return NodeUtils::DivideValues(a_data_type, a, b);
 		}
 
 		KS_FATAL_ERROR("Attempted to perform a non-supported operation in OperationNode!");
