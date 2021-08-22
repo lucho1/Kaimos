@@ -14,9 +14,29 @@ namespace Kaimos { class Material; }
 
 namespace Kaimos::MaterialEditor {
 
-	// ---- Forward Declarations & Enums ----
+	// ---- Forward Declarations ----
 	enum class PinDataType;
-	enum class MaterialNodeType	{ NONE, MAIN, VERTEX_PARAMETER, OPERATION, CONSTANT };
+
+	// ---- TYPE-DEFINING ENUMS ----
+	enum class MaterialNodeType			{ NONE, MAIN, VERTEX_PARAMETER, OPERATION, CONSTANT };
+	enum class VertexParameterNodeType	{ NONE, TEX_COORDS, POSITION, NORMAL };
+
+	enum class ConstantNodeType
+	{
+		NONE, DELTATIME, PI,												// Constants
+		INT, FLOAT, VEC2, VEC3, VEC4,										// Variables
+		SCREEN_RES, SCENE_COLOR,											// Screen, Scene, ...
+		CAMERA_FOV, CAMERA_AR, CAMERA_PLANES, CAMERA_ORTHOSIZE,				// Camera
+		INT_RANDOM, FLOAT_RANDOM, VEC2_RANDOM, VEC3_RANDOM, VEC4_RANDOM		// Randoms
+	};
+
+	enum class OperationNodeType
+	{
+		NONE, ADDITION, MULTIPLICATION,										// Basic Operations (with same types)
+		FLOATVEC2_MULTIPLY, FLOATVEC3_MULTIPLY, FLOATVEC4_MULTIPLY			// Different-Types Multiplication
+	};
+
+
 
 
 	// ---- Base Material Node ----
@@ -86,7 +106,6 @@ namespace Kaimos::MaterialEditor {
 
 
 	// ---- Main Material Node ----
-	enum class VertexParameterNodeType { NONE, TEX_COORDS, POSITION, NORMAL };
 
 	class MainMaterialNode : public MaterialNode
 	{
@@ -177,9 +196,6 @@ namespace Kaimos::MaterialEditor {
 
 
 	// ---- Constant Node ----
-	enum class ConstantNodeType { NONE, DELTATIME, PI, INT, FLOAT, VEC2, VEC3, VEC4, SCREEN_RES, SCENE_COLOR, CAMERA_FOV, CAMERA_AR, CAMERA_PLANES, CAMERA_ORTHOSIZE,
-									INT_RANDOM, FLOAT_RANDOM, VEC2_RANDOM, VEC3_RANDOM, VEC4_RANDOM };
-
 	class ConstantMaterialNode : public MaterialNode
 	{
 	public:
@@ -201,8 +217,6 @@ namespace Kaimos::MaterialEditor {
 
 
 	// ---- Operation Node ----
-	enum class OperationNodeType { NONE, ADDITION, MULTIPLICATION, FLOATVEC2_MULTIPLY, FLOATVEC3_MULTIPLY, FLOATVEC4_MULTIPLY };
-
 	class OperationMaterialNode : public MaterialNode
 	{
 	public:
