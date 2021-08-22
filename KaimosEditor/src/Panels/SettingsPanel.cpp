@@ -146,7 +146,13 @@ namespace Kaimos {
 		{
 			ImGui::Begin("Performance", &closing_performance);
 			ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_FramePadding;
+
+			// FPS
+			if (ImGui::CollapsingHeader("Framerate", flags))
+				DisplayFPSMetrics();
+
 			// Memory
+			ImGui::NewLine();
 			if (ImGui::CollapsingHeader("Memory", flags))
 				DisplayMemoryMetrics();
 
@@ -167,22 +173,69 @@ namespace Kaimos {
 
 
 	// ----------------------- Private Class Methods ------------------------------------------------------
+	void SettingsPanel::SetFPSMetrics()
+	{
+		if (m_FPSAllocationsIndex == METRICS_ALLOCATIONS_SAMPLES)
+			m_FPSAllocationsIndex = 0;
+
+		m_FPSAllocations[m_FPSAllocationsIndex] = Application::Get().GetFPS();
+		++m_FPSAllocationsIndex;
+	}
+
+	void SettingsPanel::DisplayFPSMetrics()
+	{
+		// -- Metrics Gathering --
+		float float_fps_allocs[METRICS_ALLOCATIONS_SAMPLES];
+		for (uint i = 0; i < METRICS_ALLOCATIONS_SAMPLES; ++i)
+			float_fps_allocs[i] = (float)m_FPSAllocations[i];
+
+		// -- Plots --
+		// Plots Text
+		ImGui::NewLine();
+		ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[1]);
+		float font_size = ImGui::GetFontSize() * 4.5f; // 4.5 is half the characters of "Framerate"
+		ImGui::SameLine(ImGui::GetWindowSize().x / 2 - font_size + (font_size / 2));
+		ImGui::Text("Framerate");
+		ImGui::PopFont();
+
+		// Plot
+		char overlay[50];
+		sprintf(overlay, "Avg. FPS: %i", Application::Get().GetFPS());
+		ImGui::PlotHistogram("###FramerateHistogram", float_fps_allocs, IM_ARRAYSIZE(float_fps_allocs), 0, overlay, 0.0f, 100.0f, ImVec2(ImGui::GetContentRegionAvailWidth(), 100.0f));
+
+		// -- Memory Metrics Gathering Stop --
+		static bool stop = false;
+		ImGui::Checkbox("Stop Framerate Count", &stop);
+		if (!stop)
+			SetFPSMetrics();
+
+		// -- Printing --
+		float text_separation = ImGui::GetContentRegionAvailWidth() / 3.0f + 25.0f;
+		ImGui::NewLine();
+
+		ImGui::Text("Avg. Frame ms: "); ImGui::SameLine(text_separation);
+		ImGui::Text("%.2fms", Application::Get().GetLastFrameTime());
+
+		ImGui::Text("Timestep: "); ImGui::SameLine(text_separation);
+		ImGui::Text("%.2fms", Application::Get().GetTimestep());
+	}
+
+
 	void SettingsPanel::SetMemoryMetrics()
 	{
 		m_MemoryMetrics = Application::Get().GetMemoryMetrics();
-		if (m_MemoryAllocationsIndex == MEMORY_ALLOCATIONS_SAMPLES)
+		if (m_MemoryAllocationsIndex == METRICS_ALLOCATIONS_SAMPLES)
 			m_MemoryAllocationsIndex = 0;
 
 		m_MemoryAllocations[m_MemoryAllocationsIndex] = static_cast<uint>(BTOMB(m_MemoryMetrics.GetCurrentMemoryUsage()) * 10.0f);
 		++m_MemoryAllocationsIndex;
 	}
 
-
 	void SettingsPanel::DisplayMemoryMetrics()
 	{
 		// -- Memory Metrics Gathering --
-		float float_mem_allocs[MEMORY_ALLOCATIONS_SAMPLES];
-		for (uint i = 0; i < MEMORY_ALLOCATIONS_SAMPLES; ++i)
+		float float_mem_allocs[METRICS_ALLOCATIONS_SAMPLES];
+		for (uint i = 0; i < METRICS_ALLOCATIONS_SAMPLES; ++i)
 			float_mem_allocs[i] = (float)m_MemoryAllocations[i];
 		
 
