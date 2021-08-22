@@ -69,7 +69,7 @@ namespace Kaimos {
 		s_RendererData->Shaders.ForEachShader([&](const Ref<Shader>& shader)
 			{
 				shader->Bind();
-				shader->SetUIntArray("u_Textures", texture_samplers, s_RendererData->MaxTextureSlots);
+				shader->SetUniformIntArray("u_Textures", texture_samplers, s_RendererData->MaxTextureSlots);
 				shader->Unbind();
 			});
 	}
@@ -123,8 +123,8 @@ namespace Kaimos {
 	void Renderer::Submit(const Ref<Shader>& shader, const Ref<VertexArray>& vertex_array, const glm::mat4& transformation)
 	{
 		shader->Bind();
-		shader->SetUMat4("u_ViewProjection", s_RendererData->ViewProjectionMatrix);
-		shader->SetUMat4("u_Model", transformation);
+		shader->SetUniformMat4("u_ViewProjection", s_RendererData->ViewProjectionMatrix);
+		shader->SetUniformMat4("u_Model", transformation);
 
 		// -- Vertex Array bound here since RenderCommands should NOT do multiple things, they are just commands (unless specifically supposed-to) --
 		vertex_array->Bind();

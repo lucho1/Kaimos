@@ -121,40 +121,40 @@ namespace Kaimos {
 		{
 			s_3DData->VArray->Bind();
 			shader->Bind();
-			shader->SetUMat4("u_ViewProjection", view_projection_matrix);
-			shader->SetUFloat3("u_ViewPos", camera_pos);
-			shader->SetUFloat3("u_SceneColor", Renderer::GetSceneColor());
+			shader->SetUniformMat4("u_ViewProjection", view_projection_matrix);
+			shader->SetUniformFloat3("u_ViewPos", camera_pos);
+			shader->SetUniformFloat3("u_SceneColor", Renderer::GetSceneColor());
 
 			uint max_dir_lights = Renderer::GetMaxDirLights();
 			uint dir_lights_size = dir_lights.size() >= max_dir_lights ? max_dir_lights : dir_lights.size();
-			shader->SetUInt("u_DirectionalLightsNum", dir_lights_size);
+			shader->SetUniformInt("u_DirectionalLightsNum", dir_lights_size);
 
 			for (uint i = 0; i < dir_lights_size; ++i)
 			{
 				std::string light_array_uniform = "u_DirectionalLights[" + std::to_string(i) + "].";
-				shader->SetUFloat4(light_array_uniform + "Radiance", dir_lights[i].first->Radiance);
-				shader->SetUFloat3(light_array_uniform + "Direction", dir_lights[i].second);
-				shader->SetUFloat(light_array_uniform + "Intensity", dir_lights[i].first->Intensity);
-				shader->SetUFloat(light_array_uniform + "SpecularStrength", dir_lights[i].first->SpecularStrength);
+				shader->SetUniformFloat4(light_array_uniform + "Radiance", dir_lights[i].first->Radiance);
+				shader->SetUniformFloat3(light_array_uniform + "Direction", dir_lights[i].second);
+				shader->SetUniformFloat(light_array_uniform + "Intensity", dir_lights[i].first->Intensity);
+				shader->SetUniformFloat(light_array_uniform + "SpecularStrength", dir_lights[i].first->SpecularStrength);
 			}
 
 			uint max_point_lights = Renderer::GetMaxPointLights();
 			uint point_lights_size = point_lights.size() >= max_point_lights ? max_point_lights : point_lights.size();
-			shader->SetUInt("u_PointLightsNum", point_lights_size);
+			shader->SetUniformInt("u_PointLightsNum", point_lights_size);
 
 			for (uint i = 0; i < point_lights_size; ++i)
 			{
 				std::string light_array_uniform = "u_PointLights[" + std::to_string(i) + "].";
-				shader->SetUFloat4(light_array_uniform + "Radiance", point_lights[i].first->Radiance);
-				shader->SetUFloat3(light_array_uniform + "Position", point_lights[i].second);
-				shader->SetUFloat(light_array_uniform + "Intensity", point_lights[i].first->Intensity);
-				shader->SetUFloat(light_array_uniform + "SpecularStrength", point_lights[i].first->SpecularStrength);
+				shader->SetUniformFloat4(light_array_uniform + "Radiance", point_lights[i].first->Radiance);
+				shader->SetUniformFloat3(light_array_uniform + "Position", point_lights[i].second);
+				shader->SetUniformFloat(light_array_uniform + "Intensity", point_lights[i].first->Intensity);
+				shader->SetUniformFloat(light_array_uniform + "SpecularStrength", point_lights[i].first->SpecularStrength);
 
-				shader->SetUFloat(light_array_uniform + "MinRadius", point_lights[i].first->GetMinRadius());
-				shader->SetUFloat(light_array_uniform + "MaxRadius", point_lights[i].first->GetMaxRadius());
-				shader->SetUFloat(light_array_uniform + "FalloffFactor", point_lights[i].first->FalloffMultiplier);
-				shader->SetUFloat(light_array_uniform + "AttL", point_lights[i].first->GetLinearAttenuationFactor());
-				shader->SetUFloat(light_array_uniform + "AttQ", point_lights[i].first->GetQuadraticAttenuationFactor());
+				shader->SetUniformFloat(light_array_uniform + "MinRadius", point_lights[i].first->GetMinRadius());
+				shader->SetUniformFloat(light_array_uniform + "MaxRadius", point_lights[i].first->GetMaxRadius());
+				shader->SetUniformFloat(light_array_uniform + "FalloffFactor", point_lights[i].first->FalloffMultiplier);
+				shader->SetUniformFloat(light_array_uniform + "AttL", point_lights[i].first->GetLinearAttenuationFactor());
+				shader->SetUniformFloat(light_array_uniform + "AttQ", point_lights[i].first->GetQuadraticAttenuationFactor());
 			}
 
 			StartBatch();

@@ -331,93 +331,65 @@ namespace Kaimos {
 		}
 	}
 
-
 	
+	int OGLShader::GetUniformLocation(const std::string& name)
+	{
+		if (m_UniformCache.find(name) != m_UniformCache.end())
+			return m_UniformCache[name];
+
+		int location = glGetUniformLocation(m_ShaderID, name.c_str());
+		if (location == -1)
+		{
+			KS_WARN("Tried to retrieve an unexisting uniform at Shader '{0}' ('{1}')", m_Name, name);
+			return location;
+		}
+
+		m_UniformCache[name] = location;
+		return location;
+	}
+
+
+
 	// ----------------------- Uniforms -------------------------------------------------------------------
-	void OGLShader::SetUFloat(const std::string& name, float value)
+	void OGLShader::SetUniformFloat(const std::string& name, float value)
 	{
 		KS_PROFILE_FUNCTION();
-		UploadUniformFloat(name, value);
+		glUniform1f(GetUniformLocation(name), value);
 	}
 
-	void OGLShader::SetUFloat3(const std::string& name, const glm::vec3& value)
+	void OGLShader::SetUniformFloat2(const std::string& name, const glm::vec2& value)
 	{
 		KS_PROFILE_FUNCTION();
-		UploadUniformFloat3(name, value);
+		glUniform2f(GetUniformLocation(name), value.x, value.y);
 	}
 
-	void OGLShader::SetUFloat4(const std::string& name, const glm::vec4& value)
+	void OGLShader::SetUniformFloat3(const std::string& name, const glm::vec3& value)
 	{
 		KS_PROFILE_FUNCTION();
-		UploadUniformFloat4(name, value);
+		glUniform3f(GetUniformLocation(name), value.x, value.y, value.z);
 	}
 
-	void OGLShader::SetUMat4(const std::string& name, const glm::mat4& value)
+	void OGLShader::SetUniformFloat4(const std::string& name, const glm::vec4& value)
 	{
 		KS_PROFILE_FUNCTION();
-		UploadUniformMat4(name, value);
+		glUniform4f(GetUniformLocation(name), value.x, value.y, value.z, value.w);
+	}
+
+	void OGLShader::SetUniformMat4(const std::string& name, const glm::mat4& value)
+	{
+		KS_PROFILE_FUNCTION();
+		glUniformMatrix4fv(GetUniformLocation(name), 1, GL_FALSE, glm::value_ptr(value));
 	}
 	
-	void OGLShader::SetUInt(const std::string& name, int value)
+	void OGLShader::SetUniformInt(const std::string& name, int value)
 	{
 		KS_PROFILE_FUNCTION();
-		UploadUniformInt(name, value);
+		glUniform1i(GetUniformLocation(name), value);
 	}
 
-	void OGLShader::SetUIntArray(const std::string& name, int* values_array, uint size)
+	void OGLShader::SetUniformIntArray(const std::string& name, int* values_array, uint size)
 	{
 		KS_PROFILE_FUNCTION();
-		UploadUniformIntArray(name, values_array, size);
-	}
-
-
-
-	// ----------------------- Uniforms Upload ------------------------------------------------------------
-	void OGLShader::UploadUniformInt(const std::string& name, const int& value)
-	{
-		GLint loc = glGetUniformLocation(m_ShaderID, name.c_str());
-		glUniform1i(loc, value);
-	}
-
-	void OGLShader::UploadUniformIntArray(const std::string& name, const int* values_array, uint size)
-	{
-		GLint loc = glGetUniformLocation(m_ShaderID, name.c_str());
-		glUniform1iv(loc, size, values_array);
-	}
-
-	void OGLShader::UploadUniformFloat(const std::string& name, const float& value)
-	{
-		GLint loc = glGetUniformLocation(m_ShaderID, name.c_str());
-		glUniform1f(loc, value);
-	}
-
-	void OGLShader::UploadUniformFloat2(const std::string& name, const glm::vec2& value)
-	{
-		GLint loc = glGetUniformLocation(m_ShaderID, name.c_str());
-		glUniform2f(loc, value.x, value.y);
-	}
-
-	void OGLShader::UploadUniformFloat3(const std::string& name, const glm::vec3& value)
-	{
-		GLint loc = glGetUniformLocation(m_ShaderID, name.c_str());
-		glUniform3f(loc, value.x, value.y, value.z);
-	}
-
-	void OGLShader::UploadUniformFloat4(const std::string& name, const glm::vec4& value)
-	{
-		GLint loc = glGetUniformLocation(m_ShaderID, name.c_str());
-		glUniform4f(loc, value.x, value.y, value.z, value.w);
-	}
-
-	void OGLShader::UploadUniformMat3(const std::string& name, const glm::mat3& matrix)
-	{
-		GLint loc = glGetUniformLocation(m_ShaderID, name.c_str());
-		glUniformMatrix3fv(loc, 1, GL_FALSE, glm::value_ptr(matrix));
-	}
-
-	void OGLShader::UploadUniformMat4(const std::string& name, const glm::mat4& matrix)
-	{
-		GLint loc = glGetUniformLocation(m_ShaderID, name.c_str());
-		glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(matrix));
+		glUniform1iv(GetUniformLocation(name), size, values_array);
 	}
 }
