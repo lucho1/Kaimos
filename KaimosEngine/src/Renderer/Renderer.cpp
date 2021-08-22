@@ -635,7 +635,6 @@ namespace Kaimos {
 		// -- Final Unbind + LOG --
 		s_RendererData->EnvironmentMapFBO->Unbind();
 		KS_TRACE("Successfully Changed the Environment Map");
-
 	}
 
 	void Renderer::RemoveEnvironmentMap()
@@ -939,13 +938,13 @@ namespace Kaimos {
 	{
 		s_RendererData->QuadVArray->Bind();
 		RenderCommand::DrawIndexed(s_RendererData->QuadVArray);
-		s_RendererData->QuadVArray->Unbind();
+		//s_RendererData->QuadVArray->Unbind();
 	}
 
 	void Renderer::RenderCube()
 	{
 		s_RendererData->CubeVArray->Bind();
 		RenderCommand::DrawUnindexed(s_RendererData->CubeVArray, 36);
-		s_RendererData->CubeVArray->Unbind();
+		//s_RendererData->CubeVArray->Unbind();
 	}
 }
