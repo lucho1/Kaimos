@@ -29,23 +29,15 @@ namespace Kaimos {
 	public:
 
 		// --- Uniforms Set/Upload ---
-		// Upload:	API-Specific Call (opengl -> glUniform...)
-		// Set:		high-level call/concept, it might be set inside a uniform buffer, might set it individually (not API-tied)...
-		virtual void SetUFloat(const std::string& name, float value)						override;
-		virtual void SetUFloat3(const std::string& name, const glm::vec3& value)			override;
-		virtual void SetUFloat4(const std::string& name, const glm::vec4& value)			override;
-		virtual void SetUMat4(const std::string& name, const glm::mat4& value)				override;
-		virtual void SetUInt(const std::string& name, int value)							override;
-		virtual void SetUIntArray(const std::string& name, int* values_array, uint size)	override;
-
-		void UploadUniformIntArray(const std::string& name, const int* values_array, uint size);
-		void UploadUniformInt(const std::string& name, const int& value);
-		void UploadUniformFloat(const std::string& name, const float& value);
-		void UploadUniformFloat2(const std::string& name, const glm::vec2& value);
-		void UploadUniformFloat3(const std::string& name, const glm::vec3& value);
-		void UploadUniformFloat4(const std::string& name, const glm::vec4& value);
-		void UploadUniformMat3(const std::string& name, const glm::mat3& matrix);
-		void UploadUniformMat4(const std::string& name, const glm::mat4& matrix);
+		// By now is like this, but maybe we'd like to divide in 2 functions, a API-Specific Call (opengl -> glUniform) and a
+		// high-level call/concept (where it might be set inside a uniform buffer, might set it individually not API-tied...)
+		virtual void SetUniformFloat(const std::string& name, float value)						override;
+		virtual void SetUniformFloat3(const std::string& name, const glm::vec3& value)			override;
+		virtual void SetUniformFloat2(const std::string& name, const glm::vec2& value)			override;
+		virtual void SetUniformFloat4(const std::string& name, const glm::vec4& value)			override;
+		virtual void SetUniformMat4(const std::string& name, const glm::mat4& value)			override;
+		virtual void SetUniformInt(const std::string& name, int value)							override;
+		virtual void SetUniformIntArray(const std::string& name, int* values_array, uint size)	override;
 
 	private:
 
@@ -54,11 +46,13 @@ namespace Kaimos {
 		const std::unordered_map<GLenum, std::string> PreProcessShader(std::string& source);
 		
 		void CompileShader(const std::unordered_map<GLenum, std::string>&shader_sources);
+		int GetUniformLocation(const std::string& name);
 
 	private:
 
 		uint m_ShaderID = 0;
 		std::string m_Name = "Unnamed Shader";
+		std::unordered_map<std::string, int> m_UniformCache;
 	};
 }
 
