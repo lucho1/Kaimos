@@ -4,7 +4,6 @@
 #include "Kaimos.h"
 #include "Renderer/MaterialEditor/MaterialGraph.h"
 
-
 namespace Kaimos {
 
 	class MaterialEditorPanel
@@ -46,8 +45,10 @@ namespace Kaimos {
 		// --- Private Variables ---
 		MaterialEditor::MaterialGraph* m_CurrentGraph = nullptr;
 		Ref<Scene> m_SceneContext = nullptr;
-
-		bool m_SetFocus = false;
+		
+		bool m_EditorHovered = false;
+		bool m_Resize = false;
+		bool m_Maximized = false;
 	};
 }
 
