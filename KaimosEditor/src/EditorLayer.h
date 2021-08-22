@@ -7,7 +7,6 @@
 #include "Panels/ProjectPanel.h"
 #include "Panels/ToolbarPanel.h"
 #include "Panels/MaterialEditorPanel.h"
-#include "Renderer/Cameras/CameraController.h"
 
 namespace Kaimos {
 
@@ -52,7 +51,6 @@ namespace Kaimos {
 
 		// TODO: TEMP
 		// Scene
-		CameraController m_EditorCamera;
 		Ref<Scene> m_CurrentScene = nullptr;
 
 		SettingsPanel m_SettingsPanel = {};

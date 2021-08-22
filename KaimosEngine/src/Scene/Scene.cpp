@@ -19,7 +19,6 @@
 
 namespace Kaimos {
 
-	static Entity m_PrimaryCamera;
 	// entt::entity entity = registry.create();						-- To create entities in the registry
 	// registry.clear();											-- To clear the registry (remove all in it)
 
@@ -35,18 +34,22 @@ namespace Kaimos {
 	// group = registry.group<Comp1>(entt::get<Comp2>);				-- To retrieve entities with 2 given components.
 	//																-- If "group" is iterated, we could code "auto&[c1, c2] = group.get<Comp1, Comp2>(ent)" (c1, c2 being variables)
 
-
+	// ----------------------- Static Variables -----------------------------------------------------------
+	static Entity s_PrimaryCamera;
+	static CameraController s_EditorCamera;
+	static Ref<Scene> s_CurrentScene = nullptr;
+	static bool s_RenderingEditor = true;
 
 	// ----------------------- Public Class Methods -------------------------------------------------------
 	Scene::Scene()
 	{
-		m_PrimaryCamera = {};
+		s_PrimaryCamera = {};
 		Renderer::SetSceneColor(glm::vec3(1.0f));
 	}
 
 	Scene::Scene(const std::string& name) : m_Name(name)
 	{
-		m_PrimaryCamera = {};
+		s_PrimaryCamera = {};
 		Renderer::SetSceneColor(glm::vec3(1.0f));
 	}
 	
@@ -132,17 +135,18 @@ namespace Kaimos {
 
 
 	// ----------------------- Public Scene Methods -------------------------------------------------------
-	void Scene::OnUpdateEditor(Timestep dt, const Camera& camera, const glm::vec3& camera_pos)
+	void Scene::OnUpdateEditor(Timestep dt)
 	{
 		KS_PROFILE_FUNCTION();
+		s_RenderingEditor = true;
 
 		// -- Render Meshes --
-		BeginScene(camera, camera_pos, true);
+		BeginScene(s_EditorCamera.GetCamera(), s_EditorCamera.GetPosition(), true);
 		RenderMeshes(dt);
 		Renderer3D::EndScene();
 
 		// -- Render Sprites --
-		BeginScene(camera, camera_pos, false);
+		BeginScene(s_EditorCamera.GetCamera(), s_EditorCamera.GetPosition(), false);
 		RenderSprites(dt);
 		Renderer2D::EndScene();
 	}
@@ -167,13 +171,15 @@ namespace Kaimos {
 
 		// -- Render --
 		static bool primary_camera_warn = false;
-		if (m_PrimaryCamera)
+		if (s_PrimaryCamera)
 		{
-			BeginScene(m_PrimaryCamera.GetComponent<CameraComponent>(), m_PrimaryCamera.GetComponent<TransformComponent>(), true);
+			s_RenderingEditor = false;
+
+			BeginScene(s_PrimaryCamera.GetComponent<CameraComponent>(), s_PrimaryCamera.GetComponent<TransformComponent>(), true);
 			RenderMeshes(dt);
 			Renderer3D::EndScene();
 
-			BeginScene(m_PrimaryCamera.GetComponent<CameraComponent>(), m_PrimaryCamera.GetComponent<TransformComponent>(), false);
+			BeginScene(s_PrimaryCamera.GetComponent<CameraComponent>(), s_PrimaryCamera.GetComponent<TransformComponent>(), false);
 			RenderSprites(dt);
 			Renderer2D::EndScene();
 			primary_camera_warn = false;
@@ -188,10 +194,14 @@ namespace Kaimos {
 
 	void Scene::RenderFromCamera(Timestep dt, const Entity& camera_entity)
 	{
+		KS_PROFILE_FUNCTION();
+
 		// -- Render --
 		if (camera_entity && camera_entity.HasComponent<CameraComponent>())
 		{
-			BeginScene(m_PrimaryCamera.GetComponent<CameraComponent>(), m_PrimaryCamera.GetComponent<TransformComponent>(), true);
+			s_RenderingEditor = false;
+
+			BeginScene(s_PrimaryCamera.GetComponent<CameraComponent>(), s_PrimaryCamera.GetComponent<TransformComponent>(), true);
 			RenderMeshes(dt);
 			Renderer3D::EndScene();
 
@@ -286,8 +296,8 @@ namespace Kaimos {
 	// ----------------------- Getters/Setters -----------------------------------------------------------
 	Entity Scene::GetPrimaryCamera()
 	{
-		if(m_PrimaryCamera && m_PrimaryCamera.GetComponent<TransformComponent>().EntityActive)
-			return m_PrimaryCamera;
+		if(s_PrimaryCamera && s_PrimaryCamera.GetComponent<TransformComponent>().EntityActive)
+			return s_PrimaryCamera;
 
 		return {};
 	}
@@ -297,24 +307,68 @@ namespace Kaimos {
 		if (!new_camera_entity || !new_camera_entity.HasComponent<CameraComponent>())
 			return;
 
-		if (m_PrimaryCamera && new_camera_entity == m_PrimaryCamera)
+		if (s_PrimaryCamera && new_camera_entity == s_PrimaryCamera)
 			return;
 
-		if (m_PrimaryCamera)
-			m_PrimaryCamera.GetComponent<CameraComponent>().Primary = false;
+		if (s_PrimaryCamera)
+			s_PrimaryCamera.GetComponent<CameraComponent>().Primary = false;
 
 		new_camera_entity.GetComponent<CameraComponent>().Primary = true;
-		m_PrimaryCamera = new_camera_entity;
+		s_PrimaryCamera = new_camera_entity;
 	}
 
 	void Scene::UnsetPrimaryCamera()
 	{
-		if (m_PrimaryCamera)
-			m_PrimaryCamera.GetComponent<CameraComponent>().Primary = false;
+		if (s_PrimaryCamera)
+			s_PrimaryCamera.GetComponent<CameraComponent>().Primary = false;
 
-		m_PrimaryCamera = {};
+		s_PrimaryCamera = {};
 	}
 
+	void Scene::SetGlobalCurrentScene(Ref<Scene> scene)
+	{
+		s_CurrentScene = scene;
+	}
+
+	CameraController& Scene::GetEditorCamera()
+	{
+		return s_EditorCamera;
+	}
+
+	float Scene::GetCameraFOV()
+	{
+		if (!s_RenderingEditor && GetPrimaryCamera())
+			return s_PrimaryCamera.GetComponent<CameraComponent>().Camera.GetFOV();
+
+		return s_EditorCamera.GetCamera().GetFOV();
+	}
+
+	float Scene::GetCameraAR()
+	{
+		if (!s_RenderingEditor && GetPrimaryCamera())
+			return s_PrimaryCamera.GetComponent<CameraComponent>().Camera.GetAspectRato();
+
+		return s_EditorCamera.GetCamera().GetAspectRato();
+	}
+
+	float Scene::GetCameraOrthoSize()
+	{
+		if (!s_RenderingEditor && GetPrimaryCamera())
+			return s_PrimaryCamera.GetComponent<CameraComponent>().Camera.GetSize();
+
+		return s_EditorCamera.GetCamera().GetSize();
+	}
+
+	glm::vec2 Scene::GetCameraPlanes()
+	{
+		Camera cam;
+		if (!s_RenderingEditor && GetPrimaryCamera())
+			cam = s_PrimaryCamera.GetComponent<CameraComponent>().Camera;
+		else
+			cam = s_EditorCamera.GetCamera();
+
+		return { cam.GetNearPlane(), cam.GetFarPlane() };
+	}
 	
 
 	// ----------------------- Private Scene Entities Methods --------------------------------------------

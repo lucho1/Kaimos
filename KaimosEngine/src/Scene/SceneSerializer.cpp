@@ -148,18 +148,18 @@ namespace Kaimos {
 
 
 	// ----------------------- Public Serialization Methods ----------------------------------------------
-	void SceneSerializer::Serialize(const std::string& filepath, const CameraController& scene_cam) const
+	void SceneSerializer::Serialize(const std::string& filepath) const
 	{
 		KS_PROFILE_FUNCTION();
 		KS_INFO("\n\n--- SERIALIZING KAIMOS SCENE ---");
 		
 		YAML::Emitter output;
 		output << YAML::BeginMap;
-		output << YAML::Key << "KaimosScene" << YAML::Value << m_Scene->GetName().c_str();			// Save Scene as Key + SceneName as value
-		output << YAML::Key << "SceneColor" << YAML::Value << Renderer::GetSceneColor();			// Save Scene Color
-		output << YAML::Key << "CameraPos" << YAML::Value << scene_cam.GetPosition();				// Save Scene Camera Position
-		output << YAML::Key << "CameraRot" << YAML::Value << scene_cam.GetOrientationAngles();		// Save Scene Camera Orientation
-		output << YAML::Key << "Entities" << YAML::Value << YAML::BeginSeq;							// Save Entities as a sequence (like an array)
+		output << YAML::Key << "KaimosScene" << YAML::Value << m_Scene->GetName().c_str();						// Save Scene as Key + SceneName as value
+		output << YAML::Key << "SceneColor" << YAML::Value << Renderer::GetSceneColor();						// Save Scene Color
+		output << YAML::Key << "CameraPos" << YAML::Value << m_Scene->GetEditorCamera().GetPosition();			// Save Scene Camera Position
+		output << YAML::Key << "CameraRot" << YAML::Value << m_Scene->GetEditorCamera().GetOrientationAngles();	// Save Scene Camera Orientation
+		output << YAML::Key << "Entities" << YAML::Value << YAML::BeginSeq;										// Save Entities as a sequence (like an array)
 
 		m_Scene->m_Registry.each([&](auto entityID)
 			{
@@ -181,7 +181,7 @@ namespace Kaimos {
 
 
 	// ----------------------- Public Deserialization Methods --------------------------------------------
-	bool SceneSerializer::Deserialize(const std::string& filepath, CameraController& scene_cam) const
+	bool SceneSerializer::Deserialize(const std::string& filepath) const
 	{
 		KS_PROFILE_FUNCTION();
 		KS_INFO("\n\n--- DESERIALIZING KAIMOS SCENE ---");
@@ -211,10 +211,10 @@ namespace Kaimos {
 			Renderer::SetSceneColor(data["SceneColor"].as<glm::vec3>());
 
 		if (data["CameraPos"])
-			scene_cam.SetPosition(data["CameraPos"].as<glm::vec3>());
+			m_Scene->GetEditorCamera().SetPosition(data["CameraPos"].as<glm::vec3>());
 		
 		if (data["CameraRot"])
-			scene_cam.SetOrientation(data["CameraRot"].as<glm::vec2>());
+			m_Scene->GetEditorCamera().SetOrientation(data["CameraRot"].as<glm::vec2>());
 
 		// -- Entities Load --
 		uint entities_deserialized = 0;
