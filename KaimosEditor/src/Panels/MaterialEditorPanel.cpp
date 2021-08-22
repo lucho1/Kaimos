@@ -175,6 +175,26 @@ namespace Kaimos {
 			ImGui::Separator();
 			if (ImGui::BeginMenu("Maths"))
 			{
+				if (ImGui::BeginMenu("Random"))
+				{
+					if (ImGui::MenuItem("INT"))
+						m_CurrentGraph->CreateNode(MaterialEditor::ConstantNodeType::INT_RANDOM, popup_pos);
+
+					if (ImGui::MenuItem("FLOAT"))
+						m_CurrentGraph->CreateNode(MaterialEditor::ConstantNodeType::FLOAT_RANDOM, popup_pos);
+
+					if (ImGui::MenuItem("VEC2"))
+						m_CurrentGraph->CreateNode(MaterialEditor::ConstantNodeType::VEC2_RANDOM, popup_pos);
+
+					if (ImGui::MenuItem("VEC3"))
+						m_CurrentGraph->CreateNode(MaterialEditor::ConstantNodeType::VEC3_RANDOM, popup_pos);
+
+					if (ImGui::MenuItem("VEC4"))
+						m_CurrentGraph->CreateNode(MaterialEditor::ConstantNodeType::VEC4_RANDOM, popup_pos);
+
+					ImGui::EndMenu();
+				}
+
 				if (ImGui::BeginMenu("Sum"))
 				{
 					if (ImGui::MenuItem("Float + Float"))

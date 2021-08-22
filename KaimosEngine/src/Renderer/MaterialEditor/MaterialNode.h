@@ -177,7 +177,8 @@ namespace Kaimos::MaterialEditor {
 
 
 	// ---- Constant Node ----
-	enum class ConstantNodeType { NONE, DELTATIME, PI, INT, FLOAT, VEC2, VEC3, VEC4, SCREEN_RES, SCENE_COLOR, CAMERA_FOV, CAMERA_AR, CAMERA_PLANES, CAMERA_ORTHOSIZE };
+	enum class ConstantNodeType { NONE, DELTATIME, PI, INT, FLOAT, VEC2, VEC3, VEC4, SCREEN_RES, SCENE_COLOR, CAMERA_FOV, CAMERA_AR, CAMERA_PLANES, CAMERA_ORTHOSIZE,
+									INT_RANDOM, FLOAT_RANDOM, VEC2_RANDOM, VEC3_RANDOM, VEC4_RANDOM };
 
 	class ConstantMaterialNode : public MaterialNode
 	{
