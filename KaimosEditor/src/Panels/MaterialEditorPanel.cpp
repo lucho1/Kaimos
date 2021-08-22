@@ -135,6 +135,23 @@ namespace Kaimos {
 				ImGui::EndMenu();
 			}
 
+			if (ImGui::BeginMenu("Camera"))
+			{
+				if (ImGui::MenuItem("FOV"))
+					m_CurrentGraph->CreateNode(MaterialEditor::ConstantNodeType::CAMERA_FOV, popup_pos);
+
+				if (ImGui::MenuItem("Aspect Ratio"))
+					m_CurrentGraph->CreateNode(MaterialEditor::ConstantNodeType::CAMERA_AR, popup_pos);
+
+				if (ImGui::MenuItem("Clip Planes"))
+					m_CurrentGraph->CreateNode(MaterialEditor::ConstantNodeType::CAMERA_PLANES, popup_pos);
+
+				if (ImGui::MenuItem("Ortho Size"))
+					m_CurrentGraph->CreateNode(MaterialEditor::ConstantNodeType::CAMERA_ORTHOSIZE, popup_pos);
+
+				ImGui::EndMenu();
+			}
+
 			if (ImGui::BeginMenu("Variables"))
 			{
 				if (ImGui::MenuItem("INT"))

@@ -5,6 +5,7 @@
 #include "Core/Application/Application.h"
 #include "Scene/ECS/Components.h"
 #include "Scene/KaimosYAMLExtension.h"
+#include "Scene/Scene.h"
 
 #include "Imgui/ImGuiUtils.h"
 #include "Core/Utils/PlatformUtils.h"
@@ -585,6 +586,12 @@ namespace Kaimos::MaterialEditor {
 				AddOutputPin(PinDataType::FLOAT, "AR (float)", 0.0f);
 				break;
 			}
+			case ConstantNodeType::CAMERA_PLANES:
+			{
+				m_Name = "CamPlanes";
+				AddOutputPin(PinDataType::VEC2, "Cam Planes (Vec2)", 0.0f);
+				break;
+			}
 			case ConstantNodeType::CAMERA_ORTHOSIZE:
 			{
 				m_Name = "CamOrthoSize";
@@ -646,17 +653,23 @@ namespace Kaimos::MaterialEditor {
 
 			case ConstantNodeType::CAMERA_FOV:
 			{
-				//ret.x = Application::Get().GetTime();
+				ret.x = Scene::GetCameraFOV();
 				break;
 			}
 			case ConstantNodeType::CAMERA_AR:
 			{
-				//ret.x = Application::Get().GetTime();
+				ret.x = Scene::GetCameraAR();
+				break;
+			}
+			case ConstantNodeType::CAMERA_PLANES:
+			{
+				glm::vec2 planes = Scene::GetCameraPlanes();
+				ret = glm::vec4(planes, 0.0f, 0.0f);
 				break;
 			}
 			case ConstantNodeType::CAMERA_ORTHOSIZE:
 			{
-				//ret.x = Application::Get().GetTime();
+				ret.x = Scene::GetCameraOrthoSize();
 				break;
 			}
 			default:
