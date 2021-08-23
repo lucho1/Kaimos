@@ -56,6 +56,7 @@ namespace Kaimos::MaterialEditor {
 
 	void NodeOutputPin::DrawUI()
 	{
+		ImGui::PushID(m_ID);
 		ImNodes::BeginOutputAttribute(m_ID);
 
 		float indent = ImNodes::GetNodeDimensions(m_OwnerNode->GetID()).x / 1.8f;
@@ -72,6 +73,8 @@ namespace Kaimos::MaterialEditor {
 			glm::vec4 node_value = m_OwnerNode->CalculateNodeResult();
 			SetValue(node_value);
 		}
+
+		ImGui::PopID();
 	}
 
 
