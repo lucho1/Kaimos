@@ -4,6 +4,8 @@
 #include "Kaimos.h"
 #include "Renderer/MaterialEditor/MaterialGraph.h"
 
+struct ImVec2;
+
 namespace Kaimos {
 
 	class MaterialEditorPanel
@@ -32,8 +34,15 @@ namespace Kaimos {
 
 	private:
 
-		// --- Private Material Editor Panel Methods ---
+		// --- Private Editor Panel UI Methods ---
 		void DeleteSelection(int selected_links, int selected_nodes);
+		uint PushImGuiStyleVars();
+		void DrawRightClickPopup(ImVec2 popup_pos);
+
+		void DrawSameTypesOperationNodesMenu(MaterialEditor::OperationNodeType op_node_type, const std::string& operator_str, ImVec2 popup_pos);
+		void DrawFloatVecOperationNodesMenu(MaterialEditor::OperationNodeType op_node_type, const std::string& operator_str, ImVec2 popup_pos);
+		void DrawSingleTypeOperationNodesMenu(MaterialEditor::OperationNodeType op_node_type, ImVec2 popup_pos);
+
 
 	public:
 
