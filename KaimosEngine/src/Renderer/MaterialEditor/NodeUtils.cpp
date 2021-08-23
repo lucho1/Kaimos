@@ -9,7 +9,7 @@
 
 
 namespace Kaimos::MaterialEditor::NodeUtils {
-		
+	
 	// ----------------------- Data Conversions -----------------------------------------------------------
 	template<typename T>
 	T GetDataFromType(const glm::vec4& data)
@@ -30,7 +30,47 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 		return glm::vec3(data);
 	}
 
+
 	
+
+	// ----------------------- Helpers --------------------------------------------------------------------
+	bool IsVecType(PinDataType type)
+	{
+		return (type == PinDataType::VEC2 || type == PinDataType::VEC3 || type == PinDataType::VEC4);
+	}
+
+	glm::vec2 GetNonZeroVector(glm::vec2 vec)
+	{
+		glm::vec2 ret = vec;
+		if (Maths::CompareFloats(ret.x, 0.0f)) ret.x = 0.0f;
+		if (Maths::CompareFloats(ret.y, 0.0f)) ret.y = 0.0f;
+		return ret;
+	}
+
+	glm::vec3 GetNonZeroVector(glm::vec3 vec)
+	{
+		glm::vec3 ret = vec;
+		if (Maths::CompareFloats(ret.x, 0.0f)) ret.x = 0.0f;
+		if (Maths::CompareFloats(ret.y, 0.0f)) ret.y = 0.0f;
+		if (Maths::CompareFloats(ret.z, 0.0f)) ret.z = 0.0f;
+		return ret;
+	}
+
+	glm::vec4 GetNonZeroVector(glm::vec4 vec)
+	{
+		glm::vec4 ret = vec; // We do it like this to avoid errors with ImGui Color Picker (used for Vec4)
+		if (vec.x < 0.001f)
+			ret.x = 1.0f;
+		if (vec.y < 0.001f)
+			ret.y = 1.0f;
+		if (vec.z < 0.001f)
+			ret.z = 1.0f;
+		if (vec.w < 0.001f)
+			ret.w = 1.0f;
+		return ret;
+	}
+
+
 
 
 	// ----------------------- Data Operations ------------------------------------------------------------
@@ -50,7 +90,6 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 		return {};
 	}
 
-
 	glm::vec4 SubtractValues(PinDataType values_data_type, const glm::vec4& a, const glm::vec4& b)
 	{
 		switch (values_data_type)
@@ -67,8 +106,7 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 	}
 
 
-
-	// --------- Multiply -----------
+	// ----- Multiply & Divide ------
 	glm::vec4 MultiplyValues(PinDataType values_data_type, const glm::vec4& a, const glm::vec4& b)
 	{
 		switch (values_data_type)
@@ -84,71 +122,17 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 		return {};
 	}
 
-
-	glm::vec4 ProcessFloatAndVecMultiplication(const float float_val, const glm::vec4& vec_val, PinDataType vec_data_type)
+	glm::vec4 MultiplyFloatAndVec(const glm::vec4& a, const glm::vec4& b, PinDataType a_type, PinDataType b_type)
 	{
-		switch (vec_data_type)
-		{
-			case PinDataType::VEC2:	return glm::vec4(float_val * glm::vec2(vec_val), 0.0f, 0.0f);
-			case PinDataType::VEC3:	return glm::vec4(float_val * glm::vec3(vec_val), 0.0f);
-			case PinDataType::VEC4:	return float_val * vec_val;
-		}
+		if (a_type == PinDataType::FLOAT && IsVecType(b_type))
+			return a.x * b;
 
-		KS_FATAL_ERROR("Tried to perform a non-supported float-vec multiplication operation!");
-		return {};
+		if (b_type == PinDataType::FLOAT && IsVecType(a_type))
+			return b.x * a;
+
+		return a * b;
 	}
 
-
-	glm::vec4 MultiplyFloatAndVec2(const glm::vec4& a, const glm::vec4& b, PinDataType a_data_type, PinDataType b_data_type)
-	{
-		if (a_data_type == PinDataType::FLOAT && b_data_type == PinDataType::FLOAT)
-			return MultiplyValues(PinDataType::FLOAT, a, b);
-		else if (a_data_type == PinDataType::VEC2 && b_data_type == PinDataType::VEC2)
-			return MultiplyValues(PinDataType::VEC2, a, b);
-		else if (a_data_type == PinDataType::FLOAT)
-			return ProcessFloatAndVecMultiplication(a.x, b, b_data_type);
-		else if (b_data_type == PinDataType::FLOAT)
-			return ProcessFloatAndVecMultiplication(b.x, a, a_data_type);
-
-		KS_FATAL_ERROR("Tried to perform a non-supported vec2 multiple-type multiplication operation!");
-		return {};
-	}
-
-
-	glm::vec4 MultiplyFloatAndVec3(const glm::vec4& a, const glm::vec4& b, PinDataType a_data_type, PinDataType b_data_type)
-	{
-		if (a_data_type == PinDataType::FLOAT && b_data_type == PinDataType::FLOAT)
-			return MultiplyValues(PinDataType::FLOAT, a, b);
-		else if (a_data_type == PinDataType::VEC3 && b_data_type == PinDataType::VEC3)
-			return MultiplyValues(PinDataType::VEC3, a, b);
-		else if (a_data_type == PinDataType::FLOAT)
-			return ProcessFloatAndVecMultiplication(a.x, b, b_data_type);
-		else if (b_data_type == PinDataType::FLOAT)
-			return ProcessFloatAndVecMultiplication(b.x, a, a_data_type);
-
-		KS_FATAL_ERROR("Tried to perform a non-supported vec2 multiple-type multiplication operation!");
-		return {};
-	}
-
-
-	glm::vec4 MultiplyFloatAndVec4(const glm::vec4& a, const glm::vec4& b, PinDataType a_data_type, PinDataType b_data_type)
-	{
-		if (a_data_type == PinDataType::FLOAT && b_data_type == PinDataType::FLOAT)
-			return MultiplyValues(PinDataType::FLOAT, a, b);
-		else if (a_data_type == PinDataType::VEC4 && b_data_type == PinDataType::VEC4)
-			return MultiplyValues(PinDataType::VEC4, a, b);
-		else if (a_data_type == PinDataType::FLOAT)
-			return ProcessFloatAndVecMultiplication(a.x, b, b_data_type);
-		else if (b_data_type == PinDataType::FLOAT)
-			return ProcessFloatAndVecMultiplication(b.x, a, a_data_type);
-
-		KS_FATAL_ERROR("Tried to perform a non-supported vec2 multiple-type multiplication operation!");
-		return {};
-	}
-
-
-
-	// ----------- Divide -----------
 	glm::vec4 DivideValues(PinDataType values_data_type, const glm::vec4& a, const glm::vec4& b)
 	{
 		switch (values_data_type)
@@ -160,114 +144,31 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 					return glm::vec4(a.x / b.x, 0.0f, 0.0f, 0.0f);
 				return a;
 			}
-			case PinDataType::VEC2:
-			{
-				glm::vec2 div = glm::vec2(b);
-				if (Maths::CompareFloats(b.x, 0.0f))
-					div.x = 1.0f;
-				if (Maths::CompareFloats(b.y, 0.0f))
-					div.y = 1.0f;
-
-				return glm::vec4(glm::vec2(a) / div, 0.0f, 0.0f);
-			}
-			case PinDataType::VEC3:
-			{
-				glm::vec3 div = glm::vec3(b);
-				if (Maths::CompareFloats(b.x, 0.0f))
-					div.x = 1.0f;
-				if (Maths::CompareFloats(b.y, 0.0f))
-					div.y = 1.0f;
-				if (Maths::CompareFloats(b.z, 0.0f))
-					div.z = 1.0f;
-
-				return glm::vec4(glm::vec3(a) / div, 0.0f);
-			}
-			case PinDataType::VEC4:
-			{
-				glm::vec4 div = b;
-				if (b.x < 0.001f)
-					div.x = 1.0f;
-				if (b.y < 0.001f)
-					div.y = 1.0f;
-				if (b.z < 0.001f)
-					div.z = 1.0f;
-				if (b.w < 0.001f)
-					div.w = 1.0f;
-
-				return a / div;
-			}
+			case PinDataType::VEC2:	return glm::vec4(glm::vec2(a) / GetNonZeroVector(glm::vec2(b)), 0.0f, 0.0f);
+			case PinDataType::VEC3:	return glm::vec4(glm::vec3(a) / GetNonZeroVector(glm::vec3(b)), 0.0f);
+			case PinDataType::VEC4:	return a / GetNonZeroVector(b);
 		}
 
 		KS_FATAL_ERROR("Tried to perform a non-supported divide operation!");
 		return {};
 	}
 
-
-	glm::vec4 ProcessFloatAndVecDivision(const float float_val, const glm::vec4& vec_val, PinDataType vec_data_type)
+	glm::vec4 DivideFloatAndVec(const glm::vec4& a, const glm::vec4& b, PinDataType a_type, PinDataType b_type)
 	{
-		float div = float_val;
-		if (Maths::CompareFloats(div, 0.0f))
-			div = 1.0f;
+		// In this case, division is always a/b, no b/a (like multiplication)
+		if (a_type == PinDataType::FLOAT && IsVecType(b_type))
+			return a.x / GetNonZeroVector(b);
 
-		switch (vec_data_type)
+		if (b_type == PinDataType::FLOAT && IsVecType(a_type))
 		{
-			case PinDataType::VEC2:	return glm::vec4(glm::vec2(vec_val)/div, 0.0f, 0.0f);
-			case PinDataType::VEC3:	return glm::vec4(glm::vec3(vec_val)/div, 0.0f);
-			case PinDataType::VEC4:	return vec_val/div;
+			if (Maths::CompareFloats(b.x, 0.0f))
+				return glm::vec4(0.0f);
+			else
+				return a/b.x;
 		}
 
-		KS_FATAL_ERROR("Tried to perform a non-supported float-vec division operation!");
-		return {};
+		return a / GetNonZeroVector(b);
 	}
-
-
-	glm::vec4 DivideFloatAndVec2(const glm::vec4& a, const glm::vec4& b, PinDataType a_data_type, PinDataType b_data_type)
-	{
-		if (a_data_type == PinDataType::FLOAT && b_data_type == PinDataType::FLOAT)
-			return DivideValues(PinDataType::FLOAT, a, b);
-		else if (a_data_type == PinDataType::VEC2 && b_data_type == PinDataType::VEC2)
-			return DivideValues(PinDataType::VEC2, a, b);
-		else if (a_data_type == PinDataType::FLOAT)
-			return ProcessFloatAndVecDivision(a.x, b, b_data_type);
-		else if (b_data_type == PinDataType::FLOAT)
-			return ProcessFloatAndVecDivision(b.x, a, a_data_type);
-
-		KS_FATAL_ERROR("Tried to perform a non-supported vec2 multiple-type division operation!");
-		return {};
-	}
-
-
-	glm::vec4 DivideFloatAndVec3(const glm::vec4& a, const glm::vec4& b, PinDataType a_data_type, PinDataType b_data_type)
-	{
-		if (a_data_type == PinDataType::FLOAT && b_data_type == PinDataType::FLOAT)
-			return DivideValues(PinDataType::FLOAT, a, b);
-		else if (a_data_type == PinDataType::VEC3 && b_data_type == PinDataType::VEC3)
-			return DivideValues(PinDataType::VEC3, a, b);
-		else if (a_data_type == PinDataType::FLOAT)
-			return ProcessFloatAndVecDivision(a.x, b, b_data_type);
-		else if (b_data_type == PinDataType::FLOAT)
-			return ProcessFloatAndVecDivision(b.x, a, a_data_type);
-
-		KS_FATAL_ERROR("Tried to perform a non-supported vec2 multiple-type division operation!");
-		return {};
-	}
-
-
-	glm::vec4 DivideFloatAndVec4(const glm::vec4& a, const glm::vec4& b, PinDataType a_data_type, PinDataType b_data_type)
-	{
-		if (a_data_type == PinDataType::FLOAT && b_data_type == PinDataType::FLOAT)
-			return DivideValues(PinDataType::FLOAT, a, b);
-		else if (a_data_type == PinDataType::VEC4 && b_data_type == PinDataType::VEC4)
-			return DivideValues(PinDataType::VEC4, a, b);
-		else if (a_data_type == PinDataType::FLOAT)
-			return ProcessFloatAndVecDivision(a.x, b, b_data_type);
-		else if (b_data_type == PinDataType::FLOAT)
-			return ProcessFloatAndVecDivision(b.x, a, a_data_type);
-
-		KS_FATAL_ERROR("Tried to perform a non-supported vec2 multiple-type division operation!");
-		return {};
-	}
-
 
 
 	// ----------- Powers -----------

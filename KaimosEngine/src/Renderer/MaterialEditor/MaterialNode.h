@@ -33,8 +33,7 @@ namespace Kaimos::MaterialEditor {
 	enum class OperationNodeType
 	{
 		NONE, ADDITION, SUBTRACTION, DIVISION, MULTIPLICATION,				// Basic Operations (with same types)
-		FLOATVEC2_MULTIPLY, FLOATVEC3_MULTIPLY, FLOATVEC4_MULTIPLY,			// Different-Types Multiplication
-		FLOATVEC2_DIVIDE, FLOATVEC3_DIVIDE, FLOATVEC4_DIVIDE,				// Different-Types Division
+		FLOATVEC_MULTIPLY, FLOATVEC_DIVIDE,									// Different-Types Operations
 		POWER, SQUARE_ROOT, INVERSE_SQUARE_ROOT								// Powers
 	};
 
@@ -224,10 +223,11 @@ namespace Kaimos::MaterialEditor {
 	public:
 
 		OperationMaterialNode(OperationNodeType operation_type, PinDataType operation_data_type);
-		OperationMaterialNode(const std::string& name, OperationNodeType operation_type, uint id)
-			: MaterialNode(name, MaterialNodeType::OPERATION, id), m_OperationType(operation_type) {}
+		OperationMaterialNode(const std::string& name, OperationNodeType operation_type, PinDataType vec_operation_type, uint id)
+			: MaterialNode(name, MaterialNodeType::OPERATION, id), m_OperationType(operation_type), m_VecOperationType(vec_operation_type) {}
 
 		OperationNodeType GetOperationType() const { return m_OperationType; }
+		PinDataType GetVecOperationType() const { return m_VecOperationType; }
 
 	private:
 
@@ -237,6 +237,7 @@ namespace Kaimos::MaterialEditor {
 		glm::vec4 ProcessOperation(const glm::vec4& a, const glm::vec4& b, PinDataType a_data_type, PinDataType b_data_type) const;
 
 		OperationNodeType m_OperationType = OperationNodeType::NONE;
+		PinDataType m_VecOperationType = PinDataType::FLOAT;
 	};
 }
 

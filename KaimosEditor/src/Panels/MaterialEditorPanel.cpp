@@ -278,13 +278,13 @@ namespace Kaimos {
 				if (ImGui::BeginMenu("Float x Vec"))
 				{
 					if (ImGui::MenuItem("Float * Vec2"))
-						m_CurrentGraph->CreateNode(MaterialEditor::OperationNodeType::FLOATVEC2_MULTIPLY, MaterialEditor::PinDataType::FLOAT, popup_pos);
+						m_CurrentGraph->CreateNode(MaterialEditor::OperationNodeType::FLOATVEC_MULTIPLY, MaterialEditor::PinDataType::VEC2, popup_pos);
 
 					if (ImGui::MenuItem("Float * Vec3"))
-						m_CurrentGraph->CreateNode(MaterialEditor::OperationNodeType::FLOATVEC3_MULTIPLY, MaterialEditor::PinDataType::FLOAT, popup_pos);
+						m_CurrentGraph->CreateNode(MaterialEditor::OperationNodeType::FLOATVEC_MULTIPLY, MaterialEditor::PinDataType::VEC3, popup_pos);
 
 					if (ImGui::MenuItem("Float * Vec4"))
-						m_CurrentGraph->CreateNode(MaterialEditor::OperationNodeType::FLOATVEC4_MULTIPLY, MaterialEditor::PinDataType::FLOAT, popup_pos);
+						m_CurrentGraph->CreateNode(MaterialEditor::OperationNodeType::FLOATVEC_MULTIPLY, MaterialEditor::PinDataType::VEC4, popup_pos);
 
 					ImGui::EndMenu();
 				}
@@ -292,13 +292,13 @@ namespace Kaimos {
 				if (ImGui::BeginMenu("Vec / Float"))
 				{
 					if (ImGui::MenuItem("Vec2 / Float"))
-						m_CurrentGraph->CreateNode(MaterialEditor::OperationNodeType::FLOATVEC2_DIVIDE, MaterialEditor::PinDataType::FLOAT, popup_pos);
+						m_CurrentGraph->CreateNode(MaterialEditor::OperationNodeType::FLOATVEC_DIVIDE, MaterialEditor::PinDataType::VEC2, popup_pos);
 
 					if (ImGui::MenuItem("Vec3 / Float"))
-						m_CurrentGraph->CreateNode(MaterialEditor::OperationNodeType::FLOATVEC3_DIVIDE, MaterialEditor::PinDataType::FLOAT, popup_pos);
+						m_CurrentGraph->CreateNode(MaterialEditor::OperationNodeType::FLOATVEC_DIVIDE, MaterialEditor::PinDataType::VEC3, popup_pos);
 
 					if (ImGui::MenuItem("Vec4 / Float"))
-						m_CurrentGraph->CreateNode(MaterialEditor::OperationNodeType::FLOATVEC4_DIVIDE, MaterialEditor::PinDataType::FLOAT, popup_pos);
+						m_CurrentGraph->CreateNode(MaterialEditor::OperationNodeType::FLOATVEC_DIVIDE, MaterialEditor::PinDataType::VEC4, popup_pos);
 
 					ImGui::EndMenu();
 				}

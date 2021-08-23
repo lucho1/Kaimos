@@ -225,10 +225,14 @@ namespace Kaimos::MaterialEditor {
 					case MaterialEditor::MaterialNodeType::OPERATION:
 					{
 						auto spectype_node = node_val["OpNodeType"];
+						auto vectype_node = node_val["VecOpType"];
+
 						if (spectype_node)
 						{
 							MaterialEditor::OperationNodeType op_type = (MaterialEditor::OperationNodeType)spectype_node.as<int>();
-							node = static_cast<MaterialNode*>(new OperationMaterialNode(node_name, op_type, node_id));
+							MaterialEditor::PinDataType vec_type = (MaterialEditor::PinDataType)vectype_node.as<int>();
+
+							node = static_cast<MaterialNode*>(new OperationMaterialNode(node_name, op_type, vec_type, node_id));
 							break;
 						}
 					}

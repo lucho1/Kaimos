@@ -11,26 +11,22 @@ namespace Kaimos::MaterialEditor {
 		template<typename T>
 		T GetDataFromType(const glm::vec4& data);
 
+		// --- Helpers ---
+		bool IsVecType(PinDataType type);
+		glm::vec2 GetNonZeroVector(glm::vec2 vec);
+		glm::vec3 GetNonZeroVector(glm::vec3 vec);
+		glm::vec4 GetNonZeroVector(glm::vec4 vec);
+
 		// --- Data Operations ---
 		// - Basics -
 		glm::vec4 SumValues(PinDataType values_data_type, const glm::vec4& a, const glm::vec4& b);
 		glm::vec4 SubtractValues(PinDataType values_data_type, const glm::vec4& a, const glm::vec4& b);
 
-		// - Multiply -
+		// - Multiply & Divide -
 		glm::vec4 MultiplyValues(PinDataType values_data_type, const glm::vec4& a, const glm::vec4& b);
-		glm::vec4 MultiplyFloatAndVec2(const glm::vec4& a, const glm::vec4& b, PinDataType a_data_type, PinDataType b_data_type);
-		glm::vec4 MultiplyFloatAndVec3(const glm::vec4& a, const glm::vec4& b, PinDataType a_data_type, PinDataType b_data_type);
-		glm::vec4 MultiplyFloatAndVec4(const glm::vec4& a, const glm::vec4& b, PinDataType a_data_type, PinDataType b_data_type);
-
-		glm::vec4 ProcessFloatAndVecMultiplication(const float float_val, const glm::vec4& vec_val, PinDataType vec_data_type);
-
-		// - Divide -
+		glm::vec4 MultiplyFloatAndVec(const glm::vec4& a, const glm::vec4& b, PinDataType a_type, PinDataType b_type);
 		glm::vec4 DivideValues(PinDataType values_data_type, const glm::vec4& a, const glm::vec4& b);
-		glm::vec4 DivideFloatAndVec2(const glm::vec4& a, const glm::vec4& b, PinDataType a_data_type, PinDataType b_data_type);
-		glm::vec4 DivideFloatAndVec3(const glm::vec4& a, const glm::vec4& b, PinDataType a_data_type, PinDataType b_data_type);
-		glm::vec4 DivideFloatAndVec4(const glm::vec4& a, const glm::vec4& b, PinDataType a_data_type, PinDataType b_data_type);
-
-		glm::vec4 ProcessFloatAndVecDivision(const float float_val, const glm::vec4& vec_val, PinDataType vec_data_type);
+		glm::vec4 DivideFloatAndVec(const glm::vec4& a, const glm::vec4& b, PinDataType a_type, PinDataType b_type);
 
 		// - Powers -
 		glm::vec4 PowerValues(PinDataType values_data_type, const glm::vec4& a, const glm::vec4& b);

@@ -96,8 +96,9 @@ namespace Kaimos::MaterialEditor {
 
 	void NodeOutputPin::SetOutputDataType(PinDataType datatype_to_set)
 	{
+		// This function is meant to check if there are still nodes of the passed type
+		// Check for inputs of the type passed
 		bool input_found = false;
-
 		for (uint i = 0; i < m_OwnerNode->GetInputsQuantity(); ++i)
 		{
 			if (m_OwnerNode->GetInputPin(i)->GetType() == datatype_to_set)
@@ -107,26 +108,24 @@ namespace Kaimos::MaterialEditor {
 			}
 		}
 
-		bool type_changed = false;
 		if (input_found)
 		{
+			// If there are inputs & pin type is float, change to passed type if needed
 			if (m_PinDataType == PinDataType::FLOAT)
 			{
-				type_changed = true;
 				m_PinDataType = datatype_to_set;
+				DisconnectAllInputPins();
 			}
 		}
 		else
 		{
+			// If no inputs left of that type & pin type is the same as passed, change to float
 			if (m_PinDataType == datatype_to_set)
 			{
-				type_changed = true;
 				m_PinDataType = PinDataType::FLOAT;
+				DisconnectAllInputPins();
 			}
 		}
-
-		if (type_changed)
-			DisconnectAllInputPins();
 	}
 
 
@@ -215,6 +214,7 @@ namespace Kaimos::MaterialEditor {
 
 	void NodeInputPin::DrawUI(bool& allow_node_drag, bool is_vtxattribute, bool modify_value, glm::vec4& value_to_modify, float widget_speed, float widget_min, float widget_max, const char* widget_format)
 	{
+		ImGui::PushID(m_ID);
 		ImNodes::BeginInputAttribute(m_ID);
 		ImGui::Text(m_Name.c_str());
 		ImNodes::EndInputAttribute();
@@ -226,7 +226,7 @@ namespace Kaimos::MaterialEditor {
 			SetValue(m_OutputLinked->m_Value); // TODO: Don't calculate this each frame
 		else if(!is_vtxattribute)
 		{
-			ImGui::PushID(m_ID);
+			//ImGui::PushID(m_ID);
 
 			NodeUtils::DrawPinWidget(m_PinDataType, m_Value, widget_speed, widget_min, widget_max, widget_format);
 			SetDefaultValue(m_Value);
@@ -234,8 +234,10 @@ namespace Kaimos::MaterialEditor {
 			if (ImGui::IsItemHovered() || ImGui::IsItemFocused() || ImGui::IsItemActive() || ImGui::IsItemEdited() || ImGui::IsItemClicked())
 				allow_node_drag = false;
 
-			ImGui::PopID();
+			//ImGui::PopID();
 		}
+
+		ImGui::PopID();
 	}
 
 
@@ -246,53 +248,32 @@ namespace Kaimos::MaterialEditor {
 		if (!output_pin || output_pin->IsInput())
 			return false;
 
-		PinDataType output_type = output_pin->GetType();
+		PinDataType other_pintype = output_pin->GetType();
 		if (m_OwnerNode->GetType() == MaterialNodeType::OPERATION)
 		{
+			// If we are in operation node
 			bool ret = false;
-			OperationNodeType op_type = (static_cast<OperationMaterialNode*>(m_OwnerNode))->GetOperationType();
-			PinDataType datatype_to_check = PinDataType::VEC2;
-			OperationNodeType optype_to_check = OperationNodeType::FLOATVEC2_MULTIPLY;
+			PinDataType op_pintype = (static_cast<OperationMaterialNode*>(m_OwnerNode))->GetVecOperationType();
 
-			switch (op_type)
+			// Check for data type to be float or operation type
+			if(m_PinDataType == PinDataType::FLOAT || m_PinDataType == op_pintype)
 			{
-				case OperationNodeType::FLOATVEC3_MULTIPLY:
-					datatype_to_check = PinDataType::VEC3;
-					optype_to_check = OperationNodeType::FLOATVEC3_MULTIPLY;
-					break;
-				case OperationNodeType::FLOATVEC4_MULTIPLY:
-					datatype_to_check = PinDataType::VEC4;
-					optype_to_check = OperationNodeType::FLOATVEC4_MULTIPLY;
-					break;
-				case OperationNodeType::FLOATVEC2_DIVIDE:
-					datatype_to_check = PinDataType::VEC2;
-					optype_to_check = OperationNodeType::FLOATVEC2_DIVIDE;
-					break;
-				case OperationNodeType::FLOATVEC3_DIVIDE:
-					datatype_to_check = PinDataType::VEC3;
-					optype_to_check = OperationNodeType::FLOATVEC3_DIVIDE;
-					break;
-				case OperationNodeType::FLOATVEC4_DIVIDE:
-					datatype_to_check = PinDataType::VEC4;
-					optype_to_check = OperationNodeType::FLOATVEC4_DIVIDE;
-					break;
-			}
-
-
-			if(op_type == optype_to_check && (m_PinDataType == PinDataType::FLOAT || m_PinDataType == datatype_to_check))
-			{
-				ret = (output_type == PinDataType::FLOAT || output_type == datatype_to_check);
-				if (ret)
+				// Check the same for the other pin
+				if (other_pintype == PinDataType::FLOAT || other_pintype == op_pintype)
 				{
-					m_PinDataType = output_type;
-					m_OwnerNode->CheckOutputType(datatype_to_check);
-				}
+					// If so, change type
+					m_PinDataType = other_pintype;
 
-				return ret;
+					// This is meant to check if there are nodes of the passed type, so we pass operation type
+					m_OwnerNode->CheckOutputType(op_pintype);
+					return true;
+				}
+				else
+					return false;
 			}
 		}
 
-		return output_type == m_PinDataType;
+		return other_pintype == m_PinDataType;
 	}
 
 
@@ -302,7 +283,7 @@ namespace Kaimos::MaterialEditor {
 	{
 		if (CheckLinkage(output_pin))
 		{
-			// Check if this pin's node is connected to the node of the output_pin	// TODO: Handle unavailable connections (loops, ...)				// TODO!
+			// Check if this pin's node is connected to the node of the output_pin	// TODO: Handle unavailable connections (loops, ...) // TODO!
 			//NodeOutputPin* node_output = m_OwnerNode->GetOutputPin();
 			//if (node_output)
 			//{
@@ -324,33 +305,28 @@ namespace Kaimos::MaterialEditor {
 
 	void NodeInputPin::DisconnectOutputPin(bool is_destroying)
 	{
-		if (m_OutputLinked)
+		if (!m_OutputLinked)
+			return;
+
+		if (m_OwnerNode->GetType() == MaterialNodeType::OPERATION && !is_destroying)
 		{
-			if (m_OwnerNode->GetType() == MaterialNodeType::OPERATION && !is_destroying)
+			OperationMaterialNode* op_node = static_cast<OperationMaterialNode*>(m_OwnerNode);
+			OperationNodeType op_type = op_node->GetOperationType();
+
+			if (op_type == OperationNodeType::FLOATVEC_MULTIPLY || op_type == OperationNodeType::FLOATVEC_DIVIDE)
 			{
-				OperationNodeType op_type = ((OperationMaterialNode*)m_OwnerNode)->GetOperationType();
-
-				if (op_type == OperationNodeType::FLOATVEC2_MULTIPLY || op_type == OperationNodeType::FLOATVEC3_MULTIPLY || op_type == OperationNodeType::FLOATVEC4_MULTIPLY
-					|| op_type == OperationNodeType::FLOATVEC2_DIVIDE || op_type == OperationNodeType::FLOATVEC3_DIVIDE || op_type == OperationNodeType::FLOATVEC4_DIVIDE)
-				{
-					m_PinDataType = PinDataType::FLOAT;
-					PinDataType datatype_check = PinDataType::VEC2;
-
-					if(op_type == OperationNodeType::FLOATVEC3_MULTIPLY || op_type == OperationNodeType::FLOATVEC3_DIVIDE)
-						datatype_check = PinDataType::VEC3;
-					else if(op_type == OperationNodeType::FLOATVEC4_MULTIPLY || op_type == OperationNodeType::FLOATVEC4_DIVIDE)
-						datatype_check = PinDataType::VEC4;
-					else if (op_type == OperationNodeType::FLOATVEC2_DIVIDE)
-						datatype_check = PinDataType::VEC4;
-
-					m_OwnerNode->CheckOutputType(datatype_check);
-				}
+				// If we're in a vec-float operation (multiple type), change back to float
+				m_PinDataType = PinDataType::FLOAT;
+				
+				// Also, ask output pin to change its type if needed
+				m_OwnerNode->CheckOutputType(op_node->GetVecOperationType());
 			}
-
-			m_OutputLinked->DisconnectInputPin(m_ID);
-			m_OutputLinked = nullptr;
-			ResetToDefault();
 		}
+
+		// Disconnect from linked output & reset
+		m_OutputLinked->DisconnectInputPin(m_ID);
+		m_OutputLinked = nullptr;
+		ResetToDefault();
 	}
 
 

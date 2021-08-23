@@ -43,8 +43,10 @@ namespace Kaimos::MaterialEditor {
 		ImNodes::BeginNode(m_ID);
 
 		ImNodes::BeginNodeTitleBar();
+		ImGui::PushID(m_ID);
 		ImGui::NewLine(); ImGui::SameLine(ImGui::GetItemRectSize().x / 4.0f);
 		ImGui::Text(m_Name.c_str());
+		ImGui::PopID();
 		ImNodes::EndNodeTitleBar();
 
 		// -- Draw Output Pin --
@@ -54,7 +56,7 @@ namespace Kaimos::MaterialEditor {
 		// -- Draw Input Pins --
 		bool set_node_draggable = true;
 		for (Ref<NodeInputPin>& pin : m_NodeInputPins)
-			pin->DrawUI(set_node_draggable);	
+			pin->DrawUI(set_node_draggable);
 
 		// -- End Node Drawing --
 		ImNodes::SetNodeDraggable(m_ID, set_node_draggable);
@@ -65,7 +67,7 @@ namespace Kaimos::MaterialEditor {
 		{
 			if (pin->IsConnected())
 				ImNodes::Link(pin->GetID(), pin->GetID(), pin->GetOutputLinkedID());	// Links have the same ID than its input pin
-		}
+		}		
 	}
 
 
@@ -769,28 +771,23 @@ namespace Kaimos::MaterialEditor {
 
 
 	// ---------------------------- OPERATION NODE --------------------------------------------------------
-	OperationMaterialNode::OperationMaterialNode(OperationNodeType operation_type, PinDataType operation_data_type) : MaterialNode("Operation Node", MaterialNodeType::OPERATION), m_OperationType(operation_type)
+	OperationMaterialNode::OperationMaterialNode(OperationNodeType operation_type, PinDataType operation_data_type)
+		: MaterialNode("Operation Node", MaterialNodeType::OPERATION), m_OperationType(operation_type), m_VecOperationType(operation_data_type)
 	{
 		PinDataType op_datatype = operation_data_type;
 		bool multi_type_pin = false, add_two_inputs = true;
 
-		switch (m_OperationType)
+		switch (operation_type)
 		{
 			// Addition & Subtraction
 			case OperationNodeType::ADDITION:			{ m_Name = "Sum Node";  break; }
 			case OperationNodeType::SUBTRACTION:		{ m_Name = "Subtract Node";  break; }
-			
-			// Multiply
-			case OperationNodeType::MULTIPLICATION:		{ m_Name = "Multiply Node"; break; }
-			case OperationNodeType::FLOATVEC2_MULTIPLY:	{ m_Name = "Float-Vec2 Multiply Node"; multi_type_pin = true; op_datatype = PinDataType::FLOAT; break; }
-			case OperationNodeType::FLOATVEC3_MULTIPLY:	{ m_Name = "Float-Vec3 Multiply Node"; multi_type_pin = true; op_datatype = PinDataType::FLOAT; break; }
-			case OperationNodeType::FLOATVEC4_MULTIPLY:	{ m_Name = "Float-Vec4 Multiply Node"; multi_type_pin = true; op_datatype = PinDataType::FLOAT; break; }
 
-			// Division
+			// Multiplication & Division
+			case OperationNodeType::MULTIPLICATION:		{ m_Name = "Multiply Node"; break; }
+			case OperationNodeType::FLOATVEC_MULTIPLY:	{ m_Name = "Float-Vec Multiply Node"; multi_type_pin = true; op_datatype = PinDataType::FLOAT; break; }
 			case OperationNodeType::DIVISION:			{ m_Name = "Divide Node";  break; }
-			case OperationNodeType::FLOATVEC2_DIVIDE:	{ m_Name = "Float-Vec2 Divide Node"; multi_type_pin = true; op_datatype = PinDataType::FLOAT; break; }
-			case OperationNodeType::FLOATVEC3_DIVIDE:	{ m_Name = "Float-Vec3 Divide Node"; multi_type_pin = true; op_datatype = PinDataType::FLOAT; break; }
-			case OperationNodeType::FLOATVEC4_DIVIDE:	{ m_Name = "Float-Vec4 Divide Node"; multi_type_pin = true; op_datatype = PinDataType::FLOAT; break; }
+			case OperationNodeType::FLOATVEC_DIVIDE:	{ m_Name = "Float-Vec Divide Node"; multi_type_pin = true; op_datatype = PinDataType::FLOAT; break; }
 			
 			// Powers
 			case OperationNodeType::POWER:				{ m_Name = "Power Node"; break; }
@@ -822,18 +819,6 @@ namespace Kaimos::MaterialEditor {
 		}
 
 		return result;
-
-		//float* op_result = new float[4];
-		//memcpy(op_result, GetInputValue(0).get(), 16);
-
-		//for (uint i = 1; i < m_NodeInputPins.size(); ++i)
-		//	memcpy(op_result, ProcessOperation(op_result, GetInputValue(i).get(), data_type, m_NodeInputPins[i]->GetType()), 16);
-
-		//Ref<float> ret = CreateRef<float>(static_cast<float*>(malloc(16)));
-		//memcpy(ret.get(), op_result, 16);
-		//delete[] op_result;
-		//
-		//return ret;
 	}
 
 
@@ -845,17 +830,11 @@ namespace Kaimos::MaterialEditor {
 			case OperationNodeType::ADDITION:			return NodeUtils::SumValues(a_data_type, a, b);
 			case OperationNodeType::SUBTRACTION:		return NodeUtils::SubtractValues(a_data_type, a, b);
 			
-			// Multiply
+			// Multiply & Divide
 			case OperationNodeType::MULTIPLICATION:		return NodeUtils::MultiplyValues(a_data_type, a, b);
-			case OperationNodeType::FLOATVEC2_MULTIPLY:	return NodeUtils::MultiplyFloatAndVec2(a, b, a_data_type, b_data_type);
-			case OperationNodeType::FLOATVEC3_MULTIPLY:	return NodeUtils::MultiplyFloatAndVec3(a, b, a_data_type, b_data_type);
-			case OperationNodeType::FLOATVEC4_MULTIPLY:	return NodeUtils::MultiplyFloatAndVec4(a, b, a_data_type, b_data_type);
-
-			// Divide
+			case OperationNodeType::FLOATVEC_MULTIPLY:	return NodeUtils::MultiplyFloatAndVec(a, b, a_data_type, b_data_type);
 			case OperationNodeType::DIVISION:			return NodeUtils::DivideValues(a_data_type, a, b);
-			case OperationNodeType::FLOATVEC2_DIVIDE:	return NodeUtils::DivideFloatAndVec2(a, b, a_data_type, b_data_type);
-			case OperationNodeType::FLOATVEC3_DIVIDE:	return NodeUtils::DivideFloatAndVec3(a, b, a_data_type, b_data_type);
-			case OperationNodeType::FLOATVEC4_DIVIDE:	return NodeUtils::DivideFloatAndVec4(a, b, a_data_type, b_data_type);
+			case OperationNodeType::FLOATVEC_DIVIDE:	return NodeUtils::DivideFloatAndVec(a, b, a_data_type, b_data_type);
 
 			// Powers
 			case OperationNodeType::POWER:				return NodeUtils::PowerValues(a_data_type, a, b);
@@ -873,5 +852,6 @@ namespace Kaimos::MaterialEditor {
 		// -- Serialize Base Node & Op. Type --
 		SerializeBaseNode(output_emitter);
 		output_emitter << YAML::Key << "OpNodeType" << YAML::Value << (int)m_OperationType;
+		output_emitter << YAML::Key << "VecOpType" << YAML::Value << (int)m_VecOperationType;
 	}
 }
