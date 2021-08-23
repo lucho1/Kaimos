@@ -42,17 +42,17 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 	glm::vec2 GetNonZeroVector(glm::vec2 vec)
 	{
 		glm::vec2 ret = vec;
-		if (Maths::CompareFloats(ret.x, 0.0f)) ret.x = 0.0f;
-		if (Maths::CompareFloats(ret.y, 0.0f)) ret.y = 0.0f;
+		if (Maths::CompareFloats(ret.x, 0.0f)) ret.x = 1.0f;
+		if (Maths::CompareFloats(ret.y, 0.0f)) ret.y = 1.0f;
 		return ret;
 	}
 
 	glm::vec3 GetNonZeroVector(glm::vec3 vec)
 	{
 		glm::vec3 ret = vec;
-		if (Maths::CompareFloats(ret.x, 0.0f)) ret.x = 0.0f;
-		if (Maths::CompareFloats(ret.y, 0.0f)) ret.y = 0.0f;
-		if (Maths::CompareFloats(ret.z, 0.0f)) ret.z = 0.0f;
+		if (Maths::CompareFloats(ret.x, 0.0f)) ret.x = 1.0f;
+		if (Maths::CompareFloats(ret.y, 0.0f)) ret.y = 1.0f;
+		if (Maths::CompareFloats(ret.z, 0.0f)) ret.z = 1.0f;
 		return ret;
 	}
 
@@ -224,36 +224,30 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 	void DrawPinWidget(PinDataType pin_data_type, glm::vec4& value, float widget_speed, float widget_min, float widget_max, const char* widget_format)
 	{
 		ImGui::SameLine();
-		ImGui::PushID(Random::GetRandomInt());
-		
 		switch (pin_data_type)
 		{
 			case PinDataType::FLOAT:
 			{
 				ImGui::SetNextItemWidth(30.0f);
 				ImGui::DragFloat("###float_val", &value.x, widget_speed, widget_min, widget_max, widget_format);
-				ImGui::PopID();
 				return;
 			}
 			case PinDataType::INT:
 			{
 				ImGui::SetNextItemWidth(30.0f);
 				ImGui::DragFloat("###int_val", &value.x, 1.0f, widget_min, widget_max, "%.0f");
-				ImGui::PopID();
 				return;
 			}
 			case PinDataType::VEC2:
 			{
 				ImGui::SetNextItemWidth(60.0f);
 				ImGui::DragFloat2("###v2_val", glm::value_ptr(value), widget_speed, widget_min, widget_max, widget_format);
-				ImGui::PopID();
 				return;
 			}
 			case PinDataType::VEC3:
 			{
 				ImGui::SetNextItemWidth(90.0f);
 				ImGui::DragFloat3("###v3_val", glm::value_ptr(value), widget_speed, widget_min, widget_max, widget_format);
-				ImGui::PopID();
 				return;
 			}
 			case PinDataType::VEC4:
@@ -261,12 +255,10 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 				ImGui::SetNextItemWidth(150.0f);
 				ImGuiColorEditFlags flags = ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_Float | ImGuiColorEditFlags_AlphaPreview | ImGuiColorEditFlags_NoInputs;
 				ImGui::ColorEdit4("Value", glm::value_ptr(value), flags);
-				ImGui::PopID();
 				return;
 			}
 		}
 
-		ImGui::PopID();
 		KS_FATAL_ERROR("Tried to draw a non-supported PinType!");
 	}
 }

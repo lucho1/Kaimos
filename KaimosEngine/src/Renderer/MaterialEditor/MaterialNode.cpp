@@ -42,12 +42,10 @@ namespace Kaimos::MaterialEditor {
 		// -- Draw Node & Header --
 		ImNodes::BeginNode(m_ID);
 
-		ImGui::PushID(m_ID);
 		ImNodes::BeginNodeTitleBar();
 		ImGui::NewLine(); ImGui::SameLine(ImGui::GetItemRectSize().x / 4.0f);
 		ImGui::Text(m_Name.c_str());
 		ImNodes::EndNodeTitleBar();
-		ImGui::PopID();
 
 		// -- Draw Output Pin --
 		if(m_NodeOutputPin)
