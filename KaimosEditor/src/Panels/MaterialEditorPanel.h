@@ -39,10 +39,10 @@ namespace Kaimos {
 		uint PushImGuiStyleVars();
 		void DrawRightClickPopup(ImVec2 popup_pos);
 
-		void DrawSameTypesOperationNodesMenu(MaterialEditor::OperationNodeType op_node_type, const std::string& operator_str, ImVec2 popup_pos);
-		void DrawFloatVecOperationNodesMenu(MaterialEditor::OperationNodeType op_node_type, const std::string& operator_str, ImVec2 popup_pos);
-		void DrawSingleTypeOperationNodesMenu(MaterialEditor::OperationNodeType op_node_type, ImVec2 popup_pos);
+		void DrawSameTypesOperationNodesMenu(MaterialEditor::OperationNodeType op_type, const std::string& operator_str, ImVec2 popup_pos);
+		void DrawFloatVecOperationNodesMenu(MaterialEditor::OperationNodeType op_type, const std::string& operator_str, ImVec2 popup_pos);
 
+		void DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType op_type, ImVec2 popup_pos, bool only_vec_types);
 
 	public:
 

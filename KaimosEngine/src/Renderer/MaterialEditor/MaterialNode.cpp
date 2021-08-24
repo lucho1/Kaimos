@@ -572,7 +572,7 @@ namespace Kaimos::MaterialEditor {
 			case ConstantNodeType::SCENE_COLOR:
 			{
 				m_Name = "Scene Color";
-				AddOutputPin(PinDataType::VEC3, "Color (Vec3)", 1.0f);
+				AddOutputPin(PinDataType::VEC3, "Color (Vec3)");
 				break;
 			}
 			case ConstantNodeType::SCREEN_RES:
@@ -773,7 +773,7 @@ namespace Kaimos::MaterialEditor {
 		: MaterialNode("Operation Node", MaterialNodeType::OPERATION), m_OperationType(operation_type), m_VecOperationType(operation_data_type)
 	{
 		PinDataType op_datatype = operation_data_type;
-		bool multi_type_pin = false, add_two_inputs = true;
+		bool multi_type_pin = false;
 
 		switch (operation_type)
 		{
@@ -783,23 +783,16 @@ namespace Kaimos::MaterialEditor {
 
 			// Multiplication & Division
 			case OperationNodeType::MULTIPLICATION:		{ m_Name = "Multiply Node"; break; }
-			case OperationNodeType::FLOATVEC_MULTIPLY:	{ m_Name = "Float-Vec Multiply Node"; multi_type_pin = true; op_datatype = PinDataType::FLOAT; break; }
 			case OperationNodeType::DIVISION:			{ m_Name = "Divide Node";  break; }
-			case OperationNodeType::FLOATVEC_DIVIDE:	{ m_Name = "Float-Vec Divide Node"; multi_type_pin = true; op_datatype = PinDataType::FLOAT; break; }
-			
-			// Powers
-			case OperationNodeType::POWER:				{ m_Name = "Power Node"; break; }
-			case OperationNodeType::SQUARE_ROOT:		{ m_Name = "Square Root Node";			add_two_inputs = false; break; }
-			case OperationNodeType::INVERSE_SQUARE_ROOT:{ m_Name = "Inverse Square Root Node";	add_two_inputs = false; break; }
-			
+			case OperationNodeType::FLOATVEC_MULTIPLY:	{ m_Name = "Float-Vec Multiply Node";	multi_type_pin = true; op_datatype = PinDataType::FLOAT; break; }
+			case OperationNodeType::FLOATVEC_DIVIDE:	{ m_Name = "Float-Vec Divide Node";		multi_type_pin = true; op_datatype = PinDataType::FLOAT; break; }
+
 			default: KS_FATAL_ERROR("Attempted to create a non-supported Operation Node");
 		}
 
 		AddInputPin(op_datatype, multi_type_pin, "Value 1");
+		AddInputPin(op_datatype, multi_type_pin, "Value 2");
 		AddOutputPin(op_datatype, "Out");
-
-		if(add_two_inputs)
-			AddInputPin(op_datatype, multi_type_pin, "Value 2");
 	}	
 
 
@@ -808,36 +801,26 @@ namespace Kaimos::MaterialEditor {
 		PinDataType data_type = m_NodeInputPins[0]->GetType();
 		glm::vec4 result = GetInputValue(0);
 
-		if(m_OperationType == OperationNodeType::SQUARE_ROOT || m_OperationType == OperationNodeType::INVERSE_SQUARE_ROOT)
-			result = ProcessOperation(result, glm::vec4(0.0f), data_type, PinDataType::NONE);
-		else
-		{
-			for (uint i = 1; i < m_NodeInputPins.size(); ++i)
-				result = ProcessOperation(result, GetInputValue(i), data_type, m_NodeInputPins[i]->GetType());
-		}
+		for (uint i = 1; i < m_NodeInputPins.size(); ++i)
+			result = ProcessOperation(result, GetInputValue(i), data_type, m_NodeInputPins[i]->GetType());
 
 		return result;
 	}
 
 
-	glm::vec4 OperationMaterialNode::ProcessOperation(const glm::vec4& a, const glm::vec4& b, PinDataType a_data_type, PinDataType b_data_type) const
+	glm::vec4 OperationMaterialNode::ProcessOperation(const glm::vec4& a, const glm::vec4& b, PinDataType a_type, PinDataType b_type) const
 	{
 		switch (m_OperationType)
 		{
 			// Addition & Subtraction
-			case OperationNodeType::ADDITION:			return NodeUtils::SumValues(a_data_type, a, b);
-			case OperationNodeType::SUBTRACTION:		return NodeUtils::SubtractValues(a_data_type, a, b);
+			case OperationNodeType::ADDITION:			return NodeUtils::SumValues(a_type, a, b);
+			case OperationNodeType::SUBTRACTION:		return NodeUtils::SubtractValues(a_type, a, b);
 			
 			// Multiply & Divide
-			case OperationNodeType::MULTIPLICATION:		return NodeUtils::MultiplyValues(a_data_type, a, b);
-			case OperationNodeType::FLOATVEC_MULTIPLY:	return NodeUtils::MultiplyFloatAndVec(a, b, a_data_type, b_data_type);
-			case OperationNodeType::DIVISION:			return NodeUtils::DivideValues(a_data_type, a, b);
-			case OperationNodeType::FLOATVEC_DIVIDE:	return NodeUtils::DivideFloatAndVec(a, b, a_data_type, b_data_type);
-
-			// Powers
-			case OperationNodeType::POWER:				return NodeUtils::PowerValues(a_data_type, a, b);
-			case OperationNodeType::SQUARE_ROOT:		return NodeUtils::SqrtValue(a_data_type, a);
-			case OperationNodeType::INVERSE_SQUARE_ROOT:return NodeUtils::InvSqrtValue(a_data_type, a);
+			case OperationNodeType::MULTIPLICATION:		return NodeUtils::MultiplyValues(a_type, a, b);
+			case OperationNodeType::FLOATVEC_MULTIPLY:	return NodeUtils::MultiplyFloatAndVec(a, b, a_type, b_type);
+			case OperationNodeType::DIVISION:			return NodeUtils::DivideValues(a_type, a, b);
+			case OperationNodeType::FLOATVEC_DIVIDE:	return NodeUtils::DivideFloatAndVec(a, b, a_type, b_type);
 		}
 
 		KS_FATAL_ERROR("Attempted to perform a non-supported operation in OperationNode!");
@@ -851,5 +834,81 @@ namespace Kaimos::MaterialEditor {
 		SerializeBaseNode(output_emitter);
 		output_emitter << YAML::Key << "OpNodeType" << YAML::Value << (int)m_OperationType;
 		output_emitter << YAML::Key << "VecOpType" << YAML::Value << (int)m_VecOperationType;
+	}
+
+
+
+
+	// ---------------------------- SPECIAL OPERATION NODE ------------------------------------------------
+	SpecialOperationNode::SpecialOperationNode(SpecialOperationNodeType operation_type, PinDataType operation_data_type) : MaterialNode("Operation Node", MaterialNodeType::SPECIAL_OPERATION), m_OperationType(operation_type)
+	{
+		m_InputsN = 2;
+		PinDataType in_type1, in_type2, in_type3, out_type;
+		in_type1 = in_type2 = in_type3 = out_type = operation_data_type;
+
+		switch (operation_type)
+		{
+			// Powers
+			case SpecialOperationNodeType::POWER:				{ m_Name = "Power Node"; break; }
+			case SpecialOperationNodeType::SQUARE_ROOT:			{ m_Name = "Square Root Node";			m_InputsN = 1; break; }
+			case SpecialOperationNodeType::INVERSE_SQUARE_ROOT:	{ m_Name = "Inverse Square Root Node";	m_InputsN = 1; break; }
+
+			// Lerp/Mix
+			case SpecialOperationNodeType::FLOAT_LERP:			{ m_Name = "FLerp Node"; m_InputsN = 3; in_type3 = PinDataType::FLOAT; break; }
+			case SpecialOperationNodeType::VEC_LERP:			{ m_Name = "VLerp Node"; m_InputsN = 3; break; }
+			
+			// Vectors
+			case SpecialOperationNodeType::VEC_NORMALIZE:		{ m_Name = "Normalize Node";		m_InputsN = 1; break; }
+			case SpecialOperationNodeType::VEC_MAGNITUDE:		{ m_Name = "Vec Magnitude Node";	m_InputsN = 1; out_type = PinDataType::FLOAT; break; }
+		}
+
+		AddOutputPin(out_type, "Out");
+		AddInputPin(in_type1, false, "Value 1");
+		
+		if (m_InputsN >= 2)
+			AddInputPin(in_type2, false, "Value 2");
+		if(m_InputsN == 3)
+			AddInputPin(in_type3, false, "a");
+	}
+	
+	glm::vec4 SpecialOperationNode::CalculateNodeResult()
+	{
+		PinDataType op_type = m_NodeInputPins[0]->GetType();
+		switch (m_InputsN)
+		{
+			case 1: return ProcessOperation(op_type, GetInputValue(0));
+			case 2: return ProcessOperation(op_type, GetInputValue(0), GetInputValue(1));
+			case 3: return ProcessOperation(op_type, GetInputValue(0), GetInputValue(1), GetInputValue(2));
+		}
+	}
+
+
+	glm::vec4 SpecialOperationNode::ProcessOperation(PinDataType op_type, const glm::vec4& a, const glm::vec4& b, const glm::vec4& c) const
+	{
+		switch (m_OperationType)
+		{
+			// Powers
+			case SpecialOperationNodeType::POWER:				return NodeUtils::PowerValues(op_type, a, b);
+			case SpecialOperationNodeType::SQUARE_ROOT:			return NodeUtils::SqrtValue(op_type, a);
+			case SpecialOperationNodeType::INVERSE_SQUARE_ROOT:	return NodeUtils::InvSqrtValue(op_type, a);
+
+			// Lerp/Mix
+			case SpecialOperationNodeType::FLOAT_LERP:			return NodeUtils::FLerpValues(op_type, a, b, c.x);
+			case SpecialOperationNodeType::VEC_LERP:			return NodeUtils::VLerpValues(op_type, a, b, c);
+
+			// Vectors
+			case SpecialOperationNodeType::VEC_NORMALIZE:		return NodeUtils::NormalizeVec(op_type, a);
+			case SpecialOperationNodeType::VEC_MAGNITUDE:		return NodeUtils::VecMagnitude(op_type, a);
+		}
+
+	}
+
+
+	void SpecialOperationNode::SerializeNode(YAML::Emitter& output_emitter) const
+	{
+		// -- Serialize Base Node & Op. Type --
+		SerializeBaseNode(output_emitter);
+		output_emitter << YAML::Key << "SpecOpNodeType" << YAML::Value << (int)m_OperationType;
+		output_emitter << YAML::Key << "InputsN" << YAML::Value << m_InputsN;
 	}
 }

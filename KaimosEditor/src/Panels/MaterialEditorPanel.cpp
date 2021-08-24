@@ -235,110 +235,104 @@ namespace Kaimos {
 			}
 
 			if (ImGui::BeginMenu("Sum"))
-			{
 				DrawSameTypesOperationNodesMenu(MaterialEditor::OperationNodeType::ADDITION, "+", popup_pos);
-				ImGui::EndMenu();
-			}
 
 			if (ImGui::BeginMenu("Subtract"))
-			{
 				DrawSameTypesOperationNodesMenu(MaterialEditor::OperationNodeType::SUBTRACTION, "-", popup_pos);
-				ImGui::EndMenu();
-			}
 
 			if (ImGui::BeginMenu("Multiply"))
-			{
 				DrawSameTypesOperationNodesMenu(MaterialEditor::OperationNodeType::MULTIPLICATION, "*", popup_pos);
-				ImGui::EndMenu();
-			}
 
 			if (ImGui::BeginMenu("Divide"))
-			{
 				DrawSameTypesOperationNodesMenu(MaterialEditor::OperationNodeType::DIVISION, "/", popup_pos);
-				ImGui::EndMenu();
-			}
 
 			if (ImGui::BeginMenu("Num * Vec"))
-			{
 				DrawFloatVecOperationNodesMenu(MaterialEditor::OperationNodeType::FLOATVEC_MULTIPLY, "*", popup_pos);
-				ImGui::EndMenu();
-			}
 
 			if (ImGui::BeginMenu("Num / Vec"))
-			{
 				DrawFloatVecOperationNodesMenu(MaterialEditor::OperationNodeType::FLOATVEC_DIVIDE, "/", popup_pos);
-				ImGui::EndMenu();
-			}
-
+			
 			if (ImGui::BeginMenu("Power"))
-			{
-				DrawSingleTypeOperationNodesMenu(MaterialEditor::OperationNodeType::POWER, popup_pos);
-				ImGui::EndMenu();
-			}
+				DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::POWER, popup_pos, false);
 
 			if (ImGui::BeginMenu("Sqrt"))
-			{
-				DrawSingleTypeOperationNodesMenu(MaterialEditor::OperationNodeType::SQUARE_ROOT, popup_pos);
-				ImGui::EndMenu();
-			}
+				DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::SQUARE_ROOT, popup_pos, false);
 
 			if (ImGui::BeginMenu("Inv. Sqrt"))
-			{
-				DrawSingleTypeOperationNodesMenu(MaterialEditor::OperationNodeType::INVERSE_SQUARE_ROOT, popup_pos);
-				ImGui::EndMenu();
-			}
+				DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::INVERSE_SQUARE_ROOT, popup_pos, false);
+
+			if (ImGui::BeginMenu("Lerp by Float"))
+				DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::FLOAT_LERP, popup_pos, false);
+
+			if (ImGui::BeginMenu("Lerp by Vec"))
+				DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::VEC_LERP, popup_pos, true);
+
+			if (ImGui::BeginMenu("Vec Normalize"))
+				DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::VEC_NORMALIZE, popup_pos, true);
+
+			if (ImGui::BeginMenu("Vec Magnitude"))
+				DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::VEC_MAGNITUDE, popup_pos, true);
 
 			ImGui::EndMenu();
 		}
 	}
 
 
-	void MaterialEditorPanel::DrawSameTypesOperationNodesMenu(MaterialEditor::OperationNodeType op_node_type, const std::string& operator_str, ImVec2 popup_pos)
+	void MaterialEditorPanel::DrawSameTypesOperationNodesMenu(MaterialEditor::OperationNodeType op_type, const std::string& operator_str, ImVec2 popup_pos)
 	{
 		if (ImGui::MenuItem(std::string("Float " + operator_str + " Float").c_str()))
-			m_CurrentGraph->CreateNode(op_node_type, MaterialEditor::PinDataType::FLOAT, popup_pos);
+			m_CurrentGraph->CreateNode(op_type, MaterialEditor::PinDataType::FLOAT, popup_pos);
 
 		if (ImGui::MenuItem(std::string("Int " + operator_str + " Int").c_str()))
-			m_CurrentGraph->CreateNode(op_node_type, MaterialEditor::PinDataType::INT, popup_pos);
+			m_CurrentGraph->CreateNode(op_type, MaterialEditor::PinDataType::INT, popup_pos);
 
 		if (ImGui::MenuItem(std::string("Vec2 " + operator_str + " Vec2").c_str()))
-			m_CurrentGraph->CreateNode(op_node_type, MaterialEditor::PinDataType::VEC2, popup_pos);
+			m_CurrentGraph->CreateNode(op_type, MaterialEditor::PinDataType::VEC2, popup_pos);
 
 		if (ImGui::MenuItem(std::string("Vec3 " + operator_str + " Vec3").c_str()))
-			m_CurrentGraph->CreateNode(op_node_type, MaterialEditor::PinDataType::VEC3, popup_pos);
+			m_CurrentGraph->CreateNode(op_type, MaterialEditor::PinDataType::VEC3, popup_pos);
 
 		if (ImGui::MenuItem(std::string("Vec4 " + operator_str + " Vec4").c_str()))
-			m_CurrentGraph->CreateNode(op_node_type, MaterialEditor::PinDataType::VEC4, popup_pos);
+			m_CurrentGraph->CreateNode(op_type, MaterialEditor::PinDataType::VEC4, popup_pos);
+
+		ImGui::EndMenu();
 	}
 
-	void MaterialEditorPanel::DrawFloatVecOperationNodesMenu(MaterialEditor::OperationNodeType op_node_type, const std::string& operator_str, ImVec2 popup_pos)
+	void MaterialEditorPanel::DrawFloatVecOperationNodesMenu(MaterialEditor::OperationNodeType op_type, const std::string& operator_str, ImVec2 popup_pos)
 	{
 		if (ImGui::MenuItem(std::string("Num " + operator_str + " Vec2").c_str()))
-			m_CurrentGraph->CreateNode(op_node_type, MaterialEditor::PinDataType::VEC2, popup_pos);
+			m_CurrentGraph->CreateNode(op_type, MaterialEditor::PinDataType::VEC2, popup_pos);
 		
 		if (ImGui::MenuItem(std::string("Num " + operator_str + " Vec3").c_str()))
-			m_CurrentGraph->CreateNode(op_node_type, MaterialEditor::PinDataType::VEC3, popup_pos);
+			m_CurrentGraph->CreateNode(op_type, MaterialEditor::PinDataType::VEC3, popup_pos);
 		
 		if (ImGui::MenuItem(std::string("Num " + operator_str + " Vec4").c_str()))
-			m_CurrentGraph->CreateNode(op_node_type, MaterialEditor::PinDataType::VEC4, popup_pos);
+			m_CurrentGraph->CreateNode(op_type, MaterialEditor::PinDataType::VEC4, popup_pos);
+
+		ImGui::EndMenu();
 	}
 
-	void MaterialEditorPanel::DrawSingleTypeOperationNodesMenu(MaterialEditor::OperationNodeType op_node_type, ImVec2 popup_pos)
+	void MaterialEditorPanel::DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType op_type, ImVec2 popup_pos, bool only_vec_types)
 	{
-		if (ImGui::MenuItem("Int"))
-			m_CurrentGraph->CreateNode(op_node_type, MaterialEditor::PinDataType::INT, popup_pos);
+		if (!only_vec_types)
+		{
+			if (ImGui::MenuItem("Int"))
+				m_CurrentGraph->CreateNode(op_type, MaterialEditor::PinDataType::INT, popup_pos);
 
-		if (ImGui::MenuItem("Float"))
-			m_CurrentGraph->CreateNode(op_node_type, MaterialEditor::PinDataType::FLOAT, popup_pos);
+			if (ImGui::MenuItem("Float"))
+				m_CurrentGraph->CreateNode(op_type, MaterialEditor::PinDataType::FLOAT, popup_pos);
+		}
 
 		if (ImGui::MenuItem("Vec2"))
-			m_CurrentGraph->CreateNode(op_node_type, MaterialEditor::PinDataType::VEC2, popup_pos);
+			m_CurrentGraph->CreateNode(op_type, MaterialEditor::PinDataType::VEC2, popup_pos);
 
 		if (ImGui::MenuItem("Vec3"))
-			m_CurrentGraph->CreateNode(op_node_type, MaterialEditor::PinDataType::VEC3, popup_pos);
+			m_CurrentGraph->CreateNode(op_type, MaterialEditor::PinDataType::VEC3, popup_pos);
 
 		if (ImGui::MenuItem("Vec4"))
-			m_CurrentGraph->CreateNode(op_node_type, MaterialEditor::PinDataType::VEC4, popup_pos);
+			m_CurrentGraph->CreateNode(op_type, MaterialEditor::PinDataType::VEC4, popup_pos);
+
+		ImGui::EndMenu();
 	}
 
 

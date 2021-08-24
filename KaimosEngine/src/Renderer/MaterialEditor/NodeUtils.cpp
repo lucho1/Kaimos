@@ -218,6 +218,62 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 	}
 
 
+	// ----------- Lerps ------------
+	glm::vec4 FLerpValues(PinDataType values_data_type, const glm::vec4& a, const glm::vec4& b, float c)
+	{
+		switch (values_data_type)
+		{
+			case PinDataType::FLOAT:
+			case PinDataType::INT:		return glm::vec4(glm::mix(a.x, b.x, c), 0.0f, 0.0f, 0.0f);
+			case PinDataType::VEC2:		return glm::vec4(glm::mix(glm::vec2(a), glm::vec2(b), c), 0.0f, 0.0f);
+			case PinDataType::VEC3:		return glm::vec4(glm::mix(glm::vec3(a), glm::vec3(b), c), 0.0f);
+			case PinDataType::VEC4:		return glm::mix(a, b, c);
+		}
+
+		KS_FATAL_ERROR("Tried to perform a non-supported Flerp operation!");
+		return {};
+	}
+
+	glm::vec4 VLerpValues(PinDataType values_data_type, const glm::vec4& a, const glm::vec4& b, const glm::vec4& c)
+	{
+		switch (values_data_type)
+		{
+			case PinDataType::VEC2:		return glm::vec4(glm::mix(glm::vec2(a), glm::vec2(b), glm::vec2(c)), 0.0f, 0.0f);
+			case PinDataType::VEC3:		return glm::vec4(glm::mix(glm::vec3(a), glm::vec3(b), glm::vec3(c)), 0.0f);
+			case PinDataType::VEC4:		return glm::mix(a, b, c);
+		}
+
+		KS_FATAL_ERROR("Tried to perform a non-supported Vlerp operation!");
+		return {};
+	}
+
+	glm::vec4 NormalizeVec(PinDataType values_data_type, const glm::vec4& a)
+	{
+		switch (values_data_type)
+		{
+			case PinDataType::VEC2:		return glm::vec4(glm::normalize(glm::vec2(a)), 0.0f, 0.0f);
+			case PinDataType::VEC3:		return glm::vec4(glm::normalize(glm::vec3(a)), 0.0f);
+			case PinDataType::VEC4:		return glm::normalize(a);
+		}
+
+		KS_FATAL_ERROR("Tried to perform a non-supported Vlerp operation!");
+		return {};
+	}
+
+	glm::vec4 VecMagnitude(PinDataType values_data_type, const glm::vec4& a)
+	{
+		switch (values_data_type)
+		{
+			case PinDataType::VEC2:		return glm::vec4(glm::length(glm::vec2(a)), 0.0f, 0.0f, 0.0f);
+			case PinDataType::VEC3:		return glm::vec4(glm::length(glm::vec3(a)), 0.0f, 0.0f, 0.0f);
+			case PinDataType::VEC4:		return glm::vec4(glm::length(a), 0.0f, 0.0f, 0.0f);
+		}
+
+		KS_FATAL_ERROR("Tried to perform a non-supported Vlerp operation!");
+		return {};
+	}
+
+
 
 
 	// ----------------------- UI Methods -----------------------------------------------------------------

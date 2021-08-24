@@ -18,12 +18,13 @@ namespace Kaimos::MaterialEditor {
 	enum class PinDataType;
 
 	// ---- TYPE-DEFINING ENUMS ----
-	enum class MaterialNodeType			{ NONE, MAIN, VERTEX_PARAMETER, OPERATION, CONSTANT };
+	enum class MaterialNodeType			{ NONE, MAIN, VERTEX_PARAMETER, OPERATION, SPECIAL_OPERATION, CONSTANT };
 	enum class VertexParameterNodeType	{ NONE, TEX_COORDS, POSITION, NORMAL };
 
 	enum class ConstantNodeType
 	{
-		NONE, DELTATIME, PI,												// Constants
+		NONE,
+		DELTATIME, PI,														// Constants
 		INT, FLOAT, VEC2, VEC3, VEC4,										// Variables
 		SCREEN_RES, SCENE_COLOR,											// Screen, Scene, ...
 		CAMERA_FOV, CAMERA_AR, CAMERA_PLANES, CAMERA_ORTHOSIZE,				// Camera
@@ -32,9 +33,17 @@ namespace Kaimos::MaterialEditor {
 
 	enum class OperationNodeType
 	{
-		NONE, ADDITION, SUBTRACTION, DIVISION, MULTIPLICATION,				// Basic Operations (with same types)
+		NONE,
+		ADDITION, SUBTRACTION, DIVISION, MULTIPLICATION,					// Basic Operations (with same types)
 		FLOATVEC_MULTIPLY, FLOATVEC_DIVIDE,									// Different-Types Operations
-		POWER, SQUARE_ROOT, INVERSE_SQUARE_ROOT								// Powers
+	};
+
+	enum class SpecialOperationNodeType
+	{
+		NONE,
+		POWER, SQUARE_ROOT, INVERSE_SQUARE_ROOT,							// Powers
+		FLOAT_LERP, VEC_LERP,												// Lerp/Mix
+		VEC_NORMALIZE, VEC_MAGNITUDE										// Vectors
 	};
 
 
@@ -234,10 +243,34 @@ namespace Kaimos::MaterialEditor {
 		virtual glm::vec4 CalculateNodeResult() override;
 		virtual void SerializeNode(YAML::Emitter& output_emitter) const override;
 
-		glm::vec4 ProcessOperation(const glm::vec4& a, const glm::vec4& b, PinDataType a_data_type, PinDataType b_data_type) const;
+		glm::vec4 ProcessOperation(const glm::vec4& a, const glm::vec4& b, PinDataType a_type, PinDataType b_type) const;
 
 		OperationNodeType m_OperationType = OperationNodeType::NONE;
 		PinDataType m_VecOperationType = PinDataType::FLOAT;
+	};
+
+
+
+	// ---- Special Operation Node ----
+	class SpecialOperationNode : public MaterialNode
+	{
+	public:
+
+		SpecialOperationNode(SpecialOperationNodeType operation_type, PinDataType operation_data_type);
+		SpecialOperationNode(const std::string& name, SpecialOperationNodeType operation_type, uint id, uint inputs_n)
+			: MaterialNode(name, MaterialNodeType::SPECIAL_OPERATION, id), m_OperationType(operation_type), m_InputsN(inputs_n) {}
+
+		SpecialOperationNodeType GetOperationType() const { return m_OperationType; }
+
+	private:
+
+
+		virtual glm::vec4 CalculateNodeResult() override;
+		virtual void SerializeNode(YAML::Emitter& output_emitter) const override;
+		glm::vec4 ProcessOperation(PinDataType op_type, const glm::vec4& a, const glm::vec4& b = glm::vec4(0.0f), const glm::vec4& c = glm::vec4(0.0f)) const;
+
+		SpecialOperationNodeType m_OperationType = SpecialOperationNodeType::NONE;
+		uint m_InputsN;
 	};
 }
 
