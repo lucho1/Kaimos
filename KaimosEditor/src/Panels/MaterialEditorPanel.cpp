@@ -256,8 +256,8 @@ namespace Kaimos {
 
 				ImGui::EndMenu();
 			}
-			
-			if (ImGui::BeginMenu("Specials"))
+
+			if (ImGui::BeginMenu("Advanced"))
 			{
 				if (ImGui::BeginMenu("Absolute"))
 					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::ABS, popup_pos, false);
@@ -277,6 +277,14 @@ namespace Kaimos {
 				if (ImGui::BeginMenu("Sqrt"))
 					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::SQUARE_ROOT, popup_pos, false);
 
+				if (ImGui::BeginMenu("Inv. Sqrt"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::INVERSE_SQUARE_ROOT, popup_pos, false);
+
+				ImGui::EndMenu();
+			}
+
+			if (ImGui::BeginMenu("Shaders Functions"))
+			{
 				if (ImGui::BeginMenu("Ceil"))
 					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::CEIL, popup_pos, false);
 
@@ -295,38 +303,50 @@ namespace Kaimos {
 				if (ImGui::BeginMenu("Fractal"))
 					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::FRACTAL, popup_pos, false);
 
-				if (ImGui::BeginMenu("Inv. Sqrt"))
-					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::INVERSE_SQUARE_ROOT, popup_pos, false);
+				ImGui::EndMenu();
+			}
+			
+			if (ImGui::BeginMenu("Vectors"))
+			{
+				if (ImGui::BeginMenu("Basics"))
+				{
+					if (ImGui::BeginMenu("Vec Normalize"))
+						DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::VEC_NORMALIZE, popup_pos, true);
 
-				if (ImGui::BeginMenu("Vec Reflect"))
-					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::VEC_REFLECT, popup_pos, true);
+					if (ImGui::BeginMenu("Vec Magnitude"))
+						DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::VEC_MAGNITUDE, popup_pos, true);
 
-				if (ImGui::BeginMenu("Vec Refract"))
-					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::VEC_REFRACT, popup_pos, true);
+					if (ImGui::BeginMenu("Vec Dot"))
+						DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::VEC_DOT, popup_pos, true);
 
-				if (ImGui::BeginMenu("Lerp by Float"))
-					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::FLOAT_LERP, popup_pos, false);
+					if (ImGui::BeginMenu("Vec Cross"))
+						DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::VEC_CROSS, popup_pos, true);
 
-				if (ImGui::BeginMenu("Lerp by Vec"))
-					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::VEC_LERP, popup_pos, true);
+					ImGui::EndMenu();
+				}
 
-				if (ImGui::BeginMenu("Vec Normalize"))
-					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::VEC_NORMALIZE, popup_pos, true);
+				if (ImGui::BeginMenu("Advanced"))
+				{
+					if (ImGui::BeginMenu("Vec Reflect"))
+						DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::VEC_REFLECT, popup_pos, true);
 
-				if (ImGui::BeginMenu("Vec Magnitude"))
-					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::VEC_MAGNITUDE, popup_pos, true);
+					if (ImGui::BeginMenu("Vec Refract"))
+						DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::VEC_REFRACT, popup_pos, true);
 
-				if (ImGui::BeginMenu("Mod by Float"))
-					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::FLOAT_MOD, popup_pos, false);
+					if (ImGui::BeginMenu("Lerp by Float"))
+						DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::FLOAT_LERP, popup_pos, false);
 
-				if (ImGui::BeginMenu("Mod by Vec"))
-					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::VEC_MOD, popup_pos, true);
+					if (ImGui::BeginMenu("Lerp by Vec"))
+						DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::VEC_LERP, popup_pos, true);
 
-				if (ImGui::BeginMenu("Vec Dot"))
-					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::VEC_DOT, popup_pos, true);
+					if (ImGui::BeginMenu("Mod by Float"))
+						DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::FLOAT_MOD, popup_pos, false);
 
-				if (ImGui::BeginMenu("Vec Cross"))
-					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::VEC_CROSS, popup_pos, true);
+					if (ImGui::BeginMenu("Mod by Vec"))
+						DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::VEC_MOD, popup_pos, true);
+
+					ImGui::EndMenu();
+				}
 
 				ImGui::EndMenu();
 			}
