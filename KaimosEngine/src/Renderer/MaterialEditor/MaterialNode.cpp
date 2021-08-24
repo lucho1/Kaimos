@@ -848,14 +848,19 @@ namespace Kaimos::MaterialEditor {
 
 		switch (operation_type)
 		{
+			// Basics
+			case SpecialOperationNodeType::ABS:					{ m_Name = "Absolute Node"; m_InputsN = 1; break; }
+
 			// Powers
 			case SpecialOperationNodeType::POWER:				{ m_Name = "Power Node"; break; }
 			case SpecialOperationNodeType::SQUARE_ROOT:			{ m_Name = "Square Root Node";			m_InputsN = 1; break; }
 			case SpecialOperationNodeType::INVERSE_SQUARE_ROOT:	{ m_Name = "Inverse Square Root Node";	m_InputsN = 1; break; }
 
-			// Lerp/Mix
+			// Lerp/Mix, Mod, ...
 			case SpecialOperationNodeType::FLOAT_LERP:			{ m_Name = "FLerp Node"; m_InputsN = 3; in_type3 = PinDataType::FLOAT; break; }
 			case SpecialOperationNodeType::VEC_LERP:			{ m_Name = "VLerp Node"; m_InputsN = 3; break; }
+			case SpecialOperationNodeType::FLOAT_MOD:			{ m_Name = "FMod Node"; in_type3 = PinDataType::FLOAT; break; }
+			case SpecialOperationNodeType::VEC_MOD:				{ m_Name = "VMod Node"; break; }
 			
 			// Vectors
 			case SpecialOperationNodeType::VEC_NORMALIZE:		{ m_Name = "Normalize Node";		m_InputsN = 1; break; }
@@ -867,7 +872,8 @@ namespace Kaimos::MaterialEditor {
 		
 		if (m_InputsN >= 2)
 			AddInputPin(in_type2, false, "Value 2");
-		if(m_InputsN == 3)
+
+		if (m_InputsN == 3)
 			AddInputPin(in_type3, false, "a");
 	}
 	
@@ -887,6 +893,9 @@ namespace Kaimos::MaterialEditor {
 	{
 		switch (m_OperationType)
 		{
+			// Basics
+			case SpecialOperationNodeType::ABS:					return NodeUtils::AbsoluteValue(op_type, a);
+
 			// Powers
 			case SpecialOperationNodeType::POWER:				return NodeUtils::PowerValues(op_type, a, b);
 			case SpecialOperationNodeType::SQUARE_ROOT:			return NodeUtils::SqrtValue(op_type, a);
@@ -895,6 +904,8 @@ namespace Kaimos::MaterialEditor {
 			// Lerp/Mix
 			case SpecialOperationNodeType::FLOAT_LERP:			return NodeUtils::FLerpValues(op_type, a, b, c.x);
 			case SpecialOperationNodeType::VEC_LERP:			return NodeUtils::VLerpValues(op_type, a, b, c);
+			case SpecialOperationNodeType::FLOAT_MOD:			return NodeUtils::FModValue(op_type, a, b.x);
+			case SpecialOperationNodeType::VEC_MOD:				return NodeUtils::VModValue(op_type, a, b);
 
 			// Vectors
 			case SpecialOperationNodeType::VEC_NORMALIZE:		return NodeUtils::NormalizeVec(op_type, a);

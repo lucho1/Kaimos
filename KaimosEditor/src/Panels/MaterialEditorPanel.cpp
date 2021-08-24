@@ -259,6 +259,9 @@ namespace Kaimos {
 			
 			if (ImGui::BeginMenu("Specials"))
 			{
+				if (ImGui::BeginMenu("Absolute"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::ABS, popup_pos, false);
+
 				if (ImGui::BeginMenu("Power"))
 					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::POWER, popup_pos, false);
 
@@ -279,6 +282,12 @@ namespace Kaimos {
 
 				if (ImGui::BeginMenu("Vec Magnitude"))
 					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::VEC_MAGNITUDE, popup_pos, true);
+
+				if (ImGui::BeginMenu("Mod by Float"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::FLOAT_MOD, popup_pos, false);
+
+				if (ImGui::BeginMenu("Mod by Vec"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::VEC_MOD, popup_pos, true);
 
 				ImGui::EndMenu();
 			}

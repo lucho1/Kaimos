@@ -86,7 +86,7 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 			case PinDataType::VEC4:		return glm::vec4(a.x + b.x, a.y + b.y, a.z + b.z, a.a + b.a);
 		}
 
-		KS_FATAL_ERROR("Tried to perform a non-supported addition operation!");
+		KS_FATAL_ERROR("Tried to perform a non-supported Addition operation!");
 		return {};
 	}
 
@@ -101,7 +101,7 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 			case PinDataType::VEC4:		return glm::vec4(a.x - b.x, a.y - b.y, a.z - b.z, a.a - b.a);
 		}
 
-		KS_FATAL_ERROR("Tried to perform a non-supported subtraction operation!");
+		KS_FATAL_ERROR("Tried to perform a non-supported Subtraction operation!");
 		return {};
 	}
 
@@ -118,7 +118,7 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 			case PinDataType::VEC4:		return a * b;
 		}
 
-		KS_FATAL_ERROR("Tried to perform a non-supported multiply operation!");
+		KS_FATAL_ERROR("Tried to perform a non-supported Multiply operation!");
 		return {};
 	}
 
@@ -149,7 +149,7 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 			case PinDataType::VEC4:	return a / GetNonZeroVector(b);
 		}
 
-		KS_FATAL_ERROR("Tried to perform a non-supported divide operation!");
+		KS_FATAL_ERROR("Tried to perform a non-supported Divide operation!");
 		return {};
 	}
 
@@ -183,7 +183,7 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 			case PinDataType::VEC4:		return glm::pow(a, b);
 		}
 
-		KS_FATAL_ERROR("Tried to perform a non-supported power operation!");
+		KS_FATAL_ERROR("Tried to perform a non-supported Power operation!");
 		return {};
 	}
 
@@ -198,7 +198,7 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 			case PinDataType::VEC4:		return glm::sqrt(a);
 		}
 
-		KS_FATAL_ERROR("Tried to perform a non-supported power operation!");
+		KS_FATAL_ERROR("Tried to perform a non-supported Sqrt operation!");
 		return {};
 	}
 
@@ -213,7 +213,7 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 			case PinDataType::VEC4:		return glm::inversesqrt(a);
 		}
 
-		KS_FATAL_ERROR("Tried to perform a non-supported power operation!");
+		KS_FATAL_ERROR("Tried to perform a non-supported InvSqrt operation!");
 		return {};
 	}
 
@@ -256,7 +256,7 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 			case PinDataType::VEC4:		return glm::normalize(a);
 		}
 
-		KS_FATAL_ERROR("Tried to perform a non-supported Vlerp operation!");
+		KS_FATAL_ERROR("Tried to perform a non-supported Normalize operation!");
 		return {};
 	}
 
@@ -269,7 +269,52 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 			case PinDataType::VEC4:		return glm::vec4(glm::length(a), 0.0f, 0.0f, 0.0f);
 		}
 
-		KS_FATAL_ERROR("Tried to perform a non-supported Vlerp operation!");
+		KS_FATAL_ERROR("Tried to perform a non-supported VecMagnitude operation!");
+		return {};
+	}
+
+
+	// ----------- Others -----------
+	glm::vec4 AbsoluteValue(PinDataType op_type, const glm::vec4& a)
+	{
+		switch (op_type)
+		{
+			case PinDataType::FLOAT:
+			case PinDataType::INT:		return glm::vec4(glm::abs(a.x), 0.0f, 0.0f, 0.0f);
+			case PinDataType::VEC2:		return glm::vec4(glm::abs(glm::vec2(a)), 0.0f, 0.0f);
+			case PinDataType::VEC3:		return glm::vec4(glm::abs(glm::vec3(a)), 0.0f);
+			case PinDataType::VEC4:		return glm::abs(a);
+		}
+
+		KS_FATAL_ERROR("Tried to perform a non-supported Absolute operation!");
+		return {};
+	}
+
+	glm::vec4 FModValue(PinDataType op_type, const glm::vec4& a, float b)
+	{
+		switch (op_type)
+		{
+			case PinDataType::FLOAT:
+			case PinDataType::INT:		return glm::vec4(glm::mod(a.x, b), 0.0f, 0.0f, 0.0f);
+			case PinDataType::VEC2:		return glm::vec4(glm::mod(glm::vec2(a), b), 0.0f, 0.0f);
+			case PinDataType::VEC3:		return glm::vec4(glm::mod(glm::vec3(a), b), 0.0f);
+			case PinDataType::VEC4:		return glm::mod(a, b);
+		}
+
+		KS_FATAL_ERROR("Tried to perform a non-supported FMod operation!");
+		return {};
+	}
+
+	glm::vec4 VModValue(PinDataType op_type, const glm::vec4& a, const glm::vec4& b)
+	{
+		switch (op_type)
+		{
+			case PinDataType::VEC2:		return glm::vec4(glm::mod(glm::vec2(a), glm::vec2(b)), 0.0f, 0.0f);
+			case PinDataType::VEC3:		return glm::vec4(glm::mod(glm::vec3(a), glm::vec3(b)), 0.0f);
+			case PinDataType::VEC4:		return glm::mod(a, b);
+		}
+
+		KS_FATAL_ERROR("Tried to perform a non-supported VMod operation!");
 		return {};
 	}
 
