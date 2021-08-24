@@ -60,6 +60,7 @@ namespace Kaimos::MaterialEditor {
 		glm::vec4 VecMagnitude(PinDataType op_type, const glm::vec4& a);
 		glm::vec4 DotProduct(PinDataType op_type, const glm::vec4& a, const glm::vec4& b);
 		glm::vec4 CrossProduct(PinDataType op_type, const glm::vec4& a, const glm::vec4& b);
+		glm::vec4 VecDistance(PinDataType op_type, const glm::vec4& a, const glm::vec4& b);
 
 
 		// --- UI Methods ---

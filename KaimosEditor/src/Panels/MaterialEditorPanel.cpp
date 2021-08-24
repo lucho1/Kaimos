@@ -316,6 +316,9 @@ namespace Kaimos {
 					if (ImGui::BeginMenu("Vec Magnitude"))
 						DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::VEC_MAGNITUDE, popup_pos, true);
 
+					if (ImGui::BeginMenu("Vec Distance"))
+						DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::VEC_DIST, popup_pos, true);
+
 					if (ImGui::BeginMenu("Vec Dot"))
 						DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::VEC_DOT, popup_pos, true);
 

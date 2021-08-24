@@ -878,6 +878,7 @@ namespace Kaimos::MaterialEditor {
 			// Vectors
 			case SpecialOperationNodeType::VEC_NORMALIZE:		{ m_Name = "Normalize Node";		m_InputsN = 1; break; }
 			case SpecialOperationNodeType::VEC_MAGNITUDE:		{ m_Name = "Vec Magnitude Node";	m_InputsN = 1; out_type = PinDataType::FLOAT; break; }
+			case SpecialOperationNodeType::VEC_DIST:			{ m_Name = "Vec Distance Node";		out_type = PinDataType::FLOAT; break; }
 			case SpecialOperationNodeType::VEC_DOT:				{ m_Name = "Dot Product Node";		out_type = PinDataType::FLOAT; break; }
 			case SpecialOperationNodeType::VEC_CROSS:			{ m_Name = "Cross Product Node";	if (operation_data_type == PinDataType::VEC2) out_type = PinDataType::FLOAT; break; }
 		}
@@ -938,6 +939,7 @@ namespace Kaimos::MaterialEditor {
 			// Vectors
 			case SpecialOperationNodeType::VEC_NORMALIZE:		return NodeUtils::NormalizeVec(op_type, a);
 			case SpecialOperationNodeType::VEC_MAGNITUDE:		return NodeUtils::VecMagnitude(op_type, a);
+			case SpecialOperationNodeType::VEC_DIST:			return NodeUtils::VecDistance(op_type, a, b);
 			case SpecialOperationNodeType::VEC_DOT:				return NodeUtils::DotProduct(op_type, a, b);
 			case SpecialOperationNodeType::VEC_CROSS:			return NodeUtils::CrossProduct(op_type, a, b);
 		}

@@ -509,6 +509,19 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 		return {};
 	}
 
+	glm::vec4 VecDistance(PinDataType op_type, const glm::vec4& a, const glm::vec4& b)
+	{
+		switch (op_type)
+		{
+			case PinDataType::VEC2:		return glm::vec4(glm::distance(glm::vec2(a), glm::vec2(b)), 0.0f, 0.0f, 0.0f);
+			case PinDataType::VEC3:		return glm::vec4(glm::distance(glm::vec3(a), glm::vec3(b)), 0.0f, 0.0f, 0.0f);
+			case PinDataType::VEC4:		return glm::vec4(glm::distance(a, b), 0.0f, 0.0f, 0.0f);
+		}
+
+		KS_FATAL_ERROR("Tried to perform a non-supported CrossProduct operation!");
+		return {};
+	}
+
 
 
 
