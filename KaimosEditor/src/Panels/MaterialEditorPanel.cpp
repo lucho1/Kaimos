@@ -234,44 +234,54 @@ namespace Kaimos {
 				ImGui::EndMenu();
 			}
 
-			if (ImGui::BeginMenu("Sum"))
-				DrawSameTypesOperationNodesMenu(MaterialEditor::OperationNodeType::ADDITION, "+", popup_pos);
+			if (ImGui::BeginMenu("Basics"))
+			{
+				if (ImGui::BeginMenu("Sum"))
+					DrawSameTypesOperationNodesMenu(MaterialEditor::OperationNodeType::ADDITION, "+", popup_pos);
 
-			if (ImGui::BeginMenu("Subtract"))
-				DrawSameTypesOperationNodesMenu(MaterialEditor::OperationNodeType::SUBTRACTION, "-", popup_pos);
+				if (ImGui::BeginMenu("Subtract"))
+					DrawSameTypesOperationNodesMenu(MaterialEditor::OperationNodeType::SUBTRACTION, "-", popup_pos);
 
-			if (ImGui::BeginMenu("Multiply"))
-				DrawSameTypesOperationNodesMenu(MaterialEditor::OperationNodeType::MULTIPLICATION, "*", popup_pos);
+				if (ImGui::BeginMenu("Multiply"))
+					DrawSameTypesOperationNodesMenu(MaterialEditor::OperationNodeType::MULTIPLICATION, "*", popup_pos);
 
-			if (ImGui::BeginMenu("Divide"))
-				DrawSameTypesOperationNodesMenu(MaterialEditor::OperationNodeType::DIVISION, "/", popup_pos);
+				if (ImGui::BeginMenu("Divide"))
+					DrawSameTypesOperationNodesMenu(MaterialEditor::OperationNodeType::DIVISION, "/", popup_pos);
 
-			if (ImGui::BeginMenu("Num * Vec"))
-				DrawFloatVecOperationNodesMenu(MaterialEditor::OperationNodeType::FLOATVEC_MULTIPLY, "*", popup_pos);
+				if (ImGui::BeginMenu("Num * Vec"))
+					DrawFloatVecOperationNodesMenu(MaterialEditor::OperationNodeType::FLOATVEC_MULTIPLY, "*", popup_pos);
 
-			if (ImGui::BeginMenu("Num / Vec"))
-				DrawFloatVecOperationNodesMenu(MaterialEditor::OperationNodeType::FLOATVEC_DIVIDE, "/", popup_pos);
+				if (ImGui::BeginMenu("Num / Vec"))
+					DrawFloatVecOperationNodesMenu(MaterialEditor::OperationNodeType::FLOATVEC_DIVIDE, "/", popup_pos);
+
+				ImGui::EndMenu();
+			}
 			
-			if (ImGui::BeginMenu("Power"))
-				DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::POWER, popup_pos, false);
+			if (ImGui::BeginMenu("Specials"))
+			{
+				if (ImGui::BeginMenu("Power"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::POWER, popup_pos, false);
 
-			if (ImGui::BeginMenu("Sqrt"))
-				DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::SQUARE_ROOT, popup_pos, false);
+				if (ImGui::BeginMenu("Sqrt"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::SQUARE_ROOT, popup_pos, false);
 
-			if (ImGui::BeginMenu("Inv. Sqrt"))
-				DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::INVERSE_SQUARE_ROOT, popup_pos, false);
+				if (ImGui::BeginMenu("Inv. Sqrt"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::INVERSE_SQUARE_ROOT, popup_pos, false);
 
-			if (ImGui::BeginMenu("Lerp by Float"))
-				DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::FLOAT_LERP, popup_pos, false);
+				if (ImGui::BeginMenu("Lerp by Float"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::FLOAT_LERP, popup_pos, false);
 
-			if (ImGui::BeginMenu("Lerp by Vec"))
-				DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::VEC_LERP, popup_pos, true);
+				if (ImGui::BeginMenu("Lerp by Vec"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::VEC_LERP, popup_pos, true);
 
-			if (ImGui::BeginMenu("Vec Normalize"))
-				DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::VEC_NORMALIZE, popup_pos, true);
+				if (ImGui::BeginMenu("Vec Normalize"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::VEC_NORMALIZE, popup_pos, true);
 
-			if (ImGui::BeginMenu("Vec Magnitude"))
-				DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::VEC_MAGNITUDE, popup_pos, true);
+				if (ImGui::BeginMenu("Vec Magnitude"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::VEC_MAGNITUDE, popup_pos, true);
+
+				ImGui::EndMenu();
+			}
 
 			ImGui::EndMenu();
 		}
