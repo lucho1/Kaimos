@@ -33,18 +33,25 @@ namespace Kaimos::MaterialEditor {
 		glm::vec4 SqrtValue(PinDataType op_type, const glm::vec4& a);
 		glm::vec4 InvSqrtValue(PinDataType op_type, const glm::vec4& a);
 
-		// - Lerps -
+		// - Basic Specials -
+		glm::vec4 AbsoluteValue(PinDataType op_type, const glm::vec4& a);
+		glm::vec4 MinValue(PinDataType op_type, const glm::vec4& a, const glm::vec4& b);
+		glm::vec4 MaxValue(PinDataType op_type, const glm::vec4& a, const glm::vec4& b);
+
+		// - Lerps, Mods, Reflect & Refract -
 		glm::vec4 FLerpValues(PinDataType op_type, const glm::vec4& a, const glm::vec4& b, float c);
 		glm::vec4 VLerpValues(PinDataType op_type, const glm::vec4& a, const glm::vec4& b, const glm::vec4& c);
+		glm::vec4 FModValue(PinDataType op_type, const glm::vec4& a, float b);
+		glm::vec4 VModValue(PinDataType op_type, const glm::vec4& a, const glm::vec4& b);
+		glm::vec4 ReflectVec(PinDataType op_type, const glm::vec4& a, const glm::vec4& b);
+		glm::vec4 RefractVec(PinDataType op_type, const glm::vec4& a, const glm::vec4& b, float c);
 
 		// - Vectors -
 		glm::vec4 NormalizeVec(PinDataType op_type, const glm::vec4& a);
 		glm::vec4 VecMagnitude(PinDataType op_type, const glm::vec4& a);
+		glm::vec4 DotProduct(PinDataType op_type, const glm::vec4& a, const glm::vec4& b);
+		glm::vec4 CrossProduct(PinDataType op_type, const glm::vec4& a, const glm::vec4& b);
 
-		// - Others -
-		glm::vec4 AbsoluteValue(PinDataType op_type, const glm::vec4& a);
-		glm::vec4 FModValue(PinDataType op_type, const glm::vec4& a, float b);
-		glm::vec4 VModValue(PinDataType op_type, const glm::vec4& a, const glm::vec4& b);
 
 		// --- UI Methods ---
 		void DrawPinWidget(PinDataType pin_data_type, glm::vec4& value, float widget_speed = 0.05f, float widget_min = 0.0f, float widget_max = 0.0f, const char* widget_format = "%.2f");

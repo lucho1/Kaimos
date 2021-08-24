@@ -262,6 +262,12 @@ namespace Kaimos {
 				if (ImGui::BeginMenu("Absolute"))
 					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::ABS, popup_pos, false);
 
+				if (ImGui::BeginMenu("Min"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::MIN, popup_pos, false);
+
+				if (ImGui::BeginMenu("Max"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::MAX, popup_pos, false);
+
 				if (ImGui::BeginMenu("Power"))
 					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::POWER, popup_pos, false);
 
@@ -270,6 +276,12 @@ namespace Kaimos {
 
 				if (ImGui::BeginMenu("Inv. Sqrt"))
 					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::INVERSE_SQUARE_ROOT, popup_pos, false);
+
+				if (ImGui::BeginMenu("Vec Reflect"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::VEC_REFLECT, popup_pos, true);
+
+				if (ImGui::BeginMenu("Vec Refract"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::VEC_REFRACT, popup_pos, true);
 
 				if (ImGui::BeginMenu("Lerp by Float"))
 					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::FLOAT_LERP, popup_pos, false);
@@ -288,6 +300,12 @@ namespace Kaimos {
 
 				if (ImGui::BeginMenu("Mod by Vec"))
 					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::VEC_MOD, popup_pos, true);
+
+				if (ImGui::BeginMenu("Vec Dot"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::VEC_DOT, popup_pos, true);
+
+				if (ImGui::BeginMenu("Vec Cross"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::VEC_CROSS, popup_pos, true);
 
 				ImGui::EndMenu();
 			}

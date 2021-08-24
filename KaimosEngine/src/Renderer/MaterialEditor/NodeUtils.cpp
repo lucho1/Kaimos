@@ -218,7 +218,54 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 	}
 
 
-	// ----------- Lerps ------------
+	// ------ Basic Specials --------
+	glm::vec4 AbsoluteValue(PinDataType op_type, const glm::vec4& a)
+	{
+		switch (op_type)
+		{
+		case PinDataType::FLOAT:
+		case PinDataType::INT:		return glm::vec4(glm::abs(a.x), 0.0f, 0.0f, 0.0f);
+		case PinDataType::VEC2:		return glm::vec4(glm::abs(glm::vec2(a)), 0.0f, 0.0f);
+		case PinDataType::VEC3:		return glm::vec4(glm::abs(glm::vec3(a)), 0.0f);
+		case PinDataType::VEC4:		return glm::abs(a);
+		}
+
+		KS_FATAL_ERROR("Tried to perform a non-supported Absolute operation!");
+		return {};
+	}
+
+	glm::vec4 MinValue(PinDataType op_type, const glm::vec4& a, const glm::vec4& b)
+	{
+		switch (op_type)
+		{
+		case PinDataType::FLOAT:
+		case PinDataType::INT:		return glm::vec4(glm::min(a.x, b.x), 0.0f, 0.0f, 0.0f);
+		case PinDataType::VEC2:		return glm::vec4(glm::min(glm::vec2(a), glm::vec2(b)), 0.0f, 0.0f);
+		case PinDataType::VEC3:		return glm::vec4(glm::min(glm::vec3(a), glm::vec3(b)), 0.0f);
+		case PinDataType::VEC4:		return glm::min(a, b);
+		}
+
+		KS_FATAL_ERROR("Tried to perform a non-supported Min operation!");
+		return {};
+	}
+
+	glm::vec4 MaxValue(PinDataType op_type, const glm::vec4& a, const glm::vec4& b)
+	{
+		switch (op_type)
+		{
+		case PinDataType::FLOAT:
+		case PinDataType::INT:		return glm::vec4(glm::max(a.x, b.x), 0.0f, 0.0f, 0.0f);
+		case PinDataType::VEC2:		return glm::vec4(glm::max(glm::vec2(a), glm::vec2(b)), 0.0f, 0.0f);
+		case PinDataType::VEC3:		return glm::vec4(glm::max(glm::vec3(a), glm::vec3(b)), 0.0f);
+		case PinDataType::VEC4:		return glm::max(a, b);
+		}
+
+		KS_FATAL_ERROR("Tried to perform a non-supported Max operation!");
+		return {};
+	}
+
+
+	// -------- Lerps, Mods, Reflect & Refract --------
 	glm::vec4 FLerpValues(PinDataType op_type, const glm::vec4& a, const glm::vec4& b, float c)
 	{
 		switch (op_type)
@@ -247,6 +294,62 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 		return {};
 	}
 
+	glm::vec4 FModValue(PinDataType op_type, const glm::vec4& a, float b)
+	{
+		switch (op_type)
+		{
+		case PinDataType::FLOAT:
+		case PinDataType::INT:		return glm::vec4(glm::mod(a.x, b), 0.0f, 0.0f, 0.0f);
+		case PinDataType::VEC2:		return glm::vec4(glm::mod(glm::vec2(a), b), 0.0f, 0.0f);
+		case PinDataType::VEC3:		return glm::vec4(glm::mod(glm::vec3(a), b), 0.0f);
+		case PinDataType::VEC4:		return glm::mod(a, b);
+		}
+
+		KS_FATAL_ERROR("Tried to perform a non-supported FMod operation!");
+		return {};
+	}
+
+	glm::vec4 VModValue(PinDataType op_type, const glm::vec4& a, const glm::vec4& b)
+	{
+		switch (op_type)
+		{
+		case PinDataType::VEC2:		return glm::vec4(glm::mod(glm::vec2(a), glm::vec2(b)), 0.0f, 0.0f);
+		case PinDataType::VEC3:		return glm::vec4(glm::mod(glm::vec3(a), glm::vec3(b)), 0.0f);
+		case PinDataType::VEC4:		return glm::mod(a, b);
+		}
+
+		KS_FATAL_ERROR("Tried to perform a non-supported VMod operation!");
+		return {};
+	}
+
+	glm::vec4 ReflectVec(PinDataType op_type, const glm::vec4& a, const glm::vec4& b)
+	{
+		switch (op_type)
+		{
+		case PinDataType::VEC2:		return glm::vec4(glm::reflect(glm::vec2(a), glm::vec2(b)), 0.0f, 0.0f);
+		case PinDataType::VEC3:		return glm::vec4(glm::reflect(glm::vec3(a), glm::vec3(b)), 0.0f);
+		case PinDataType::VEC4:		return glm::reflect(a, b);
+		}
+
+		KS_FATAL_ERROR("Tried to perform a non-supported ReflectVec operation!");
+		return {};
+	}
+
+	glm::vec4 RefractVec(PinDataType op_type, const glm::vec4& a, const glm::vec4& b, float c)
+	{
+		switch (op_type)
+		{
+		case PinDataType::VEC2:		return glm::vec4(glm::refract(glm::vec2(a), glm::vec2(b), c), 0.0f, 0.0f);
+		case PinDataType::VEC3:		return glm::vec4(glm::refract(glm::vec3(a), glm::vec3(b), c), 0.0f);
+		case PinDataType::VEC4:		return glm::refract(a, b, c);
+		}
+
+		KS_FATAL_ERROR("Tried to perform a non-supported RefractVec operation!");
+		return {};
+	}
+
+
+	// ----------- Vectors ----------
 	glm::vec4 NormalizeVec(PinDataType op_type, const glm::vec4& a)
 	{
 		switch (op_type)
@@ -273,48 +376,29 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 		return {};
 	}
 
-
-	// ----------- Others -----------
-	glm::vec4 AbsoluteValue(PinDataType op_type, const glm::vec4& a)
+	glm::vec4 DotProduct(PinDataType op_type, const glm::vec4& a, const glm::vec4& b)
 	{
 		switch (op_type)
 		{
-			case PinDataType::FLOAT:
-			case PinDataType::INT:		return glm::vec4(glm::abs(a.x), 0.0f, 0.0f, 0.0f);
-			case PinDataType::VEC2:		return glm::vec4(glm::abs(glm::vec2(a)), 0.0f, 0.0f);
-			case PinDataType::VEC3:		return glm::vec4(glm::abs(glm::vec3(a)), 0.0f);
-			case PinDataType::VEC4:		return glm::abs(a);
+			case PinDataType::VEC2:		return glm::vec4(glm::dot(glm::vec2(a), glm::vec2(b)), 0.0f, 0.0f, 0.0f);
+			case PinDataType::VEC3:		return glm::vec4(glm::dot(glm::vec3(a), glm::vec3(b)), 0.0f, 0.0f, 0.0f);
+			case PinDataType::VEC4:		return glm::vec4(glm::dot(a, b), 0.0f, 0.0f, 0.0f);
 		}
 
-		KS_FATAL_ERROR("Tried to perform a non-supported Absolute operation!");
+		KS_FATAL_ERROR("Tried to perform a non-supported DotProduct operation!");
 		return {};
 	}
 
-	glm::vec4 FModValue(PinDataType op_type, const glm::vec4& a, float b)
+	glm::vec4 CrossProduct(PinDataType op_type, const glm::vec4& a, const glm::vec4& b)
 	{
 		switch (op_type)
 		{
-			case PinDataType::FLOAT:
-			case PinDataType::INT:		return glm::vec4(glm::mod(a.x, b), 0.0f, 0.0f, 0.0f);
-			case PinDataType::VEC2:		return glm::vec4(glm::mod(glm::vec2(a), b), 0.0f, 0.0f);
-			case PinDataType::VEC3:		return glm::vec4(glm::mod(glm::vec3(a), b), 0.0f);
-			case PinDataType::VEC4:		return glm::mod(a, b);
+			case PinDataType::VEC2:		return glm::vec4(a.x*b.y - b.x*a.y, 0.0f, 0.0f, 0.0f);
+			case PinDataType::VEC3:		return glm::vec4(glm::cross(glm::vec3(a), glm::vec3(b)), 0.0f);
+			case PinDataType::VEC4:		return glm::vec4(glm::cross(glm::vec3(a), glm::vec3(b)), 1.0f);
 		}
 
-		KS_FATAL_ERROR("Tried to perform a non-supported FMod operation!");
-		return {};
-	}
-
-	glm::vec4 VModValue(PinDataType op_type, const glm::vec4& a, const glm::vec4& b)
-	{
-		switch (op_type)
-		{
-			case PinDataType::VEC2:		return glm::vec4(glm::mod(glm::vec2(a), glm::vec2(b)), 0.0f, 0.0f);
-			case PinDataType::VEC3:		return glm::vec4(glm::mod(glm::vec3(a), glm::vec3(b)), 0.0f);
-			case PinDataType::VEC4:		return glm::mod(a, b);
-		}
-
-		KS_FATAL_ERROR("Tried to perform a non-supported VMod operation!");
+		KS_FATAL_ERROR("Tried to perform a non-supported DotProduct operation!");
 		return {};
 	}
 

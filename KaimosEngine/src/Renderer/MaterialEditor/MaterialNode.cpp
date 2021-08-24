@@ -849,22 +849,28 @@ namespace Kaimos::MaterialEditor {
 		switch (operation_type)
 		{
 			// Basics
-			case SpecialOperationNodeType::ABS:					{ m_Name = "Absolute Node"; m_InputsN = 1; break; }
+			case SpecialOperationNodeType::ABS:					{ m_Name = "Absolute Node";	m_InputsN = 1; break; }
+			case SpecialOperationNodeType::MIN:					{ m_Name = "Min Node";		break; }
+			case SpecialOperationNodeType::MAX:					{ m_Name = "Max Node";		break; }
 
 			// Powers
 			case SpecialOperationNodeType::POWER:				{ m_Name = "Power Node"; break; }
 			case SpecialOperationNodeType::SQUARE_ROOT:			{ m_Name = "Square Root Node";			m_InputsN = 1; break; }
 			case SpecialOperationNodeType::INVERSE_SQUARE_ROOT:	{ m_Name = "Inverse Square Root Node";	m_InputsN = 1; break; }
 
-			// Lerp/Mix, Mod, ...
-			case SpecialOperationNodeType::FLOAT_LERP:			{ m_Name = "FLerp Node"; m_InputsN = 3; in_type3 = PinDataType::FLOAT; break; }
-			case SpecialOperationNodeType::VEC_LERP:			{ m_Name = "VLerp Node"; m_InputsN = 3; break; }
-			case SpecialOperationNodeType::FLOAT_MOD:			{ m_Name = "FMod Node"; in_type3 = PinDataType::FLOAT; break; }
-			case SpecialOperationNodeType::VEC_MOD:				{ m_Name = "VMod Node"; break; }
+			// Lerp/Mix, Mod, Reflect, Refract
+			case SpecialOperationNodeType::FLOAT_LERP:			{ m_Name = "FLerp Node";	m_InputsN = 3; in_type3 = PinDataType::FLOAT; break; }
+			case SpecialOperationNodeType::VEC_LERP:			{ m_Name = "VLerp Node";	m_InputsN = 3; break; }
+			case SpecialOperationNodeType::FLOAT_MOD:			{ m_Name = "FMod Node";		in_type2 = PinDataType::FLOAT; break; }
+			case SpecialOperationNodeType::VEC_MOD:				{ m_Name = "VMod Node";		break; }
+			case SpecialOperationNodeType::VEC_REFLECT:			{ m_Name = "Reflect Node";	break; }
+			case SpecialOperationNodeType::VEC_REFRACT:			{ m_Name = "Refract Node";	m_InputsN = 3; in_type3 = PinDataType::FLOAT; break; }
 			
 			// Vectors
 			case SpecialOperationNodeType::VEC_NORMALIZE:		{ m_Name = "Normalize Node";		m_InputsN = 1; break; }
 			case SpecialOperationNodeType::VEC_MAGNITUDE:		{ m_Name = "Vec Magnitude Node";	m_InputsN = 1; out_type = PinDataType::FLOAT; break; }
+			case SpecialOperationNodeType::VEC_DOT:				{ m_Name = "Dot Product Node";		out_type = PinDataType::FLOAT; break; }
+			case SpecialOperationNodeType::VEC_CROSS:			{ m_Name = "Cross Product Node";	if (operation_data_type == PinDataType::VEC2) out_type = PinDataType::FLOAT; break; }
 		}
 
 		AddOutputPin(out_type, "Out");
@@ -895,21 +901,27 @@ namespace Kaimos::MaterialEditor {
 		{
 			// Basics
 			case SpecialOperationNodeType::ABS:					return NodeUtils::AbsoluteValue(op_type, a);
+			case SpecialOperationNodeType::MIN:					return NodeUtils::MinValue(op_type, a, b);
+			case SpecialOperationNodeType::MAX:					return NodeUtils::MaxValue(op_type, a, b);
 
 			// Powers
 			case SpecialOperationNodeType::POWER:				return NodeUtils::PowerValues(op_type, a, b);
 			case SpecialOperationNodeType::SQUARE_ROOT:			return NodeUtils::SqrtValue(op_type, a);
 			case SpecialOperationNodeType::INVERSE_SQUARE_ROOT:	return NodeUtils::InvSqrtValue(op_type, a);
 
-			// Lerp/Mix
+			// Lerp/Mix, Mod, Reflect, Refract
 			case SpecialOperationNodeType::FLOAT_LERP:			return NodeUtils::FLerpValues(op_type, a, b, c.x);
 			case SpecialOperationNodeType::VEC_LERP:			return NodeUtils::VLerpValues(op_type, a, b, c);
 			case SpecialOperationNodeType::FLOAT_MOD:			return NodeUtils::FModValue(op_type, a, b.x);
 			case SpecialOperationNodeType::VEC_MOD:				return NodeUtils::VModValue(op_type, a, b);
+			case SpecialOperationNodeType::VEC_REFLECT:			return NodeUtils::ReflectVec(op_type, a, b);
+			case SpecialOperationNodeType::VEC_REFRACT:			return NodeUtils::RefractVec(op_type, a, b, c.x);
 
 			// Vectors
 			case SpecialOperationNodeType::VEC_NORMALIZE:		return NodeUtils::NormalizeVec(op_type, a);
 			case SpecialOperationNodeType::VEC_MAGNITUDE:		return NodeUtils::VecMagnitude(op_type, a);
+			case SpecialOperationNodeType::VEC_DOT:				return NodeUtils::DotProduct(op_type, a, b);
+			case SpecialOperationNodeType::VEC_CROSS:			return NodeUtils::CrossProduct(op_type, a, b);
 		}
 
 	}
