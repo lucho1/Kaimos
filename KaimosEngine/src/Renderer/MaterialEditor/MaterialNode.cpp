@@ -866,6 +866,14 @@ namespace Kaimos::MaterialEditor {
 			case SpecialOperationNodeType::VEC_MOD:				{ m_Name = "VMod Node";		break; }
 			case SpecialOperationNodeType::VEC_REFLECT:			{ m_Name = "Reflect Node";	break; }
 			case SpecialOperationNodeType::VEC_REFRACT:			{ m_Name = "Refract Node";	m_InputsN = 3; in_type3 = PinDataType::FLOAT; break; }
+
+			// Ceil, Floor, Clamp, ...
+			case SpecialOperationNodeType::CEIL:				{ m_Name = "Ceil Node";		m_InputsN = 1; break; }
+			case SpecialOperationNodeType::FLOOR:				{ m_Name = "Floor Node";	m_InputsN = 1; break; }
+			case SpecialOperationNodeType::CLAMP:				{ m_Name = "Clamp Node";	m_InputsN = 3; in_type2 = in_type3 = PinDataType::FLOAT; break; }
+			case SpecialOperationNodeType::ROUND:				{ m_Name = "Round Node";	m_InputsN = 1; break; }
+			case SpecialOperationNodeType::SIGN:				{ m_Name = "Sign Node";		m_InputsN = 1; break; }
+			case SpecialOperationNodeType::FRACTAL:				{ m_Name = "Fractal Node";	m_InputsN = 1; break; }
 			
 			// Vectors
 			case SpecialOperationNodeType::VEC_NORMALIZE:		{ m_Name = "Normalize Node";		m_InputsN = 1; break; }
@@ -918,6 +926,14 @@ namespace Kaimos::MaterialEditor {
 			case SpecialOperationNodeType::VEC_MOD:				return NodeUtils::VModValue(op_type, a, b);
 			case SpecialOperationNodeType::VEC_REFLECT:			return NodeUtils::ReflectVec(op_type, a, b);
 			case SpecialOperationNodeType::VEC_REFRACT:			return NodeUtils::RefractVec(op_type, a, b, c.x);
+
+			// Ceil, Floor, Clamp, ...
+			case SpecialOperationNodeType::CEIL:				return NodeUtils::CeilValue(op_type, a);
+			case SpecialOperationNodeType::FLOOR:				return NodeUtils::FloorValue(op_type, a);
+			case SpecialOperationNodeType::CLAMP:				return NodeUtils::ClampValue(op_type, a, b.x, c.x);
+			case SpecialOperationNodeType::ROUND:				return NodeUtils::RoundValue(op_type, a);
+			case SpecialOperationNodeType::SIGN:				return NodeUtils::SignValue(op_type, a);
+			case SpecialOperationNodeType::FRACTAL:				return NodeUtils::FractalValue(op_type, a);
 
 			// Vectors
 			case SpecialOperationNodeType::VEC_NORMALIZE:		return NodeUtils::NormalizeVec(op_type, a);

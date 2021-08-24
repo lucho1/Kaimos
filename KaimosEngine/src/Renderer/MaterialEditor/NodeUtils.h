@@ -47,6 +47,14 @@ namespace Kaimos::MaterialEditor {
 		glm::vec4 ReflectVec(PinDataType op_type, const glm::vec4& a, const glm::vec4& b);
 		glm::vec4 RefractVec(PinDataType op_type, const glm::vec4& a, const glm::vec4& b, float c);
 
+		// - Ceil, Floor, ... -
+		glm::vec4 CeilValue(PinDataType op_type, const glm::vec4& a);
+		glm::vec4 FloorValue(PinDataType op_type, const glm::vec4& a);
+		glm::vec4 ClampValue(PinDataType op_type, const glm::vec4& a, float min_val, float max_val);
+		glm::vec4 RoundValue(PinDataType op_type, const glm::vec4& a);
+		glm::vec4 SignValue(PinDataType op_type, const glm::vec4& a);
+		glm::vec4 FractalValue(PinDataType op_type, const glm::vec4& a);
+
 		// - Vectors -
 		glm::vec4 NormalizeVec(PinDataType op_type, const glm::vec4& a);
 		glm::vec4 VecMagnitude(PinDataType op_type, const glm::vec4& a);

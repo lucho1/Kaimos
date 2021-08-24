@@ -277,6 +277,24 @@ namespace Kaimos {
 				if (ImGui::BeginMenu("Sqrt"))
 					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::SQUARE_ROOT, popup_pos, false);
 
+				if (ImGui::BeginMenu("Ceil"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::CEIL, popup_pos, false);
+
+				if (ImGui::BeginMenu("Floor"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::FLOOR, popup_pos, false);
+
+				if (ImGui::BeginMenu("Clamp"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::CLAMP, popup_pos, false);
+
+				if (ImGui::BeginMenu("Round"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::ROUND, popup_pos, false);
+
+				if (ImGui::BeginMenu("Sign"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::SIGN, popup_pos, false);
+
+				if (ImGui::BeginMenu("Fractal"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::FRACTAL, popup_pos, false);
+
 				if (ImGui::BeginMenu("Inv. Sqrt"))
 					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::INVERSE_SQUARE_ROOT, popup_pos, false);
 

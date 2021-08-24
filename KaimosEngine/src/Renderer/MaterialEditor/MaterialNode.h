@@ -44,6 +44,7 @@ namespace Kaimos::MaterialEditor {
 		ABS, MIN, MAX, NEGATE,												// Basics
 		POWER, SQUARE_ROOT, INVERSE_SQUARE_ROOT,							// Powers
 		FLOAT_LERP, VEC_LERP, FLOAT_MOD, VEC_MOD, VEC_REFLECT, VEC_REFRACT,	// Lerp/Mix, Mod, Reflect, Refract
+		CEIL, FLOOR, CLAMP, ROUND, SIGN, FRACTAL,							// Ceil, Floor, Clamp, ...
 		VEC_NORMALIZE, VEC_MAGNITUDE, VEC_DOT, VEC_CROSS					// Vectors
 	};
 
