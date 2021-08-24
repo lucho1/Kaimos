@@ -852,6 +852,7 @@ namespace Kaimos::MaterialEditor {
 			case SpecialOperationNodeType::ABS:					{ m_Name = "Absolute Node";	m_InputsN = 1; break; }
 			case SpecialOperationNodeType::MIN:					{ m_Name = "Min Node";		break; }
 			case SpecialOperationNodeType::MAX:					{ m_Name = "Max Node";		break; }
+			case SpecialOperationNodeType::NEGATE:				{ m_Name = "Negate Node";	m_InputsN = 1; break; }
 
 			// Powers
 			case SpecialOperationNodeType::POWER:				{ m_Name = "Power Node"; break; }
@@ -903,6 +904,7 @@ namespace Kaimos::MaterialEditor {
 			case SpecialOperationNodeType::ABS:					return NodeUtils::AbsoluteValue(op_type, a);
 			case SpecialOperationNodeType::MIN:					return NodeUtils::MinValue(op_type, a, b);
 			case SpecialOperationNodeType::MAX:					return NodeUtils::MaxValue(op_type, a, b);
+			case SpecialOperationNodeType::NEGATE:				return NodeUtils::Negate(op_type, a);
 
 			// Powers
 			case SpecialOperationNodeType::POWER:				return NodeUtils::PowerValues(op_type, a, b);

@@ -268,6 +268,9 @@ namespace Kaimos {
 				if (ImGui::BeginMenu("Max"))
 					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::MAX, popup_pos, false);
 
+				if (ImGui::BeginMenu("Negate"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::NEGATE, popup_pos, false);
+
 				if (ImGui::BeginMenu("Power"))
 					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::POWER, popup_pos, false);
 

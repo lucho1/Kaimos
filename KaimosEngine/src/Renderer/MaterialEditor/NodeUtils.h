@@ -37,6 +37,7 @@ namespace Kaimos::MaterialEditor {
 		glm::vec4 AbsoluteValue(PinDataType op_type, const glm::vec4& a);
 		glm::vec4 MinValue(PinDataType op_type, const glm::vec4& a, const glm::vec4& b);
 		glm::vec4 MaxValue(PinDataType op_type, const glm::vec4& a, const glm::vec4& b);
+		glm::vec4 Negate(PinDataType op_type, const glm::vec4& a);
 
 		// - Lerps, Mods, Reflect & Refract -
 		glm::vec4 FLerpValues(PinDataType op_type, const glm::vec4& a, const glm::vec4& b, float c);
