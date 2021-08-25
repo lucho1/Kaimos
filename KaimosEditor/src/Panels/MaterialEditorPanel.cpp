@@ -285,6 +285,18 @@ namespace Kaimos {
 
 			if (ImGui::BeginMenu("Shaders Functions"))
 			{
+				if (ImGui::BeginMenu("Step by Float"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::FLOAT_STEP, popup_pos, false);
+
+				if (ImGui::BeginMenu("Step by Vec"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::VEC_STEP, popup_pos, true);
+
+				if (ImGui::BeginMenu("Smoothstep by Float"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::FLOAT_SMOOTHSTEP, popup_pos, false);
+
+				if (ImGui::BeginMenu("Smoothstep by Vec"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::VEC_SMOOTHSTEP, popup_pos, true);
+
 				if (ImGui::BeginMenu("Ceil"))
 					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::CEIL, popup_pos, false);
 

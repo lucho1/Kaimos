@@ -44,6 +44,7 @@ namespace Kaimos::MaterialEditor {
 		ABS, MIN, MAX, NEGATE,												// Basics
 		POWER, SQUARE_ROOT, INVERSE_SQUARE_ROOT,							// Powers
 		FLOAT_LERP, VEC_LERP, FLOAT_MOD, VEC_MOD, VEC_REFLECT, VEC_REFRACT,	// Lerp/Mix, Mod, Reflect, Refract
+		FLOAT_STEP, VEC_STEP, FLOAT_SMOOTHSTEP, VEC_SMOOTHSTEP,				// Step, Smoothstep
 		CEIL, FLOOR, CLAMP, ROUND, SIGN, FRACTAL,							// Ceil, Floor, Clamp, ...
 		VEC_NORMALIZE, VEC_MAGNITUDE, VEC_DIST, VEC_DOT, VEC_CROSS			// Vectors
 	};
@@ -259,8 +260,9 @@ namespace Kaimos::MaterialEditor {
 	public:
 
 		SpecialOperationNode(SpecialOperationNodeType operation_type, PinDataType operation_data_type);
-		SpecialOperationNode(const std::string& name, SpecialOperationNodeType operation_type, uint id, uint inputs_n)
-			: MaterialNode(name, MaterialNodeType::SPECIAL_OPERATION, id), m_OperationType(operation_type), m_InputsN(inputs_n) {}
+		SpecialOperationNode(const std::string& name, SpecialOperationNodeType operation_type, uint id, uint inputs_n, PinDataType op_out_type)
+			: MaterialNode(name, MaterialNodeType::SPECIAL_OPERATION, id)
+			, m_OperationType(operation_type), m_InputsN(inputs_n), m_OperationOutputType(op_out_type) {}
 
 		SpecialOperationNodeType GetOperationType() const { return m_OperationType; }
 
@@ -273,6 +275,7 @@ namespace Kaimos::MaterialEditor {
 
 		SpecialOperationNodeType m_OperationType = SpecialOperationNodeType::NONE;
 		uint m_InputsN;
+		PinDataType m_OperationOutputType = PinDataType::NONE;
 	};
 }
 

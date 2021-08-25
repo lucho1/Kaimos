@@ -363,6 +363,71 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 		return {};
 	}
 
+
+	// ------------- Step, Smoothstep -----------------
+	glm::vec4 FStepValue(PinDataType op_type, float edge, const glm::vec4& val)
+	{
+		switch (op_type)
+		{
+			case PinDataType::FLOAT:
+			case PinDataType::INT:		return glm::vec4(glm::step(edge, val.x), 0.0f, 0.0f, 0.0f);
+			case PinDataType::VEC2:		return glm::vec4(glm::step(edge, glm::vec2(val)), 0.0f, 0.0f);
+			case PinDataType::VEC3:		return glm::vec4(glm::step(edge, glm::vec3(val)), 0.0f);
+			case PinDataType::VEC4:		return glm::step(edge, val);
+		}
+
+		KS_FATAL_ERROR("Tried to perform a non-supported FStep operation!");
+		return {};
+	}
+	
+	glm::vec4 VStepValue(PinDataType op_type, const glm::vec4& edge, const glm::vec4& val)
+	{
+		switch (op_type)
+		{
+			case PinDataType::VEC2:		return glm::vec4(glm::step(glm::vec2(edge), glm::vec2(val)), 0.0f, 0.0f);
+			case PinDataType::VEC3:		return glm::vec4(glm::step(glm::vec3(edge), glm::vec3(val)), 0.0f);
+			case PinDataType::VEC4:		return glm::step(edge, val);
+		}
+
+		KS_FATAL_ERROR("Tried to perform a non-supported VStep operation!");
+		return {};
+	}
+
+	glm::vec4 FSmoothstepValue(PinDataType op_type, float edge1, float edge2, const glm::vec4& val)
+	{
+		float e1 = edge1, e2 = edge2;
+		if (Maths::CompareFloats(e1, e2))
+		{
+			e1 = 0.0f;
+			e2 = 1.0f;
+		}
+
+		switch (op_type)
+		{
+			case PinDataType::FLOAT:
+			case PinDataType::INT:		return glm::vec4(glm::smoothstep(e1, e2, val.x), 0.0f, 0.0f, 0.0f);
+			case PinDataType::VEC2:		return glm::vec4(glm::smoothstep(e1, e2, glm::vec2(val)), 0.0f, 0.0f);
+			case PinDataType::VEC3:		return glm::vec4(glm::smoothstep(e1, e2, glm::vec3(val)), 0.0f);
+			case PinDataType::VEC4:		return glm::smoothstep(e1, e2, val);
+		}
+
+		KS_FATAL_ERROR("Tried to perform a non-supported FSmoothstep operation!");
+		return {};
+	}
+
+	glm::vec4 VSmoothstepValue(PinDataType op_type, const glm::vec4& edge1, const glm::vec4& edge2, const glm::vec4& val)
+	{
+		switch (op_type)
+		{
+			case PinDataType::VEC2:		return glm::vec4(glm::smoothstep(glm::vec2(edge1), glm::vec2(edge2), glm::vec2(val)), 0.0f, 0.0f);
+			case PinDataType::VEC3:		return glm::vec4(glm::smoothstep(glm::vec3(edge1), glm::vec3(edge2), glm::vec3(val)), 0.0f);
+			case PinDataType::VEC4:		return glm::smoothstep(edge1, edge2, val);
+		}
+
+		KS_FATAL_ERROR("Tried to perform a non-supported VSmoothstep operation!");
+		return {};
+	}
+
 	
 	// ----- Ceil, Floor, ... -------
 	glm::vec4 CeilValue(PinDataType op_type, const glm::vec4& a)

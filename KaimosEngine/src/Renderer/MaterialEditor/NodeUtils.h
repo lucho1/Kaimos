@@ -55,6 +55,12 @@ namespace Kaimos::MaterialEditor {
 		glm::vec4 SignValue(PinDataType op_type, const glm::vec4& a);
 		glm::vec4 FractalValue(PinDataType op_type, const glm::vec4& a);
 
+		// - Step, Smoothstep -
+		glm::vec4 FStepValue(PinDataType op_type, float edge, const glm::vec4& val);
+		glm::vec4 VStepValue(PinDataType op_type, const glm::vec4& edge, const glm::vec4& val);
+		glm::vec4 FSmoothstepValue(PinDataType op_type, float edge1, float edge2, const glm::vec4& val);
+		glm::vec4 VSmoothstepValue(PinDataType op_type, const glm::vec4& edge1, const glm::vec4& edge2, const glm::vec4& val);
+
 		// - Vectors -
 		glm::vec4 NormalizeVec(PinDataType op_type, const glm::vec4& a);
 		glm::vec4 VecMagnitude(PinDataType op_type, const glm::vec4& a);

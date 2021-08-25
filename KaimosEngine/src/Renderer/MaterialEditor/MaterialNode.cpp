@@ -867,6 +867,12 @@ namespace Kaimos::MaterialEditor {
 			case SpecialOperationNodeType::VEC_REFLECT:			{ m_Name = "Reflect Node";	break; }
 			case SpecialOperationNodeType::VEC_REFRACT:			{ m_Name = "Refract Node";	m_InputsN = 3; in_type3 = PinDataType::FLOAT; break; }
 
+			// Lerp/Mix, Mod, Reflect, Refract
+			case SpecialOperationNodeType::FLOAT_STEP:			{ m_Name = "FStep Node";		in_type1 = PinDataType::FLOAT; break; }
+			case SpecialOperationNodeType::VEC_STEP:			{ m_Name = "VStep Node";		break; }
+			case SpecialOperationNodeType::FLOAT_SMOOTHSTEP:	{ m_Name = "FSmoothstep Node";	m_InputsN = 3; in_type1 = in_type2 = PinDataType::FLOAT; break; }
+			case SpecialOperationNodeType::VEC_SMOOTHSTEP:		{ m_Name = "VSmoothstep Node";	m_InputsN = 3; break; }
+
 			// Ceil, Floor, Clamp, ...
 			case SpecialOperationNodeType::CEIL:				{ m_Name = "Ceil Node";		m_InputsN = 1; break; }
 			case SpecialOperationNodeType::FLOOR:				{ m_Name = "Floor Node";	m_InputsN = 1; break; }
@@ -883,8 +889,9 @@ namespace Kaimos::MaterialEditor {
 			case SpecialOperationNodeType::VEC_CROSS:			{ m_Name = "Cross Product Node";	if (operation_data_type == PinDataType::VEC2) out_type = PinDataType::FLOAT; break; }
 		}
 
+		m_OperationOutputType = out_type;
 		AddOutputPin(out_type, "Out");
-		AddInputPin(in_type1, false, "Value 1");
+		AddInputPin(in_type1, false, "Value 1", 0.0f);
 		
 		if (m_InputsN >= 2)
 			AddInputPin(in_type2, false, "Value 2");
@@ -895,12 +902,14 @@ namespace Kaimos::MaterialEditor {
 	
 	glm::vec4 SpecialOperationNode::CalculateNodeResult()
 	{
-		PinDataType op_type = m_NodeInputPins[0]->GetType();
+		if(m_OperationOutputType == PinDataType::NONE)
+			KS_FATAL_ERROR("Some material node has this wrong!")
+
 		switch (m_InputsN)
 		{
-			case 1: return ProcessOperation(op_type, GetInputValue(0));
-			case 2: return ProcessOperation(op_type, GetInputValue(0), GetInputValue(1));
-			case 3: return ProcessOperation(op_type, GetInputValue(0), GetInputValue(1), GetInputValue(2));
+			case 1: return ProcessOperation(m_OperationOutputType, GetInputValue(0));
+			case 2: return ProcessOperation(m_OperationOutputType, GetInputValue(0), GetInputValue(1));
+			case 3: return ProcessOperation(m_OperationOutputType, GetInputValue(0), GetInputValue(1), GetInputValue(2));
 		}
 	}
 
@@ -928,6 +937,12 @@ namespace Kaimos::MaterialEditor {
 			case SpecialOperationNodeType::VEC_REFLECT:			return NodeUtils::ReflectVec(op_type, a, b);
 			case SpecialOperationNodeType::VEC_REFRACT:			return NodeUtils::RefractVec(op_type, a, b, c.x);
 
+			// Lerp/Mix, Mod, Reflect, Refract
+			case SpecialOperationNodeType::FLOAT_STEP:			return NodeUtils::FStepValue(op_type, a.x, b);
+			case SpecialOperationNodeType::VEC_STEP:			return NodeUtils::VStepValue(op_type, a, b);
+			case SpecialOperationNodeType::FLOAT_SMOOTHSTEP:	return NodeUtils::FSmoothstepValue(op_type, a.x, b.x, c);
+			case SpecialOperationNodeType::VEC_SMOOTHSTEP:		return NodeUtils::VSmoothstepValue(op_type, a, b, c);
+
 			// Ceil, Floor, Clamp, ...
 			case SpecialOperationNodeType::CEIL:				return NodeUtils::CeilValue(op_type, a);
 			case SpecialOperationNodeType::FLOOR:				return NodeUtils::FloorValue(op_type, a);
@@ -953,5 +968,6 @@ namespace Kaimos::MaterialEditor {
 		SerializeBaseNode(output_emitter);
 		output_emitter << YAML::Key << "SpecOpNodeType" << YAML::Value << (int)m_OperationType;
 		output_emitter << YAML::Key << "InputsN" << YAML::Value << m_InputsN;
+		output_emitter << YAML::Key << "OpOutType" << YAML::Value << (int)m_OperationOutputType;
 	}
 }

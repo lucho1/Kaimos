@@ -255,9 +255,14 @@ namespace Kaimos::MaterialEditor {
 						auto spectype_node = node_val["SpecOpNodeType"];
 						if (spectype_node)
 						{
+							if (!node_val["InputsN"] || node_val["OpOutType"])
+								KS_FATAL_ERROR("Some material didn't Serialized this value!");
+
 							uint inputs_n = node_val["InputsN"].as<uint>();
+							uint op_out_type = node_val["OpOutType"].as<uint>();
+
 							MaterialEditor::SpecialOperationNodeType op_type = (MaterialEditor::SpecialOperationNodeType)spectype_node.as<int>();
-							node = static_cast<MaterialNode*>(new SpecialOperationNode(node_name, op_type, node_id, inputs_n));
+							node = static_cast<MaterialNode*>(new SpecialOperationNode(node_name, op_type, node_id, inputs_n, (MaterialEditor::PinDataType)op_out_type));
 							break;
 						}
 					}
