@@ -280,6 +280,18 @@ namespace Kaimos {
 				if (ImGui::BeginMenu("Inv. Sqrt"))
 					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::INVERSE_SQUARE_ROOT, popup_pos, false);
 
+				if (ImGui::BeginMenu("Log"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::LOG, popup_pos, false);
+
+				if (ImGui::BeginMenu("Log2"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::LOG2, popup_pos, false);
+
+				if (ImGui::BeginMenu("Exp"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::EXP, popup_pos, false);
+
+				if (ImGui::BeginMenu("Exp2"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::EXP2, popup_pos, false);
+
 				ImGui::EndMenu();
 			}
 

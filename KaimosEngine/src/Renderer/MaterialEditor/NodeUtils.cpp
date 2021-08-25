@@ -198,7 +198,7 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 			case PinDataType::VEC4:		return glm::sqrt(a);
 		}
 
-		KS_FATAL_ERROR("Tried to perform a non-supported Sqrt operation!");
+		KS_FATAL_ERROR("Tried to perform a non-supported Squared operation!");
 		return {};
 	}
 
@@ -213,7 +213,68 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 			case PinDataType::VEC4:		return glm::inversesqrt(a);
 		}
 
-		KS_FATAL_ERROR("Tried to perform a non-supported InvSqrt operation!");
+		KS_FATAL_ERROR("Tried to perform a non-supported Inverse Squared operation!");
+		return {};
+	}
+
+
+	glm::vec4 LogValue(PinDataType op_type, const glm::vec4& a)
+	{
+		switch (op_type)
+		{
+			case PinDataType::FLOAT:
+			case PinDataType::INT:		return glm::vec4(glm::log(glm::max(a.x, 0.00001f)), 0.0f, 0.0f, 0.0f);
+			case PinDataType::VEC2:		return glm::vec4(glm::log(glm::max(glm::vec2(a), 0.00001f)), 0.0f, 0.0f);
+			case PinDataType::VEC3:		return glm::vec4(glm::log(glm::max(glm::vec3(a), 0.00001f)), 0.0f);
+			case PinDataType::VEC4:		return glm::log(glm::max(a, 0.00001f));
+		}
+
+		KS_FATAL_ERROR("Tried to perform a non-supported Logarithmic operation!");
+		return {};
+	}
+
+	glm::vec4 Log2Value(PinDataType op_type, const glm::vec4& a)
+	{
+		switch (op_type)
+		{
+			case PinDataType::FLOAT:
+			case PinDataType::INT:		return glm::vec4(glm::log2(glm::max(a.x, 0.001f)), 0.0f, 0.0f, 0.0f);
+			case PinDataType::VEC2:		return glm::vec4(glm::log2(glm::max(glm::vec2(a), 0.001f)), 0.0f, 0.0f);
+			case PinDataType::VEC3:		return glm::vec4(glm::log2(glm::max(glm::vec3(a), 0.001f)), 0.0f);
+			case PinDataType::VEC4:		return glm::log2(glm::max(a, 0.001f));
+		}
+
+		KS_FATAL_ERROR("Tried to perform a non-supported Logarithmic2 operation!");
+		return {};
+	}
+
+	glm::vec4 ExpValue(PinDataType op_type, const glm::vec4& a)
+	{
+		switch (op_type)
+		{
+			case PinDataType::FLOAT:
+			case PinDataType::INT:		return glm::vec4(glm::exp(a.x), 0.0f, 0.0f, 0.0f);
+			case PinDataType::VEC2:		return glm::vec4(glm::exp(glm::vec2(a)), 0.0f, 0.0f);
+			case PinDataType::VEC3:		return glm::vec4(glm::exp(glm::vec3(a)), 0.0f);
+			case PinDataType::VEC4:		return glm::exp(a);
+		}
+
+		KS_FATAL_ERROR("Tried to perform a non-supported Exponential operation!");
+		return {};
+	}
+
+	glm::vec4 Exp2Value(PinDataType op_type, const glm::vec4& a)
+	{
+		switch (op_type)
+		{
+			case PinDataType::FLOAT:
+			case PinDataType::INT:		return glm::vec4(glm::exp2(a.x), 0.0f, 0.0f, 0.0f);
+			case PinDataType::VEC2:		return glm::vec4(glm::exp2(glm::vec2(a)), 0.0f, 0.0f);
+			case PinDataType::VEC3:		return glm::vec4(glm::exp2(glm::vec3(a)), 0.0f);
+			case PinDataType::VEC4:		return glm::exp2(a);
+		}
+
+		KS_FATAL_ERROR("Tried to perform a non-supported Exponential2 operation!");
 		return {};
 	}
 

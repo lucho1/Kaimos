@@ -858,6 +858,10 @@ namespace Kaimos::MaterialEditor {
 			case SpecialOperationNodeType::POWER:				{ m_Name = "Power Node"; break; }
 			case SpecialOperationNodeType::SQUARE_ROOT:			{ m_Name = "Square Root Node";			m_InputsN = 1; break; }
 			case SpecialOperationNodeType::INVERSE_SQUARE_ROOT:	{ m_Name = "Inverse Square Root Node";	m_InputsN = 1; break; }
+			case SpecialOperationNodeType::LOG:					{ m_Name = "Log Root Node";				m_InputsN = 1; break; }
+			case SpecialOperationNodeType::LOG2:				{ m_Name = "Log2 Root Node";			m_InputsN = 1; break; }
+			case SpecialOperationNodeType::EXP:					{ m_Name = "Exp Root Node";				m_InputsN = 1; break; }
+			case SpecialOperationNodeType::EXP2:				{ m_Name = "Exp2 Root Node";			m_InputsN = 1; break; }
 
 			// Lerp/Mix, Mod, Reflect, Refract
 			case SpecialOperationNodeType::FLOAT_LERP:			{ m_Name = "FLerp Node";	m_InputsN = 3; in_type3 = PinDataType::FLOAT; break; }
@@ -928,6 +932,10 @@ namespace Kaimos::MaterialEditor {
 			case SpecialOperationNodeType::POWER:				return NodeUtils::PowerValues(op_type, a, b);
 			case SpecialOperationNodeType::SQUARE_ROOT:			return NodeUtils::SqrtValue(op_type, a);
 			case SpecialOperationNodeType::INVERSE_SQUARE_ROOT:	return NodeUtils::InvSqrtValue(op_type, a);
+			case SpecialOperationNodeType::LOG:					return NodeUtils::LogValue(op_type, a);
+			case SpecialOperationNodeType::LOG2:				return NodeUtils::Log2Value(op_type, a);
+			case SpecialOperationNodeType::EXP:					return NodeUtils::ExpValue(op_type, a);
+			case SpecialOperationNodeType::EXP2:				return NodeUtils::Exp2Value(op_type, a);
 
 			// Lerp/Mix, Mod, Reflect, Refract
 			case SpecialOperationNodeType::FLOAT_LERP:			return NodeUtils::FLerpValues(op_type, a, b, c.x);

@@ -32,6 +32,10 @@ namespace Kaimos::MaterialEditor {
 		glm::vec4 PowerValues(PinDataType op_type, const glm::vec4& a, const glm::vec4& b);
 		glm::vec4 SqrtValue(PinDataType op_type, const glm::vec4& a);
 		glm::vec4 InvSqrtValue(PinDataType op_type, const glm::vec4& a);
+		glm::vec4 LogValue(PinDataType op_type, const glm::vec4& a);
+		glm::vec4 Log2Value(PinDataType op_type, const glm::vec4& a);
+		glm::vec4 ExpValue(PinDataType op_type, const glm::vec4& a);
+		glm::vec4 Exp2Value(PinDataType op_type, const glm::vec4& a);
 
 		// - Basic Specials -
 		glm::vec4 AbsoluteValue(PinDataType op_type, const glm::vec4& a);

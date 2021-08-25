@@ -42,7 +42,7 @@ namespace Kaimos::MaterialEditor {
 	{
 		NONE,
 		ABS, MIN, MAX, NEGATE,												// Basics
-		POWER, SQUARE_ROOT, INVERSE_SQUARE_ROOT,							// Powers
+		POWER, SQUARE_ROOT, INVERSE_SQUARE_ROOT, LOG, LOG2, EXP, EXP2,		// Powers
 		FLOAT_LERP, VEC_LERP, FLOAT_MOD, VEC_MOD, VEC_REFLECT, VEC_REFRACT,	// Lerp/Mix, Mod, Reflect, Refract
 		FLOAT_STEP, VEC_STEP, FLOAT_SMOOTHSTEP, VEC_SMOOTHSTEP,				// Step, Smoothstep
 		CEIL, FLOOR, CLAMP, ROUND, SIGN, FRACTAL,							// Ceil, Floor, Clamp, ...

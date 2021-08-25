@@ -255,7 +255,7 @@ namespace Kaimos::MaterialEditor {
 						auto spectype_node = node_val["SpecOpNodeType"];
 						if (spectype_node)
 						{
-							if (!node_val["InputsN"] || node_val["OpOutType"])
+							if (!node_val["InputsN"] || !node_val["OpOutType"])
 								KS_FATAL_ERROR("Some material didn't Serialized this value!");
 
 							uint inputs_n = node_val["InputsN"].as<uint>();
