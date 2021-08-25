@@ -855,9 +855,9 @@ namespace Kaimos::MaterialEditor {
 			case SpecialOperationNodeType::NEGATE:				{ m_Name = "Negate Node";	m_InputsN = 1; break; }
 
 			// Powers
-			case SpecialOperationNodeType::POWER:				{ m_Name = "Power Node"; break; }
-			case SpecialOperationNodeType::SQUARE_ROOT:			{ m_Name = "Square Root Node";			m_InputsN = 1; break; }
-			case SpecialOperationNodeType::INVERSE_SQUARE_ROOT:	{ m_Name = "Inverse Square Root Node";	m_InputsN = 1; break; }
+			case SpecialOperationNodeType::POW:					{ m_Name = "Power Node"; break; }
+			case SpecialOperationNodeType::SQRT:				{ m_Name = "Square Root Node";			m_InputsN = 1; break; }
+			case SpecialOperationNodeType::INV_SQRT:			{ m_Name = "Inverse Square Root Node";	m_InputsN = 1; break; }
 			case SpecialOperationNodeType::LOG:					{ m_Name = "Log Root Node";				m_InputsN = 1; break; }
 			case SpecialOperationNodeType::LOG2:				{ m_Name = "Log2 Root Node";			m_InputsN = 1; break; }
 			case SpecialOperationNodeType::EXP:					{ m_Name = "Exp Root Node";				m_InputsN = 1; break; }
@@ -929,9 +929,9 @@ namespace Kaimos::MaterialEditor {
 			case SpecialOperationNodeType::NEGATE:				return NodeUtils::Negate(op_type, a);
 
 			// Powers
-			case SpecialOperationNodeType::POWER:				return NodeUtils::PowerValues(op_type, a, b);
-			case SpecialOperationNodeType::SQUARE_ROOT:			return NodeUtils::SqrtValue(op_type, a);
-			case SpecialOperationNodeType::INVERSE_SQUARE_ROOT:	return NodeUtils::InvSqrtValue(op_type, a);
+			case SpecialOperationNodeType::POW:					return NodeUtils::PowerValues(op_type, a, b);
+			case SpecialOperationNodeType::SQRT:				return NodeUtils::SqrtValue(op_type, a);
+			case SpecialOperationNodeType::INV_SQRT:			return NodeUtils::InvSqrtValue(op_type, a);
 			case SpecialOperationNodeType::LOG:					return NodeUtils::LogValue(op_type, a);
 			case SpecialOperationNodeType::LOG2:				return NodeUtils::Log2Value(op_type, a);
 			case SpecialOperationNodeType::EXP:					return NodeUtils::ExpValue(op_type, a);

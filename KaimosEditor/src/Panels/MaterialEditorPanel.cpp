@@ -272,13 +272,13 @@ namespace Kaimos {
 					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::NEGATE, popup_pos, false);
 
 				if (ImGui::BeginMenu("Power"))
-					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::POWER, popup_pos, false);
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::POW, popup_pos, false);
 
 				if (ImGui::BeginMenu("Sqrt"))
-					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::SQUARE_ROOT, popup_pos, false);
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::SQRT, popup_pos, false);
 
 				if (ImGui::BeginMenu("Inv. Sqrt"))
-					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::INVERSE_SQUARE_ROOT, popup_pos, false);
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::INV_SQRT, popup_pos, false);
 
 				if (ImGui::BeginMenu("Log"))
 					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::LOG, popup_pos, false);
