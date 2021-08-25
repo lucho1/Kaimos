@@ -43,6 +43,8 @@ namespace Kaimos::MaterialEditor {
 		NONE,
 		ABS, MIN, MAX, NEGATE,												// Basics
 		POW, SQRT, INV_SQRT, LOG, LOG2, EXP, EXP2,							// Powers
+		SIN, COS, TAN, ASIN, ACOS, ATAN,									// Trigonometry
+		HSIN, HCOS, HTAN, HASIN, HACOS, HATAN,								// Hiperbolic Trigonometry
 		FLOAT_LERP, VEC_LERP, FLOAT_MOD, VEC_MOD, VEC_REFLECT, VEC_REFRACT,	// Lerp/Mix, Mod, Reflect, Refract
 		FLOAT_STEP, VEC_STEP, FLOAT_SMOOTHSTEP, VEC_SMOOTHSTEP,				// Step, Smoothstep
 		CEIL, FLOOR, CLAMP, ROUND, SIGN, FRACTAL,							// Ceil, Floor, Clamp, ...

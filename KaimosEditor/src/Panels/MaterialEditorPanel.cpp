@@ -295,6 +295,57 @@ namespace Kaimos {
 				ImGui::EndMenu();
 			}
 
+			if (ImGui::BeginMenu("Trigonometry"))
+			{
+				if (ImGui::BeginMenu("Standard"))
+				{
+					if (ImGui::BeginMenu("Sin"))
+						DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::SIN, popup_pos, false);
+
+					if (ImGui::BeginMenu("Cos"))
+						DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::COS, popup_pos, false);
+
+					if (ImGui::BeginMenu("Tan"))
+						DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::TAN, popup_pos, false);
+
+					if (ImGui::BeginMenu("ArcSin"))
+						DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::ASIN, popup_pos, false);
+
+					if (ImGui::BeginMenu("ArcCos"))
+						DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::ACOS, popup_pos, false);
+
+					if (ImGui::BeginMenu("ArcTan"))
+						DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::ATAN, popup_pos, false);
+
+					ImGui::EndMenu();
+				}
+
+				if (ImGui::BeginMenu("Hyperbolic"))
+				{
+					if (ImGui::BeginMenu("H Sin"))
+						DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::HSIN, popup_pos, false);
+
+					if (ImGui::BeginMenu("H Cos"))
+						DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::HCOS, popup_pos, false);
+
+					if (ImGui::BeginMenu("H Tan"))
+						DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::HTAN, popup_pos, false);
+
+					if (ImGui::BeginMenu("H ArcSin"))
+						DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::HASIN, popup_pos, false);
+
+					if (ImGui::BeginMenu("H ArcCos"))
+						DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::HACOS, popup_pos, false);
+
+					if (ImGui::BeginMenu("H ArcTan"))
+						DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::HATAN, popup_pos, false);
+
+					ImGui::EndMenu();
+				}
+
+				ImGui::EndMenu();
+			}
+
 			if (ImGui::BeginMenu("Shaders Functions"))
 			{
 				if (ImGui::BeginMenu("Step by Float"))

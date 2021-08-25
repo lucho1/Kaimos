@@ -39,6 +39,33 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 		return (type == PinDataType::VEC2 || type == PinDataType::VEC3 || type == PinDataType::VEC4);
 	}
 
+	glm::vec2 EnsureDivisor(const glm::vec2& a, const glm::vec4& b)
+	{
+		glm::vec2 ret = a;
+		if (Maths::CompareFloats(a.x - b.x, 0.0f)) ret.x = b.x + 1.0f;
+		if (Maths::CompareFloats(a.y - b.y, 0.0f)) ret.y = b.y + 1.0f;
+		return ret;
+	}
+
+	glm::vec3 EnsureDivisor(const glm::vec3& a, const glm::vec4& b)
+	{
+		glm::vec3 ret = a;
+		if (Maths::CompareFloats(a.x - b.x, 0.0f)) ret.x = b.x + 1.0f;
+		if (Maths::CompareFloats(a.y - b.y, 0.0f)) ret.y = b.y + 1.0f;
+		if (Maths::CompareFloats(a.z - b.z, 0.0f)) ret.z = b.z + 1.0f;
+		return ret;
+	}
+
+	glm::vec4 EnsureDivisor(const glm::vec4& a, const glm::vec4& b)
+	{
+		glm::vec4 ret = a;
+		if (Maths::CompareFloats(a.x - b.x, 0.0f)) ret.x = b.x + 1.0f;
+		if (Maths::CompareFloats(a.y - b.y, 0.0f)) ret.y = b.y + 1.0f;
+		if (Maths::CompareFloats(a.z - b.z, 0.0f)) ret.z = b.z + 1.0f;
+		if (Maths::CompareFloats(a.w - b.w, 0.0f)) ret.w = b.w + 1.0f;
+		return ret;
+	}
+
 	glm::vec2 GetNonZeroVector(glm::vec2 vec)
 	{
 		glm::vec2 ret = vec;
@@ -217,7 +244,6 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 		return {};
 	}
 
-
 	glm::vec4 LogValue(PinDataType op_type, const glm::vec4& a)
 	{
 		switch (op_type)
@@ -275,6 +301,188 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 		}
 
 		KS_FATAL_ERROR("Tried to perform a non-supported Exponential2 operation!");
+		return {};
+	}
+
+	
+	// ------- Trigonometry ---------
+	glm::vec4 Sin(PinDataType op_type, const glm::vec4& a)
+	{
+		switch (op_type)
+		{
+			case PinDataType::FLOAT:
+			case PinDataType::INT:		return glm::vec4(glm::sin(a.x), 0.0f, 0.0f, 0.0f);
+			case PinDataType::VEC2:		return glm::vec4(glm::sin(glm::vec2(a)), 0.0f, 0.0f);
+			case PinDataType::VEC3:		return glm::vec4(glm::sin(glm::vec3(a)), 0.0f);
+			case PinDataType::VEC4:		return glm::sin(a);
+		}
+
+		KS_FATAL_ERROR("Tried to perform a non-supported Sinus operation!");
+		return {};
+	}
+
+	glm::vec4 Cos(PinDataType op_type, const glm::vec4& a)
+	{
+		switch (op_type)
+		{
+			case PinDataType::FLOAT:
+			case PinDataType::INT:		return glm::vec4(glm::cos(a.x), 0.0f, 0.0f, 0.0f);
+			case PinDataType::VEC2:		return glm::vec4(glm::cos(glm::vec2(a)), 0.0f, 0.0f);
+			case PinDataType::VEC3:		return glm::vec4(glm::cos(glm::vec3(a)), 0.0f);
+			case PinDataType::VEC4:		return glm::cos(a);
+		}
+
+		KS_FATAL_ERROR("Tried to perform a non-supported Cosinus operation!");
+		return {};
+	}
+
+	glm::vec4 Tan(PinDataType op_type, const glm::vec4& a)
+	{
+		switch (op_type)
+		{
+			case PinDataType::FLOAT:
+			case PinDataType::INT:		return glm::vec4(glm::tan(a.x), 0.0f, 0.0f, 0.0f);
+			case PinDataType::VEC2:		return glm::vec4(glm::tan(glm::vec2(a)), 0.0f, 0.0f);
+			case PinDataType::VEC3:		return glm::vec4(glm::tan(glm::vec3(a)), 0.0f);
+			case PinDataType::VEC4:		return glm::tan(a);
+		}
+
+		KS_FATAL_ERROR("Tried to perform a non-supported Tangent operation!");
+		return {};
+	}
+
+	glm::vec4 ASin(PinDataType op_type, const glm::vec4& a)
+	{
+		switch (op_type)
+		{
+			case PinDataType::FLOAT:
+			case PinDataType::INT:		return glm::vec4(glm::asin(glm::clamp(a.x, -1.0f, 1.0f)), 0.0f, 0.0f, 0.0f);
+			case PinDataType::VEC2:		return glm::vec4(glm::asin(glm::clamp(glm::vec2(a), -1.0f, 1.0f)), 0.0f, 0.0f);
+			case PinDataType::VEC3:		return glm::vec4(glm::asin(glm::clamp(glm::vec3(a), -1.0f, 1.0f)), 0.0f);
+			case PinDataType::VEC4:		return glm::asin(glm::clamp(a, -1.0f, 1.0f));
+		}
+
+		KS_FATAL_ERROR("Tried to perform a non-supported ArcSinus operation!");
+		return {};
+	}
+
+	glm::vec4 ACos(PinDataType op_type, const glm::vec4& a)
+	{
+		switch (op_type)
+		{
+			case PinDataType::FLOAT:
+			case PinDataType::INT:		return glm::vec4(glm::acos(glm::clamp(a.x, -1.0f, 1.0f)), 0.0f, 0.0f, 0.0f);
+			case PinDataType::VEC2:		return glm::vec4(glm::acos(glm::clamp(glm::vec2(a), -1.0f, 1.0f)), 0.0f, 0.0f);
+			case PinDataType::VEC3:		return glm::vec4(glm::acos(glm::clamp(glm::vec3(a), -1.0f, 1.0f)), 0.0f);
+			case PinDataType::VEC4:		return glm::acos(glm::clamp(a, -1.0f, 1.0f));
+		}
+
+		KS_FATAL_ERROR("Tried to perform a non-supported ArcCos operation!");
+		return {};
+	}
+
+	glm::vec4 ATan(PinDataType op_type, const glm::vec4& a)
+	{
+		switch (op_type)
+		{
+			case PinDataType::FLOAT:
+			case PinDataType::INT:		return glm::vec4(glm::atan(a.x), 0.0f, 0.0f, 0.0f);
+			case PinDataType::VEC2:		return glm::vec4(glm::atan(glm::vec2(a)), 0.0f, 0.0f);
+			case PinDataType::VEC3:		return glm::vec4(glm::atan(glm::vec3(a)), 0.0f);
+			case PinDataType::VEC4:		return glm::atan(a);
+		}
+
+		KS_FATAL_ERROR("Tried to perform a non-supported ArcTangent operation!");
+		return {};
+	}
+
+	glm::vec4 HSin(PinDataType op_type, const glm::vec4& a)
+	{
+		switch (op_type)
+		{
+			case PinDataType::FLOAT:
+			case PinDataType::INT:		return glm::vec4(glm::sinh(a.x), 0.0f, 0.0f, 0.0f);
+			case PinDataType::VEC2:		return glm::vec4(glm::sinh(glm::vec2(a)), 0.0f, 0.0f);
+			case PinDataType::VEC3:		return glm::vec4(glm::sinh(glm::vec3(a)), 0.0f);
+			case PinDataType::VEC4:		return glm::sinh(a);
+		}
+
+		KS_FATAL_ERROR("Tried to perform a non-supported Hiperbolic Sinus operation!");
+		return {};
+	}
+
+	glm::vec4 HCos(PinDataType op_type, const glm::vec4& a)
+	{
+		switch (op_type)
+		{
+			case PinDataType::FLOAT:
+			case PinDataType::INT:		return glm::vec4(glm::cosh(a.x), 0.0f, 0.0f, 0.0f);
+			case PinDataType::VEC2:		return glm::vec4(glm::cosh(glm::vec2(a)), 0.0f, 0.0f);
+			case PinDataType::VEC3:		return glm::vec4(glm::cosh(glm::vec3(a)), 0.0f);
+			case PinDataType::VEC4:		return glm::cosh(a);
+		}
+
+		KS_FATAL_ERROR("Tried to perform a non-supported Hiperbolic Cosinus operation!");
+		return {};
+	}
+
+	glm::vec4 HTan(PinDataType op_type, const glm::vec4& a)
+	{
+		switch (op_type)
+		{
+			case PinDataType::FLOAT:
+			case PinDataType::INT:		return glm::vec4(glm::tanh(a.x), 0.0f, 0.0f, 0.0f);
+			case PinDataType::VEC2:		return glm::vec4(glm::tanh(glm::vec2(a)), 0.0f, 0.0f);
+			case PinDataType::VEC3:		return glm::vec4(glm::tanh(glm::vec3(a)), 0.0f);
+			case PinDataType::VEC4:		return glm::tanh(a);
+		}
+
+		KS_FATAL_ERROR("Tried to perform a non-supported Hiperbolic Tangent operation!");
+		return {};
+	}
+
+	glm::vec4 HASin(PinDataType op_type, const glm::vec4& a)
+	{
+		switch (op_type)
+		{
+			case PinDataType::FLOAT:
+			case PinDataType::INT:		return glm::vec4(glm::asinh(a.x), 0.0f, 0.0f, 0.0f);
+			case PinDataType::VEC2:		return glm::vec4(glm::asinh(glm::vec2(a)), 0.0f, 0.0f);
+			case PinDataType::VEC3:		return glm::vec4(glm::asinh(glm::vec3(a)), 0.0f);
+			case PinDataType::VEC4:		return glm::asinh(a);
+		}
+
+		KS_FATAL_ERROR("Tried to perform a non-supported Hiperbolic ArcSinus operation!");
+		return {};
+	}
+
+	glm::vec4 HACos(PinDataType op_type, const glm::vec4& a)
+	{
+		switch (op_type)
+		{
+			case PinDataType::FLOAT:
+			case PinDataType::INT:		return glm::vec4(glm::acosh(glm::max(a.x, 1.0f)), 0.0f, 0.0f, 0.0f);
+			case PinDataType::VEC2:		return glm::vec4(glm::acosh(glm::max(glm::vec2(a), 1.0f)), 0.0f, 0.0f);
+			case PinDataType::VEC3:		return glm::vec4(glm::acosh(glm::max(glm::vec3(a), 1.0f)), 0.0f);
+			case PinDataType::VEC4:		return glm::acosh(glm::max(a, 1.0f));
+		}
+
+		KS_FATAL_ERROR("Tried to perform a non-supported Hiperbolic ArcCos operation!");
+		return {};
+	}
+
+	glm::vec4 HATan(PinDataType op_type, const glm::vec4& a)
+	{
+		switch (op_type)
+		{
+			case PinDataType::FLOAT:
+			case PinDataType::INT:		return glm::vec4(glm::atanh(glm::clamp(a.x, -0.99f, 0.99f)), 0.0f, 0.0f, 0.0f);
+			case PinDataType::VEC2:		return glm::vec4(glm::atanh(glm::clamp(glm::vec2(a), -0.99f, 0.99f)), 0.0f, 0.0f);
+			case PinDataType::VEC3:		return glm::vec4(glm::atanh(glm::clamp(glm::vec3(a), -0.99f, 0.99f)), 0.0f);
+			case PinDataType::VEC4:		return glm::atanh(glm::clamp(a, -0.99f, 0.99f));
+		}
+
+		KS_FATAL_ERROR("Tried to perform a non-supported Hiperbolic ArcTangent operation!");
 		return {};
 	}
 
@@ -480,9 +688,21 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 	{
 		switch (op_type)
 		{
-			case PinDataType::VEC2:		return glm::vec4(glm::smoothstep(glm::vec2(edge1), glm::vec2(edge2), glm::vec2(val)), 0.0f, 0.0f);
-			case PinDataType::VEC3:		return glm::vec4(glm::smoothstep(glm::vec3(edge1), glm::vec3(edge2), glm::vec3(val)), 0.0f);
-			case PinDataType::VEC4:		return glm::smoothstep(edge1, edge2, val);
+			case PinDataType::VEC2:
+			{
+				glm::vec2 e2 = EnsureDivisor(edge2, edge1);
+				return glm::vec4(glm::smoothstep(glm::vec2(edge1), e2, glm::vec2(val)), 0.0f, 0.0f);
+			}
+			case PinDataType::VEC3:
+			{
+				glm::vec3 e2 = EnsureDivisor(edge2, edge1);
+				return glm::vec4(glm::smoothstep(glm::vec3(edge1), e2, glm::vec3(val)), 0.0f);
+			}
+			case PinDataType::VEC4:
+			{
+				glm::vec4 e2 = EnsureDivisor(edge2, edge1);
+				return glm::smoothstep(edge1, e2, val);
+			}
 		}
 
 		KS_FATAL_ERROR("Tried to perform a non-supported VSmoothstep operation!");

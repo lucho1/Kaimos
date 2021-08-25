@@ -13,6 +13,9 @@ namespace Kaimos::MaterialEditor {
 
 		// --- Helpers ---
 		bool IsVecType(PinDataType type);
+		glm::vec2 EnsureDivisor(const glm::vec2& a, const glm::vec4& b);
+		glm::vec3 EnsureDivisor(const glm::vec3& a, const glm::vec4& b);
+		glm::vec4 EnsureDivisor(const glm::vec4& a, const glm::vec4& b);
 		glm::vec2 GetNonZeroVector(glm::vec2 vec);
 		glm::vec3 GetNonZeroVector(glm::vec3 vec);
 		glm::vec4 GetNonZeroVector(glm::vec4 vec);
@@ -36,6 +39,21 @@ namespace Kaimos::MaterialEditor {
 		glm::vec4 Log2Value(PinDataType op_type, const glm::vec4& a);
 		glm::vec4 ExpValue(PinDataType op_type, const glm::vec4& a);
 		glm::vec4 Exp2Value(PinDataType op_type, const glm::vec4& a);
+
+		// - Trigonometry -
+		glm::vec4 Sin(PinDataType op_type, const glm::vec4& a);
+		glm::vec4 Cos(PinDataType op_type, const glm::vec4& a);
+		glm::vec4 Tan(PinDataType op_type, const glm::vec4& a);
+		glm::vec4 ASin(PinDataType op_type, const glm::vec4& a);
+		glm::vec4 ACos(PinDataType op_type, const glm::vec4& a);
+		glm::vec4 ATan(PinDataType op_type, const glm::vec4& a);
+
+		glm::vec4 HSin(PinDataType op_type, const glm::vec4& a);
+		glm::vec4 HCos(PinDataType op_type, const glm::vec4& a);
+		glm::vec4 HTan(PinDataType op_type, const glm::vec4& a);
+		glm::vec4 HASin(PinDataType op_type, const glm::vec4& a);
+		glm::vec4 HACos(PinDataType op_type, const glm::vec4& a);
+		glm::vec4 HATan(PinDataType op_type, const glm::vec4& a);
 
 		// - Basic Specials -
 		glm::vec4 AbsoluteValue(PinDataType op_type, const glm::vec4& a);

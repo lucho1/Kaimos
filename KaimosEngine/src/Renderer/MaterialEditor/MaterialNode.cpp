@@ -863,6 +863,22 @@ namespace Kaimos::MaterialEditor {
 			case SpecialOperationNodeType::EXP:					{ m_Name = "Exp Root Node";				m_InputsN = 1; break; }
 			case SpecialOperationNodeType::EXP2:				{ m_Name = "Exp2 Root Node";			m_InputsN = 1; break; }
 
+			// Trigonometry
+			case SpecialOperationNodeType::SIN:					{ m_Name = "Sin Node";			m_InputsN = 1; break; }
+			case SpecialOperationNodeType::COS:					{ m_Name = "Cos Node";			m_InputsN = 1; break; }
+			case SpecialOperationNodeType::TAN:					{ m_Name = "Tan Node";			m_InputsN = 1; break; }
+			case SpecialOperationNodeType::ASIN:				{ m_Name = "ArcSin Node";		m_InputsN = 1; break; }
+			case SpecialOperationNodeType::ACOS:				{ m_Name = "ArcCos Node";		m_InputsN = 1; break; }
+			case SpecialOperationNodeType::ATAN:				{ m_Name = "ArcTan Node";		m_InputsN = 1; break; }
+
+			// Hyperbolic Trigonometry
+			case SpecialOperationNodeType::HSIN:				{ m_Name = "Hyp. Sin Node";		m_InputsN = 1; break; }
+			case SpecialOperationNodeType::HCOS:				{ m_Name = "Hyp. Cos Node";		m_InputsN = 1; break; }
+			case SpecialOperationNodeType::HTAN:				{ m_Name = "Hyp. Tan Node";		m_InputsN = 1; break; }
+			case SpecialOperationNodeType::HASIN:				{ m_Name = "Hyp. ArcSin Node";	m_InputsN = 1; break; }
+			case SpecialOperationNodeType::HACOS:				{ m_Name = "Hyp. ArcCos Node";	m_InputsN = 1; break; }
+			case SpecialOperationNodeType::HATAN:				{ m_Name = "Hyp. ArcTan Node";	m_InputsN = 1; break; }
+
 			// Lerp/Mix, Mod, Reflect, Refract
 			case SpecialOperationNodeType::FLOAT_LERP:			{ m_Name = "FLerp Node";	m_InputsN = 3; in_type3 = PinDataType::FLOAT; break; }
 			case SpecialOperationNodeType::VEC_LERP:			{ m_Name = "VLerp Node";	m_InputsN = 3; break; }
@@ -936,6 +952,22 @@ namespace Kaimos::MaterialEditor {
 			case SpecialOperationNodeType::LOG2:				return NodeUtils::Log2Value(op_type, a);
 			case SpecialOperationNodeType::EXP:					return NodeUtils::ExpValue(op_type, a);
 			case SpecialOperationNodeType::EXP2:				return NodeUtils::Exp2Value(op_type, a);
+
+			// Trigonometry
+			case SpecialOperationNodeType::SIN:					return NodeUtils::Sin(op_type, a);
+			case SpecialOperationNodeType::COS:					return NodeUtils::Cos(op_type, a);
+			case SpecialOperationNodeType::TAN:					return NodeUtils::Tan(op_type, a);
+			case SpecialOperationNodeType::ASIN:				return NodeUtils::ASin(op_type, a);
+			case SpecialOperationNodeType::ACOS:				return NodeUtils::ACos(op_type, a);
+			case SpecialOperationNodeType::ATAN:				return NodeUtils::ATan(op_type, a);
+
+			// Hiperbolic Trigonometry
+			case SpecialOperationNodeType::HSIN:				return NodeUtils::HSin(op_type, a);
+			case SpecialOperationNodeType::HCOS:				return NodeUtils::HCos(op_type, a);
+			case SpecialOperationNodeType::HTAN:				return NodeUtils::HTan(op_type, a);
+			case SpecialOperationNodeType::HASIN:				return NodeUtils::HASin(op_type, a);
+			case SpecialOperationNodeType::HACOS:				return NodeUtils::HACos(op_type, a);
+			case SpecialOperationNodeType::HATAN:				return NodeUtils::HATan(op_type, a);
 
 			// Lerp/Mix, Mod, Reflect, Refract
 			case SpecialOperationNodeType::FLOAT_LERP:			return NodeUtils::FLerpValues(op_type, a, b, c.x);
