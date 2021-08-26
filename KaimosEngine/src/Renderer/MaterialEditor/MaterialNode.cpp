@@ -941,6 +941,12 @@ namespace Kaimos::MaterialEditor {
 			case SpecialOperationNodeType::VEC_MOD:				{ m_Name = "VMod Node";		break; }
 			case SpecialOperationNodeType::VEC_REFLECT:			{ m_Name = "Reflect Node";	break; }
 			case SpecialOperationNodeType::VEC_REFRACT:			{ m_Name = "Refract Node";	m_InputsN = 3; in_type3 = PinDataType::FLOAT; break; }
+
+			// Vector Components
+			case SpecialOperationNodeType::VEC_X:				{ m_Name = "Vec X Node";	m_InputsN = 1; out_type = PinDataType::FLOAT; break; }
+			case SpecialOperationNodeType::VEC_Y:				{ m_Name = "Vec Y Node";	m_InputsN = 1; out_type = PinDataType::FLOAT; break; }
+			case SpecialOperationNodeType::VEC_Z:				{ m_Name = "Vec Z Node";	m_InputsN = 1; out_type = PinDataType::FLOAT; break; }
+			case SpecialOperationNodeType::VEC_W:				{ m_Name = "Vec W Node";	m_InputsN = 1; out_type = PinDataType::FLOAT; break; }
 		}
 
 		m_OperationOutputType = operation_data_type;
@@ -962,6 +968,9 @@ namespace Kaimos::MaterialEditor {
 		if (m_OperationType == SpecialOperationNodeType::FINT || m_OperationType == SpecialOperationNodeType::INTF)
 			return GetInputValue(0);
 
+		if (IsGetVecCompType())
+			return glm::vec4(GetVectorComponent(), 0.0f, 0.0f, 0.0f);
+
 		switch (m_InputsN)
 		{
 			case 1: return ProcessOperation(m_OperationOutputType, GetInputValue(0));
@@ -971,6 +980,26 @@ namespace Kaimos::MaterialEditor {
 
 		KS_FATAL_ERROR("A node has more than 3 inputs!");
 		return {};
+	}
+
+	float SpecialOperationNode::GetVectorComponent()
+	{
+		switch (m_OperationType)
+		{
+			case SpecialOperationNodeType::VEC_X: return GetInputValue(0).x;
+			case SpecialOperationNodeType::VEC_Y: return GetInputValue(0).y;
+			case SpecialOperationNodeType::VEC_Z: return GetInputValue(0).z;
+			case SpecialOperationNodeType::VEC_W: return GetInputValue(0).w;
+		}
+
+		KS_FATAL_ERROR("Tried to retrieve a vector component from the wrong node! (SpecialOperationNode::GetVectorComponent)");
+		return {};
+	}
+
+	bool SpecialOperationNode::IsGetVecCompType()
+	{
+		return (m_OperationType == SpecialOperationNodeType::VEC_X || m_OperationType == SpecialOperationNodeType::VEC_Y
+			|| m_OperationType == SpecialOperationNodeType::VEC_Z || m_OperationType == SpecialOperationNodeType::VEC_W);
 	}
 
 

@@ -51,7 +51,8 @@ namespace Kaimos::MaterialEditor {
 		VEC_NORMALIZE, VEC_MAGNITUDE, VEC_DIST, VEC_DOT, VEC_CROSS,				// Vector Ops.
 		SHT_ANGLE_NVECS, SHT_ANGLE_VECS, LNG_ANGLE_NVECS, LNG_ANGLE_VECS,		// Vector Angles
 		VEC_ROTX, VEC_ROTY, VEC_ROTZ,											// Vector Rotations
-		FLOAT_LERP, VEC_LERP, FLOAT_MOD, VEC_MOD, VEC_REFLECT, VEC_REFRACT		// Advanced Vector Ops.
+		FLOAT_LERP, VEC_LERP, FLOAT_MOD, VEC_MOD, VEC_REFLECT, VEC_REFRACT,		// Advanced Vector Ops.
+		VEC_X, VEC_Y, VEC_Z, VEC_W												// Vector Components
 	};
 
 
@@ -273,10 +274,15 @@ namespace Kaimos::MaterialEditor {
 
 	private:
 
-
 		virtual glm::vec4 CalculateNodeResult() override;
 		virtual void SerializeNode(YAML::Emitter& output_emitter) const override;
 		glm::vec4 ProcessOperation(PinDataType op_type, const glm::vec4& a, const glm::vec4& b = glm::vec4(0.0f), const glm::vec4& c = glm::vec4(0.0f)) const;
+
+		// vec_comp must be VEC_X, VEC_Y, VEC_Z or VEC_W
+		float GetVectorComponent();
+		bool IsGetVecCompType();
+
+	private:
 
 		SpecialOperationNodeType m_OperationType = SpecialOperationNodeType::NONE;
 		uint m_InputsN;

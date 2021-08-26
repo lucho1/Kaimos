@@ -416,87 +416,93 @@ namespace Kaimos {
 
 				ImGui::EndMenu();
 			}
-			
-			if (ImGui::BeginMenu("Vectors"))
+
+			ImGui::EndMenu();
+		}
+
+		if (ImGui::BeginMenu("Vectors"))
+		{
+			if (ImGui::BeginMenu("Break Vector"))
 			{
-				if (ImGui::BeginMenu("Basics"))
+				DrawBreakVectorSubmenu(popup_pos);
+				ImGui::EndMenu();
+			}
+
+			if (ImGui::BeginMenu("Basics"))
+			{
+				if (ImGui::BeginMenu("Vec Normalize"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::VEC_NORMALIZE, popup_pos, true);
+
+				if (ImGui::BeginMenu("Vec Magnitude"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::VEC_MAGNITUDE, popup_pos, true);
+
+				if (ImGui::BeginMenu("Vec Distance"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::VEC_DIST, popup_pos, true);
+
+				if (ImGui::BeginMenu("Vec Dot"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::VEC_DOT, popup_pos, true);
+
+				if (ImGui::BeginMenu("Vec Cross"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::VEC_CROSS, popup_pos, true);
+
+				if (ImGui::BeginMenu("Norm. Vec-Vec Angle"))
 				{
-					if (ImGui::BeginMenu("Vec Normalize"))
-						DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::VEC_NORMALIZE, popup_pos, true);
+					if (ImGui::BeginMenu("Short"))
+						DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::SHT_ANGLE_NVECS, popup_pos, true);
 
-					if (ImGui::BeginMenu("Vec Magnitude"))
-						DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::VEC_MAGNITUDE, popup_pos, true);
-
-					if (ImGui::BeginMenu("Vec Distance"))
-						DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::VEC_DIST, popup_pos, true);
-
-					if (ImGui::BeginMenu("Vec Dot"))
-						DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::VEC_DOT, popup_pos, true);
-
-					if (ImGui::BeginMenu("Vec Cross"))
-						DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::VEC_CROSS, popup_pos, true);
-
-					if (ImGui::BeginMenu("Norm. Vec-Vec Angle"))
-					{
-						if(ImGui::BeginMenu("Short"))
-							DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::SHT_ANGLE_NVECS, popup_pos, true);
-
-						if (ImGui::BeginMenu("Long"))
-							DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::LNG_ANGLE_NVECS, popup_pos, true);
-
-						ImGui::EndMenu();
-					}
-
-					if (ImGui::BeginMenu("Vec-Vec Angle"))
-					{
-						if (ImGui::BeginMenu("Short"))
-							DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::SHT_ANGLE_VECS, popup_pos, true);
-
-						if (ImGui::BeginMenu("Long"))
-							DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::LNG_ANGLE_VECS, popup_pos, true);
-
-						ImGui::EndMenu();
-					}
-
-					if (ImGui::BeginMenu("Rotate Vec"))
-					{
-						if (ImGui::BeginMenu("Rotate X"))
-							DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::VEC_ROTX, popup_pos, true);
-
-						if (ImGui::BeginMenu("Rotate Y"))
-							DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::VEC_ROTY, popup_pos, true);
-
-						if (ImGui::BeginMenu("Rotate Z"))
-							DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::VEC_ROTZ, popup_pos, true);
-
-						ImGui::EndMenu();
-					}
+					if (ImGui::BeginMenu("Long"))
+						DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::LNG_ANGLE_NVECS, popup_pos, true);
 
 					ImGui::EndMenu();
 				}
 
-				if (ImGui::BeginMenu("Advanced"))
+				if (ImGui::BeginMenu("Vec-Vec Angle"))
 				{
-					if (ImGui::BeginMenu("Vec Reflect"))
-						DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::VEC_REFLECT, popup_pos, true);
+					if (ImGui::BeginMenu("Short"))
+						DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::SHT_ANGLE_VECS, popup_pos, true);
 
-					if (ImGui::BeginMenu("Vec Refract"))
-						DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::VEC_REFRACT, popup_pos, true);
-
-					if (ImGui::BeginMenu("Lerp by Float"))
-						DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::FLOAT_LERP, popup_pos, false);
-
-					if (ImGui::BeginMenu("Lerp by Vec"))
-						DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::VEC_LERP, popup_pos, true);
-
-					if (ImGui::BeginMenu("Mod by Float"))
-						DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::FLOAT_MOD, popup_pos, false);
-
-					if (ImGui::BeginMenu("Mod by Vec"))
-						DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::VEC_MOD, popup_pos, true);
+					if (ImGui::BeginMenu("Long"))
+						DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::LNG_ANGLE_VECS, popup_pos, true);
 
 					ImGui::EndMenu();
 				}
+
+				if (ImGui::BeginMenu("Rotate Vec"))
+				{
+					if (ImGui::BeginMenu("Rotate X"))
+						DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::VEC_ROTX, popup_pos, true);
+
+					if (ImGui::BeginMenu("Rotate Y"))
+						DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::VEC_ROTY, popup_pos, true);
+
+					if (ImGui::BeginMenu("Rotate Z"))
+						DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::VEC_ROTZ, popup_pos, true);
+
+					ImGui::EndMenu();
+				}
+
+				ImGui::EndMenu();
+			}
+
+			if (ImGui::BeginMenu("Advanced"))
+			{
+				if (ImGui::BeginMenu("Vec Reflect"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::VEC_REFLECT, popup_pos, true);
+
+				if (ImGui::BeginMenu("Vec Refract"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::VEC_REFRACT, popup_pos, true);
+
+				if (ImGui::BeginMenu("Lerp by Float"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::FLOAT_LERP, popup_pos, false);
+
+				if (ImGui::BeginMenu("Lerp by Vec"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::VEC_LERP, popup_pos, true);
+
+				if (ImGui::BeginMenu("Mod by Float"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::FLOAT_MOD, popup_pos, false);
+
+				if (ImGui::BeginMenu("Mod by Vec"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::VEC_MOD, popup_pos, true);
 
 				ImGui::EndMenu();
 			}
@@ -564,6 +570,80 @@ namespace Kaimos {
 			m_CurrentGraph->CreateNode(op_type, MaterialEditor::PinDataType::VEC4, popup_pos);
 
 		ImGui::EndMenu();
+	}
+
+	void MaterialEditorPanel::DrawBreakVectorSubmenu(ImVec2 popup_pos)
+	{
+		if (ImGui::BeginMenu("Break Vec2"))
+		{
+			if(ImGui::MenuItem("Get X"))
+				m_CurrentGraph->CreateNode(MaterialEditor::SpecialOperationNodeType::VEC_X, MaterialEditor::PinDataType::VEC2, popup_pos);
+
+			if (ImGui::MenuItem("Get Y"))
+				m_CurrentGraph->CreateNode(MaterialEditor::SpecialOperationNodeType::VEC_Y, MaterialEditor::PinDataType::VEC2, popup_pos);
+
+			ImGui::EndMenu();
+		}
+
+		if (ImGui::BeginMenu("Break Vec3"))
+		{
+			if (ImGui::MenuItem("Get X"))
+				m_CurrentGraph->CreateNode(MaterialEditor::SpecialOperationNodeType::VEC_X, MaterialEditor::PinDataType::VEC3, popup_pos);
+
+			if (ImGui::MenuItem("Get Y"))
+				m_CurrentGraph->CreateNode(MaterialEditor::SpecialOperationNodeType::VEC_Y, MaterialEditor::PinDataType::VEC3, popup_pos);
+
+			if (ImGui::MenuItem("Get Z"))
+				m_CurrentGraph->CreateNode(MaterialEditor::SpecialOperationNodeType::VEC_Z, MaterialEditor::PinDataType::VEC3, popup_pos);
+
+			ImGui::EndMenu();
+		}
+
+		if (ImGui::BeginMenu("Break Vec4"))
+		{
+			if (ImGui::MenuItem("Get X"))
+				m_CurrentGraph->CreateNode(MaterialEditor::SpecialOperationNodeType::VEC_X, MaterialEditor::PinDataType::VEC4, popup_pos);
+
+			if (ImGui::MenuItem("Get Y"))
+				m_CurrentGraph->CreateNode(MaterialEditor::SpecialOperationNodeType::VEC_Y, MaterialEditor::PinDataType::VEC4, popup_pos);
+
+			if (ImGui::MenuItem("Get Z"))
+				m_CurrentGraph->CreateNode(MaterialEditor::SpecialOperationNodeType::VEC_Z, MaterialEditor::PinDataType::VEC4, popup_pos);
+
+			if (ImGui::MenuItem("Get W"))
+				m_CurrentGraph->CreateNode(MaterialEditor::SpecialOperationNodeType::VEC_W, MaterialEditor::PinDataType::VEC4, popup_pos);
+
+			ImGui::EndMenu();
+		}
+
+		if (ImGui::BeginMenu("Break it!"))
+		{
+			ImVec2 pos = popup_pos;
+			float diff = 130.0f;
+
+			if (ImGui::MenuItem("Vec2"))
+			{
+				m_CurrentGraph->CreateNode(MaterialEditor::SpecialOperationNodeType::VEC_X, MaterialEditor::PinDataType::VEC2, pos);
+				m_CurrentGraph->CreateNode(MaterialEditor::SpecialOperationNodeType::VEC_Y, MaterialEditor::PinDataType::VEC2, ImVec2(pos.x, pos.y + diff));
+			}
+
+			if (ImGui::MenuItem("Vec3"))
+			{
+				m_CurrentGraph->CreateNode(MaterialEditor::SpecialOperationNodeType::VEC_X, MaterialEditor::PinDataType::VEC3, pos);
+				m_CurrentGraph->CreateNode(MaterialEditor::SpecialOperationNodeType::VEC_Y, MaterialEditor::PinDataType::VEC3, ImVec2(pos.x, pos.y + diff));
+				m_CurrentGraph->CreateNode(MaterialEditor::SpecialOperationNodeType::VEC_Z, MaterialEditor::PinDataType::VEC3, ImVec2(pos.x, pos.y + diff * 2.0f));
+			}
+			
+			if (ImGui::MenuItem("Vec4"))
+			{
+				m_CurrentGraph->CreateNode(MaterialEditor::SpecialOperationNodeType::VEC_X, MaterialEditor::PinDataType::VEC4, pos);
+				m_CurrentGraph->CreateNode(MaterialEditor::SpecialOperationNodeType::VEC_Y, MaterialEditor::PinDataType::VEC4, ImVec2(pos.x, pos.y + diff));
+				m_CurrentGraph->CreateNode(MaterialEditor::SpecialOperationNodeType::VEC_Z, MaterialEditor::PinDataType::VEC4, ImVec2(pos.x, pos.y + diff * 2.0f));
+				m_CurrentGraph->CreateNode(MaterialEditor::SpecialOperationNodeType::VEC_W, MaterialEditor::PinDataType::VEC4, ImVec2(pos.x, pos.y + diff * 3.0f));
+			}
+
+			ImGui::EndMenu();
+		}
 	}
 
 
