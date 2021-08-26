@@ -400,6 +400,28 @@ namespace Kaimos {
 					if (ImGui::BeginMenu("Vec Cross"))
 						DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::VEC_CROSS, popup_pos, true);
 
+					if (ImGui::BeginMenu("Norm. Vec-Vec Angle"))
+					{
+						if(ImGui::BeginMenu("Short"))
+							DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::SHT_ANGLE_NVECS, popup_pos, true);
+
+						if (ImGui::BeginMenu("Long"))
+							DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::LNG_ANGLE_NVECS, popup_pos, true);
+
+						ImGui::EndMenu();
+					}
+
+					if (ImGui::BeginMenu("Vec-Vec Angle"))
+					{
+						if (ImGui::BeginMenu("Short"))
+							DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::SHT_ANGLE_VECS, popup_pos, true);
+
+						if (ImGui::BeginMenu("Long"))
+							DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::LNG_ANGLE_VECS, popup_pos, true);
+
+						ImGui::EndMenu();
+					}
+
 					ImGui::EndMenu();
 				}
 

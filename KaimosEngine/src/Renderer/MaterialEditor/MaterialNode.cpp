@@ -907,17 +907,23 @@ namespace Kaimos::MaterialEditor {
 			case SpecialOperationNodeType::VEC_DIST:			{ m_Name = "Vec Distance Node";		out_type = PinDataType::FLOAT; break; }
 			case SpecialOperationNodeType::VEC_DOT:				{ m_Name = "Dot Product Node";		out_type = PinDataType::FLOAT; break; }
 			case SpecialOperationNodeType::VEC_CROSS:			{ m_Name = "Cross Product Node";	if (operation_data_type == PinDataType::VEC2) out_type = PinDataType::FLOAT; break; }
+			
+			// Vecs Angle
+			case SpecialOperationNodeType::SHT_ANGLE_NVECS:		{ m_Name = "N. Vecs Short Angle Node";	out_type = PinDataType::FLOAT; break; }
+			case SpecialOperationNodeType::SHT_ANGLE_VECS:		{ m_Name = "Vecs Short Angle Node";		out_type = PinDataType::FLOAT; break; }
+			case SpecialOperationNodeType::LNG_ANGLE_NVECS:		{ m_Name = "N. Vecs Long Angle Node";	out_type = PinDataType::FLOAT; break; }
+			case SpecialOperationNodeType::LNG_ANGLE_VECS:		{ m_Name = "Vecs Long Angle Node";		out_type = PinDataType::FLOAT; break; }
 		}
 
-		m_OperationOutputType = out_type;
+		m_OperationOutputType = operation_data_type;
 		AddOutputPin(out_type, "Out");
 		AddInputPin(in_type1, false, "Value 1", 0.0f);
 		
 		if (m_InputsN >= 2)
-			AddInputPin(in_type2, false, "Value 2");
+			AddInputPin(in_type2, false, "Value 2", 0.0f);
 
 		if (m_InputsN == 3)
-			AddInputPin(in_type3, false, "a");
+			AddInputPin(in_type3, false, "a", 0.0f);
 	}
 	
 	glm::vec4 SpecialOperationNode::CalculateNodeResult()
@@ -997,6 +1003,12 @@ namespace Kaimos::MaterialEditor {
 			case SpecialOperationNodeType::VEC_DIST:			return NodeUtils::VecDistance(op_type, a, b);
 			case SpecialOperationNodeType::VEC_DOT:				return NodeUtils::DotProduct(op_type, a, b);
 			case SpecialOperationNodeType::VEC_CROSS:			return NodeUtils::CrossProduct(op_type, a, b);
+			
+			// Vecs Angle
+			case SpecialOperationNodeType::SHT_ANGLE_NVECS:		return NodeUtils::ShortAngleBtNormVecs(op_type, a, b);
+			case SpecialOperationNodeType::SHT_ANGLE_VECS:		return NodeUtils::ShortAngleBtUnormVecs(op_type, a, b);
+			case SpecialOperationNodeType::LNG_ANGLE_NVECS:		return NodeUtils::LongAngleBtNormVecs(op_type, a, b);
+			case SpecialOperationNodeType::LNG_ANGLE_VECS:		return NodeUtils::LongAngleBtUnormVecs(op_type, a, b);
 		}
 
 	}

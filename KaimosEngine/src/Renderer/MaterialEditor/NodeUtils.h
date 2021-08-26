@@ -13,6 +13,9 @@ namespace Kaimos::MaterialEditor {
 
 		// --- Helpers ---
 		bool IsVecType(PinDataType type);
+		bool IsZeroVector(const glm::vec2& a);
+		bool IsZeroVector(const glm::vec3& a);
+		bool IsZeroVector(const glm::vec4& a);
 		glm::vec2 EnsureDivisor(const glm::vec2& a, const glm::vec4& b);
 		glm::vec3 EnsureDivisor(const glm::vec3& a, const glm::vec4& b);
 		glm::vec4 EnsureDivisor(const glm::vec4& a, const glm::vec4& b);
@@ -89,6 +92,11 @@ namespace Kaimos::MaterialEditor {
 		glm::vec4 DotProduct(PinDataType op_type, const glm::vec4& a, const glm::vec4& b);
 		glm::vec4 CrossProduct(PinDataType op_type, const glm::vec4& a, const glm::vec4& b);
 		glm::vec4 VecDistance(PinDataType op_type, const glm::vec4& a, const glm::vec4& b);
+		
+		glm::vec4 ShortAngleBtNormVecs(PinDataType op_type, const glm::vec4& a, const glm::vec4& b);
+		glm::vec4 ShortAngleBtUnormVecs(PinDataType op_type, const glm::vec4& a, const glm::vec4& b);
+		glm::vec4 LongAngleBtNormVecs(PinDataType op_type, const glm::vec4& a, const glm::vec4& b);
+		glm::vec4 LongAngleBtUnormVecs(PinDataType op_type, const glm::vec4& a, const glm::vec4& b);
 
 
 		// --- UI Methods ---

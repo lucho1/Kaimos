@@ -5,6 +5,7 @@
 #include "Core/Utils/Maths/Maths.h"
 
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/vector_angle.hpp>
 #include <imgui.h>
 
 
@@ -37,6 +38,21 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 	bool IsVecType(PinDataType type)
 	{
 		return (type == PinDataType::VEC2 || type == PinDataType::VEC3 || type == PinDataType::VEC4);
+	}
+
+	bool IsZeroVector(const glm::vec2& a)
+	{
+		return Maths::CompareFloats(glm::length(a), 0.0f);
+	}
+
+	bool IsZeroVector(const glm::vec3& a)
+	{
+		return Maths::CompareFloats(glm::length(a), 0.0f);
+	}
+
+	bool IsZeroVector(const glm::vec4& a)
+	{
+		return Maths::CompareFloats(glm::length(a), 0.0f);
 	}
 
 	glm::vec2 EnsureDivisor(const glm::vec2& a, const glm::vec4& b)
@@ -805,11 +821,26 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 	// ----------- Vectors ----------
 	glm::vec4 NormalizeVec(PinDataType op_type, const glm::vec4& a)
 	{
+		glm::vec4 ret;
 		switch (op_type)
 		{
-			case PinDataType::VEC2:		return glm::vec4(glm::normalize(glm::vec2(a)), 0.0f, 0.0f);
-			case PinDataType::VEC3:		return glm::vec4(glm::normalize(glm::vec3(a)), 0.0f);
-			case PinDataType::VEC4:		return glm::normalize(a);
+			case PinDataType::VEC2:
+			{
+				glm::vec2 vec = glm::vec2(a);
+				ret = IsZeroVector(vec) ? glm::vec4(0.0f) : glm::vec4(glm::normalize(vec), 0.0f, 0.0f);
+				return ret;
+			}
+			case PinDataType::VEC3:
+			{
+				glm::vec3 vec = glm::vec3(a);
+				ret = IsZeroVector(vec) ? glm::vec4(0.0f) : glm::vec4(glm::normalize(vec), 0.0f);
+				return ret;
+			}
+			case PinDataType::VEC4:
+			{
+				ret = IsZeroVector(a) ? glm::vec4(0.0f) : glm::normalize(a);
+				return ret;
+			}
 		}
 
 		KS_FATAL_ERROR("Tried to perform a non-supported Normalize operation!");
@@ -866,6 +897,50 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 
 		KS_FATAL_ERROR("Tried to perform a non-supported CrossProduct operation!");
 		return {};
+	}
+
+	glm::vec4 ShortAngleBtNormVecs(PinDataType op_type, const glm::vec4& a, const glm::vec4& b)
+	{
+		switch (op_type)
+		{
+			case PinDataType::VEC2:
+			{
+				glm::vec2 v1 = glm::vec2(a), v2 = glm::vec2(b);
+				if (IsZeroVector(v1) || IsZeroVector(v2)) return glm::vec4(0.0f);
+				return glm::vec4(glm::angle(v1, v2), 0.0f, 0.0f, 0.0f);
+			}
+			case PinDataType::VEC3:
+			{
+				glm::vec3 v1 = glm::vec3(a), v2 = glm::vec3(b);
+				if (IsZeroVector(v1) || IsZeroVector(v2)) return glm::vec4(0.0f);
+				return glm::vec4(glm::angle(v1, v2), 0.0f, 0.0f, 0.0f);
+			}
+			case PinDataType::VEC4:
+			{
+				if (IsZeroVector(a) || IsZeroVector(b)) return glm::vec4(0.0f);
+				return glm::vec4(glm::angle(a, b), 0.0f, 0.0f, 0.0f);
+			}
+		}
+
+		KS_FATAL_ERROR("Tried to perform a non-supported VecsAngle operation!");
+		return {};
+	}
+
+	glm::vec4 ShortAngleBtUnormVecs(PinDataType op_type, const glm::vec4& a, const glm::vec4& b)
+	{
+		glm::vec4 norm_a = NormalizeVec(op_type, a);
+		glm::vec4 norm_b = NormalizeVec(op_type, b);
+		return ShortAngleBtNormVecs(op_type, norm_a, norm_b);
+	}
+
+	glm::vec4 LongAngleBtNormVecs(PinDataType op_type, const glm::vec4& a, const glm::vec4& b)
+	{
+		return (glm::two_pi<float>() - ShortAngleBtNormVecs(op_type, a, b));
+	}
+
+	glm::vec4 LongAngleBtUnormVecs(PinDataType op_type, const glm::vec4& a, const glm::vec4& b)
+	{
+		return (glm::two_pi<float>() - ShortAngleBtUnormVecs(op_type, a, b));
 	}
 
 
