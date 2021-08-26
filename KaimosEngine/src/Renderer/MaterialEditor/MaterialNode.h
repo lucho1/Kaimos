@@ -24,7 +24,7 @@ namespace Kaimos::MaterialEditor {
 	enum class ConstantNodeType
 	{
 		NONE,
-		DELTATIME, PI,														// Constants
+		DELTATIME, PI, GOLDEN_RATIO,										// Constants
 		INT, FLOAT, VEC2, VEC3, VEC4,										// Variables
 		SCREEN_RES, SCENE_COLOR,											// Screen, Scene, ...
 		CAMERA_FOV, CAMERA_AR, CAMERA_PLANES, CAMERA_ORTHOSIZE,				// Camera

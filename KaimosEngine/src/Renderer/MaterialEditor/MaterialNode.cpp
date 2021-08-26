@@ -527,6 +527,12 @@ namespace Kaimos::MaterialEditor {
 				AddOutputPin(PinDataType::FLOAT, "Pi (float)");
 				break;
 			}
+			case ConstantNodeType::GOLDEN_RATIO:
+			{
+				m_Name = "Golden Ratio (Tau)";
+				AddOutputPin(PinDataType::FLOAT, "Tau (float)");
+				break;
+			}
 
 			// Variables
 			case ConstantNodeType::INT:
@@ -660,6 +666,11 @@ namespace Kaimos::MaterialEditor {
 			case ConstantNodeType::PI:
 			{
 				ret.x = glm::pi<float>();
+				break;
+			}
+			case ConstantNodeType::GOLDEN_RATIO:
+			{
+				ret.x = glm::golden_ratio<float>();
 				break;
 			}
 

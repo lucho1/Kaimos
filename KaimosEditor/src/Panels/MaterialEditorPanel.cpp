@@ -194,10 +194,11 @@ namespace Kaimos {
 
 		if (ImGui::BeginMenu("Constants"))
 		{
-			if (ImGui::MenuItem("Time"))		m_CurrentGraph->CreateNode(MaterialEditor::ConstantNodeType::DELTATIME, popup_pos);
-			if (ImGui::MenuItem("PI"))			m_CurrentGraph->CreateNode(MaterialEditor::ConstantNodeType::PI, popup_pos);
-			if (ImGui::MenuItem("Scene Color"))	m_CurrentGraph->CreateNode(MaterialEditor::ConstantNodeType::SCENE_COLOR, popup_pos);
-			if (ImGui::MenuItem("Screen Resolution")) m_CurrentGraph->CreateNode(MaterialEditor::ConstantNodeType::SCREEN_RES, popup_pos);
+			if (ImGui::MenuItem("Time"))				m_CurrentGraph->CreateNode(MaterialEditor::ConstantNodeType::DELTATIME, popup_pos);
+			if (ImGui::MenuItem("PI"))					m_CurrentGraph->CreateNode(MaterialEditor::ConstantNodeType::PI, popup_pos);
+			if (ImGui::MenuItem("TAU (Golden Ratio)"))	m_CurrentGraph->CreateNode(MaterialEditor::ConstantNodeType::GOLDEN_RATIO, popup_pos);
+			if (ImGui::MenuItem("Scene Color"))			m_CurrentGraph->CreateNode(MaterialEditor::ConstantNodeType::SCENE_COLOR, popup_pos);
+			if (ImGui::MenuItem("Screen Resolution"))	m_CurrentGraph->CreateNode(MaterialEditor::ConstantNodeType::SCREEN_RES, popup_pos);
 			ImGui::EndMenu();
 		}
 
