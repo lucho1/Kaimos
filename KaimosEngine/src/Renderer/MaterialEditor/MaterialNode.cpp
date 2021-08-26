@@ -865,14 +865,6 @@ namespace Kaimos::MaterialEditor {
 			case SpecialOperationNodeType::MAX:					{ m_Name = "Max Node";		break; }
 			case SpecialOperationNodeType::NEGATE:				{ m_Name = "Negate Node";	m_InputsN = 1; break; }
 
-			// Conversions
-			case SpecialOperationNodeType::RTOD:				{ m_Name = "Rad-Deg Node";		m_InputsN = 1; break; }
-			case SpecialOperationNodeType::DTOR:				{ m_Name = "Deg-Rad Node";		m_InputsN = 1; break; }
-			case SpecialOperationNodeType::RGBTOHSV:			{ m_Name = "RGB-HSV Node";		m_InputsN = 1; break; }
-			case SpecialOperationNodeType::HSVTORGB:			{ m_Name = "HSV-RGB Node";		m_InputsN = 1; break; }
-			case SpecialOperationNodeType::COL_NORM:			{ m_Name = "Color Norm Node";	m_InputsN = 1; if(out_type == PinDataType::INT) out_type = PinDataType::FLOAT; break; }
-			case SpecialOperationNodeType::COL_UNORM:			{ m_Name = "Color Unnorm Node";	m_InputsN = 1; if(out_type == PinDataType::INT) in_type1 = PinDataType::FLOAT; break; }
-
 			// Powers
 			case SpecialOperationNodeType::POW:					{ m_Name = "Power Node"; break; }
 			case SpecialOperationNodeType::SQRT:				{ m_Name = "Square Root Node";			m_InputsN = 1; break; }
@@ -881,6 +873,14 @@ namespace Kaimos::MaterialEditor {
 			case SpecialOperationNodeType::LOG2:				{ m_Name = "Log2 Root Node";			m_InputsN = 1; break; }
 			case SpecialOperationNodeType::EXP:					{ m_Name = "Exp Root Node";				m_InputsN = 1; break; }
 			case SpecialOperationNodeType::EXP2:				{ m_Name = "Exp2 Root Node";			m_InputsN = 1; break; }
+
+			// Conversions
+			case SpecialOperationNodeType::RTOD:				{ m_Name = "Rad-Deg Node";		m_InputsN = 1; break; }
+			case SpecialOperationNodeType::DTOR:				{ m_Name = "Deg-Rad Node";		m_InputsN = 1; break; }
+			case SpecialOperationNodeType::RGBTOHSV:			{ m_Name = "RGB-HSV Node";		m_InputsN = 1; break; }
+			case SpecialOperationNodeType::HSVTORGB:			{ m_Name = "HSV-RGB Node";		m_InputsN = 1; break; }
+			case SpecialOperationNodeType::COL_NORM:			{ m_Name = "Color Norm Node";	m_InputsN = 1; if(out_type == PinDataType::INT) out_type = PinDataType::FLOAT; break; }
+			case SpecialOperationNodeType::COL_UNORM:			{ m_Name = "Color Unnorm Node";	m_InputsN = 1; if(out_type == PinDataType::INT) in_type1 = PinDataType::FLOAT; break; }			
 
 			// Trigonometry
 			case SpecialOperationNodeType::SIN:					{ m_Name = "Sin Node";			m_InputsN = 1; break; }
@@ -898,45 +898,45 @@ namespace Kaimos::MaterialEditor {
 			case SpecialOperationNodeType::HACOS:				{ m_Name = "Hyp. ArcCos Node";	m_InputsN = 1; break; }
 			case SpecialOperationNodeType::HATAN:				{ m_Name = "Hyp. ArcTan Node";	m_InputsN = 1; break; }
 
-			// Lerp/Mix, Mod, Reflect, Refract
-			case SpecialOperationNodeType::FLOAT_LERP:			{ m_Name = "FLerp Node";	m_InputsN = 3; in_type3 = PinDataType::FLOAT; break; }
-			case SpecialOperationNodeType::VEC_LERP:			{ m_Name = "VLerp Node";	m_InputsN = 3; break; }
-			case SpecialOperationNodeType::FLOAT_MOD:			{ m_Name = "FMod Node";		in_type2 = PinDataType::FLOAT; break; }
-			case SpecialOperationNodeType::VEC_MOD:				{ m_Name = "VMod Node";		break; }
-			case SpecialOperationNodeType::VEC_REFLECT:			{ m_Name = "Reflect Node";	break; }
-			case SpecialOperationNodeType::VEC_REFRACT:			{ m_Name = "Refract Node";	m_InputsN = 3; in_type3 = PinDataType::FLOAT; break; }
-
-			// Lerp/Mix, Mod, Reflect, Refract
-			case SpecialOperationNodeType::FLOAT_STEP:			{ m_Name = "FStep Node";		in_type1 = PinDataType::FLOAT; break; }
-			case SpecialOperationNodeType::VEC_STEP:			{ m_Name = "VStep Node";		break; }
-			case SpecialOperationNodeType::FLOAT_SMOOTHSTEP:	{ m_Name = "FSmoothstep Node";	m_InputsN = 3; in_type1 = in_type2 = PinDataType::FLOAT; break; }
-			case SpecialOperationNodeType::VEC_SMOOTHSTEP:		{ m_Name = "VSmoothstep Node";	m_InputsN = 3; break; }
-
-			// Ceil, Floor, Clamp, ...
+			// Shaders (Ceil, Floor, Clamp, ...)
 			case SpecialOperationNodeType::CEIL:				{ m_Name = "Ceil Node";		m_InputsN = 1; break; }
 			case SpecialOperationNodeType::FLOOR:				{ m_Name = "Floor Node";	m_InputsN = 1; break; }
 			case SpecialOperationNodeType::CLAMP:				{ m_Name = "Clamp Node";	m_InputsN = 3; in_type2 = in_type3 = PinDataType::FLOAT; break; }
 			case SpecialOperationNodeType::ROUND:				{ m_Name = "Round Node";	m_InputsN = 1; break; }
 			case SpecialOperationNodeType::SIGN:				{ m_Name = "Sign Node";		m_InputsN = 1; break; }
 			case SpecialOperationNodeType::FRACTAL:				{ m_Name = "Fractal Node";	m_InputsN = 1; break; }
+
+			// Step, Smoothstep
+			case SpecialOperationNodeType::FLOAT_STEP:			{ m_Name = "FStep Node";		in_type1 = PinDataType::FLOAT; break; }
+			case SpecialOperationNodeType::VEC_STEP:			{ m_Name = "VStep Node";		break; }
+			case SpecialOperationNodeType::FLOAT_SMOOTHSTEP:	{ m_Name = "FSmoothstep Node";	m_InputsN = 3; in_type1 = in_type2 = PinDataType::FLOAT; break; }
+			case SpecialOperationNodeType::VEC_SMOOTHSTEP:		{ m_Name = "VSmoothstep Node";	m_InputsN = 3; break; }
 			
-			// Vectors
+			// Vector Ops.
 			case SpecialOperationNodeType::VEC_NORMALIZE:		{ m_Name = "Normalize Node";		m_InputsN = 1; break; }
 			case SpecialOperationNodeType::VEC_MAGNITUDE:		{ m_Name = "Vec Magnitude Node";	m_InputsN = 1; out_type = PinDataType::FLOAT; break; }
 			case SpecialOperationNodeType::VEC_DIST:			{ m_Name = "Vec Distance Node";		out_type = PinDataType::FLOAT; break; }
 			case SpecialOperationNodeType::VEC_DOT:				{ m_Name = "Dot Product Node";		out_type = PinDataType::FLOAT; break; }
 			case SpecialOperationNodeType::VEC_CROSS:			{ m_Name = "Cross Product Node";	if (operation_data_type == PinDataType::VEC2) out_type = PinDataType::FLOAT; break; }
 			
-			// Vecs Angle
+			// Vector Angles
 			case SpecialOperationNodeType::SHT_ANGLE_NVECS:		{ m_Name = "N. Vecs Short Angle Node";	out_type = PinDataType::FLOAT; break; }
 			case SpecialOperationNodeType::SHT_ANGLE_VECS:		{ m_Name = "Vecs Short Angle Node";		out_type = PinDataType::FLOAT; break; }
 			case SpecialOperationNodeType::LNG_ANGLE_NVECS:		{ m_Name = "N. Vecs Long Angle Node";	out_type = PinDataType::FLOAT; break; }
 			case SpecialOperationNodeType::LNG_ANGLE_VECS:		{ m_Name = "Vecs Long Angle Node";		out_type = PinDataType::FLOAT; break; }
 			
-			// Vecs Rotation
+			// Vector Rotations
 			case SpecialOperationNodeType::VEC_ROTX:			{ m_Name = "Vec RotX Node";	in_type2 = PinDataType::FLOAT; break; }
 			case SpecialOperationNodeType::VEC_ROTY:			{ m_Name = "Vec RotY Node";	in_type2 = PinDataType::FLOAT; break; }
 			case SpecialOperationNodeType::VEC_ROTZ:			{ m_Name = "Vec RotZ Node";	in_type2 = PinDataType::FLOAT; break; }
+
+			// Advanced Vector Ops.
+			case SpecialOperationNodeType::FLOAT_LERP:			{ m_Name = "FLerp Node";	m_InputsN = 3; in_type3 = PinDataType::FLOAT; break; }
+			case SpecialOperationNodeType::VEC_LERP:			{ m_Name = "VLerp Node";	m_InputsN = 3; break; }
+			case SpecialOperationNodeType::FLOAT_MOD:			{ m_Name = "FMod Node";		in_type2 = PinDataType::FLOAT; break; }
+			case SpecialOperationNodeType::VEC_MOD:				{ m_Name = "VMod Node";		break; }
+			case SpecialOperationNodeType::VEC_REFLECT:			{ m_Name = "Reflect Node";	break; }
+			case SpecialOperationNodeType::VEC_REFRACT:			{ m_Name = "Refract Node";	m_InputsN = 3; in_type3 = PinDataType::FLOAT; break; }
 		}
 
 		m_OperationOutputType = operation_data_type;
@@ -977,14 +977,6 @@ namespace Kaimos::MaterialEditor {
 			case SpecialOperationNodeType::MAX:					return NodeUtils::MaxValue(op_type, a, b);
 			case SpecialOperationNodeType::NEGATE:				return NodeUtils::Negate(op_type, a);
 
-			// Basics
-			case SpecialOperationNodeType::RTOD:				return NodeUtils::RadToDeg(op_type, a);
-			case SpecialOperationNodeType::DTOR:				return NodeUtils::DegToRad(op_type, a);
-			case SpecialOperationNodeType::RGBTOHSV:			return NodeUtils::RGBtoHSV(op_type, a);
-			case SpecialOperationNodeType::HSVTORGB:			return NodeUtils::HSVtoRGB(op_type, a);
-			case SpecialOperationNodeType::COL_NORM:			return NodeUtils::ColorNorm(op_type, a);
-			case SpecialOperationNodeType::COL_UNORM:			return NodeUtils::ColorUnnorm(op_type, a);
-
 			// Powers
 			case SpecialOperationNodeType::POW:					return NodeUtils::PowerValues(op_type, a, b);
 			case SpecialOperationNodeType::SQRT:				return NodeUtils::SqrtValue(op_type, a);
@@ -993,6 +985,14 @@ namespace Kaimos::MaterialEditor {
 			case SpecialOperationNodeType::LOG2:				return NodeUtils::Log2Value(op_type, a);
 			case SpecialOperationNodeType::EXP:					return NodeUtils::ExpValue(op_type, a);
 			case SpecialOperationNodeType::EXP2:				return NodeUtils::Exp2Value(op_type, a);
+
+			// Conversions
+			case SpecialOperationNodeType::RTOD:				return NodeUtils::RadToDeg(op_type, a);
+			case SpecialOperationNodeType::DTOR:				return NodeUtils::DegToRad(op_type, a);
+			case SpecialOperationNodeType::RGBTOHSV:			return NodeUtils::RGBtoHSV(op_type, a);
+			case SpecialOperationNodeType::HSVTORGB:			return NodeUtils::HSVtoRGB(op_type, a);
+			case SpecialOperationNodeType::COL_NORM:			return NodeUtils::ColorNorm(op_type, a);
+			case SpecialOperationNodeType::COL_UNORM:			return NodeUtils::ColorUnnorm(op_type, a);
 
 			// Trigonometry
 			case SpecialOperationNodeType::SIN:					return NodeUtils::Sin(op_type, a);
@@ -1010,21 +1010,7 @@ namespace Kaimos::MaterialEditor {
 			case SpecialOperationNodeType::HACOS:				return NodeUtils::HACos(op_type, a);
 			case SpecialOperationNodeType::HATAN:				return NodeUtils::HATan(op_type, a);
 
-			// Lerp/Mix, Mod, Reflect, Refract
-			case SpecialOperationNodeType::FLOAT_LERP:			return NodeUtils::FLerpValues(op_type, a, b, c.x);
-			case SpecialOperationNodeType::VEC_LERP:			return NodeUtils::VLerpValues(op_type, a, b, c);
-			case SpecialOperationNodeType::FLOAT_MOD:			return NodeUtils::FModValue(op_type, a, b.x);
-			case SpecialOperationNodeType::VEC_MOD:				return NodeUtils::VModValue(op_type, a, b);
-			case SpecialOperationNodeType::VEC_REFLECT:			return NodeUtils::ReflectVec(op_type, a, b);
-			case SpecialOperationNodeType::VEC_REFRACT:			return NodeUtils::RefractVec(op_type, a, b, c.x);
-
-			// Lerp/Mix, Mod, Reflect, Refract
-			case SpecialOperationNodeType::FLOAT_STEP:			return NodeUtils::FStepValue(op_type, a.x, b);
-			case SpecialOperationNodeType::VEC_STEP:			return NodeUtils::VStepValue(op_type, a, b);
-			case SpecialOperationNodeType::FLOAT_SMOOTHSTEP:	return NodeUtils::FSmoothstepValue(op_type, a.x, b.x, c);
-			case SpecialOperationNodeType::VEC_SMOOTHSTEP:		return NodeUtils::VSmoothstepValue(op_type, a, b, c);
-
-			// Ceil, Floor, Clamp, ...
+			// Shaders (Ceil, Floor, Clamp, ...)
 			case SpecialOperationNodeType::CEIL:				return NodeUtils::CeilValue(op_type, a);
 			case SpecialOperationNodeType::FLOOR:				return NodeUtils::FloorValue(op_type, a);
 			case SpecialOperationNodeType::CLAMP:				return NodeUtils::ClampValue(op_type, a, b.x, c.x);
@@ -1032,22 +1018,37 @@ namespace Kaimos::MaterialEditor {
 			case SpecialOperationNodeType::SIGN:				return NodeUtils::SignValue(op_type, a);
 			case SpecialOperationNodeType::FRACTAL:				return NodeUtils::FractalValue(op_type, a);
 
-			// Vectors
+			// Step, Smoothstep
+			case SpecialOperationNodeType::FLOAT_STEP:			return NodeUtils::FStepValue(op_type, a.x, b);
+			case SpecialOperationNodeType::VEC_STEP:			return NodeUtils::VStepValue(op_type, a, b);
+			case SpecialOperationNodeType::FLOAT_SMOOTHSTEP:	return NodeUtils::FSmoothstepValue(op_type, a.x, b.x, c);
+			case SpecialOperationNodeType::VEC_SMOOTHSTEP:		return NodeUtils::VSmoothstepValue(op_type, a, b, c);
+
+			// Vector Ops.
 			case SpecialOperationNodeType::VEC_NORMALIZE:		return NodeUtils::NormalizeVec(op_type, a);
 			case SpecialOperationNodeType::VEC_MAGNITUDE:		return NodeUtils::VecMagnitude(op_type, a);
 			case SpecialOperationNodeType::VEC_DIST:			return NodeUtils::VecDistance(op_type, a, b);
 			case SpecialOperationNodeType::VEC_DOT:				return NodeUtils::DotProduct(op_type, a, b);
 			case SpecialOperationNodeType::VEC_CROSS:			return NodeUtils::CrossProduct(op_type, a, b);
 			
-			// Vecs Angle
+			// Vector Angles
 			case SpecialOperationNodeType::SHT_ANGLE_NVECS:		return NodeUtils::ShortAngleBtNormVecs(op_type, a, b);
 			case SpecialOperationNodeType::SHT_ANGLE_VECS:		return NodeUtils::ShortAngleBtUnormVecs(op_type, a, b);
 			case SpecialOperationNodeType::LNG_ANGLE_NVECS:		return NodeUtils::LongAngleBtNormVecs(op_type, a, b);
 			case SpecialOperationNodeType::LNG_ANGLE_VECS:		return NodeUtils::LongAngleBtUnormVecs(op_type, a, b);
 
+			// Vector Rotations
 			case SpecialOperationNodeType::VEC_ROTX:			return NodeUtils::VectorRotateX(op_type, a, b.x);
 			case SpecialOperationNodeType::VEC_ROTY:			return NodeUtils::VectorRotateY(op_type, a, b.x);
 			case SpecialOperationNodeType::VEC_ROTZ:			return NodeUtils::VectorRotateZ(op_type, a, b.x);
+
+			// Advanced Vector Ops.
+			case SpecialOperationNodeType::FLOAT_LERP:			return NodeUtils::FLerpValues(op_type, a, b, c.x);
+			case SpecialOperationNodeType::VEC_LERP:			return NodeUtils::VLerpValues(op_type, a, b, c);
+			case SpecialOperationNodeType::FLOAT_MOD:			return NodeUtils::FModValue(op_type, a, b.x);
+			case SpecialOperationNodeType::VEC_MOD:				return NodeUtils::VModValue(op_type, a, b);
+			case SpecialOperationNodeType::VEC_REFLECT:			return NodeUtils::ReflectVec(op_type, a, b);
+			case SpecialOperationNodeType::VEC_REFRACT:			return NodeUtils::RefractVec(op_type, a, b, c.x);
 		}
 
 		KS_FATAL_ERROR("Forgot to add an operation for that Type in SpecialOperationNode::ProcessOperation()");

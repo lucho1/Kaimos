@@ -42,16 +42,16 @@ namespace Kaimos::MaterialEditor {
 	{
 		NONE,
 		ABS, MIN, MAX, NEGATE,												// Basics
-		RTOD, DTOR, RGBTOHSV, HSVTORGB,	COL_NORM, COL_UNORM,				// Conversions
 		POW, SQRT, INV_SQRT, LOG, LOG2, EXP, EXP2,							// Powers
+		RTOD, DTOR, RGBTOHSV, HSVTORGB,	COL_NORM, COL_UNORM,				// Conversions
 		SIN, COS, TAN, ASIN, ACOS, ATAN,									// Trigonometry
 		HSIN, HCOS, HTAN, HASIN, HACOS, HATAN,								// Hiperbolic Trigonometry
-		FLOAT_LERP, VEC_LERP, FLOAT_MOD, VEC_MOD, VEC_REFLECT, VEC_REFRACT,	// Lerp/Mix, Mod, Reflect, Refract
+		CEIL, FLOOR, CLAMP, ROUND, SIGN, FRACTAL,							// Shaders (Ceil, Floor, Clamp, ...)
 		FLOAT_STEP, VEC_STEP, FLOAT_SMOOTHSTEP, VEC_SMOOTHSTEP,				// Step, Smoothstep
-		CEIL, FLOOR, CLAMP, ROUND, SIGN, FRACTAL,							// Ceil, Floor, Clamp, ...
-		VEC_NORMALIZE, VEC_MAGNITUDE, VEC_DIST, VEC_DOT, VEC_CROSS,			// Vectors
-		SHT_ANGLE_NVECS, SHT_ANGLE_VECS, LNG_ANGLE_NVECS, LNG_ANGLE_VECS,	// Vecs Angle
-		VEC_ROTX, VEC_ROTY, VEC_ROTZ										// Vecs Rotation
+		VEC_NORMALIZE, VEC_MAGNITUDE, VEC_DIST, VEC_DOT, VEC_CROSS,			// Vector Ops.
+		SHT_ANGLE_NVECS, SHT_ANGLE_VECS, LNG_ANGLE_NVECS, LNG_ANGLE_VECS,	// Vector Angles
+		VEC_ROTX, VEC_ROTY, VEC_ROTZ,										// Vector Rotations
+		FLOAT_LERP, VEC_LERP, FLOAT_MOD, VEC_MOD, VEC_REFLECT, VEC_REFRACT	// Advanced Vector Ops.
 	};
 
 
