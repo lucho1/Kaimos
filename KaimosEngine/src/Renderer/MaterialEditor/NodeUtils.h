@@ -98,6 +98,10 @@ namespace Kaimos::MaterialEditor {
 		glm::vec4 LongAngleBtNormVecs(PinDataType op_type, const glm::vec4& a, const glm::vec4& b);
 		glm::vec4 LongAngleBtUnormVecs(PinDataType op_type, const glm::vec4& a, const glm::vec4& b);
 
+		glm::vec4 VectorRotateX(PinDataType op_type, const glm::vec4& a, float angle);
+		glm::vec4 VectorRotateY(PinDataType op_type, const glm::vec4& a, float angle);
+		glm::vec4 VectorRotateZ(PinDataType op_type, const glm::vec4& a, float angle);
+
 
 		// --- UI Methods ---
 		void DrawPinWidget(PinDataType pin_data_type, glm::vec4& value, float widget_speed = 0.05f, float widget_min = 0.0f, float widget_max = 0.0f, const char* widget_format = "%.2f");

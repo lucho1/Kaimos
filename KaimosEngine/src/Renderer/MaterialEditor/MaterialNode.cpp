@@ -913,6 +913,11 @@ namespace Kaimos::MaterialEditor {
 			case SpecialOperationNodeType::SHT_ANGLE_VECS:		{ m_Name = "Vecs Short Angle Node";		out_type = PinDataType::FLOAT; break; }
 			case SpecialOperationNodeType::LNG_ANGLE_NVECS:		{ m_Name = "N. Vecs Long Angle Node";	out_type = PinDataType::FLOAT; break; }
 			case SpecialOperationNodeType::LNG_ANGLE_VECS:		{ m_Name = "Vecs Long Angle Node";		out_type = PinDataType::FLOAT; break; }
+			
+			// Vecs Rotation
+			case SpecialOperationNodeType::VEC_ROTX:			{ m_Name = "Vec RotX Node";	in_type2 = PinDataType::FLOAT; break; }
+			case SpecialOperationNodeType::VEC_ROTY:			{ m_Name = "Vec RotY Node";	in_type2 = PinDataType::FLOAT; break; }
+			case SpecialOperationNodeType::VEC_ROTZ:			{ m_Name = "Vec RotZ Node";	in_type2 = PinDataType::FLOAT; break; }
 		}
 
 		m_OperationOutputType = operation_data_type;
@@ -937,6 +942,9 @@ namespace Kaimos::MaterialEditor {
 			case 2: return ProcessOperation(m_OperationOutputType, GetInputValue(0), GetInputValue(1));
 			case 3: return ProcessOperation(m_OperationOutputType, GetInputValue(0), GetInputValue(1), GetInputValue(2));
 		}
+
+		KS_FATAL_ERROR("A node has more than 3 inputs!");
+		return {};
 	}
 
 
@@ -1009,8 +1017,14 @@ namespace Kaimos::MaterialEditor {
 			case SpecialOperationNodeType::SHT_ANGLE_VECS:		return NodeUtils::ShortAngleBtUnormVecs(op_type, a, b);
 			case SpecialOperationNodeType::LNG_ANGLE_NVECS:		return NodeUtils::LongAngleBtNormVecs(op_type, a, b);
 			case SpecialOperationNodeType::LNG_ANGLE_VECS:		return NodeUtils::LongAngleBtUnormVecs(op_type, a, b);
+
+			case SpecialOperationNodeType::VEC_ROTX:			return NodeUtils::VectorRotateX(op_type, a, b.x);
+			case SpecialOperationNodeType::VEC_ROTY:			return NodeUtils::VectorRotateY(op_type, a, b.x);
+			case SpecialOperationNodeType::VEC_ROTZ:			return NodeUtils::VectorRotateZ(op_type, a, b.x);
 		}
 
+		KS_FATAL_ERROR("Forgot to add an operation for that Type in SpecialOperationNode::ProcessOperation()");
+		return {};
 	}
 
 

@@ -422,6 +422,20 @@ namespace Kaimos {
 						ImGui::EndMenu();
 					}
 
+					if (ImGui::BeginMenu("Rotate Vec"))
+					{
+						if (ImGui::BeginMenu("Rotate X"))
+							DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::VEC_ROTX, popup_pos, true);
+
+						if (ImGui::BeginMenu("Rotate Y"))
+							DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::VEC_ROTY, popup_pos, true);
+
+						if (ImGui::BeginMenu("Rotate Z"))
+							DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::VEC_ROTZ, popup_pos, true);
+
+						ImGui::EndMenu();
+					}
+
 					ImGui::EndMenu();
 				}
 

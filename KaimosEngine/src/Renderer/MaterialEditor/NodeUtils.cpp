@@ -943,6 +943,45 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 		return (glm::two_pi<float>() - ShortAngleBtUnormVecs(op_type, a, b));
 	}
 
+	glm::vec4 VectorRotateX(PinDataType op_type, const glm::vec4& a, float angle)
+	{
+		switch (op_type)
+		{
+			case PinDataType::VEC2:		return glm::vec4(glm::rotateX(glm::vec3(glm::vec2(a), 0.0f), angle), 0.0f);
+			case PinDataType::VEC3:		return glm::vec4(glm::rotateX(glm::vec3(a), angle), 0.0f);
+			case PinDataType::VEC4:		return glm::rotateX(a, angle);
+		}
+
+		KS_FATAL_ERROR("Tried to perform a non-supported VecRotateX operation!");
+		return {};
+	}
+
+	glm::vec4 VectorRotateY(PinDataType op_type, const glm::vec4& a, float angle)
+	{
+		switch (op_type)
+		{
+			case PinDataType::VEC2:		return glm::vec4(glm::rotateY(glm::vec3(glm::vec2(a), 0.0f), angle), 0.0f);
+			case PinDataType::VEC3:		return glm::vec4(glm::rotateY(glm::vec3(a), angle), 0.0f);
+			case PinDataType::VEC4:		return glm::rotateY(a, angle);
+		}
+
+		KS_FATAL_ERROR("Tried to perform a non-supported VecRotateY operation!");
+		return {};
+	}
+
+	glm::vec4 VectorRotateZ(PinDataType op_type, const glm::vec4& a, float angle)
+	{
+		switch (op_type)
+		{
+			case PinDataType::VEC2:		return glm::vec4(glm::rotateZ(glm::vec3(glm::vec2(a), 0.0f), angle), 0.0f);
+			case PinDataType::VEC3:		return glm::vec4(glm::rotateZ(glm::vec3(a), angle), 0.0f);
+			case PinDataType::VEC4:		return glm::rotateZ(a, angle);
+		}
+
+		KS_FATAL_ERROR("Tried to perform a non-supported VecRotateZ operation!");
+		return {};
+	}
+
 
 
 
