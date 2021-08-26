@@ -298,6 +298,12 @@ namespace Kaimos {
 
 			if(ImGui::BeginMenu("Conversions"))
 			{
+				if (ImGui::MenuItem("Int to Float"))
+					m_CurrentGraph->CreateNode(MaterialEditor::SpecialOperationNodeType::INTF, MaterialEditor::PinDataType::INT, popup_pos);
+
+				if (ImGui::MenuItem("Float to Int"))
+					m_CurrentGraph->CreateNode(MaterialEditor::SpecialOperationNodeType::FINT, MaterialEditor::PinDataType::FLOAT, popup_pos);
+
 				if (ImGui::BeginMenu("Rad to Deg"))
 					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::RTOD, popup_pos, false);
 
@@ -305,22 +311,22 @@ namespace Kaimos {
 					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::DTOR, popup_pos, false);
 
 				if (ImGui::BeginMenu("RGB to HSV"))
-					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::RGBTOHSV, popup_pos, true, false);
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::RGB_HSV, popup_pos, true, false);
 
 				if (ImGui::BeginMenu("HSV to RGB"))
-					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::HSVTORGB, popup_pos, true, false);
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::HSV_RGB, popup_pos, true, false);
 
 				if (ImGui::BeginMenu("RGB Normalize"))
-					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::COL_NORM, popup_pos, false);
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::COLNR, popup_pos, false);
 
 				if (ImGui::BeginMenu("RGB Denormalize"))
-					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::COL_UNORM, popup_pos, false);
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::COLUNR, popup_pos, false);
 
 				if (ImGui::BeginMenu("Linear to sRGB"))
-					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::LTOSRGB, popup_pos, false);
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::L_SRGB, popup_pos, false);
 
 				if (ImGui::BeginMenu("sRGB To Linear"))
-					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::SRGBTOL, popup_pos, false);
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::SRGB_L, popup_pos, false);
 
 				ImGui::EndMenu();
 			}

@@ -43,7 +43,7 @@ namespace Kaimos::MaterialEditor {
 		NONE,
 		ABS, MIN, MAX, NEGATE,													// Basics
 		POW, SQRT, INV_SQRT, LOG, LOG2, EXP, EXP2,								// Powers
-		RTOD, DTOR, RGBTOHSV, HSVTORGB,	COL_NORM, COL_UNORM, LTOSRGB, SRGBTOL,	// Conversions
+		RTOD, DTOR, RGB_HSV, HSV_RGB, COLNR, COLUNR, L_SRGB, SRGB_L, INTF, FINT,// Conversions
 		SIN, COS, TAN, ASIN, ACOS, ATAN,										// Trigonometry
 		HSIN, HCOS, HTAN, HASIN, HACOS, HATAN,									// Hiperbolic Trigonometry
 		CEIL, FLOOR, CLAMP, ROUND, SIGN, FRACTAL,								// Shaders (Ceil, Floor, Clamp, ...)

@@ -877,12 +877,14 @@ namespace Kaimos::MaterialEditor {
 			// Conversions
 			case SpecialOperationNodeType::RTOD:				{ m_Name = "Rad-Deg Node";		m_InputsN = 1; break; }
 			case SpecialOperationNodeType::DTOR:				{ m_Name = "Deg-Rad Node";		m_InputsN = 1; break; }
-			case SpecialOperationNodeType::RGBTOHSV:			{ m_Name = "RGB-HSV Node";		m_InputsN = 1; break; }
-			case SpecialOperationNodeType::HSVTORGB:			{ m_Name = "HSV-RGB Node";		m_InputsN = 1; break; }
-			case SpecialOperationNodeType::COL_NORM:			{ m_Name = "Color Norm Node";	m_InputsN = 1; if(out_type == PinDataType::INT) out_type = PinDataType::FLOAT; break; }
-			case SpecialOperationNodeType::COL_UNORM:			{ m_Name = "Color Unnorm Node";	m_InputsN = 1; if(out_type == PinDataType::INT) in_type1 = PinDataType::FLOAT; break; }			
-			case SpecialOperationNodeType::LTOSRGB:				{ m_Name = "Linear-sRGB Node";	m_InputsN = 1; break; } // URGENT TODO: Change gamma value upon changing this
-			case SpecialOperationNodeType::SRGBTOL:				{ m_Name = "sRGB-Linear Node";	m_InputsN = 1; break; }
+			case SpecialOperationNodeType::RGB_HSV:				{ m_Name = "RGB-HSV Node";		m_InputsN = 1; break; }
+			case SpecialOperationNodeType::HSV_RGB:				{ m_Name = "HSV-RGB Node";		m_InputsN = 1; break; }
+			case SpecialOperationNodeType::COLNR:				{ m_Name = "Color Norm Node";	m_InputsN = 1; if(out_type == PinDataType::INT) out_type = PinDataType::FLOAT; break; }
+			case SpecialOperationNodeType::COLUNR:				{ m_Name = "Color Unnorm Node";	m_InputsN = 1; if(out_type == PinDataType::INT) in_type1 = PinDataType::FLOAT; break; }
+			case SpecialOperationNodeType::L_SRGB:				{ m_Name = "Linear-sRGB Node";	m_InputsN = 1; break; } // URGENT TODO: Change gamma value upon changing this
+			case SpecialOperationNodeType::SRGB_L:				{ m_Name = "sRGB-Linear Node";	m_InputsN = 1; break; }
+			case SpecialOperationNodeType::INTF:				{ m_Name = "Int-Float Node";	m_InputsN = 1; out_type = PinDataType::FLOAT; break; }
+			case SpecialOperationNodeType::FINT:				{ m_Name = "Float-Int Node";	m_InputsN = 1; out_type = PinDataType::INT; break; }
 
 			// Trigonometry
 			case SpecialOperationNodeType::SIN:					{ m_Name = "Sin Node";			m_InputsN = 1; break; }
@@ -954,8 +956,11 @@ namespace Kaimos::MaterialEditor {
 	
 	glm::vec4 SpecialOperationNode::CalculateNodeResult()
 	{
-		if(m_OperationOutputType == PinDataType::NONE)
-			KS_FATAL_ERROR("Some material node has this wrong!")
+		if (m_OperationOutputType == PinDataType::NONE)
+			KS_FATAL_ERROR("Some material node has this wrong!");
+
+		if (m_OperationType == SpecialOperationNodeType::FINT || m_OperationType == SpecialOperationNodeType::INTF)
+			return GetInputValue(0);
 
 		switch (m_InputsN)
 		{
@@ -991,12 +996,12 @@ namespace Kaimos::MaterialEditor {
 			// Conversions
 			case SpecialOperationNodeType::RTOD:				return NodeUtils::RadToDeg(op_type, a);
 			case SpecialOperationNodeType::DTOR:				return NodeUtils::DegToRad(op_type, a);
-			case SpecialOperationNodeType::RGBTOHSV:			return NodeUtils::RGBtoHSV(op_type, a);
-			case SpecialOperationNodeType::HSVTORGB:			return NodeUtils::HSVtoRGB(op_type, a);
-			case SpecialOperationNodeType::COL_NORM:			return NodeUtils::ColorNorm(op_type, a);
-			case SpecialOperationNodeType::COL_UNORM:			return NodeUtils::ColorUnnorm(op_type, a);
-			case SpecialOperationNodeType::LTOSRGB:				return NodeUtils::LinearToSRGB(op_type, a);
-			case SpecialOperationNodeType::SRGBTOL:				return NodeUtils::SRGBToLinear(op_type, a);
+			case SpecialOperationNodeType::RGB_HSV:				return NodeUtils::RGBtoHSV(op_type, a);
+			case SpecialOperationNodeType::HSV_RGB:				return NodeUtils::HSVtoRGB(op_type, a);
+			case SpecialOperationNodeType::COLNR:				return NodeUtils::ColorNorm(op_type, a);
+			case SpecialOperationNodeType::COLUNR:				return NodeUtils::ColorUnnorm(op_type, a);
+			case SpecialOperationNodeType::L_SRGB:				return NodeUtils::LinearToSRGB(op_type, a);
+			case SpecialOperationNodeType::SRGB_L:				return NodeUtils::SRGBToLinear(op_type, a);
 
 			// Trigonometry
 			case SpecialOperationNodeType::SIN:					return NodeUtils::Sin(op_type, a);
