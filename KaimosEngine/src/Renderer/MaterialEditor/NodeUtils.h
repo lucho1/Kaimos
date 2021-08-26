@@ -25,6 +25,8 @@ namespace Kaimos::MaterialEditor {
 
 		glm::vec4 CalculateRGBtoHSV(const glm::vec4& a);
 		glm::vec4 CalculateHSVtoRGB(const glm::vec4& a);
+		float CalculateLinearToSRGB(const float a);
+		float CalculateSRGBToLinear(const float a);
 
 		// --- Data Operations ---
 		// - Basics -
@@ -59,6 +61,8 @@ namespace Kaimos::MaterialEditor {
 		glm::vec4 HSVtoRGB(PinDataType op_type, const glm::vec4& a);
 		glm::vec4 ColorNorm(PinDataType op_type, const glm::vec4& a);
 		glm::vec4 ColorUnnorm(PinDataType op_type, const glm::vec4& a);
+		glm::vec4 LinearToSRGB(PinDataType op_type, const glm::vec4& a);
+		glm::vec4 SRGBToLinear(PinDataType op_type, const glm::vec4& a);
 
 		// - Trigonometry -
 		glm::vec4 Sin(PinDataType op_type, const glm::vec4& a);

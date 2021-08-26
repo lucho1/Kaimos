@@ -881,6 +881,8 @@ namespace Kaimos::MaterialEditor {
 			case SpecialOperationNodeType::HSVTORGB:			{ m_Name = "HSV-RGB Node";		m_InputsN = 1; break; }
 			case SpecialOperationNodeType::COL_NORM:			{ m_Name = "Color Norm Node";	m_InputsN = 1; if(out_type == PinDataType::INT) out_type = PinDataType::FLOAT; break; }
 			case SpecialOperationNodeType::COL_UNORM:			{ m_Name = "Color Unnorm Node";	m_InputsN = 1; if(out_type == PinDataType::INT) in_type1 = PinDataType::FLOAT; break; }			
+			case SpecialOperationNodeType::LTOSRGB:				{ m_Name = "Linear-sRGB Node";	m_InputsN = 1; break; } // URGENT TODO: Change gamma value upon changing this
+			case SpecialOperationNodeType::SRGBTOL:				{ m_Name = "sRGB-Linear Node";	m_InputsN = 1; break; }
 
 			// Trigonometry
 			case SpecialOperationNodeType::SIN:					{ m_Name = "Sin Node";			m_InputsN = 1; break; }
@@ -993,6 +995,8 @@ namespace Kaimos::MaterialEditor {
 			case SpecialOperationNodeType::HSVTORGB:			return NodeUtils::HSVtoRGB(op_type, a);
 			case SpecialOperationNodeType::COL_NORM:			return NodeUtils::ColorNorm(op_type, a);
 			case SpecialOperationNodeType::COL_UNORM:			return NodeUtils::ColorUnnorm(op_type, a);
+			case SpecialOperationNodeType::LTOSRGB:				return NodeUtils::LinearToSRGB(op_type, a);
+			case SpecialOperationNodeType::SRGBTOL:				return NodeUtils::SRGBToLinear(op_type, a);
 
 			// Trigonometry
 			case SpecialOperationNodeType::SIN:					return NodeUtils::Sin(op_type, a);

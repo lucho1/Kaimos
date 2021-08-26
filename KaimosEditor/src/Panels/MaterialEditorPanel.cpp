@@ -316,6 +316,12 @@ namespace Kaimos {
 				if (ImGui::BeginMenu("RGB Denormalize"))
 					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::COL_UNORM, popup_pos, false);
 
+				if (ImGui::BeginMenu("Linear to sRGB"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::LTOSRGB, popup_pos, false);
+
+				if (ImGui::BeginMenu("sRGB To Linear"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::SRGBTOL, popup_pos, false);
+
 				ImGui::EndMenu();
 			}
 

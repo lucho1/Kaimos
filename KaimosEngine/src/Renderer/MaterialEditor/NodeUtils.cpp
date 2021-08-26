@@ -176,6 +176,23 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 		return glm::vec4(rgb, sva.z * 2.55f);
 	}
 
+	float CalculateLinearToSRGB(const float a)
+	{
+		float ret;
+		if (a > 0.0031308f)
+			return 1.055f * (glm::pow(a, (1.0f/2.4f))) - 0.055f;
+		else
+			return 12.92f*a;
+	}
+
+	float CalculateSRGBToLinear(const float a)
+	{
+		if (a > 0.04045f)
+			return glm::pow((a + 0.055f) / 1.055f, 2.4f);
+		else
+			return a/12.92f;
+	}
+
 
 
 
@@ -282,11 +299,11 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 	{
 		switch (op_type)
 		{
-		case PinDataType::FLOAT:
-		case PinDataType::INT:		return glm::vec4(glm::abs(a.x), 0.0f, 0.0f, 0.0f);
-		case PinDataType::VEC2:		return glm::vec4(glm::abs(glm::vec2(a)), 0.0f, 0.0f);
-		case PinDataType::VEC3:		return glm::vec4(glm::abs(glm::vec3(a)), 0.0f);
-		case PinDataType::VEC4:		return glm::abs(a);
+			case PinDataType::FLOAT:
+			case PinDataType::INT:		return glm::vec4(glm::abs(a.x), 0.0f, 0.0f, 0.0f);
+			case PinDataType::VEC2:		return glm::vec4(glm::abs(glm::vec2(a)), 0.0f, 0.0f);
+			case PinDataType::VEC3:		return glm::vec4(glm::abs(glm::vec3(a)), 0.0f);
+			case PinDataType::VEC4:		return glm::abs(a);
 		}
 
 		KS_FATAL_ERROR("Tried to perform a non-supported Absolute operation!");
@@ -297,11 +314,11 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 	{
 		switch (op_type)
 		{
-		case PinDataType::FLOAT:
-		case PinDataType::INT:		return glm::vec4(glm::min(a.x, b.x), 0.0f, 0.0f, 0.0f);
-		case PinDataType::VEC2:		return glm::vec4(glm::min(glm::vec2(a), glm::vec2(b)), 0.0f, 0.0f);
-		case PinDataType::VEC3:		return glm::vec4(glm::min(glm::vec3(a), glm::vec3(b)), 0.0f);
-		case PinDataType::VEC4:		return glm::min(a, b);
+			case PinDataType::FLOAT:
+			case PinDataType::INT:		return glm::vec4(glm::min(a.x, b.x), 0.0f, 0.0f, 0.0f);
+			case PinDataType::VEC2:		return glm::vec4(glm::min(glm::vec2(a), glm::vec2(b)), 0.0f, 0.0f);
+			case PinDataType::VEC3:		return glm::vec4(glm::min(glm::vec3(a), glm::vec3(b)), 0.0f);
+			case PinDataType::VEC4:		return glm::min(a, b);
 		}
 
 		KS_FATAL_ERROR("Tried to perform a non-supported Min operation!");
@@ -312,11 +329,11 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 	{
 		switch (op_type)
 		{
-		case PinDataType::FLOAT:
-		case PinDataType::INT:		return glm::vec4(glm::max(a.x, b.x), 0.0f, 0.0f, 0.0f);
-		case PinDataType::VEC2:		return glm::vec4(glm::max(glm::vec2(a), glm::vec2(b)), 0.0f, 0.0f);
-		case PinDataType::VEC3:		return glm::vec4(glm::max(glm::vec3(a), glm::vec3(b)), 0.0f);
-		case PinDataType::VEC4:		return glm::max(a, b);
+			case PinDataType::FLOAT:
+			case PinDataType::INT:		return glm::vec4(glm::max(a.x, b.x), 0.0f, 0.0f, 0.0f);
+			case PinDataType::VEC2:		return glm::vec4(glm::max(glm::vec2(a), glm::vec2(b)), 0.0f, 0.0f);
+			case PinDataType::VEC3:		return glm::vec4(glm::max(glm::vec3(a), glm::vec3(b)), 0.0f);
+			case PinDataType::VEC4:		return glm::max(a, b);
 		}
 
 		KS_FATAL_ERROR("Tried to perform a non-supported Max operation!");
@@ -327,11 +344,11 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 	{
 		switch (op_type)
 		{
-		case PinDataType::FLOAT:
-		case PinDataType::INT:		return glm::vec4(-a.x, 0.0f, 0.0f, 0.0f);
-		case PinDataType::VEC2:		return glm::vec4(-glm::vec2(a), 0.0f, 0.0f);
-		case PinDataType::VEC3:		return glm::vec4(-glm::vec3(a), 0.0f);
-		case PinDataType::VEC4:		return -a;
+			case PinDataType::FLOAT:
+			case PinDataType::INT:		return glm::vec4(-a.x, 0.0f, 0.0f, 0.0f);
+			case PinDataType::VEC2:		return glm::vec4(-glm::vec2(a), 0.0f, 0.0f);
+			case PinDataType::VEC3:		return glm::vec4(-glm::vec3(a), 0.0f);
+			case PinDataType::VEC4:		return -a;
 		}
 
 		KS_FATAL_ERROR("Tried to perform a non-supported Negate operation!");
@@ -451,11 +468,11 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 	{
 		switch (op_type)
 		{
-		case PinDataType::FLOAT:
-		case PinDataType::INT:		return glm::vec4(glm::degrees(a.x), 0.0f, 0.0f, 0.0f);
-		case PinDataType::VEC2:		return glm::vec4(glm::degrees(glm::vec2(a)), 0.0f, 0.0f);
-		case PinDataType::VEC3:		return glm::vec4(glm::degrees(glm::vec3(a)), 0.0f);
-		case PinDataType::VEC4:		return glm::degrees(a);
+			case PinDataType::FLOAT:
+			case PinDataType::INT:		return glm::vec4(glm::degrees(a.x), 0.0f, 0.0f, 0.0f);
+			case PinDataType::VEC2:		return glm::vec4(glm::degrees(glm::vec2(a)), 0.0f, 0.0f);
+			case PinDataType::VEC3:		return glm::vec4(glm::degrees(glm::vec3(a)), 0.0f);
+			case PinDataType::VEC4:		return glm::degrees(a);
 		}
 
 		KS_FATAL_ERROR("Tried to perform a non-supported RadToDeg operation!");
@@ -466,11 +483,11 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 	{
 		switch (op_type)
 		{
-		case PinDataType::FLOAT:
-		case PinDataType::INT:		return glm::vec4(glm::radians(a.x), 0.0f, 0.0f, 0.0f);
-		case PinDataType::VEC2:		return glm::vec4(glm::radians(glm::vec2(a)), 0.0f, 0.0f);
-		case PinDataType::VEC3:		return glm::vec4(glm::radians(glm::vec3(a)), 0.0f);
-		case PinDataType::VEC4:		return glm::radians(a);
+			case PinDataType::FLOAT:
+			case PinDataType::INT:		return glm::vec4(glm::radians(a.x), 0.0f, 0.0f, 0.0f);
+			case PinDataType::VEC2:		return glm::vec4(glm::radians(glm::vec2(a)), 0.0f, 0.0f);
+			case PinDataType::VEC3:		return glm::vec4(glm::radians(glm::vec3(a)), 0.0f);
+			case PinDataType::VEC4:		return glm::radians(a);
 		}
 
 		KS_FATAL_ERROR("Tried to perform a non-supported DegToRad operation!");
@@ -481,8 +498,8 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 	{
 		switch (op_type)
 		{
-		case PinDataType::VEC3:		return CalculateRGBtoHSV(glm::vec4(glm::vec3(a), 1.0f));
-		case PinDataType::VEC4:		return CalculateRGBtoHSV(a);
+			case PinDataType::VEC3:		return CalculateRGBtoHSV(glm::vec4(glm::vec3(a), 1.0f));
+			case PinDataType::VEC4:		return CalculateRGBtoHSV(a);
 		}
 
 		KS_FATAL_ERROR("Tried to perform a non-supported RGBtoHSV operation!");
@@ -493,8 +510,8 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 	{
 		switch (op_type)
 		{
-		case PinDataType::VEC3: return CalculateHSVtoRGB(glm::vec4(glm::vec3(a), 1.0f));
-		case PinDataType::VEC4: return CalculateHSVtoRGB(a);
+			case PinDataType::VEC3: return CalculateHSVtoRGB(glm::vec4(glm::vec3(a), 1.0f));
+			case PinDataType::VEC4: return CalculateHSVtoRGB(a);
 		}
 
 		KS_FATAL_ERROR("Tried to perform a non-supported HSVtoRGB operation!");
@@ -505,11 +522,11 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 	{
 		switch (op_type)
 		{
-		case PinDataType::FLOAT:
-		case PinDataType::INT:		return glm::vec4(a.x / 255.0f, 0.0f, 0.0f, 0.0f);
-		case PinDataType::VEC2:		return glm::vec4(glm::vec2(a) / 255.0f, 0.0f, 0.0f);
-		case PinDataType::VEC3:		return glm::vec4(glm::vec3(a) / 255.0f, 0.0f);
-		case PinDataType::VEC4:		return a / 255.0f;
+			case PinDataType::FLOAT:
+			case PinDataType::INT:		return glm::vec4(a.x / 255.0f, 0.0f, 0.0f, 0.0f);
+			case PinDataType::VEC2:		return glm::vec4(glm::vec2(a) / 255.0f, 0.0f, 0.0f);
+			case PinDataType::VEC3:		return glm::vec4(glm::vec3(a) / 255.0f, 0.0f);
+			case PinDataType::VEC4:		return a / 255.0f;
 		}
 
 		KS_FATAL_ERROR("Tried to perform a non-supported Color Normalization operation!");
@@ -520,14 +537,44 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 	{
 		switch (op_type)
 		{
-		case PinDataType::FLOAT:
-		case PinDataType::INT:		return glm::vec4(a.x * 255.0f, 0.0f, 0.0f, 0.0f);
-		case PinDataType::VEC2:		return glm::vec4(glm::vec2(a) * 255.0f, 0.0f, 0.0f);
-		case PinDataType::VEC3:		return glm::vec4(glm::vec3(a) * 255.0f, 0.0f);
-		case PinDataType::VEC4:		return a * 255.0f;
+			case PinDataType::FLOAT:
+			case PinDataType::INT:		return glm::vec4(a.x * 255.0f, 0.0f, 0.0f, 0.0f);
+			case PinDataType::VEC2:		return glm::vec4(glm::vec2(a) * 255.0f, 0.0f, 0.0f);
+			case PinDataType::VEC3:		return glm::vec4(glm::vec3(a) * 255.0f, 0.0f);
+			case PinDataType::VEC4:		return a * 255.0f;
 		}
 
 		KS_FATAL_ERROR("Tried to perform a non-supported Color Unnormalization operation!");
+		return {};
+	}
+
+	glm::vec4 LinearToSRGB(PinDataType op_type, const glm::vec4& a)
+	{
+		switch (op_type)
+		{
+			case PinDataType::FLOAT:
+			case PinDataType::INT:		return glm::vec4(CalculateLinearToSRGB(a.x), 0.0f, 0.0f, 0.0f);
+			case PinDataType::VEC2:		return glm::vec4(CalculateLinearToSRGB(a.x), CalculateLinearToSRGB(a.y), 0., 0.0f);
+			case PinDataType::VEC3:		return glm::vec4(CalculateLinearToSRGB(a.x), CalculateLinearToSRGB(a.y), CalculateLinearToSRGB(a.z), 0.0f);
+			case PinDataType::VEC4:		return glm::vec4(CalculateLinearToSRGB(a.x), CalculateLinearToSRGB(a.y), CalculateLinearToSRGB(a.z), a.a);
+		}
+
+		KS_FATAL_ERROR("Tried to perform a non-supported LinearToSRGB operation!");
+		return {};
+	}
+
+	glm::vec4 SRGBToLinear(PinDataType op_type, const glm::vec4& a)
+	{
+		switch (op_type)
+		{
+			case PinDataType::FLOAT:
+			case PinDataType::INT:		return glm::vec4(CalculateSRGBToLinear(a.x), 0.0f, 0.0f, 0.0f);
+			case PinDataType::VEC2:		return glm::vec4(CalculateSRGBToLinear(a.x), CalculateSRGBToLinear(a.y), 0., 0.0f);
+			case PinDataType::VEC3:		return glm::vec4(CalculateSRGBToLinear(a.x), CalculateSRGBToLinear(a.y), CalculateSRGBToLinear(a.z), 0.0f);
+			case PinDataType::VEC4:		return glm::vec4(CalculateSRGBToLinear(a.x), CalculateSRGBToLinear(a.y), CalculateSRGBToLinear(a.z), a.a);
+		}
+
+		KS_FATAL_ERROR("Tried to perform a non-supported SRGBToLinear operation!");
 		return {};
 	}
 
@@ -719,11 +766,11 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 	{
 		switch (op_type)
 		{
-		case PinDataType::FLOAT:
-		case PinDataType::INT:		return glm::vec4(glm::ceil(a.x), 0.0f, 0.0f, 0.0f);
-		case PinDataType::VEC2:		return glm::vec4(glm::ceil(glm::vec2(a)), 0.0f, 0.0f);
-		case PinDataType::VEC3:		return glm::vec4(glm::ceil(glm::vec3(a)), 0.0f);
-		case PinDataType::VEC4:		return glm::ceil(a);
+			case PinDataType::FLOAT:
+			case PinDataType::INT:		return glm::vec4(glm::ceil(a.x), 0.0f, 0.0f, 0.0f);
+			case PinDataType::VEC2:		return glm::vec4(glm::ceil(glm::vec2(a)), 0.0f, 0.0f);
+			case PinDataType::VEC3:		return glm::vec4(glm::ceil(glm::vec3(a)), 0.0f);
+			case PinDataType::VEC4:		return glm::ceil(a);
 		}
 
 		KS_FATAL_ERROR("Tried to perform a non-supported Ceil operation!");
@@ -734,11 +781,11 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 	{
 		switch (op_type)
 		{
-		case PinDataType::FLOAT:
-		case PinDataType::INT:		return glm::vec4(glm::floor(a.x), 0.0f, 0.0f, 0.0f);
-		case PinDataType::VEC2:		return glm::vec4(glm::floor(glm::vec2(a)), 0.0f, 0.0f);
-		case PinDataType::VEC3:		return glm::vec4(glm::floor(glm::vec3(a)), 0.0f);
-		case PinDataType::VEC4:		return glm::floor(a);
+			case PinDataType::FLOAT:
+			case PinDataType::INT:		return glm::vec4(glm::floor(a.x), 0.0f, 0.0f, 0.0f);
+			case PinDataType::VEC2:		return glm::vec4(glm::floor(glm::vec2(a)), 0.0f, 0.0f);
+			case PinDataType::VEC3:		return glm::vec4(glm::floor(glm::vec3(a)), 0.0f);
+			case PinDataType::VEC4:		return glm::floor(a);
 		}
 
 		KS_FATAL_ERROR("Tried to perform a non-supported Floor operation!");
@@ -749,11 +796,11 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 	{
 		switch (op_type)
 		{
-		case PinDataType::FLOAT:
-		case PinDataType::INT:		return glm::vec4(glm::clamp(a.x, min_val, max_val), 0.0f, 0.0f, 0.0f);
-		case PinDataType::VEC2:		return glm::vec4(glm::clamp(glm::vec2(a), min_val, max_val), 0.0f, 0.0f);
-		case PinDataType::VEC3:		return glm::vec4(glm::clamp(glm::vec3(a), min_val, max_val), 0.0f);
-		case PinDataType::VEC4:		return glm::clamp(a, min_val, max_val);
+			case PinDataType::FLOAT:
+			case PinDataType::INT:		return glm::vec4(glm::clamp(a.x, min_val, max_val), 0.0f, 0.0f, 0.0f);
+			case PinDataType::VEC2:		return glm::vec4(glm::clamp(glm::vec2(a), min_val, max_val), 0.0f, 0.0f);
+			case PinDataType::VEC3:		return glm::vec4(glm::clamp(glm::vec3(a), min_val, max_val), 0.0f);
+			case PinDataType::VEC4:		return glm::clamp(a, min_val, max_val);
 		}
 
 		KS_FATAL_ERROR("Tried to perform a non-supported Clamp operation!");
@@ -764,11 +811,11 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 	{
 		switch (op_type)
 		{
-		case PinDataType::FLOAT:
-		case PinDataType::INT:		return glm::vec4(glm::round(a.x), 0.0f, 0.0f, 0.0f);
-		case PinDataType::VEC2:		return glm::vec4(glm::round(glm::vec2(a)), 0.0f, 0.0f);
-		case PinDataType::VEC3:		return glm::vec4(glm::round(glm::vec3(a)), 0.0f);
-		case PinDataType::VEC4:		return glm::round(a);
+			case PinDataType::FLOAT:
+			case PinDataType::INT:		return glm::vec4(glm::round(a.x), 0.0f, 0.0f, 0.0f);
+			case PinDataType::VEC2:		return glm::vec4(glm::round(glm::vec2(a)), 0.0f, 0.0f);
+			case PinDataType::VEC3:		return glm::vec4(glm::round(glm::vec3(a)), 0.0f);
+			case PinDataType::VEC4:		return glm::round(a);
 		}
 
 		KS_FATAL_ERROR("Tried to perform a non-supported Round operation!");
@@ -779,11 +826,11 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 	{
 		switch (op_type)
 		{
-		case PinDataType::FLOAT:
-		case PinDataType::INT:		return glm::vec4(glm::sign(a.x), 0.0f, 0.0f, 0.0f);
-		case PinDataType::VEC2:		return glm::vec4(glm::sign(glm::vec2(a)), 0.0f, 0.0f);
-		case PinDataType::VEC3:		return glm::vec4(glm::sign(glm::vec3(a)), 0.0f);
-		case PinDataType::VEC4:		return glm::sign(a);
+			case PinDataType::FLOAT:
+			case PinDataType::INT:		return glm::vec4(glm::sign(a.x), 0.0f, 0.0f, 0.0f);
+			case PinDataType::VEC2:		return glm::vec4(glm::sign(glm::vec2(a)), 0.0f, 0.0f);
+			case PinDataType::VEC3:		return glm::vec4(glm::sign(glm::vec3(a)), 0.0f);
+			case PinDataType::VEC4:		return glm::sign(a);
 		}
 
 		KS_FATAL_ERROR("Tried to perform a non-supported Sign operation!");
@@ -794,11 +841,11 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 	{
 		switch (op_type)
 		{
-		case PinDataType::FLOAT:
-		case PinDataType::INT:		return glm::vec4(glm::fract(a.x), 0.0f, 0.0f, 0.0f);
-		case PinDataType::VEC2:		return glm::vec4(glm::fract(glm::vec2(a)), 0.0f, 0.0f);
-		case PinDataType::VEC3:		return glm::vec4(glm::fract(glm::vec3(a)), 0.0f);
-		case PinDataType::VEC4:		return glm::fract(a);
+			case PinDataType::FLOAT:
+			case PinDataType::INT:		return glm::vec4(glm::fract(a.x), 0.0f, 0.0f, 0.0f);
+			case PinDataType::VEC2:		return glm::vec4(glm::fract(glm::vec2(a)), 0.0f, 0.0f);
+			case PinDataType::VEC3:		return glm::vec4(glm::fract(glm::vec3(a)), 0.0f);
+			case PinDataType::VEC4:		return glm::fract(a);
 		}
 
 		KS_FATAL_ERROR("Tried to perform a non-supported Fractal operation!");
@@ -1053,11 +1100,11 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 	{
 		switch (op_type)
 		{
-		case PinDataType::FLOAT:
-		case PinDataType::INT:		return glm::vec4(glm::mix(a.x, b.x, c), 0.0f, 0.0f, 0.0f);
-		case PinDataType::VEC2:		return glm::vec4(glm::mix(glm::vec2(a), glm::vec2(b), c), 0.0f, 0.0f);
-		case PinDataType::VEC3:		return glm::vec4(glm::mix(glm::vec3(a), glm::vec3(b), c), 0.0f);
-		case PinDataType::VEC4:		return glm::mix(a, b, c);
+			case PinDataType::FLOAT:
+			case PinDataType::INT:		return glm::vec4(glm::mix(a.x, b.x, c), 0.0f, 0.0f, 0.0f);
+			case PinDataType::VEC2:		return glm::vec4(glm::mix(glm::vec2(a), glm::vec2(b), c), 0.0f, 0.0f);
+			case PinDataType::VEC3:		return glm::vec4(glm::mix(glm::vec3(a), glm::vec3(b), c), 0.0f);
+			case PinDataType::VEC4:		return glm::mix(a, b, c);
 		}
 
 		KS_FATAL_ERROR("Tried to perform a non-supported FLerp operation!");
@@ -1068,9 +1115,9 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 	{
 		switch (op_type)
 		{
-		case PinDataType::VEC2:		return glm::vec4(glm::mix(glm::vec2(a), glm::vec2(b), glm::vec2(c)), 0.0f, 0.0f);
-		case PinDataType::VEC3:		return glm::vec4(glm::mix(glm::vec3(a), glm::vec3(b), glm::vec3(c)), 0.0f);
-		case PinDataType::VEC4:		return glm::mix(a, b, c);
+			case PinDataType::VEC2:		return glm::vec4(glm::mix(glm::vec2(a), glm::vec2(b), glm::vec2(c)), 0.0f, 0.0f);
+			case PinDataType::VEC3:		return glm::vec4(glm::mix(glm::vec3(a), glm::vec3(b), glm::vec3(c)), 0.0f);
+			case PinDataType::VEC4:		return glm::mix(a, b, c);
 		}
 
 		KS_FATAL_ERROR("Tried to perform a non-supported VLerp operation!");
@@ -1096,9 +1143,9 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 	{
 		switch (op_type)
 		{
-		case PinDataType::VEC2:		return glm::vec4(glm::mod(glm::vec2(a), glm::vec2(b)), 0.0f, 0.0f);
-		case PinDataType::VEC3:		return glm::vec4(glm::mod(glm::vec3(a), glm::vec3(b)), 0.0f);
-		case PinDataType::VEC4:		return glm::mod(a, b);
+			case PinDataType::VEC2:		return glm::vec4(glm::mod(glm::vec2(a), glm::vec2(b)), 0.0f, 0.0f);
+			case PinDataType::VEC3:		return glm::vec4(glm::mod(glm::vec3(a), glm::vec3(b)), 0.0f);
+			case PinDataType::VEC4:		return glm::mod(a, b);
 		}
 
 		KS_FATAL_ERROR("Tried to perform a non-supported VMod operation!");
@@ -1122,9 +1169,9 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 	{
 		switch (op_type)
 		{
-		case PinDataType::VEC2:		return glm::vec4(glm::refract(glm::vec2(a), glm::vec2(b), c), 0.0f, 0.0f);
-		case PinDataType::VEC3:		return glm::vec4(glm::refract(glm::vec3(a), glm::vec3(b), c), 0.0f);
-		case PinDataType::VEC4:		return glm::refract(a, b, c);
+			case PinDataType::VEC2:		return glm::vec4(glm::refract(glm::vec2(a), glm::vec2(b), c), 0.0f, 0.0f);
+			case PinDataType::VEC3:		return glm::vec4(glm::refract(glm::vec3(a), glm::vec3(b), c), 0.0f);
+			case PinDataType::VEC4:		return glm::refract(a, b, c);
 		}
 
 		KS_FATAL_ERROR("Tried to perform a non-supported RefractVec operation!");
