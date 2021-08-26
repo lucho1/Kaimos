@@ -162,12 +162,15 @@ namespace Kaimos {
 			shader->SetUniformFloat3("u_SceneColor", s_RendererData->SceneColor);
 
 			// Bind Environment Textures
-			s_RendererData->IrradianceCubemap->Bind(29);
-			s_RendererData->PrefilterCubemap->Bind(30);
-			s_RendererData->BRDF_LutTexture->Bind(31);
-			shader->SetUniformInt("u_IrradianceMap", 29);
-			shader->SetUniformInt("u_PrefilterSpecularMap", 30);
-			shader->SetUniformInt("u_BRDF_LUTMap", 31);
+			if (s_RendererData->IrradianceCubemap && s_RendererData->PrefilterCubemap && s_RendererData->BRDF_LutTexture)
+			{
+				s_RendererData->IrradianceCubemap->Bind(29);
+				s_RendererData->PrefilterCubemap->Bind(30);
+				s_RendererData->BRDF_LutTexture->Bind(31);
+				shader->SetUniformInt("u_IrradianceMap", 29);
+				shader->SetUniformInt("u_PrefilterSpecularMap", 30);
+				shader->SetUniformInt("u_BRDF_LUTMap", 31);
+			}
 
 			// Set Directional Lights Uniforms
 			uint dir_lights_num = dir_lights.size() >= s_RendererData->MaxDirLights ? s_RendererData->MaxDirLights : dir_lights.size();
@@ -221,7 +224,7 @@ namespace Kaimos {
 	{
 		KS_PROFILE_FUNCTION();
 		Ref<Shader> skybox_shader = GetShader("SkyboxShader");
-		if (skybox_shader)
+		if (skybox_shader && s_RendererData->EnvironmentCubemap)
 		{
 			skybox_shader->Bind();
 			glm::mat4 view_proj = projection_matrix * glm::mat4(glm::mat3(view_matrix));

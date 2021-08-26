@@ -133,7 +133,8 @@ namespace Kaimos::MaterialEditor {
 
 		// --- Public Class Methods ---
 		MainMaterialNode(Material* attached_material);
-		MainMaterialNode(Material* attached_material, uint id) : MaterialNode("Main Node", MaterialNodeType::MAIN, id), m_AttachedMaterial(attached_material) {}
+		MainMaterialNode(Material* attached_material, uint id)
+			: MaterialNode("Main Node", MaterialNodeType::MAIN, id), m_AttachedMaterial(attached_material) {}
 
 		~MainMaterialNode();
 
