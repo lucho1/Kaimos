@@ -14,9 +14,48 @@ namespace Kaimos { enum class MATERIAL_TEXTURES; class Material; }
 
 namespace Kaimos::MaterialEditor {
 
-	// ---- Forward Declarations & Enums ----
+	// ---- Forward Declarations ----
 	enum class PinDataType;
-	enum class MaterialNodeType	{ NONE, MAIN, VERTEX_PARAMETER, OPERATION, CONSTANT };
+
+	// ---- TYPE-DEFINING ENUMS ----
+	enum class MaterialNodeType			{ NONE, MAIN, VERTEX_PARAMETER, OPERATION, SPECIAL_OPERATION, CONSTANT };
+	enum class VertexParameterNodeType	{ NONE, TEX_COORDS, POSITION, NORMAL };
+
+	enum class ConstantNodeType
+	{
+		NONE,
+		DELTATIME, PI, GOLDEN_RATIO,											// Constants
+		INT, FLOAT, VEC2, VEC3, VEC4,											// Variables
+		SCREEN_RES, SCENE_COLOR,												// Screen, Scene, ...
+		CAMERA_FOV, CAMERA_AR, CAMERA_PLANES, CAMERA_ORTHOSIZE,					// Camera
+		INT_RANDOM, FLOAT_RANDOM, VEC2_RANDOM, VEC3_RANDOM, VEC4_RANDOM			// Randoms
+	};
+
+	enum class OperationNodeType
+	{
+		NONE,
+		ADDITION, SUBTRACTION, DIVISION, MULTIPLICATION,						// Basic Operations (with same types)
+		FLOATVEC_MULTIPLY, FLOATVEC_DIVIDE,										// Different-Types Operations
+	};
+
+	enum class SpecialOperationNodeType
+	{
+		NONE,
+		ABS, MIN, MAX, NEGATE,													// Basics
+		POW, SQRT, INV_SQRT, LOG, LOG2, EXP, EXP2,								// Powers
+		RTOD, DTOR, RGB_HSV, HSV_RGB, COLNR, COLUNR, L_SRGB, SRGB_L, INTF, FINT,// Conversions
+		SIN, COS, TAN, ASIN, ACOS, ATAN,										// Trigonometry
+		HSIN, HCOS, HTAN, HASIN, HACOS, HATAN,									// Hiperbolic Trigonometry
+		CEIL, FLOOR, CLAMP, ROUND, SIGN, FRACTAL,								// Shaders (Ceil, Floor, Clamp, ...)
+		FLOAT_STEP, VEC_STEP, FLOAT_SMOOTHSTEP, VEC_SMOOTHSTEP,					// Step, Smoothstep
+		VEC_NORMALIZE, VEC_MAGNITUDE, VEC_DIST, VEC_DOT, VEC_CROSS,				// Vector Ops.
+		SHT_ANGLE_NVECS, SHT_ANGLE_VECS, LNG_ANGLE_NVECS, LNG_ANGLE_VECS,		// Vector Angles
+		VEC_ROTX, VEC_ROTY, VEC_ROTZ,											// Vector Rotations
+		FLOAT_LERP, VEC_LERP, FLOAT_MOD, VEC_MOD, VEC_REFLECT, VEC_REFRACT,		// Advanced Vector Ops.
+		VEC_X, VEC_Y, VEC_Z, VEC_W												// Vector Components
+	};
+
+
 
 
 	// ---- Base Material Node ----
@@ -86,7 +125,6 @@ namespace Kaimos::MaterialEditor {
 
 
 	// ---- Main Material Node ----
-	enum class VertexParameterNodeType { NONE, TEX_COORDS, POSITION, NORMAL };
 
 	class MainMaterialNode : public MaterialNode
 	{
@@ -188,8 +226,6 @@ namespace Kaimos::MaterialEditor {
 
 
 	// ---- Constant Node ----
-	enum class ConstantNodeType { NONE, DELTATIME, PI, INT, FLOAT, VEC2, VEC3, VEC4 };
-
 	class ConstantMaterialNode : public MaterialNode
 	{
 	public:
@@ -211,26 +247,57 @@ namespace Kaimos::MaterialEditor {
 
 
 	// ---- Operation Node ----
-	enum class OperationNodeType { NONE, ADDITION, MULTIPLICATION, FLOATVEC2_MULTIPLY, FLOATVEC3_MULTIPLY, FLOATVEC4_MULTIPLY };
-
 	class OperationMaterialNode : public MaterialNode
 	{
 	public:
 
 		OperationMaterialNode(OperationNodeType operation_type, PinDataType operation_data_type);
-		OperationMaterialNode(const std::string& name, OperationNodeType operation_type, uint id)
-			: MaterialNode(name, MaterialNodeType::OPERATION, id), m_OperationType(operation_type) {}
+		OperationMaterialNode(const std::string& name, OperationNodeType operation_type, PinDataType vec_operation_type, uint id)
+			: MaterialNode(name, MaterialNodeType::OPERATION, id), m_OperationType(operation_type), m_VecOperationType(vec_operation_type) {}
 
 		OperationNodeType GetOperationType() const { return m_OperationType; }
+		PinDataType GetVecOperationType() const { return m_VecOperationType; }
 
 	private:
 
 		virtual glm::vec4 CalculateNodeResult() override;
 		virtual void SerializeNode(YAML::Emitter& output_emitter) const override;
 
-		glm::vec4 ProcessOperation(const glm::vec4& a, const glm::vec4& b, PinDataType a_data_type, PinDataType b_data_type) const;
+		glm::vec4 ProcessOperation(const glm::vec4& a, const glm::vec4& b, PinDataType a_type, PinDataType b_type) const;
 
 		OperationNodeType m_OperationType = OperationNodeType::NONE;
+		PinDataType m_VecOperationType = PinDataType::FLOAT;
+	};
+
+
+
+	// ---- Special Operation Node ----
+	class SpecialOperationNode : public MaterialNode
+	{
+	public:
+
+		SpecialOperationNode(SpecialOperationNodeType operation_type, PinDataType operation_data_type);
+		SpecialOperationNode(const std::string& name, SpecialOperationNodeType operation_type, uint id, uint inputs_n, PinDataType op_out_type)
+			: MaterialNode(name, MaterialNodeType::SPECIAL_OPERATION, id)
+			, m_OperationType(operation_type), m_InputsN(inputs_n), m_OperationOutputType(op_out_type) {}
+
+		SpecialOperationNodeType GetOperationType() const { return m_OperationType; }
+
+	private:
+
+		virtual glm::vec4 CalculateNodeResult() override;
+		virtual void SerializeNode(YAML::Emitter& output_emitter) const override;
+		glm::vec4 ProcessOperation(PinDataType op_type, const glm::vec4& a, const glm::vec4& b = glm::vec4(0.0f), const glm::vec4& c = glm::vec4(0.0f)) const;
+
+		// vec_comp must be VEC_X, VEC_Y, VEC_Z or VEC_W
+		float GetVectorComponent();
+		bool IsGetVecCompType();
+
+	private:
+
+		SpecialOperationNodeType m_OperationType = SpecialOperationNodeType::NONE;
+		uint m_InputsN;
+		PinDataType m_OperationOutputType = PinDataType::NONE;
 	};
 }
 

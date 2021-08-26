@@ -89,6 +89,20 @@ namespace Kaimos::MaterialEditor {
 		return node;
 	}
 
+	MaterialNode* MaterialGraph::CreateNode(SpecialOperationNodeType operation_type, PinDataType operation_data_type, const ImVec2& node_pos)
+	{
+		if (operation_type == SpecialOperationNodeType::NONE || operation_data_type == PinDataType::NONE)
+		{
+			KS_FATAL_ERROR("Tried to create an invalid Special Operation Node");
+			return nullptr;
+		}
+
+		MaterialNode* node = static_cast<MaterialNode*>(new SpecialOperationNode(operation_type, operation_data_type));
+		m_Nodes.push_back(CreateRef<MaterialNode>(node));
+		ImNodes::SetNodeScreenSpacePos(node->GetID(), ImVec2(node_pos.x, node_pos.y));
+		return node;
+	}
+
 	void MaterialGraph::CreateLink(uint output_pinID, uint input_pinID)
 	{
 		NodePin* pin = FindNodePin(input_pinID);
@@ -261,10 +275,30 @@ namespace Kaimos::MaterialEditor {
 					case MaterialEditor::MaterialNodeType::OPERATION:
 					{
 						auto spectype_node = node_val["OpNodeType"];
-						if (spectype_node)
+						auto vectype_node = node_val["VecOpType"];
+
+						if (spectype_node && vectype_node)
 						{
 							MaterialEditor::OperationNodeType op_type = (MaterialEditor::OperationNodeType)spectype_node.as<int>();
-							node = static_cast<MaterialNode*>(new OperationMaterialNode(node_name, op_type, node_id));
+							MaterialEditor::PinDataType vec_type = (MaterialEditor::PinDataType)vectype_node.as<int>();
+
+							node = static_cast<MaterialNode*>(new OperationMaterialNode(node_name, op_type, vec_type, node_id));
+							break;
+						}
+					}
+					case MaterialEditor::MaterialNodeType::SPECIAL_OPERATION:
+					{
+						auto spectype_node = node_val["SpecOpNodeType"];
+						if (spectype_node)
+						{
+							if (!node_val["InputsN"] || !node_val["OpOutType"])
+								KS_FATAL_ERROR("Some material didn't Serialized this value!");
+
+							uint inputs_n = node_val["InputsN"].as<uint>();
+							uint op_out_type = node_val["OpOutType"].as<uint>();
+
+							MaterialEditor::SpecialOperationNodeType op_type = (MaterialEditor::SpecialOperationNodeType)spectype_node.as<int>();
+							node = static_cast<MaterialNode*>(new SpecialOperationNode(node_name, op_type, node_id, inputs_n, (MaterialEditor::PinDataType)op_out_type));
 							break;
 						}
 					}

@@ -148,7 +148,7 @@ namespace Kaimos {
 
 
 	// ----------------------- Public Serialization Methods ----------------------------------------------
-	void SceneSerializer::Serialize(const std::string& filepath, const CameraController& scene_cam) const
+	void SceneSerializer::Serialize(const std::string& filepath) const
 	{
 		KS_PROFILE_FUNCTION();
 		KS_INFO("\n\n--- SERIALIZING KAIMOS SCENE ---");
@@ -158,13 +158,14 @@ namespace Kaimos {
 		output << YAML::Key << "KaimosScene" << YAML::Value << m_Scene->GetName().c_str();							// Save Scene as Key + SceneName as value
 		output << YAML::Key << "SceneColor" << YAML::Value << Renderer::GetSceneColor();							// Save Scene Color
 		output << YAML::Key << "PBRPipeline" << YAML::Value << Renderer::IsSceneInPBRPipeline();					// Save if scene is PBR or not
-		output << YAML::Key << "CameraPos" << YAML::Value << scene_cam.GetPosition();								// Save Scene Camera Position
-		output << YAML::Key << "CameraRot" << YAML::Value << scene_cam.GetOrientationAngles();						// Save Scene Camera Orientation
+		output << YAML::Key << "CameraPos" << YAML::Value << m_Scene->GetEditorCamera().GetPosition();				// Save Scene Camera Position
+		output << YAML::Key << "CameraRot" << YAML::Value << m_Scene->GetEditorCamera().GetOrientationAngles();		// Save Scene Camera Orientation
 		output << YAML::Key << "EnvironmentMapTexture" << YAML::Value << Renderer::GetEnvironmentMapFilepath();		// Save Scene Camera Orientation
 		output << YAML::Key << "EnviroMapRes" << YAML::Value << Renderer::GetEnvironmentMapResolution();
 
 		// Save Entities as a sequence (like an array)
-		output << YAML::Key << "Entities" << YAML::Value << YAML::BeginSeq;
+		output << YAML::Key << "Entities" << YAML::Value << YAML::BeginSeq;											// Save Entities as a sequence (like an array)
+
 		m_Scene->m_Registry.each([&](auto entityID)
 			{
 				Entity entity = { entityID, m_Scene.get() };
@@ -185,7 +186,7 @@ namespace Kaimos {
 
 
 	// ----------------------- Public Deserialization Methods --------------------------------------------
-	bool SceneSerializer::Deserialize(const std::string& filepath, CameraController& scene_cam) const
+	bool SceneSerializer::Deserialize(const std::string& filepath) const
 	{
 		KS_PROFILE_FUNCTION();
 		KS_INFO("\n\n--- DESERIALIZING KAIMOS SCENE ---");
@@ -216,12 +217,14 @@ namespace Kaimos {
 
 		if (data["PBRPipeline"])
 			Renderer::SetPBRPipeline(data["PBRPipeline"].as<bool>());
+		else
+			Renderer::SetPBRPipeline(false);
 
 		if (data["CameraPos"])
-			scene_cam.SetPosition(data["CameraPos"].as<glm::vec3>());
-
+			m_Scene->GetEditorCamera().SetPosition(data["CameraPos"].as<glm::vec3>());
+		
 		if (data["CameraRot"])
-			scene_cam.SetOrientation(data["CameraRot"].as<glm::vec2>());
+			m_Scene->GetEditorCamera().SetOrientation(data["CameraRot"].as<glm::vec2>());
 
 		if (data["EnvironmentMapTexture"])
 		{
@@ -233,6 +236,8 @@ namespace Kaimos {
 			else
 				KS_ENGINE_TRACE("Scene has no Environment Map to load");
 		}
+		else
+			Renderer::RemoveEnvironmentMap();
 
 		// -- Entities Load --
 		uint entities_deserialized = 0;

@@ -55,7 +55,7 @@ namespace Kaimos {
 		SetSceneParameters(false);
 
 		SceneSerializer m_Serializer(m_CurrentScene);
-		m_Serializer.Deserialize("assets/scenes/PBRSphereTest.kaimos", m_EditorCamera);
+		m_Serializer.Deserialize("assets/scenes/PBRSphereTest.kaimos");
 		m_KMEPanel = MaterialEditorPanel(m_CurrentScene);
 		m_ScenePanel = ScenePanel(m_CurrentScene, &m_KMEPanel);
 	}
@@ -78,7 +78,7 @@ namespace Kaimos {
 		{
 			m_Framebuffer->Resize((uint)m_ViewportSize.x, (uint)m_ViewportSize.y);
 			m_CurrentScene->SetViewportSize((uint)m_ViewportSize.x, (uint)m_ViewportSize.y);
-			m_EditorCamera.SetCameraViewport(m_ViewportSize.x, m_ViewportSize.y);
+			m_CurrentScene->GetEditorCamera().SetCameraViewport(m_ViewportSize.x, m_ViewportSize.y);
 		}
 
 		// -- Camera Update --
@@ -87,7 +87,7 @@ namespace Kaimos {
 		if (selected_entity)
 			focus_pos = selected_entity.GetComponent<TransformComponent>().Translation;
 
-		m_EditorCamera.OnUpdate(dt, m_ViewportFocused, focus_pos);
+		m_CurrentScene->GetEditorCamera().OnUpdate(dt, m_ViewportFocused, focus_pos);
 
 		// -- Render --
 		Renderer2D::ResetStats();
@@ -101,7 +101,7 @@ namespace Kaimos {
 		m_Framebuffer->ClearFBOTexture(1, -1);
 
 		// -- Scene Update --
-		m_CurrentScene->OnUpdateEditor(dt, m_EditorCamera.GetCamera(), m_EditorCamera.GetPosition());
+		m_CurrentScene->OnUpdateEditor(dt);
 
 		// -- Mouse Picking --
 		// Get Mouse position with respect to the viewport boundaries
@@ -283,7 +283,7 @@ namespace Kaimos {
 		static float viewport_endpos = 500.0f;
 		float left_boundary = std::max(500.0f, viewport_endpos - 100.0f);
 		float right_boundary = std::min(left_boundary, 1500.0f);
-		m_ToolbarPanel.OnUIRender(m_IconsArray, m_EditorCamera, right_boundary);
+		m_ToolbarPanel.OnUIRender(m_IconsArray, m_CurrentScene->GetEditorCamera(), right_boundary);
 
 		// -- Scene Panel Rendering --
 		if(show_scene_panel)
@@ -392,7 +392,7 @@ namespace Kaimos {
 
 	void EditorLayer::OnEvent(Event& ev)
 	{
-		m_EditorCamera.OnEvent(ev);
+		m_CurrentScene->GetEditorCamera().OnEvent(ev);
 
 		EventDispatcher dispatcher(ev);
 		dispatcher.Dispatch<KeyPressedEvent>(KS_BIND_EVENT_FN(EditorLayer::OnKeyPressed));
@@ -491,7 +491,7 @@ namespace Kaimos {
 				popup_size = ImGui::GetWindowSize();
 				ImGui::SetWindowFontScale(2);
 
-				float speed_multiplier = m_EditorCamera.GetSpeedMultiplier();
+				float speed_multiplier = m_CurrentScene->GetEditorCamera().GetSpeedMultiplier();
 				ImGui::Text("x%.2f", speed_multiplier);
 			}
 			ImGui::End();
@@ -505,7 +505,7 @@ namespace Kaimos {
 		if (selected_entity && m_ToolbarPanel.m_SelectedOperation != -1)
 		{
 			// Set Guizmo
-			m_EditorCamera.UsingGuizmo(ImGuizmo::IsOver());
+			m_CurrentScene->GetEditorCamera().UsingGuizmo(ImGuizmo::IsOver());
 			ImGuizmo::SetOrthographic(false);
 			ImGuizmo::SetDrawlist();
 			ImGuizmo::SetRect(m_ViewportLimits[0].x, m_ViewportLimits[0].y, m_ViewportLimits[1].x - m_ViewportLimits[0].x, m_ViewportLimits[1].y - m_ViewportLimits[0].y);
@@ -514,11 +514,11 @@ namespace Kaimos {
 			TransformComponent& transform = selected_entity.GetComponent<TransformComponent>();
 			glm::mat4 tr_mat = transform.GetTransform();
 
-			if (!m_EditorCamera.IsUsingLMB())
+			if (!m_CurrentScene->GetEditorCamera().IsUsingLMB())
 			{
 				// Camera
-				const glm::mat4& cam_proj = m_EditorCamera.GetCamera().GetProjection();
-				glm::mat4 cam_view = m_EditorCamera.GetCamera().GetView();
+				const glm::mat4& cam_proj = m_CurrentScene->GetEditorCamera().GetCamera().GetProjection();
+				glm::mat4 cam_view = m_CurrentScene->GetEditorCamera().GetCamera().GetView();
 
 				// Snapping
 				bool snap = Input::IsKeyPressed(KEY::LEFT_CONTROL) || Input::IsKeyPressed(KEY::RIGHT_CONTROL) || m_ToolbarPanel.m_Snap;
@@ -587,9 +587,9 @@ namespace Kaimos {
 	{
 		if (Input::IsMouseButtonPressed(MOUSE::BUTTON_RIGHT))
 		{
-			float current_multiplier = m_EditorCamera.GetSpeedMultiplier();
+			float current_multiplier = m_CurrentScene->GetEditorCamera().GetSpeedMultiplier();
 			float scroll_pow = ev.GetYOffset() * current_multiplier / 8.0f;
-			m_EditorCamera.SetSpeedMultiplier(current_multiplier + scroll_pow);
+			m_CurrentScene->GetEditorCamera().SetSpeedMultiplier(current_multiplier + scroll_pow);
 			m_MultiSpeedPanelAlpha = 0.75f;
 		}
 
@@ -600,7 +600,7 @@ namespace Kaimos {
 	bool EditorLayer::OnKeyPressed(KeyPressedEvent& ev)
 	{
 		// -- Shortcuts --
-		if (ev.GetRepeatCount() > 0 || m_EditorCamera.IsCameraMoving())
+		if (ev.GetRepeatCount() > 0 || m_CurrentScene->GetEditorCamera().IsCameraMoving())
 			return false;
 
 		bool control_pressed = Input::IsKeyPressed(KEY::LEFT_CONTROL) || Input::IsKeyPressed(KEY::RIGHT_CONTROL);
@@ -707,7 +707,9 @@ namespace Kaimos {
 	{
 		m_KMEPanel.UnsetGraphToModify();
 		m_ScenePanel.SetContext(m_CurrentScene);
-		if (set_viewport)
+		m_CurrentScene->SetGlobalCurrentScene(m_CurrentScene);
+		
+		if(set_viewport)
 			m_CurrentScene->SetViewportSize((uint)m_ViewportSize.x, (uint)m_ViewportSize.y);
 	}
 
@@ -722,9 +724,9 @@ namespace Kaimos {
 
 		// TODO: This should be handled by a filepath class/assets class or something
 		if(m_CurrentScene->GetPath().empty())
-			m_Serializer.Serialize("assets/scenes/" + m_CurrentScene->GetName() + ".kaimos", m_EditorCamera);
+			m_Serializer.Serialize("assets/scenes/" + m_CurrentScene->GetName() + ".kaimos");
 		else
-			m_Serializer.Serialize(m_CurrentScene->GetPath(), m_EditorCamera);
+			m_Serializer.Serialize(m_CurrentScene->GetPath());
 
 		// -- Save Editor Settings (ini files) --
 		ImGui::SaveIniSettingsToDisk("imgui.ini");
@@ -756,7 +758,7 @@ namespace Kaimos {
 			// -- Save Graphs & Scene --
 			m_KMEPanel.SerializeGraphs();
 			SceneSerializer m_Serializer(m_CurrentScene);
-			m_Serializer.Serialize(filepath, m_EditorCamera);
+			m_Serializer.Serialize(filepath);
 
 			// -- Save Editor Settings (ini file) --
 			ImGui::SaveIniSettingsToDisk("imgui.ini");
@@ -773,7 +775,7 @@ namespace Kaimos {
 			SetSceneParameters();
 
 			SceneSerializer m_Serializer(m_CurrentScene);
-			m_Serializer.Deserialize(filepath, m_EditorCamera);
+			m_Serializer.Deserialize(filepath);
 		}
 	}
 }

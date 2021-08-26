@@ -3,6 +3,7 @@
 
 #include "Core/Utils/Time/Timestep.h"
 #include "Renderer/Cameras/Camera.h"
+#include "Renderer/Cameras/CameraController.h"
 
 #include <entt.hpp>
 
@@ -30,7 +31,7 @@ namespace Kaimos {
 		~Scene() = default;
 
 		// --- Public Scene Methods ---
-		void OnUpdateEditor(Timestep dt, const Camera& camera, const glm::vec3& camera_pos);
+		void OnUpdateEditor(Timestep dt);
 		void OnUpdateRuntime(Timestep dt);
 
 		void RenderFromCamera(Timestep dt, const Entity& camera_entity);
@@ -45,9 +46,16 @@ namespace Kaimos {
 	public:
 
 		// --- Getters/Setters ---
-		Entity GetPrimaryCamera();
+		static Entity GetPrimaryCamera();
 		void SetPrimaryCamera(Entity new_camera_entity);
 		void UnsetPrimaryCamera();
+
+		void SetGlobalCurrentScene(Ref<Scene> scene);
+		static CameraController& GetEditorCamera();
+		static float GetCameraFOV();
+		static float GetCameraAR();
+		static float GetCameraOrthoSize();
+		static glm::vec2 GetCameraPlanes();
 
 		inline const std::string GetName()				const { return m_Name; }
 		inline const std::string GetPath()				const { return m_Path; }
