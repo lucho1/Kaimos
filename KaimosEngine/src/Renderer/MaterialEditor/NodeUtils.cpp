@@ -40,6 +40,7 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 		return (type == PinDataType::VEC2 || type == PinDataType::VEC3 || type == PinDataType::VEC4);
 	}
 
+
 	bool IsZeroVector(const glm::vec2& a)
 	{
 		return Maths::CompareFloats(glm::length(a), 0.0f);
@@ -54,6 +55,7 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 	{
 		return Maths::CompareFloats(glm::length(a), 0.0f);
 	}
+
 
 	glm::vec2 EnsureDivisor(const glm::vec2& a, const glm::vec4& b)
 	{
@@ -81,6 +83,7 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 		if (Maths::CompareFloats(a.w - b.w, 0.0f)) ret.w = b.w + 1.0f;
 		return ret;
 	}
+
 
 	glm::vec2 GetNonZeroVector(glm::vec2 vec)
 	{
@@ -111,6 +114,66 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 		if (vec.w < 0.001f)
 			ret.w = 1.0f;
 		return ret;
+	}
+
+
+	glm::vec4 CalculateRGBtoHSV(const glm::vec4& a)
+	{
+		// Vars
+		const glm::vec4 col = GetNonZeroVector(a)/255.0f;
+
+		float c_max = glm::max(col.r, glm::max(col.g, col.b));
+		float c_min = glm::min(col.r, glm::min(col.g, col.b));
+		float diff = c_max - c_min;
+
+		// H
+		float h = c_max == c_min ? 0.0f : -1.0f;
+		float num = 0.0f;
+
+		if (Maths::CompareFloats(c_max, col.r))
+			num = 60.0f * ((col.g - col.b) / diff) + 360.0f;
+		else if (Maths::CompareFloats(c_max, col.g))
+			num = 60.0f * ((col.b - col.r) / diff) + 120.0f;
+		else if (Maths::CompareFloats(c_max, col.b))
+			num = 60.0f * ((col.r - col.g) / diff) + 240.0f;
+
+		h = (int)num % 360;
+
+		// S & V
+		float s = Maths::CompareFloats(c_max, 0.0f) ? 0.0f : ((diff / c_max) * 100.0f);
+		float v = c_max * 100.0f;
+		return glm::vec4(h, s, v, (a.a*0.392156863f)); //0.392156863 = 100/255 (simplification of: alphaHSV = (alphaRGB/255)*100
+	}
+
+
+	glm::vec4 CalculateHSVtoRGB(const glm::vec4& a)
+	{
+		// Make sure we're within HSV values
+		glm::vec3 sva = glm::vec3(a.g, a.b, a.a); // Get the SVA comps to clamp [0,100] (H is [0, 360])
+		float red = glm::clamp(a.r, 0.0f, 360.0f);
+		sva = glm::clamp(sva, 0.0f, 100.0f);
+
+		// Convert
+		glm::vec3 hsv = glm::vec3(red, sva.x, sva.y);
+		if (Maths::CompareFloats(hsv.y, 0.0f))
+			return glm::vec4(hsv.z, hsv.z, hsv.z, sva.z * 2.55f);
+
+		float h = hsv.x, s = hsv.y/100.0f, v = hsv.z/100.0f;
+		float c = s*v;
+		float x = c * (1.0f - glm::abs(fmod(h/60.0f, 2.0f) - 1.0f));
+		float m = v-c;
+
+		// Get RGB
+		float r, g, b;
+		if (h >= 0.0f && h < 60.0f)			{ r = c; g = x; b = 0.0f; }
+		else if (h >= 60.0f && h < 120.0f)	{ r = x; g = c; b = 0.0f; }
+		else if (h >= 120.0f && h < 180.0f)	{ r = 0.0f; g = c; b = x; }
+		else if (h >= 180.0f && h < 240.0f)	{ r = 0.0f; g = x; b = c; }
+		else if (h >= 240.0f && h < 360.0f)	{ r = x; g = 0.0f; b = c; }
+		else								{ r = c; g = 0.0f; b = x; }
+
+		glm::vec3 rgb = glm::vec3(b+m, g+m, r+m) * 255.0f;
+		return glm::vec4(rgb, sva.z * 2.55f);
 	}
 
 
@@ -593,6 +656,60 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 		}
 
 		KS_FATAL_ERROR("Tried to perform a non-supported DegToRad operation!");
+		return {};
+	}
+
+	glm::vec4 RGBtoHSV(PinDataType op_type, const glm::vec4& a)
+	{
+		switch (op_type)
+		{
+			case PinDataType::VEC3:		return CalculateRGBtoHSV(glm::vec4(glm::vec3(a), 1.0f));
+			case PinDataType::VEC4:		return CalculateRGBtoHSV(a);
+		}
+
+		KS_FATAL_ERROR("Tried to perform a non-supported RGBtoHSV operation!");
+		return {};
+	}
+
+	glm::vec4 HSVtoRGB(PinDataType op_type, const glm::vec4& a)
+	{
+		switch (op_type)
+		{
+			case PinDataType::VEC3: return CalculateHSVtoRGB(glm::vec4(glm::vec3(a), 1.0f));
+			case PinDataType::VEC4: return CalculateHSVtoRGB(a);
+		}
+
+		KS_FATAL_ERROR("Tried to perform a non-supported HSVtoRGB operation!");
+		return {};
+	}
+
+	glm::vec4 ColorNorm(PinDataType op_type, const glm::vec4& a)
+	{
+		switch (op_type)
+		{
+			case PinDataType::FLOAT:
+			case PinDataType::INT:		return glm::vec4(a.x/255.0f, 0.0f, 0.0f, 0.0f);
+			case PinDataType::VEC2:		return glm::vec4(glm::vec2(a)/255.0f, 0.0f, 0.0f);
+			case PinDataType::VEC3:		return glm::vec4(glm::vec3(a)/255.0f, 0.0f);
+			case PinDataType::VEC4:		return a/255.0f;
+		}
+
+		KS_FATAL_ERROR("Tried to perform a non-supported Color Normalization operation!");
+		return {};
+	}
+
+	glm::vec4 ColorUnnorm(PinDataType op_type, const glm::vec4& a)
+	{
+		switch (op_type)
+		{
+			case PinDataType::FLOAT:
+			case PinDataType::INT:		return glm::vec4(a.x*255.0f, 0.0f, 0.0f, 0.0f);
+			case PinDataType::VEC2:		return glm::vec4(glm::vec2(a)*255.0f, 0.0f, 0.0f);
+			case PinDataType::VEC3:		return glm::vec4(glm::vec3(a)*255.0f, 0.0f);
+			case PinDataType::VEC4:		return a*255.0f;
+		}
+
+		KS_FATAL_ERROR("Tried to perform a non-supported Color Unnormalization operation!");
 		return {};
 	}
 

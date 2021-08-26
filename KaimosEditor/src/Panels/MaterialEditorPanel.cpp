@@ -304,6 +304,18 @@ namespace Kaimos {
 				if (ImGui::BeginMenu("Deg to Rad"))
 					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::DTOR, popup_pos, false);
 
+				if (ImGui::BeginMenu("RGB to HSV"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::RGBTOHSV, popup_pos, true, false);
+
+				if (ImGui::BeginMenu("HSV to RGB"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::HSVTORGB, popup_pos, true, false);
+
+				if (ImGui::BeginMenu("RGB Normalize"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::COL_NORM, popup_pos, false);
+
+				if (ImGui::BeginMenu("RGB Denormalize"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::COL_UNORM, popup_pos, false);
+
 				ImGui::EndMenu();
 			}
 
@@ -516,7 +528,7 @@ namespace Kaimos {
 		ImGui::EndMenu();
 	}
 
-	void MaterialEditorPanel::DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType op_type, ImVec2 popup_pos, bool only_vec_types)
+	void MaterialEditorPanel::DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType op_type, ImVec2 popup_pos, bool only_vec_types, bool add_vec2)
 	{
 		if (!only_vec_types)
 		{
@@ -527,8 +539,11 @@ namespace Kaimos {
 				m_CurrentGraph->CreateNode(op_type, MaterialEditor::PinDataType::FLOAT, popup_pos);
 		}
 
-		if (ImGui::MenuItem("Vec2"))
-			m_CurrentGraph->CreateNode(op_type, MaterialEditor::PinDataType::VEC2, popup_pos);
+		if (add_vec2)
+		{
+			if (ImGui::MenuItem("Vec2"))
+				m_CurrentGraph->CreateNode(op_type, MaterialEditor::PinDataType::VEC2, popup_pos);
+		}
 
 		if (ImGui::MenuItem("Vec3"))
 			m_CurrentGraph->CreateNode(op_type, MaterialEditor::PinDataType::VEC3, popup_pos);

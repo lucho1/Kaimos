@@ -23,6 +23,9 @@ namespace Kaimos::MaterialEditor {
 		glm::vec3 GetNonZeroVector(glm::vec3 vec);
 		glm::vec4 GetNonZeroVector(glm::vec4 vec);
 
+		glm::vec4 CalculateRGBtoHSV(const glm::vec4& a);
+		glm::vec4 CalculateHSVtoRGB(const glm::vec4& a);
+
 		// --- Data Operations ---
 		// - Basics -
 		glm::vec4 SumValues(PinDataType values_type, const glm::vec4& a, const glm::vec4& b);
@@ -67,6 +70,10 @@ namespace Kaimos::MaterialEditor {
 		// - Conversions -
 		glm::vec4 RadToDeg(PinDataType op_type, const glm::vec4& a);
 		glm::vec4 DegToRad(PinDataType op_type, const glm::vec4& a);
+		glm::vec4 RGBtoHSV(PinDataType op_type, const glm::vec4& a);
+		glm::vec4 HSVtoRGB(PinDataType op_type, const glm::vec4& a);
+		glm::vec4 ColorNorm(PinDataType op_type, const glm::vec4& a);
+		glm::vec4 ColorUnnorm(PinDataType op_type, const glm::vec4& a);
 
 		// - Lerps, Mods, Reflect & Refract -
 		glm::vec4 FLerpValues(PinDataType op_type, const glm::vec4& a, const glm::vec4& b, float c);

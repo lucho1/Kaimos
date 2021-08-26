@@ -42,7 +42,7 @@ namespace Kaimos {
 		void DrawSameTypesOperationNodesMenu(MaterialEditor::OperationNodeType op_type, const std::string& operator_str, ImVec2 popup_pos);
 		void DrawFloatVecOperationNodesMenu(MaterialEditor::OperationNodeType op_type, const std::string& operator_str, ImVec2 popup_pos);
 
-		void DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType op_type, ImVec2 popup_pos, bool only_vec_types);
+		void DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType op_type, ImVec2 popup_pos, bool only_vec_types, bool add_vec2 = true);
 
 	public:
 

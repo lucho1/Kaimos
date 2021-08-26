@@ -866,8 +866,12 @@ namespace Kaimos::MaterialEditor {
 			case SpecialOperationNodeType::NEGATE:				{ m_Name = "Negate Node";	m_InputsN = 1; break; }
 
 			// Conversions
-			case SpecialOperationNodeType::RTOD:				{ m_Name = "Rad-Deg Node";	m_InputsN = 1; break; }
-			case SpecialOperationNodeType::DTOR:				{ m_Name = "Deg-Rad Node";	m_InputsN = 1; break; }
+			case SpecialOperationNodeType::RTOD:				{ m_Name = "Rad-Deg Node";		m_InputsN = 1; break; }
+			case SpecialOperationNodeType::DTOR:				{ m_Name = "Deg-Rad Node";		m_InputsN = 1; break; }
+			case SpecialOperationNodeType::RGBTOHSV:			{ m_Name = "RGB-HSV Node";		m_InputsN = 1; break; }
+			case SpecialOperationNodeType::HSVTORGB:			{ m_Name = "HSV-RGB Node";		m_InputsN = 1; break; }
+			case SpecialOperationNodeType::COL_NORM:			{ m_Name = "Color Norm Node";	m_InputsN = 1; if(out_type == PinDataType::INT) out_type = PinDataType::FLOAT; break; }
+			case SpecialOperationNodeType::COL_UNORM:			{ m_Name = "Color Unnorm Node";	m_InputsN = 1; if(out_type == PinDataType::INT) in_type1 = PinDataType::FLOAT; break; }
 
 			// Powers
 			case SpecialOperationNodeType::POW:					{ m_Name = "Power Node"; break; }
@@ -976,6 +980,10 @@ namespace Kaimos::MaterialEditor {
 			// Basics
 			case SpecialOperationNodeType::RTOD:				return NodeUtils::RadToDeg(op_type, a);
 			case SpecialOperationNodeType::DTOR:				return NodeUtils::DegToRad(op_type, a);
+			case SpecialOperationNodeType::RGBTOHSV:			return NodeUtils::RGBtoHSV(op_type, a);
+			case SpecialOperationNodeType::HSVTORGB:			return NodeUtils::HSVtoRGB(op_type, a);
+			case SpecialOperationNodeType::COL_NORM:			return NodeUtils::ColorNorm(op_type, a);
+			case SpecialOperationNodeType::COL_UNORM:			return NodeUtils::ColorUnnorm(op_type, a);
 
 			// Powers
 			case SpecialOperationNodeType::POW:					return NodeUtils::PowerValues(op_type, a, b);
