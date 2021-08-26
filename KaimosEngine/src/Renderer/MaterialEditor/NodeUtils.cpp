@@ -565,6 +565,38 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 	}
 
 
+	// ------- Conversions ----------
+	glm::vec4 RadToDeg(PinDataType op_type, const glm::vec4& a)
+	{
+		switch (op_type)
+		{
+			case PinDataType::FLOAT:
+			case PinDataType::INT:		return glm::vec4(glm::degrees(a.x), 0.0f, 0.0f, 0.0f);
+			case PinDataType::VEC2:		return glm::vec4(glm::degrees(glm::vec2(a)), 0.0f, 0.0f);
+			case PinDataType::VEC3:		return glm::vec4(glm::degrees(glm::vec3(a)), 0.0f);
+			case PinDataType::VEC4:		return glm::degrees(a);
+		}
+
+		KS_FATAL_ERROR("Tried to perform a non-supported RadToDeg operation!");
+		return {};
+	}
+
+	glm::vec4 DegToRad(PinDataType op_type, const glm::vec4& a)
+	{
+		switch (op_type)
+		{
+			case PinDataType::FLOAT:
+			case PinDataType::INT:		return glm::vec4(glm::radians(a.x), 0.0f, 0.0f, 0.0f);
+			case PinDataType::VEC2:		return glm::vec4(glm::radians(glm::vec2(a)), 0.0f, 0.0f);
+			case PinDataType::VEC3:		return glm::vec4(glm::radians(glm::vec3(a)), 0.0f);
+			case PinDataType::VEC4:		return glm::radians(a);
+		}
+
+		KS_FATAL_ERROR("Tried to perform a non-supported DegToRad operation!");
+		return {};
+	}
+
+
 	// -------- Lerps, Mods, Reflect & Refract --------
 	glm::vec4 FLerpValues(PinDataType op_type, const glm::vec4& a, const glm::vec4& b, float c)
 	{

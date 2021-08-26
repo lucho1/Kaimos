@@ -865,6 +865,10 @@ namespace Kaimos::MaterialEditor {
 			case SpecialOperationNodeType::MAX:					{ m_Name = "Max Node";		break; }
 			case SpecialOperationNodeType::NEGATE:				{ m_Name = "Negate Node";	m_InputsN = 1; break; }
 
+			// Conversions
+			case SpecialOperationNodeType::RTOD:				{ m_Name = "Rad-Deg Node";	m_InputsN = 1; break; }
+			case SpecialOperationNodeType::DTOR:				{ m_Name = "Deg-Rad Node";	m_InputsN = 1; break; }
+
 			// Powers
 			case SpecialOperationNodeType::POW:					{ m_Name = "Power Node"; break; }
 			case SpecialOperationNodeType::SQRT:				{ m_Name = "Square Root Node";			m_InputsN = 1; break; }
@@ -968,6 +972,10 @@ namespace Kaimos::MaterialEditor {
 			case SpecialOperationNodeType::MIN:					return NodeUtils::MinValue(op_type, a, b);
 			case SpecialOperationNodeType::MAX:					return NodeUtils::MaxValue(op_type, a, b);
 			case SpecialOperationNodeType::NEGATE:				return NodeUtils::Negate(op_type, a);
+
+			// Basics
+			case SpecialOperationNodeType::RTOD:				return NodeUtils::RadToDeg(op_type, a);
+			case SpecialOperationNodeType::DTOR:				return NodeUtils::DegToRad(op_type, a);
 
 			// Powers
 			case SpecialOperationNodeType::POW:					return NodeUtils::PowerValues(op_type, a, b);

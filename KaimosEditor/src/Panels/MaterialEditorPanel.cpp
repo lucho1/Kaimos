@@ -296,6 +296,17 @@ namespace Kaimos {
 				ImGui::EndMenu();
 			}
 
+			if(ImGui::BeginMenu("Conversions"))
+			{
+				if (ImGui::BeginMenu("Rad to Deg"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::RTOD, popup_pos, false);
+
+				if (ImGui::BeginMenu("Deg to Rad"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::DTOR, popup_pos, false);
+
+				ImGui::EndMenu();
+			}
+
 			if (ImGui::BeginMenu("Trigonometry"))
 			{
 				if (ImGui::BeginMenu("Standard"))

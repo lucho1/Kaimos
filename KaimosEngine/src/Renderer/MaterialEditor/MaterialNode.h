@@ -42,6 +42,7 @@ namespace Kaimos::MaterialEditor {
 	{
 		NONE,
 		ABS, MIN, MAX, NEGATE,												// Basics
+		RTOD, DTOR,															// Conversions
 		POW, SQRT, INV_SQRT, LOG, LOG2, EXP, EXP2,							// Powers
 		SIN, COS, TAN, ASIN, ACOS, ATAN,									// Trigonometry
 		HSIN, HCOS, HTAN, HASIN, HACOS, HATAN,								// Hiperbolic Trigonometry
