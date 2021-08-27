@@ -377,10 +377,10 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 		switch (op_type)
 		{
 			case PinDataType::FLOAT:
-			case PinDataType::INT:		return glm::vec4(glm::sqrt(a.x), 0.0f, 0.0f, 0.0f);
-			case PinDataType::VEC2:		return glm::vec4(glm::sqrt(glm::vec2(a)), 0.0f, 0.0f);
-			case PinDataType::VEC3:		return glm::vec4(glm::sqrt(glm::vec3(a)), 0.0f);
-			case PinDataType::VEC4:		return glm::sqrt(a);
+			case PinDataType::INT:		return glm::vec4(glm::sqrt(glm::max(a.x, 0.0f)), 0.0f, 0.0f, 0.0f);
+			case PinDataType::VEC2:		return glm::vec4(glm::sqrt(glm::max(glm::vec2(a), 0.0f)), 0.0f, 0.0f);
+			case PinDataType::VEC3:		return glm::vec4(glm::sqrt(glm::max(glm::vec3(a), 0.0f)), 0.0f);
+			case PinDataType::VEC4:		return glm::sqrt(glm::max(a, 0.0f));
 		}
 
 		KS_FATAL_ERROR("Tried to perform a non-supported Squared operation!");
@@ -392,10 +392,10 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 		switch (op_type)
 		{
 			case PinDataType::FLOAT:
-			case PinDataType::INT:		return glm::vec4(glm::inversesqrt(a.x), 0.0f, 0.0f, 0.0f);
-			case PinDataType::VEC2:		return glm::vec4(glm::inversesqrt(glm::vec2(a)), 0.0f, 0.0f);
-			case PinDataType::VEC3:		return glm::vec4(glm::inversesqrt(glm::vec3(a)), 0.0f);
-			case PinDataType::VEC4:		return glm::inversesqrt(a);
+			case PinDataType::INT:		return glm::vec4(glm::inversesqrt(glm::max(a.x, 0.0f)), 0.0f, 0.0f, 0.0f);
+			case PinDataType::VEC2:		return glm::vec4(glm::inversesqrt(glm::max(glm::vec2(a), 0.0f)), 0.0f, 0.0f);
+			case PinDataType::VEC3:		return glm::vec4(glm::inversesqrt(glm::max(glm::vec3(a), 0.0f)), 0.0f);
+			case PinDataType::VEC4:		return glm::inversesqrt(glm::max(a, 0.0f));
 		}
 
 		KS_FATAL_ERROR("Tried to perform a non-supported Inverse Squared operation!");
