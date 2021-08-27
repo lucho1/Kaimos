@@ -952,7 +952,7 @@ namespace Kaimos::MaterialEditor {
 			case SpecialOperationNodeType::RGB_HSV:				{ m_Name = "RGB-HSV Node";		m_InputsN = 1; break; }
 			case SpecialOperationNodeType::HSV_RGB:				{ m_Name = "HSV-RGB Node";		m_InputsN = 1; break; }
 			case SpecialOperationNodeType::COLNR:				{ m_Name = "Color Norm Node";	m_InputsN = 1; if(out_type == PinDataType::INT) out_type = PinDataType::FLOAT; break; }
-			case SpecialOperationNodeType::COLUNR:				{ m_Name = "Color Unnorm Node";	m_InputsN = 1; if(out_type == PinDataType::INT) in_type1 = PinDataType::FLOAT; break; }
+			case SpecialOperationNodeType::COLUNR:				{ m_Name = "Color Unnorm Node";	m_InputsN = 1; break; }
 			case SpecialOperationNodeType::L_SRGB:				{ m_Name = "Linear-sRGB Node";	m_InputsN = 1; break; } // URGENT TODO: Change gamma value upon changing this
 			case SpecialOperationNodeType::SRGB_L:				{ m_Name = "sRGB-Linear Node";	m_InputsN = 1; break; }
 			case SpecialOperationNodeType::INTF:				{ m_Name = "Int-Float Node";	m_InputsN = 1; out_type = PinDataType::FLOAT; break; }
@@ -1205,7 +1205,7 @@ namespace Kaimos::MaterialEditor {
 			case SpecialOperationNodeType::DTOR:				m_Tooltip = "Degrees to Radians conversion\nOutput Type: same as Input"; break;
 			case SpecialOperationNodeType::RGB_HSV:				m_Tooltip = "RGB to HSV color conversion\nOutput Type: same as Input\nOnly Vec3 & Vec4\nInput must be in range [0, 255]"; break;
 			case SpecialOperationNodeType::HSV_RGB:				m_Tooltip = "HSV to RGB color conversion\nOutput Type: same as Input\nOnly Vec3 & Vec4\nInput must be in range [0, 100 (360 for H)]"; break;
-			case SpecialOperationNodeType::COLNR:				m_Tooltip = "Color normalization [0, 255]>[0.0, 1.0]\nOutput Type: same as Input\nInput must be in range [0, 255]"; break;
+			case SpecialOperationNodeType::COLNR:				m_Tooltip = "Color normalization [0, 255]>[0.0, 1.0]\nOutput Type: same as Input\nInput must be in range [0, 255]\nInt input will output Float"; break;
 			case SpecialOperationNodeType::COLUNR:				m_Tooltip = "Color Unnormalization [0.0, 1.0]>[0, 255]\nOutput Type: same as Input\nInput must be in range [0.0, 1.0]"; break;
 			case SpecialOperationNodeType::L_SRGB:				m_Tooltip = "Linear to sRGB conversion\nOutput Type: same as Input"; break;
 			case SpecialOperationNodeType::SRGB_L:				m_Tooltip = "sRGB to Linear conversion\nOutput Type: same as Input"; break;
