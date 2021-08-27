@@ -584,6 +584,24 @@ namespace Kaimos::MaterialEditor {
 				AddOutputPin(PinDataType::VEC3, "Color (Vec3)");
 				break;
 			}
+			case ConstantNodeType::ENVIRO_RES:
+			{
+				m_Name = "Envrionment Map Resolution";
+				AddOutputPin(PinDataType::FLOAT, "Res (float)");
+				break;
+			}
+			case ConstantNodeType::ENVIRO_W:
+			{
+				m_Name = "Envrionment Map Width";
+				AddOutputPin(PinDataType::FLOAT, "Width (float)");
+				break;
+			}
+			case ConstantNodeType::ENVIRO_H:
+			{
+				m_Name = "Envrionment Map Height";
+				AddOutputPin(PinDataType::FLOAT, "Height (float)");
+				break;
+			}
 			case ConstantNodeType::SCREEN_RES:
 			{
 				m_Name = "Screen Resolution";
@@ -703,6 +721,21 @@ namespace Kaimos::MaterialEditor {
 			case ConstantNodeType::SCENE_COLOR:
 			{
 				ret = glm::vec4(Renderer::GetSceneColor(), 1.0f);
+				break;
+			}
+			case ConstantNodeType::ENVIRO_RES:
+			{
+				ret = glm::vec4(Renderer::GetEnvironmentMapResolution(), 0.0f, 0.0f, 0.0f);
+				break;
+			}
+			case ConstantNodeType::ENVIRO_W:
+			{
+				ret = glm::vec4(Renderer::GetEnvironmentMapSize().x, 0.0f, 0.0f, 0.0f);
+				break;
+			}
+			case ConstantNodeType::ENVIRO_H:
+			{
+				ret = glm::vec4(Renderer::GetEnvironmentMapSize().y, 0.0f, 0.0f, 0.0f);
 				break;
 			}
 			case ConstantNodeType::SCREEN_RES:

@@ -26,7 +26,7 @@ namespace Kaimos::MaterialEditor {
 		NONE,
 		DELTATIME, PI, GOLDEN_RATIO,											// Constants
 		INT, FLOAT, VEC2, VEC3, VEC4,											// Variables
-		SCREEN_RES, SCENE_COLOR,												// Screen, Scene, ...
+		SCREEN_RES, SCENE_COLOR, ENVIRO_RES, ENVIRO_W, ENVIRO_H,				// Screen, Scene, ...
 		CAMERA_FOV, CAMERA_AR, CAMERA_PLANES, CAMERA_ORTHOSIZE,					// Camera
 		INT_RANDOM, FLOAT_RANDOM, VEC2_RANDOM, VEC3_RANDOM, VEC4_RANDOM			// Randoms
 	};

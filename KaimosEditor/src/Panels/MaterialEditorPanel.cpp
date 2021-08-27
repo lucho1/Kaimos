@@ -207,6 +207,9 @@ namespace Kaimos {
 			if (ImGui::MenuItem("TAU (Golden Ratio)"))	m_CurrentGraph->CreateNode(MaterialEditor::ConstantNodeType::GOLDEN_RATIO, popup_pos);
 			if (ImGui::MenuItem("Scene Color"))			m_CurrentGraph->CreateNode(MaterialEditor::ConstantNodeType::SCENE_COLOR, popup_pos);
 			if (ImGui::MenuItem("Screen Resolution"))	m_CurrentGraph->CreateNode(MaterialEditor::ConstantNodeType::SCREEN_RES, popup_pos);
+			if (ImGui::MenuItem("Enviro. Map Resolution"))	m_CurrentGraph->CreateNode(MaterialEditor::ConstantNodeType::ENVIRO_RES, popup_pos);
+			if (ImGui::MenuItem("Enviro. Map Width"))	m_CurrentGraph->CreateNode(MaterialEditor::ConstantNodeType::ENVIRO_W, popup_pos);
+			if (ImGui::MenuItem("Enviro. Map Height"))	m_CurrentGraph->CreateNode(MaterialEditor::ConstantNodeType::ENVIRO_H, popup_pos);
 			ImGui::EndMenu();
 		}
 
