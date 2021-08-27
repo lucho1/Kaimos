@@ -62,6 +62,7 @@ namespace Kaimos::MaterialEditor {
 	class MaterialNode
 	{
 	private:
+		virtual void SetNodeVariables() {}
 		virtual void SetNodeTooltip() = 0;
 	protected:
 
@@ -119,6 +120,7 @@ namespace Kaimos::MaterialEditor {
 		uint m_ID = 0;
 		std::string m_Name = "unnamed", m_Tooltip = "";
 		MaterialNodeType m_Type = MaterialNodeType::NONE;
+		glm::ivec3 m_NodeColor = glm::ivec3(1), m_HighlightColor = glm::ivec3(1);
 
 		std::vector<Ref<NodeInputPin>> m_NodeInputPins;
 		Ref<NodeOutputPin> m_NodeOutputPin = nullptr;
@@ -198,12 +200,13 @@ namespace Kaimos::MaterialEditor {
 	class VertexParameterMaterialNode : public MaterialNode
 	{
 	private:
+		virtual void SetNodeVariables() override;
 		virtual void SetNodeTooltip() override;
 	public:
 
 		VertexParameterMaterialNode(VertexParameterNodeType parameter_type);
 		VertexParameterMaterialNode(const std::string& name, VertexParameterNodeType parameter_type, uint id)
-			: MaterialNode(name, MaterialNodeType::VERTEX_PARAMETER, id), m_ParameterType(parameter_type) { SetNodeTooltip(); }
+			: MaterialNode(name, MaterialNodeType::VERTEX_PARAMETER, id), m_ParameterType(parameter_type) { SetNodeVariables(); }
 		
 		void SetNodeOutputResult(const glm::vec4& value);
 		virtual void AddOutputPin(PinDataType pin_data_type, const std::string& name, float default_value = 1.0f) override;
@@ -224,12 +227,13 @@ namespace Kaimos::MaterialEditor {
 	class ConstantMaterialNode : public MaterialNode
 	{
 	private:
+		virtual void SetNodeVariables() override;
 		virtual void SetNodeTooltip() override;
 	public:
 
 		ConstantMaterialNode(ConstantNodeType constant_type);
 		ConstantMaterialNode(const std::string& name, ConstantNodeType constant_type, uint id)
-			: MaterialNode(name, MaterialNodeType::CONSTANT, id), m_ConstantType(constant_type) { SetNodeTooltip(); }
+			: MaterialNode(name, MaterialNodeType::CONSTANT, id), m_ConstantType(constant_type) { SetNodeVariables(); }
 
 		bool IsTimeNode() const { return m_ConstantType == ConstantNodeType::DELTATIME; }
 
@@ -247,12 +251,13 @@ namespace Kaimos::MaterialEditor {
 	class OperationMaterialNode : public MaterialNode
 	{
 	private:
+		virtual void SetNodeVariables() override;
 		virtual void SetNodeTooltip() override;
 	public:
 
 		OperationMaterialNode(OperationNodeType operation_type, PinDataType operation_data_type);
 		OperationMaterialNode(const std::string& name, OperationNodeType operation_type, PinDataType vec_operation_type, uint id)
-			: MaterialNode(name, MaterialNodeType::OPERATION, id), m_OperationType(operation_type), m_VecOperationType(vec_operation_type) { SetNodeTooltip(); }
+			: MaterialNode(name, MaterialNodeType::OPERATION, id), m_OperationType(operation_type), m_VecOperationType(vec_operation_type) { SetNodeVariables(); }
 
 		OperationNodeType GetOperationType() const { return m_OperationType; }
 		PinDataType GetVecOperationType() const { return m_VecOperationType; }
@@ -274,13 +279,14 @@ namespace Kaimos::MaterialEditor {
 	class SpecialOperationNode : public MaterialNode
 	{
 	private:
+		virtual void SetNodeVariables() override;
 		virtual void SetNodeTooltip() override;
 	public:
 
 		SpecialOperationNode(SpecialOperationNodeType operation_type, PinDataType operation_data_type);
 		SpecialOperationNode(const std::string& name, SpecialOperationNodeType operation_type, uint id, uint inputs_n, PinDataType op_out_type)
 			: MaterialNode(name, MaterialNodeType::SPECIAL_OPERATION, id)
-			, m_OperationType(operation_type), m_InputsN(inputs_n), m_OperationOutputType(op_out_type) { SetNodeTooltip(); }
+			, m_OperationType(operation_type), m_InputsN(inputs_n), m_OperationOutputType(op_out_type) { SetNodeVariables(); }
 
 		SpecialOperationNodeType GetOperationType() const { return m_OperationType; }
 

@@ -39,6 +39,11 @@ namespace Kaimos::MaterialEditor {
 
 	void MaterialNode::DrawNodeUI()
 	{
+		// -- Push Node Colors --
+		ImNodes::PushColorStyle(ImNodesCol_TitleBar, IM_COL32(m_NodeColor.r, m_NodeColor.g, m_NodeColor.b, 255));
+		ImNodes::PushColorStyle(ImNodesCol_TitleBarHovered, IM_COL32(m_HighlightColor.r, m_HighlightColor.g, m_HighlightColor.b, 255));
+		ImNodes::PushColorStyle(ImNodesCol_TitleBarSelected, IM_COL32(m_HighlightColor.r, m_HighlightColor.g, m_HighlightColor.b, 255));
+
 		// -- Draw Node & Header --
 		ImNodes::BeginNode(m_ID);
 
@@ -61,12 +66,17 @@ namespace Kaimos::MaterialEditor {
 		ImNodes::SetNodeDraggable(m_ID, set_node_draggable);
 		ImNodes::EndNode();
 
+		// -- Pop Node Colors --
+		ImNodes::PopColorStyle();
+		ImNodes::PopColorStyle();
+		ImNodes::PopColorStyle();
+
 		// -- Draw Links --
 		for (Ref<NodeInputPin>& pin : m_NodeInputPins)
 		{
 			if (pin->IsConnected())
 				ImNodes::Link(pin->GetID(), pin->GetID(), pin->GetOutputLinkedID());	// Links have the same ID than its input pin
-		}		
+		}
 	}
 
 
@@ -492,7 +502,14 @@ namespace Kaimos::MaterialEditor {
 				KS_FATAL_ERROR("Attempted to create a non-supported Vertex parameter Node");
 		}
 
+		SetNodeVariables();
+	}
+
+	void VertexParameterMaterialNode::SetNodeVariables()
+	{
 		SetNodeTooltip();
+		m_NodeColor = glm::ivec3(172, 172, 43);
+		m_HighlightColor = glm::ivec3(215, 215, 65);
 	}
 
 	void VertexParameterMaterialNode::SetNodeOutputResult(const glm::vec4& value)
@@ -658,7 +675,15 @@ namespace Kaimos::MaterialEditor {
 				KS_FATAL_ERROR("Attempted to create a non-supported Constant Node");
 		}
 
+		SetNodeVariables();
+	}
+
+
+	void ConstantMaterialNode::SetNodeVariables()
+	{
 		SetNodeTooltip();
+		m_NodeColor = glm::ivec3(172, 172, 43);
+		m_HighlightColor = glm::ivec3(215, 215, 65);
 	}
 
 
@@ -858,8 +883,15 @@ namespace Kaimos::MaterialEditor {
 		AddInputPin(op_datatype, multi_type_pin, "Value 1");
 		AddInputPin(op_datatype, multi_type_pin, "Value 2");
 		AddOutputPin(op_datatype, "Result");
+		SetNodeVariables();
+	}
 
+
+	void OperationMaterialNode::SetNodeVariables()
+	{
 		SetNodeTooltip();
+		m_NodeColor = glm::ivec3(40, 140, 40);
+		m_HighlightColor = glm::ivec3(65, 191, 65);
 	}
 
 
@@ -1037,8 +1069,17 @@ namespace Kaimos::MaterialEditor {
 		if (m_InputsN == 3)
 			AddInputPin(in_type3, false, n3, 1.0f);
 
-		SetNodeTooltip();
+		SetNodeVariables();
 	}
+
+
+	void SpecialOperationNode::SetNodeVariables()
+	{
+		SetNodeTooltip();
+		m_NodeColor = glm::ivec3(51, 166, 179);
+		m_HighlightColor = glm::ivec3(76, 217, 230);
+	}
+
 	
 	glm::vec4 SpecialOperationNode::CalculateNodeResult()
 	{
@@ -1062,6 +1103,7 @@ namespace Kaimos::MaterialEditor {
 		return {};
 	}
 
+
 	float SpecialOperationNode::GetVectorComponent()
 	{
 		switch (m_OperationType)
@@ -1075,6 +1117,7 @@ namespace Kaimos::MaterialEditor {
 		KS_FATAL_ERROR("Tried to retrieve a vector component from the wrong node! (SpecialOperationNode::GetVectorComponent)");
 		return {};
 	}
+
 
 	bool SpecialOperationNode::IsGetVecCompType()
 	{
