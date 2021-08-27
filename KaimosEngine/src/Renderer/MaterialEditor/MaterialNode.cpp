@@ -953,8 +953,8 @@ namespace Kaimos::MaterialEditor {
 			case SpecialOperationNodeType::HSV_RGB:				{ m_Name = "HSV-RGB Node";		m_InputsN = 1; break; }
 			case SpecialOperationNodeType::COLNR:				{ m_Name = "Color Norm Node";	m_InputsN = 1; if(out_type == PinDataType::INT) out_type = PinDataType::FLOAT; break; }
 			case SpecialOperationNodeType::COLUNR:				{ m_Name = "Color Unnorm Node";	m_InputsN = 1; break; }
-			case SpecialOperationNodeType::L_SRGB:				{ m_Name = "Linear-sRGB Node";	m_InputsN = 1; break; } // URGENT TODO: Change gamma value upon changing this
-			case SpecialOperationNodeType::SRGB_L:				{ m_Name = "sRGB-Linear Node";	m_InputsN = 1; break; }
+			case SpecialOperationNodeType::L_SRGB:				{ m_Name = "Linear-sRGB Node";	n2 = "Gamma"; in_type2 = PinDataType::FLOAT; break; }
+			case SpecialOperationNodeType::SRGB_L:				{ m_Name = "sRGB-Linear Node";	n2 = "Gamma"; in_type2 = PinDataType::FLOAT; break; }
 			case SpecialOperationNodeType::INTF:				{ m_Name = "Int-Float Node";	m_InputsN = 1; out_type = PinDataType::FLOAT; break; }
 			case SpecialOperationNodeType::FINT:				{ m_Name = "Float-Int Node";	m_InputsN = 1; out_type = PinDataType::INT; break; }
 
@@ -1029,10 +1029,13 @@ namespace Kaimos::MaterialEditor {
 		AddInputPin(in_type1, false, n1, 0.0f);
 		
 		if (m_InputsN >= 2)
-			AddInputPin(in_type2, false, n2, 0.0f);
+		{
+			bool srgb_conv = (operation_type == SpecialOperationNodeType::SRGB_L || operation_type == SpecialOperationNodeType::L_SRGB);
+			AddInputPin(in_type2, false, n2, srgb_conv ? 2.4f : 1.0f);
+		}
 
 		if (m_InputsN == 3)
-			AddInputPin(in_type3, false, n3, 0.0f);
+			AddInputPin(in_type3, false, n3, 1.0f);
 
 		SetNodeTooltip();
 	}
@@ -1106,8 +1109,8 @@ namespace Kaimos::MaterialEditor {
 			case SpecialOperationNodeType::HSV_RGB:				return NodeUtils::HSVtoRGB(op_type, a);
 			case SpecialOperationNodeType::COLNR:				return NodeUtils::ColorNorm(op_type, a);
 			case SpecialOperationNodeType::COLUNR:				return NodeUtils::ColorUnnorm(op_type, a);
-			case SpecialOperationNodeType::L_SRGB:				return NodeUtils::LinearToSRGB(op_type, a);
-			case SpecialOperationNodeType::SRGB_L:				return NodeUtils::SRGBToLinear(op_type, a);
+			case SpecialOperationNodeType::L_SRGB:				return NodeUtils::LinearToSRGB(op_type, a, b.x);
+			case SpecialOperationNodeType::SRGB_L:				return NodeUtils::SRGBToLinear(op_type, a, b.x);
 
 			// Trigonometry
 			case SpecialOperationNodeType::SIN:					return NodeUtils::Sin(op_type, a);
@@ -1207,8 +1210,8 @@ namespace Kaimos::MaterialEditor {
 			case SpecialOperationNodeType::HSV_RGB:				m_Tooltip = "HSV to RGB color conversion\nOutput Type: same as Input\nOnly Vec3 & Vec4\nInput must be in range [0, 100 (360 for H)]"; break;
 			case SpecialOperationNodeType::COLNR:				m_Tooltip = "Color normalization [0, 255]>[0.0, 1.0]\nOutput Type: same as Input\nInput must be in range [0, 255]\nInt input will output Float"; break;
 			case SpecialOperationNodeType::COLUNR:				m_Tooltip = "Color Unnormalization [0.0, 1.0]>[0, 255]\nOutput Type: same as Input\nInput must be in range [0.0, 1.0]"; break;
-			case SpecialOperationNodeType::L_SRGB:				m_Tooltip = "Linear to sRGB conversion\nOutput Type: same as Input"; break;
-			case SpecialOperationNodeType::SRGB_L:				m_Tooltip = "sRGB to Linear conversion\nOutput Type: same as Input"; break;
+			case SpecialOperationNodeType::L_SRGB:				m_Tooltip = "Linear to sRGB conversion\nOutput Type: same as Input\nA gamma of 0.0 will be used as 1.0"; break;
+			case SpecialOperationNodeType::SRGB_L:				m_Tooltip = "sRGB to Linear conversion\nOutput Type: same as Input\nA gamma of 0.0 will be used as 0.1"; break;
 			// Trigonometry
 			case SpecialOperationNodeType::SIN:					m_Tooltip = "Sine of a value\nOutput Type: same as Input\nInput must be in RADIANS"; break;
 			case SpecialOperationNodeType::COS:					m_Tooltip = "Cosine of a value\nOutput Type: same as Input\nInput must be in RADIANS"; break;

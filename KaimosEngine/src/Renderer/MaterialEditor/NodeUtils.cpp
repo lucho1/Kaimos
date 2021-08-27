@@ -176,19 +176,19 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 		return glm::vec4(rgb, sva.z * 2.55f);
 	}
 
-	float CalculateLinearToSRGB(const float a)
+	float CalculateLinearToSRGB(const float a, const float gamma)
 	{
 		float ret;
 		if (a > 0.0031308f)
-			return 1.055f * (glm::pow(a, (1.0f/2.4f))) - 0.055f;
+			return 1.055f * (glm::pow(a, (1.0f/gamma))) - 0.055f;
 		else
 			return 12.92f*a;
 	}
 
-	float CalculateSRGBToLinear(const float a)
+	float CalculateSRGBToLinear(const float a, const float gamma)
 	{
 		if (a > 0.04045f)
-			return glm::pow((a + 0.055f) / 1.055f, 2.4f);
+			return glm::pow((a + 0.055f) / 1.055f, gamma);
 		else
 			return a/12.92f;
 	}
@@ -548,30 +548,32 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 		return {};
 	}
 
-	glm::vec4 LinearToSRGB(PinDataType op_type, const glm::vec4& a)
+	glm::vec4 LinearToSRGB(PinDataType op_type, const glm::vec4& a, float gamma)
 	{
+		float g = Maths::CompareFloats(gamma, 0.0f) ? 1.0f : gamma;
 		switch (op_type)
 		{
 			case PinDataType::FLOAT:
-			case PinDataType::INT:		return glm::vec4(CalculateLinearToSRGB(a.x), 0.0f, 0.0f, 0.0f);
-			case PinDataType::VEC2:		return glm::vec4(CalculateLinearToSRGB(a.x), CalculateLinearToSRGB(a.y), 0., 0.0f);
-			case PinDataType::VEC3:		return glm::vec4(CalculateLinearToSRGB(a.x), CalculateLinearToSRGB(a.y), CalculateLinearToSRGB(a.z), 0.0f);
-			case PinDataType::VEC4:		return glm::vec4(CalculateLinearToSRGB(a.x), CalculateLinearToSRGB(a.y), CalculateLinearToSRGB(a.z), a.a);
+			case PinDataType::INT:		return glm::vec4(CalculateLinearToSRGB(a.x, g), 0.0f, 0.0f, 0.0f);
+			case PinDataType::VEC2:		return glm::vec4(CalculateLinearToSRGB(a.x, g), CalculateLinearToSRGB(a.y, g), 0., 0.0f);
+			case PinDataType::VEC3:		return glm::vec4(CalculateLinearToSRGB(a.x, g), CalculateLinearToSRGB(a.y, g), CalculateLinearToSRGB(a.z, g), 0.0f);
+			case PinDataType::VEC4:		return glm::vec4(CalculateLinearToSRGB(a.x, g), CalculateLinearToSRGB(a.y, g), CalculateLinearToSRGB(a.z, g), a.a);
 		}
 
 		KS_FATAL_ERROR("Tried to perform a non-supported LinearToSRGB operation!");
 		return {};
 	}
 
-	glm::vec4 SRGBToLinear(PinDataType op_type, const glm::vec4& a)
+	glm::vec4 SRGBToLinear(PinDataType op_type, const glm::vec4& a, float gamma)
 	{
+		float g = Maths::CompareFloats(gamma, 0.0f) ? 0.1f : gamma;
 		switch (op_type)
 		{
 			case PinDataType::FLOAT:
-			case PinDataType::INT:		return glm::vec4(CalculateSRGBToLinear(a.x), 0.0f, 0.0f, 0.0f);
-			case PinDataType::VEC2:		return glm::vec4(CalculateSRGBToLinear(a.x), CalculateSRGBToLinear(a.y), 0., 0.0f);
-			case PinDataType::VEC3:		return glm::vec4(CalculateSRGBToLinear(a.x), CalculateSRGBToLinear(a.y), CalculateSRGBToLinear(a.z), 0.0f);
-			case PinDataType::VEC4:		return glm::vec4(CalculateSRGBToLinear(a.x), CalculateSRGBToLinear(a.y), CalculateSRGBToLinear(a.z), a.a);
+			case PinDataType::INT:		return glm::vec4(CalculateSRGBToLinear(a.x, g), 0.0f, 0.0f, 0.0f);
+			case PinDataType::VEC2:		return glm::vec4(CalculateSRGBToLinear(a.x, g), CalculateSRGBToLinear(a.y, g), 0., 0.0f);
+			case PinDataType::VEC3:		return glm::vec4(CalculateSRGBToLinear(a.x, g), CalculateSRGBToLinear(a.y, g), CalculateSRGBToLinear(a.z, g), 0.0f);
+			case PinDataType::VEC4:		return glm::vec4(CalculateSRGBToLinear(a.x, g), CalculateSRGBToLinear(a.y, g), CalculateSRGBToLinear(a.z, g), a.a);
 		}
 
 		KS_FATAL_ERROR("Tried to perform a non-supported SRGBToLinear operation!");
