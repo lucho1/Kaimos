@@ -548,6 +548,30 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 		return {};
 	}
 
+	glm::vec4 HSVNorm(PinDataType op_type, const glm::vec4& a)
+	{
+		switch (op_type)
+		{
+			case PinDataType::VEC3:		return glm::vec4(glm::vec3(a.x / 360.0f, a.y / 100.0f, a.z / 100.f), 0.0f);
+			case PinDataType::VEC4:		return glm::vec4(glm::vec3(a.x / 360.0f, a.y / 100.0f, a.z / 100.f), 100.0f);
+		}
+
+		KS_FATAL_ERROR("Tried to perform a non-supported HSV Normalization operation!");
+		return {};
+	}
+
+	glm::vec4 HSVUnnorm(PinDataType op_type, const glm::vec4& a)
+	{
+		switch (op_type)
+		{
+			case PinDataType::VEC3:		return glm::vec4(glm::vec3(a.x * 360.0f, a.y * 100.0f, a.z * 100.f), 0.0f);
+			case PinDataType::VEC4:		return glm::vec4(glm::vec3(a.x * 360.0f, a.y * 100.0f, a.z * 100.f), 100.0f);
+		}
+
+		KS_FATAL_ERROR("Tried to perform a non-supported HSV Unnormalization operation!");
+		return {};
+	}
+
 	glm::vec4 LinearToSRGB(PinDataType op_type, const glm::vec4& a, float gamma)
 	{
 		float g = Maths::CompareFloats(gamma, 0.0f) ? 1.0f : gamma;

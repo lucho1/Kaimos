@@ -985,6 +985,8 @@ namespace Kaimos::MaterialEditor {
 			case SpecialOperationNodeType::HSV_RGB:				{ m_Name = "HSV-RGB Node";		m_InputsN = 1; break; }
 			case SpecialOperationNodeType::COLNR:				{ m_Name = "Color Norm Node";	m_InputsN = 1; if(out_type == PinDataType::INT) out_type = PinDataType::FLOAT; break; }
 			case SpecialOperationNodeType::COLUNR:				{ m_Name = "Color Unnorm Node";	m_InputsN = 1; break; }
+			case SpecialOperationNodeType::HSVNR:				{ m_Name = "HSV Norm Node";		m_InputsN = 1; if(out_type == PinDataType::INT) out_type = PinDataType::FLOAT; break; }
+			case SpecialOperationNodeType::HSVUNR:				{ m_Name = "HSV Unnorm Node";	m_InputsN = 1; break; }
 			case SpecialOperationNodeType::L_SRGB:				{ m_Name = "Linear-sRGB Node";	n2 = "Gamma"; in_type2 = PinDataType::FLOAT; break; }
 			case SpecialOperationNodeType::SRGB_L:				{ m_Name = "sRGB-Linear Node";	n2 = "Gamma"; in_type2 = PinDataType::FLOAT; break; }
 			case SpecialOperationNodeType::INTF:				{ m_Name = "Int-Float Node";	m_InputsN = 1; out_type = PinDataType::FLOAT; break; }
@@ -1152,6 +1154,8 @@ namespace Kaimos::MaterialEditor {
 			case SpecialOperationNodeType::HSV_RGB:				return NodeUtils::HSVtoRGB(op_type, a);
 			case SpecialOperationNodeType::COLNR:				return NodeUtils::ColorNorm(op_type, a);
 			case SpecialOperationNodeType::COLUNR:				return NodeUtils::ColorUnnorm(op_type, a);
+			case SpecialOperationNodeType::HSVNR:				return NodeUtils::HSVNorm(op_type, a);
+			case SpecialOperationNodeType::HSVUNR:				return NodeUtils::HSVUnnorm(op_type, a);
 			case SpecialOperationNodeType::L_SRGB:				return NodeUtils::LinearToSRGB(op_type, a, b.x);
 			case SpecialOperationNodeType::SRGB_L:				return NodeUtils::SRGBToLinear(op_type, a, b.x);
 
@@ -1253,6 +1257,8 @@ namespace Kaimos::MaterialEditor {
 			case SpecialOperationNodeType::HSV_RGB:				m_Tooltip = "HSV to RGB color conversion\nOutput Type: same as Input\nOnly Vec3 & Vec4\nInput must be in range [0, 100 (360 for H)]"; break;
 			case SpecialOperationNodeType::COLNR:				m_Tooltip = "Color normalization [0, 255]>[0.0, 1.0]\nOutput Type: same as Input\nInput must be in range [0, 255]\nInt input will output Float"; break;
 			case SpecialOperationNodeType::COLUNR:				m_Tooltip = "Color Unnormalization [0.0, 1.0]>[0, 255]\nOutput Type: same as Input\nInput must be in range [0.0, 1.0]"; break;
+			case SpecialOperationNodeType::HSVNR:				m_Tooltip = "HSV Color normalization [0, 100 (H360)]>[0.0, 1.0]\nOutput Type: same as Input\nInput must be in range [0, 100(H to 360)]\nInt input will output Float"; break;
+			case SpecialOperationNodeType::HSVUNR:				m_Tooltip = "HSV Color Unnormalization [0.0, 1.0]>[0, 100(H360)]\nOutput Type: same as Input\nInput must be in range [0.0, 1.0]"; break;
 			case SpecialOperationNodeType::L_SRGB:				m_Tooltip = "Linear to sRGB conversion\nOutput Type: same as Input\nA gamma of 0.0 will be used as 1.0"; break;
 			case SpecialOperationNodeType::SRGB_L:				m_Tooltip = "sRGB to Linear conversion\nOutput Type: same as Input\nA gamma of 0.0 will be used as 0.1"; break;
 			// Trigonometry

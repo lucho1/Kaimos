@@ -24,35 +24,36 @@ namespace Kaimos::MaterialEditor {
 	enum class ConstantNodeType
 	{
 		NONE,
-		DELTATIME, PI, GOLDEN_RATIO,											// Constants
-		INT, FLOAT, VEC2, VEC3, VEC4,											// Variables
-		SCREEN_RES, SCENE_COLOR,												// Screen, Scene, ...
-		CAMERA_FOV, CAMERA_AR, CAMERA_PLANES, CAMERA_ORTHOSIZE,					// Camera
-		INT_RANDOM, FLOAT_RANDOM, VEC2_RANDOM, VEC3_RANDOM, VEC4_RANDOM			// Randoms
+		DELTATIME, PI, GOLDEN_RATIO,										// Constants
+		INT, FLOAT, VEC2, VEC3, VEC4,										// Variables
+		SCREEN_RES, SCENE_COLOR,											// Screen, Scene, ...
+		CAMERA_FOV, CAMERA_AR, CAMERA_PLANES, CAMERA_ORTHOSIZE,				// Camera
+		INT_RANDOM, FLOAT_RANDOM, VEC2_RANDOM, VEC3_RANDOM, VEC4_RANDOM		// Randoms
 	};
 
 	enum class OperationNodeType
 	{
 		NONE,
-		ADDITION, SUBTRACTION, DIVISION, MULTIPLICATION,						// Basic Operations (with same types)
-		FLOATVEC_MULTIPLY, FLOATVEC_DIVIDE,										// Different-Types Operations
+		ADDITION, SUBTRACTION, DIVISION, MULTIPLICATION,					// Basic Operations (with same types)
+		FLOATVEC_MULTIPLY, FLOATVEC_DIVIDE,									// Different-Types Operations
 	};
 
 	enum class SpecialOperationNodeType
 	{
 		NONE,
-		ABS, MIN, MAX, NEGATE,													// Basics
-		POW, SQRT, INV_SQRT, LOG, LOG2, EXP, EXP2,								// Powers
-		RTOD, DTOR, RGB_HSV, HSV_RGB, COLNR, COLUNR, L_SRGB, SRGB_L, INTF, FINT,// Conversions
-		SIN, COS, TAN, ASIN, ACOS, ATAN,										// Trigonometry
-		HSIN, HCOS, HTAN, HASIN, HACOS, HATAN,									// Hiperbolic Trigonometry
-		CEIL, FLOOR, CLAMP, ROUND, SIGN, FRACTAL,								// Shaders (Ceil, Floor, Clamp, ...)
-		FLOAT_STEP, VEC_STEP, FLOAT_SMOOTHSTEP, VEC_SMOOTHSTEP,					// Step, Smoothstep
-		VEC_NORMALIZE, VEC_MAGNITUDE, VEC_DIST, VEC_DOT, VEC_CROSS,				// Vector Ops.
-		SHT_ANGLE_NVECS, SHT_ANGLE_VECS, LNG_ANGLE_NVECS, LNG_ANGLE_VECS,		// Vector Angles
-		VEC_ROTX, VEC_ROTY, VEC_ROTZ,											// Vector Rotations
-		FLOAT_LERP, VEC_LERP, FLOAT_MOD, VEC_MOD, VEC_REFLECT, VEC_REFRACT,		// Advanced Vector Ops.
-		VEC_X, VEC_Y, VEC_Z, VEC_W												// Vector Components
+		ABS, MIN, MAX, NEGATE,																	// Basics
+		POW, SQRT, INV_SQRT, LOG, LOG2, EXP, EXP2,												// Powers
+		RTOD, DTOR, RGB_HSV, HSV_RGB, COLNR, COLUNR, HSVNR, HSVUNR,								// Conversions
+		L_SRGB, SRGB_L, INTF, FINT,
+		SIN, COS, TAN, ASIN, ACOS, ATAN,														// Trigonometry
+		HSIN, HCOS, HTAN, HASIN, HACOS, HATAN,													// Hiperbolic Trigonometry
+		CEIL, FLOOR, CLAMP, ROUND, SIGN, FRACTAL,												// Shaders (Ceil, Floor, Clamp, ...)
+		FLOAT_STEP, VEC_STEP, FLOAT_SMOOTHSTEP, VEC_SMOOTHSTEP,									// Step, Smoothstep
+		VEC_NORMALIZE, VEC_MAGNITUDE, VEC_DIST, VEC_DOT, VEC_CROSS,								// Vector Ops.
+		SHT_ANGLE_NVECS, SHT_ANGLE_VECS, LNG_ANGLE_NVECS, LNG_ANGLE_VECS,						// Vector Angles
+		VEC_ROTX, VEC_ROTY, VEC_ROTZ,															// Vector Rotations
+		FLOAT_LERP, VEC_LERP, FLOAT_MOD, VEC_MOD, VEC_REFLECT, VEC_REFRACT,						// Advanced Vector Ops.
+		VEC_X, VEC_Y, VEC_Z, VEC_W																// Vector Components
 	};
 
 

@@ -61,6 +61,8 @@ namespace Kaimos::MaterialEditor {
 		glm::vec4 HSVtoRGB(PinDataType op_type, const glm::vec4& a);
 		glm::vec4 ColorNorm(PinDataType op_type, const glm::vec4& a);
 		glm::vec4 ColorUnnorm(PinDataType op_type, const glm::vec4& a);
+		glm::vec4 HSVNorm(PinDataType op_type, const glm::vec4& a);
+		glm::vec4 HSVUnnorm(PinDataType op_type, const glm::vec4& a);
 		glm::vec4 LinearToSRGB(PinDataType op_type, const glm::vec4& a, float gamma);
 		glm::vec4 SRGBToLinear(PinDataType op_type, const glm::vec4& a, float gamma);
 
