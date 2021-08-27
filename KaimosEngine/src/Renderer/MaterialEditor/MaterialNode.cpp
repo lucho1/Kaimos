@@ -196,7 +196,7 @@ namespace Kaimos::MaterialEditor {
 
 	void MainMaterialNode::SetNodeTooltip()
 	{
-		m_Tooltip = "Main Node with the Material properties as node inputs";
+		m_Tooltip = "Main Node with the Material properties as inputs";
 	}
 
 
@@ -473,19 +473,19 @@ namespace Kaimos::MaterialEditor {
 			case VertexParameterNodeType::TEX_COORDS:
 			{
 				m_Name = "TCoords";
-				AddOutputPin(PinDataType::VEC2, "XY (Vec2)");
+				AddOutputPin(PinDataType::VEC2, "XY");
 				break;
 			}
 			case VertexParameterNodeType::POSITION:
 			{
 				m_Name = "VertexPos";
-				AddOutputPin(PinDataType::VEC3, "XYZ (Vec3)");
+				AddOutputPin(PinDataType::VEC3, "XYZ");
 				break;
 			}
 			case VertexParameterNodeType::NORMAL:
 			{
 				m_Name = "VertexNorm";
-				AddOutputPin(PinDataType::VEC3, "XYZ  (Vec3)");
+				AddOutputPin(PinDataType::VEC3, "XYZ");
 				break;
 			}
 			default:
@@ -522,11 +522,11 @@ namespace Kaimos::MaterialEditor {
 		switch (m_ParameterType)
 		{
 			case VertexParameterNodeType::TEX_COORDS:
-				m_Tooltip = "Object's vertex Texture Coordinates (Output: Vec2)"; break;
+				m_Tooltip = "Object's vertex Texture Coordinates\nOutput: Vec2"; break;
 			case VertexParameterNodeType::POSITION:
-				m_Tooltip = "Object's vertex positions (Output: Vec3)"; break;
+				m_Tooltip = "Object's vertex positions\nOutput: Vec3"; break;
 			case VertexParameterNodeType::NORMAL:
-				m_Tooltip = "Object's vertex normals (Output: Vec3)"; break;
+				m_Tooltip = "Object's vertex normals\nOutput: Vec3"; break;
 		}
 	}
 
@@ -539,38 +539,23 @@ namespace Kaimos::MaterialEditor {
 		switch (m_ConstantType)
 		{
 			// Global Constants
-			case ConstantNodeType::DELTATIME:
-			{
-				m_Name = "Time";
-				AddOutputPin(PinDataType::FLOAT, "Time (float)");
-				break;
-			}
-			case ConstantNodeType::PI:
-			{
-				m_Name = "Pi";
-				AddOutputPin(PinDataType::FLOAT, "Pi (float)");
-				break;
-			}
-			case ConstantNodeType::GOLDEN_RATIO:
-			{
-				m_Name = "Golden Ratio (Tau)";
-				AddOutputPin(PinDataType::FLOAT, "Tau (float)");
-				break;
-			}
+			case ConstantNodeType::DELTATIME:		m_Name = "Time";				AddOutputPin(PinDataType::FLOAT, "Time"); break;
+			case ConstantNodeType::PI:				m_Name = "Pi";					AddOutputPin(PinDataType::FLOAT, "Pi"); break;
+			case ConstantNodeType::GOLDEN_RATIO:	m_Name = "Golden Ratio (Tau)";	AddOutputPin(PinDataType::FLOAT, "Tau"); break;
 
 			// Variables
 			case ConstantNodeType::INT:
 			{
 				m_Name = "Int";
 				AddInputPin(PinDataType::INT, false, "Value");
-				AddOutputPin(PinDataType::INT, "Value (int)");
+				AddOutputPin(PinDataType::INT, "Value");
 				break;
 			}
 			case ConstantNodeType::FLOAT:
 			{
 				m_Name = "Float";
 				AddInputPin(PinDataType::FLOAT, false, "Value");
-				AddOutputPin(PinDataType::FLOAT, "Value (float)");
+				AddOutputPin(PinDataType::FLOAT, "Value");
 				break;
 			}
 			case ConstantNodeType::VEC2:
@@ -578,7 +563,7 @@ namespace Kaimos::MaterialEditor {
 				m_Name = "Vec2";
 				AddInputPin(PinDataType::FLOAT, false, "X");
 				AddInputPin(PinDataType::FLOAT, false, "Y");
-				AddOutputPin(PinDataType::VEC2, "Value (Vec2)");
+				AddOutputPin(PinDataType::VEC2, "Value");
 				break;
 			}
 			case ConstantNodeType::VEC3:
@@ -587,14 +572,14 @@ namespace Kaimos::MaterialEditor {
 				AddInputPin(PinDataType::FLOAT, false, "X");
 				AddInputPin(PinDataType::FLOAT, false, "Y");
 				AddInputPin(PinDataType::FLOAT, false, "Z");
-				AddOutputPin(PinDataType::VEC3, "Value (Vec3)");
+				AddOutputPin(PinDataType::VEC3, "Value");
 				break;
 			}
 			case ConstantNodeType::VEC4:
 			{
 				m_Name = "Vec4";
 				AddInputPin(PinDataType::VEC4, false, "Value");
-				AddOutputPin(PinDataType::VEC4, "Value (Vec4)");
+				AddOutputPin(PinDataType::VEC4, "Value");
 				break;
 			}
 
@@ -602,13 +587,13 @@ namespace Kaimos::MaterialEditor {
 			case ConstantNodeType::SCREEN_RES:
 			{
 				m_Name = "Screen Resolution";
-				AddOutputPin(PinDataType::VEC2, "Resolution (Vec2)", 0.0f);
+				AddOutputPin(PinDataType::VEC2, "Resolution", 0.0f);
 				break;
 			}
 			case ConstantNodeType::SCENE_COLOR:
 			{
 				m_Name = "Scene Color";
-				AddOutputPin(PinDataType::VEC3, "Color (Vec3)");
+				AddOutputPin(PinDataType::VEC3, "Color");
 				break;
 			}
 			
@@ -616,25 +601,25 @@ namespace Kaimos::MaterialEditor {
 			case ConstantNodeType::CAMERA_FOV:
 			{
 				m_Name = "CamFOV";
-				AddOutputPin(PinDataType::FLOAT, "FOV (float)", 0.0f);
+				AddOutputPin(PinDataType::FLOAT, "FOV", 0.0f);
 				break;
 			}
 			case ConstantNodeType::CAMERA_AR:
 			{
 				m_Name = "CamAR";
-				AddOutputPin(PinDataType::FLOAT, "AR (float)", 0.0f);
+				AddOutputPin(PinDataType::FLOAT, "AR", 0.0f);
 				break;
 			}
 			case ConstantNodeType::CAMERA_PLANES:
 			{
 				m_Name = "CamPlanes";
-				AddOutputPin(PinDataType::VEC2, "Cam Planes (Vec2)", 0.0f);
+				AddOutputPin(PinDataType::VEC2, "Cam Planes", 0.0f);
 				break;
 			}
 			case ConstantNodeType::CAMERA_ORTHOSIZE:
 			{
 				m_Name = "CamOrthoSize";
-				AddOutputPin(PinDataType::FLOAT, "Ortho Size (float)", 0.0f);
+				AddOutputPin(PinDataType::FLOAT, "Ortho Size", 0.0f);
 				break;
 			}
 
@@ -642,34 +627,33 @@ namespace Kaimos::MaterialEditor {
 			case ConstantNodeType::INT_RANDOM:
 			{
 				m_Name = "Random Int";
-				AddOutputPin(PinDataType::INT, "Out");
+				AddOutputPin(PinDataType::INT, "Value");
 				break;
 			}
 			case ConstantNodeType::FLOAT_RANDOM:
 			{
 				m_Name = "Random Float";
-				AddOutputPin(PinDataType::FLOAT, "Out");
+				AddOutputPin(PinDataType::FLOAT, "Value");
 				break;
 			}
 			case ConstantNodeType::VEC2_RANDOM:
 			{
 				m_Name = "Random Vec2";
-				AddOutputPin(PinDataType::VEC2, "Out");
+				AddOutputPin(PinDataType::VEC2, "Value");
 				break;
 			}
 			case ConstantNodeType::VEC3_RANDOM:
 			{
 				m_Name = "Random Vec3";
-				AddOutputPin(PinDataType::VEC3, "Out");
+				AddOutputPin(PinDataType::VEC3, "Value");
 				break;
 			}
 			case ConstantNodeType::VEC4_RANDOM:
 			{
 				m_Name = "Random Vec4";
-				AddOutputPin(PinDataType::VEC4, "Out");
+				AddOutputPin(PinDataType::VEC4, "Value");
 				break;
 			}
-
 			default:
 				KS_FATAL_ERROR("Attempted to create a non-supported Constant Node");
 		}
@@ -873,7 +857,7 @@ namespace Kaimos::MaterialEditor {
 
 		AddInputPin(op_datatype, multi_type_pin, "Value 1");
 		AddInputPin(op_datatype, multi_type_pin, "Value 2");
-		AddOutputPin(op_datatype, "Out");
+		AddOutputPin(op_datatype, "Result");
 
 		SetNodeTooltip();
 	}
@@ -939,6 +923,8 @@ namespace Kaimos::MaterialEditor {
 	// ---------------------------- SPECIAL OPERATION NODE ------------------------------------------------
 	SpecialOperationNode::SpecialOperationNode(SpecialOperationNodeType operation_type, PinDataType operation_data_type) : MaterialNode("Operation Node", MaterialNodeType::SPECIAL_OPERATION), m_OperationType(operation_type)
 	{
+		std::string n1 = "Value 1", n2 = "Value 2", n3 = "Value 3";
+		
 		m_InputsN = 2;
 		PinDataType in_type1, in_type2, in_type3, out_type;
 		in_type1 = in_type2 = in_type3 = out_type = operation_data_type;
@@ -946,13 +932,13 @@ namespace Kaimos::MaterialEditor {
 		switch (operation_type)
 		{
 			// Basics
-			case SpecialOperationNodeType::ABS:					{ m_Name = "Absolute Node";	m_InputsN = 1; break; }
-			case SpecialOperationNodeType::MIN:					{ m_Name = "Min Node";		break; }
-			case SpecialOperationNodeType::MAX:					{ m_Name = "Max Node";		break; }
-			case SpecialOperationNodeType::NEGATE:				{ m_Name = "Negate Node";	m_InputsN = 1; break; }
+			case SpecialOperationNodeType::ABS:					m_Name = "Absolute Node";	m_InputsN = 1; break;
+			case SpecialOperationNodeType::MIN:					m_Name = "Min Node";		break;
+			case SpecialOperationNodeType::MAX:					m_Name = "Max Node";		break;
+			case SpecialOperationNodeType::NEGATE:				m_Name = "Negate Node";		m_InputsN = 1; break;
 
 			// Powers
-			case SpecialOperationNodeType::POW:					{ m_Name = "Power Node"; break; }
+			case SpecialOperationNodeType::POW:					{ m_Name = "Power Node";				n2 = "Exponent"; break; }
 			case SpecialOperationNodeType::SQRT:				{ m_Name = "Square Root Node";			m_InputsN = 1; break; }
 			case SpecialOperationNodeType::INV_SQRT:			{ m_Name = "Inverse Square Root Node";	m_InputsN = 1; break; }
 			case SpecialOperationNodeType::LOG:					{ m_Name = "Log Root Node";				m_InputsN = 1; break; }
@@ -989,18 +975,18 @@ namespace Kaimos::MaterialEditor {
 			case SpecialOperationNodeType::HATAN:				{ m_Name = "Hyp. ArcTan Node";	m_InputsN = 1; break; }
 
 			// Shaders (Ceil, Floor, Clamp, ...)
-			case SpecialOperationNodeType::CEIL:				{ m_Name = "Ceil Node";		m_InputsN = 1; break; }
-			case SpecialOperationNodeType::FLOOR:				{ m_Name = "Floor Node";	m_InputsN = 1; break; }
-			case SpecialOperationNodeType::CLAMP:				{ m_Name = "Clamp Node";	m_InputsN = 3; in_type2 = in_type3 = PinDataType::FLOAT; break; }
-			case SpecialOperationNodeType::ROUND:				{ m_Name = "Round Node";	m_InputsN = 1; break; }
-			case SpecialOperationNodeType::SIGN:				{ m_Name = "Sign Node";		m_InputsN = 1; break; }
-			case SpecialOperationNodeType::FRACTAL:				{ m_Name = "Fractal Node";	m_InputsN = 1; break; }
+			case SpecialOperationNodeType::CEIL:				{ m_Name = "Ceil Node";			m_InputsN = 1; break; }
+			case SpecialOperationNodeType::FLOOR:				{ m_Name = "Floor Node";		m_InputsN = 1; break; }
+			case SpecialOperationNodeType::CLAMP:				{ m_Name = "Clamp Node";		m_InputsN = 3; n2 = "Min"; n3 = "Max"; in_type2 = in_type3 = PinDataType::FLOAT; break; }
+			case SpecialOperationNodeType::ROUND:				{ m_Name = "Round Node";		m_InputsN = 1; break; }
+			case SpecialOperationNodeType::SIGN:				{ m_Name = "Sign Node";			m_InputsN = 1; break; }
+			case SpecialOperationNodeType::FRACTAL:				{ m_Name = "Fractal Node";		m_InputsN = 1; break; }
 
 			// Step, Smoothstep
-			case SpecialOperationNodeType::FLOAT_STEP:			{ m_Name = "FStep Node";		in_type1 = PinDataType::FLOAT; break; }
-			case SpecialOperationNodeType::VEC_STEP:			{ m_Name = "VStep Node";		break; }
-			case SpecialOperationNodeType::FLOAT_SMOOTHSTEP:	{ m_Name = "FSmoothstep Node";	m_InputsN = 3; in_type1 = in_type2 = PinDataType::FLOAT; break; }
-			case SpecialOperationNodeType::VEC_SMOOTHSTEP:		{ m_Name = "VSmoothstep Node";	m_InputsN = 3; break; }
+			case SpecialOperationNodeType::FLOAT_STEP:			{ m_Name = "FStep Node";			n2 = "Edge"; in_type1 = PinDataType::FLOAT; break; }
+			case SpecialOperationNodeType::VEC_STEP:			{ m_Name = "VStep Node";			n2 = "Edge"; break; }
+			case SpecialOperationNodeType::FLOAT_SMOOTHSTEP:	{ m_Name = "FSmoothstep Node";		n2 = "Edge 1"; n2 = "Edge 2"; m_InputsN = 3; in_type1 = in_type2 = PinDataType::FLOAT; break; }
+			case SpecialOperationNodeType::VEC_SMOOTHSTEP:		{ m_Name = "VSmoothstep Node";		n2 = "Edge 1"; n2 = "Edge 2"; m_InputsN = 3; break; }
 			
 			// Vector Ops.
 			case SpecialOperationNodeType::VEC_NORMALIZE:		{ m_Name = "Normalize Node";		m_InputsN = 1; break; }
@@ -1016,34 +1002,37 @@ namespace Kaimos::MaterialEditor {
 			case SpecialOperationNodeType::LNG_ANGLE_VECS:		{ m_Name = "Vecs Long Angle Node";		out_type = PinDataType::FLOAT; break; }
 			
 			// Vector Rotations
-			case SpecialOperationNodeType::VEC_ROTX:			{ m_Name = "Vec RotX Node";	in_type2 = PinDataType::FLOAT; break; }
-			case SpecialOperationNodeType::VEC_ROTY:			{ m_Name = "Vec RotY Node";	in_type2 = PinDataType::FLOAT; break; }
-			case SpecialOperationNodeType::VEC_ROTZ:			{ m_Name = "Vec RotZ Node";	in_type2 = PinDataType::FLOAT; break; }
+			case SpecialOperationNodeType::VEC_ROTX:			{ m_Name = "Vec RotX Node";	n2 = "Angle"; in_type2 = PinDataType::FLOAT; break; }
+			case SpecialOperationNodeType::VEC_ROTY:			{ m_Name = "Vec RotY Node";	n2 = "Angle"; in_type2 = PinDataType::FLOAT; break; }
+			case SpecialOperationNodeType::VEC_ROTZ:			{ m_Name = "Vec RotZ Node";	n2 = "Angle"; in_type2 = PinDataType::FLOAT; break; }
 
 			// Advanced Vector Ops.
-			case SpecialOperationNodeType::FLOAT_LERP:			{ m_Name = "FLerp Node";	m_InputsN = 3; in_type3 = PinDataType::FLOAT; break; }
-			case SpecialOperationNodeType::VEC_LERP:			{ m_Name = "VLerp Node";	m_InputsN = 3; break; }
+			case SpecialOperationNodeType::FLOAT_LERP:			{ m_Name = "FLerp Node";	n3 = "a"; m_InputsN = 3; in_type3 = PinDataType::FLOAT; break; }
+			case SpecialOperationNodeType::VEC_LERP:			{ m_Name = "VLerp Node";	n3 = "a"; m_InputsN = 3; break; }
 			case SpecialOperationNodeType::FLOAT_MOD:			{ m_Name = "FMod Node";		in_type2 = PinDataType::FLOAT; break; }
 			case SpecialOperationNodeType::VEC_MOD:				{ m_Name = "VMod Node";		break; }
-			case SpecialOperationNodeType::VEC_REFLECT:			{ m_Name = "Reflect Node";	break; }
-			case SpecialOperationNodeType::VEC_REFRACT:			{ m_Name = "Refract Node";	m_InputsN = 3; in_type3 = PinDataType::FLOAT; break; }
+			case SpecialOperationNodeType::VEC_REFLECT:			{ m_Name = "Reflect Node";	n1 = "I"; n2 = "N"; break; }
+			case SpecialOperationNodeType::VEC_REFRACT:			{ m_Name = "Refract Node";	n1 = "I"; n2 = "N"; n3 = "eta (ior)"; m_InputsN = 3; in_type3 = PinDataType::FLOAT; break; }
 
 			// Vector Components
-			case SpecialOperationNodeType::VEC_X:				{ m_Name = "Vec X Node";	m_InputsN = 1; out_type = PinDataType::FLOAT; break; }
-			case SpecialOperationNodeType::VEC_Y:				{ m_Name = "Vec Y Node";	m_InputsN = 1; out_type = PinDataType::FLOAT; break; }
-			case SpecialOperationNodeType::VEC_Z:				{ m_Name = "Vec Z Node";	m_InputsN = 1; out_type = PinDataType::FLOAT; break; }
-			case SpecialOperationNodeType::VEC_W:				{ m_Name = "Vec W Node";	m_InputsN = 1; out_type = PinDataType::FLOAT; break; }
+			case SpecialOperationNodeType::VEC_X:				{ m_Name = "Vec X Node";	n1 = "Vec Value"; m_InputsN = 1; out_type = PinDataType::FLOAT; break; }
+			case SpecialOperationNodeType::VEC_Y:				{ m_Name = "Vec Y Node";	n1 = "Vec Value"; m_InputsN = 1; out_type = PinDataType::FLOAT; break; }
+			case SpecialOperationNodeType::VEC_Z:				{ m_Name = "Vec Z Node";	n1 = "Vec Value"; m_InputsN = 1; out_type = PinDataType::FLOAT; break; }
+			case SpecialOperationNodeType::VEC_W:				{ m_Name = "Vec W Node";	n1 = "Vec Value"; m_InputsN = 1; out_type = PinDataType::FLOAT; break; }
 		}
 
 		m_OperationOutputType = operation_data_type;
-		AddOutputPin(out_type, "Out");
-		AddInputPin(in_type1, false, "Value 1", 0.0f);
+		if (n1 == "Value 1" && m_InputsN == 1)
+			n1 = "Value";
+
+		AddOutputPin(out_type, "Result");
+		AddInputPin(in_type1, false, n1, 0.0f);
 		
 		if (m_InputsN >= 2)
-			AddInputPin(in_type2, false, "Value 2", 0.0f);
+			AddInputPin(in_type2, false, n2, 0.0f);
 
 		if (m_InputsN == 3)
-			AddInputPin(in_type3, false, "a", 0.0f);
+			AddInputPin(in_type3, false, n3, 0.0f);
 
 		SetNodeTooltip();
 	}
