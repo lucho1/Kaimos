@@ -263,6 +263,8 @@ namespace Kaimos::MaterialEditor {
 		OperationNodeType GetOperationType() const { return m_OperationType; }
 		PinDataType GetVecOperationType() const { return m_VecOperationType; }
 
+		void AddExtraInputPin();
+
 	private:
 
 		virtual glm::vec4 CalculateNodeResult() override;

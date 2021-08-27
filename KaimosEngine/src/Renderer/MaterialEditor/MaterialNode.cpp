@@ -62,6 +62,13 @@ namespace Kaimos::MaterialEditor {
 		for (Ref<NodeInputPin>& pin : m_NodeInputPins)
 			pin->DrawUI(set_node_draggable);
 
+		if (m_Type == MaterialNodeType::OPERATION)
+		{
+			ImGui::NewLine(); ImGui::SameLine(10.0f);
+			if (ImGui::Button("+", ImVec2(18.0f, 20.0f)))
+				static_cast<OperationMaterialNode*>(this)->AddExtraInputPin();
+		}
+
 		// -- End Node Drawing --
 		ImNodes::SetNodeDraggable(m_ID, set_node_draggable);
 		ImNodes::EndNode();
@@ -886,6 +893,15 @@ namespace Kaimos::MaterialEditor {
 		SetNodeVariables();
 	}
 
+	void OperationMaterialNode::AddExtraInputPin()
+	{
+		bool multi_type = false;
+		if (m_OperationType == OperationNodeType::FLOATVEC_MULTIPLY || m_OperationType == OperationNodeType::FLOATVEC_DIVIDE)
+			multi_type = true;
+
+		std::string node_n = std::to_string(m_NodeInputPins.size() + 1);
+		AddInputPin(m_VecOperationType, multi_type, "Value " + node_n);
+	}
 
 	void OperationMaterialNode::SetNodeVariables()
 	{
