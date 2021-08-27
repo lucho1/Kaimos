@@ -44,7 +44,8 @@ namespace Kaimos::MaterialEditor {
 
 		ImNodes::BeginNodeTitleBar();
 		ImGui::NewLine(); ImGui::SameLine(ImGui::GetItemRectSize().x / 4.0f);
-		ImGui::Text(m_Name.c_str());
+		ImGui::Text(m_Name.c_str()); ImGui::SameLine();
+		KaimosUI::UIFunctionalities::DrawHelpMarker(m_Tooltip);
 		ImNodes::EndNodeTitleBar();
 
 		// -- Draw Output Pin --
@@ -158,7 +159,7 @@ namespace Kaimos::MaterialEditor {
 
 	// ---------------------------- MAIN MAT NODE ---------------------------------------------------------
 	MainMaterialNode::MainMaterialNode(Material* attached_material)
-		: MaterialNode("Main Node", MaterialNodeType::MAIN), m_AttachedMaterial(attached_material)
+		: m_AttachedMaterial(attached_material), MaterialNode("Main Node", MaterialNodeType::MAIN)
 	{
 		m_VertexPositionPin =		CreateRef<NodeInputPin>(this, PinDataType::VEC3, false, "Vertex Position (Vec3)");
 		m_VertexNormalPin =			CreateRef<NodeInputPin>(this, PinDataType::VEC3, false, "Vertex Normal (Vec3)");
@@ -176,6 +177,8 @@ namespace Kaimos::MaterialEditor {
 		m_NodeInputPins.push_back(m_SmoothnessPin);
 		m_NodeInputPins.push_back(m_SpecularityPin);
 		m_NodeInputPins.push_back(m_BumpinessPin);
+
+		SetNodeTooltip();
 	}
 
 
@@ -189,6 +192,11 @@ namespace Kaimos::MaterialEditor {
 		m_SmoothnessPin.reset();
 		m_SpecularityPin.reset();
 		m_BumpinessPin.reset();
+	}
+
+	void MainMaterialNode::SetNodeTooltip()
+	{
+		m_Tooltip = "Main Node with the Material properties as node inputs";
 	}
 
 
@@ -250,7 +258,8 @@ namespace Kaimos::MaterialEditor {
 		ImNodes::BeginNode(m_ID);
 
 		ImNodes::BeginNodeTitleBar();
-		ImGui::Text(m_Name.c_str());
+		ImGui::Text(m_Name.c_str()); ImGui::SameLine();
+		KaimosUI::UIFunctionalities::DrawHelpMarker(m_Tooltip);
 		ImNodes::EndNodeTitleBar();
 
 		// -- Draw Vertex Attribute Input Pins --
@@ -457,7 +466,7 @@ namespace Kaimos::MaterialEditor {
 
 
 	// ---------------------------- VERTEX PARAMETER NODE -------------------------------------------------
-	VertexParameterMaterialNode::VertexParameterMaterialNode(VertexParameterNodeType parameter_type) : MaterialNode("VtxParam Node", MaterialNodeType::VERTEX_PARAMETER), m_ParameterType(parameter_type)
+	VertexParameterMaterialNode::VertexParameterMaterialNode(VertexParameterNodeType parameter_type) : m_ParameterType(parameter_type), MaterialNode("VtxParam Node", MaterialNodeType::VERTEX_PARAMETER)
 	{
 		switch (m_ParameterType)
 		{
@@ -482,6 +491,8 @@ namespace Kaimos::MaterialEditor {
 			default:
 				KS_FATAL_ERROR("Attempted to create a non-supported Vertex parameter Node");
 		}
+
+		SetNodeTooltip();
 	}
 
 	void VertexParameterMaterialNode::SetNodeOutputResult(const glm::vec4& value)
@@ -506,11 +517,24 @@ namespace Kaimos::MaterialEditor {
 		m_NodeOutputPin = CreateRef<NodeOutputPin>(this, pin_data_type, name, true);
 	}
 
+	void VertexParameterMaterialNode::SetNodeTooltip()
+	{
+		switch (m_ParameterType)
+		{
+			case VertexParameterNodeType::TEX_COORDS:
+				m_Tooltip = "Object's vertex Texture Coordinates (Output: Vec2)"; break;
+			case VertexParameterNodeType::POSITION:
+				m_Tooltip = "Object's vertex positions (Output: Vec3)"; break;
+			case VertexParameterNodeType::NORMAL:
+				m_Tooltip = "Object's vertex normals (Output: Vec3)"; break;
+		}
+	}
+
 
 
 
 	// ---------------------------- CONSTANT NODE ---------------------------------------------------------
-	ConstantMaterialNode::ConstantMaterialNode(ConstantNodeType constant_type) : MaterialNode("Constant Node", MaterialNodeType::CONSTANT), m_ConstantType(constant_type)
+	ConstantMaterialNode::ConstantMaterialNode(ConstantNodeType constant_type) : m_ConstantType(constant_type), MaterialNode("Constant Node", MaterialNodeType::CONSTANT)
 	{
 		switch (m_ConstantType)
 		{
@@ -575,26 +599,26 @@ namespace Kaimos::MaterialEditor {
 			}
 
 			// Scene & Screen
-			case ConstantNodeType::SCENE_COLOR:
-			{
-				m_Name = "Scene Color";
-				AddOutputPin(PinDataType::VEC3, "Color (Vec3)");
-				break;
-			}
 			case ConstantNodeType::SCREEN_RES:
 			{
 				m_Name = "Screen Resolution";
 				AddOutputPin(PinDataType::VEC2, "Resolution (Vec2)", 0.0f);
 				break;
 			}
+			case ConstantNodeType::SCENE_COLOR:
+			{
+				m_Name = "Scene Color";
+				AddOutputPin(PinDataType::VEC3, "Color (Vec3)");
+				break;
+			}
+			
+			// Camera
 			case ConstantNodeType::CAMERA_FOV:
 			{
 				m_Name = "CamFOV";
 				AddOutputPin(PinDataType::FLOAT, "FOV (float)", 0.0f);
 				break;
 			}
-
-			// Camera
 			case ConstantNodeType::CAMERA_AR:
 			{
 				m_Name = "CamAR";
@@ -649,6 +673,8 @@ namespace Kaimos::MaterialEditor {
 			default:
 				KS_FATAL_ERROR("Attempted to create a non-supported Constant Node");
 		}
+
+		SetNodeTooltip();
 	}
 
 
@@ -697,15 +723,15 @@ namespace Kaimos::MaterialEditor {
 			}
 
 			// Scene & Screen
-			case ConstantNodeType::SCENE_COLOR:
-			{
-				ret = glm::vec4(Renderer::GetSceneColor(), 1.0f);
-				break;
-			}
 			case ConstantNodeType::SCREEN_RES:
 			{
 				ret.x = Application::Get().GetWindow().GetWidth();
 				ret.y = Application::Get().GetWindow().GetHeight();
+				break;
+			}
+			case ConstantNodeType::SCENE_COLOR:
+			{
+				ret = glm::vec4(Renderer::GetSceneColor(), 1.0f);
 				break;
 			}
 
@@ -769,6 +795,7 @@ namespace Kaimos::MaterialEditor {
 		return m_NodeOutputPin->GetValue();
 	}
 
+
 	void ConstantMaterialNode::SerializeNode(YAML::Emitter& output_emitter) const
 	{
 		// -- Serialize Base Node & Const Type --
@@ -777,11 +804,54 @@ namespace Kaimos::MaterialEditor {
 	}
 
 
+	void ConstantMaterialNode::SetNodeTooltip()
+	{
+		switch (m_ConstantType)
+		{
+			case ConstantNodeType::DELTATIME:
+				m_Tooltip = "Time passed since the beginning of the application\nOutput Type: Float"; break;
+			case ConstantNodeType::PI:
+				m_Tooltip = "Pi Variable\nOutput Type: Float"; break;
+			case ConstantNodeType::GOLDEN_RATIO:
+				m_Tooltip = "Golden Ratio Variable\nOutput Type: Float"; break;
+			case ConstantNodeType::INT:
+				m_Tooltip = "Int Variable\nOutput Type: Int"; break;
+			case ConstantNodeType::FLOAT:
+				m_Tooltip = "Float Variable\nOutput Type: Float"; break;
+			case ConstantNodeType::VEC2:
+				m_Tooltip = "Vec2 Variable\nOutput Type: Vec2"; break;
+			case ConstantNodeType::VEC3:
+				m_Tooltip = "Vec3 Variable\nOutput Type: Vec3"; break;
+			case ConstantNodeType::VEC4:
+				m_Tooltip = "Vec4 (color) Variable\nOutput Type: Vec4"; break;
+			case ConstantNodeType::SCREEN_RES:
+				m_Tooltip = "Resolution of the whole window of the program\nOutput Type: Vec2"; break;
+			case ConstantNodeType::SCENE_COLOR:
+				m_Tooltip = "Current scene color\nOutput Type: Vec3"; break;
+			case ConstantNodeType::CAMERA_FOV:
+				m_Tooltip = "Primary Camera Field of View\nOutput Type: Float\nIf no current or primary camera, will use the editor one"; break;
+			case ConstantNodeType::CAMERA_AR:
+				m_Tooltip = "Primary Camera Aspect Ratio\nOutput Type: Vec2\nIf no current or primary camera, will use the editor one"; break;
+			case ConstantNodeType::CAMERA_PLANES:
+				m_Tooltip = "Primary Camera Clip Planes - Near & Far\nOutput Type: Vec2\nIf no current or primary camera, will use the editor one"; break;
+			case ConstantNodeType::CAMERA_ORTHOSIZE:
+				m_Tooltip = "Primary Camera Orthographic Size (current camera must be orthographic!)\nOutput Type: Float\nIf no current/primary camera, will use the editor one"; break;
+
+			// Random
+			case ConstantNodeType::INT_RANDOM:		m_Tooltip = "Random positive Int, no range"; break;
+			case ConstantNodeType::FLOAT_RANDOM:	m_Tooltip = "Random float in range [0.0, 1.0]\nFor higher ranges, multiply by the max range you want"; break;
+			case ConstantNodeType::VEC2_RANDOM:		m_Tooltip = "Vec2 of Randoms in range [0.0, 1.0]\nFor higher ranges, multiply by the max range you want"; break;
+			case ConstantNodeType::VEC3_RANDOM:		m_Tooltip = "Vec3 of Randoms in range [0.0, 1.0]\nFor higher ranges, multiply by the max range you want"; break;
+			case ConstantNodeType::VEC4_RANDOM:		m_Tooltip = "Vec4 of Randoms in range [0.0, 1.0]\nFor higher ranges, multiply by the max range you want"; break;
+		}
+	}
+
+
 
 
 	// ---------------------------- OPERATION NODE --------------------------------------------------------
 	OperationMaterialNode::OperationMaterialNode(OperationNodeType operation_type, PinDataType operation_data_type)
-		: MaterialNode("Operation Node", MaterialNodeType::OPERATION), m_OperationType(operation_type), m_VecOperationType(operation_data_type)
+		: m_OperationType(operation_type), m_VecOperationType(operation_data_type), MaterialNode("Operation Node", MaterialNodeType::OPERATION)
 	{
 		PinDataType op_datatype = operation_data_type;
 		bool multi_type_pin = false;
@@ -804,7 +874,9 @@ namespace Kaimos::MaterialEditor {
 		AddInputPin(op_datatype, multi_type_pin, "Value 1");
 		AddInputPin(op_datatype, multi_type_pin, "Value 2");
 		AddOutputPin(op_datatype, "Out");
-	}	
+
+		SetNodeTooltip();
+	}
 
 
 	glm::vec4 OperationMaterialNode::CalculateNodeResult()
@@ -845,6 +917,20 @@ namespace Kaimos::MaterialEditor {
 		SerializeBaseNode(output_emitter);
 		output_emitter << YAML::Key << "OpNodeType" << YAML::Value << (int)m_OperationType;
 		output_emitter << YAML::Key << "VecOpType" << YAML::Value << (int)m_VecOperationType;
+	}
+
+
+	void OperationMaterialNode::SetNodeTooltip()
+	{
+		switch (m_OperationType)
+		{
+			case OperationNodeType::ADDITION:			{ m_Tooltip = "Sum values\nOutput Type: same as Input";  break; }
+			case OperationNodeType::SUBTRACTION:		{ m_Tooltip = "Subtract values\nOutput Type: same as Input";  break; }
+			case OperationNodeType::MULTIPLICATION:		{ m_Tooltip = "Multiply values\nOutput Type: same as Input"; break; }
+			case OperationNodeType::DIVISION:			{ m_Tooltip = "Divide values\nOutput Type: same as Input\nDivisor shouldn't be 0, otherwise the numerator (or 0) will be returned";  break; }
+			case OperationNodeType::FLOATVEC_MULTIPLY:	{ m_Tooltip = "Float*Vec multiplication\nOutput Type: same as vec Input"; break; }
+			case OperationNodeType::FLOATVEC_DIVIDE:	{ m_Tooltip = "Float/Vec & Vec/Float dvision\nOutput Type: same as vec Input\nDivisor shouldn't be 0, otherwise the numerator (or 0) will be returned"; break; }
+		}
 	}
 
 
@@ -958,6 +1044,8 @@ namespace Kaimos::MaterialEditor {
 
 		if (m_InputsN == 3)
 			AddInputPin(in_type3, false, "a", 0.0f);
+
+		SetNodeTooltip();
 	}
 	
 	glm::vec4 SpecialOperationNode::CalculateNodeResult()
@@ -1101,5 +1189,85 @@ namespace Kaimos::MaterialEditor {
 		output_emitter << YAML::Key << "SpecOpNodeType" << YAML::Value << (int)m_OperationType;
 		output_emitter << YAML::Key << "InputsN" << YAML::Value << m_InputsN;
 		output_emitter << YAML::Key << "OpOutType" << YAML::Value << (int)m_OperationOutputType;
+	}
+
+
+	void SpecialOperationNode::SetNodeTooltip()
+	{
+		switch (m_OperationType)
+		{
+			// Basics
+			case SpecialOperationNodeType::ABS:					m_Tooltip = "Absolute value of a value\nOutput Type: same as Input"; break;
+			case SpecialOperationNodeType::MIN:					m_Tooltip = "Minimum of two values\nOutput Type: same as Input"; break;
+			case SpecialOperationNodeType::MAX:					m_Tooltip = "Maximum of two values\nOutput Type: same as Input"; break;
+			case SpecialOperationNodeType::NEGATE:				m_Tooltip = "Negated value of a value\nOutput Type: same as Input"; break;
+			// Powers
+			case SpecialOperationNodeType::POW:					m_Tooltip = "Power of a value to an exponent\nOutput Type: same as Input"; break;
+			case SpecialOperationNodeType::SQRT:				m_Tooltip = "Square Root of a value\nOutput Type: same as Input\nNegative values will return 0.0"; break;
+			case SpecialOperationNodeType::INV_SQRT:			m_Tooltip = "Inverse Square Root of a value\nOutput Type: same as Input\nNegative values will return 0.0"; break;
+			case SpecialOperationNodeType::LOG:					m_Tooltip = "Logarithm of a value\nOutput Type: same as Input\nNegative values will return log(0.00001)"; break;
+			case SpecialOperationNodeType::LOG2:				m_Tooltip = "Base2-Logarithm of a value\nOutput Type: same as Input\nNegative values will return log2(0.001)"; break;
+			case SpecialOperationNodeType::EXP:					m_Tooltip = "Exponential of a value\nOutput Type: same as Input"; break;
+			case SpecialOperationNodeType::EXP2:				m_Tooltip = "Base2-Exponential of a value\nOutput Type: same as Input"; break;
+			// Conversions
+			case SpecialOperationNodeType::INTF:				m_Tooltip = "Int to Float conversion\nOutput Type: Float"; break;
+			case SpecialOperationNodeType::FINT:				m_Tooltip = "Float to Int conversion\nOutput Type: Int"; break;
+			case SpecialOperationNodeType::RTOD:				m_Tooltip = "Radians to Degrees conversion\nOutput Type: same as Input"; break;
+			case SpecialOperationNodeType::DTOR:				m_Tooltip = "Degrees to Radians conversion\nOutput Type: same as Input"; break;
+			case SpecialOperationNodeType::RGB_HSV:				m_Tooltip = "RGB to HSV color conversion\nOutput Type: same as Input\nOnly Vec3 & Vec4\nInput must be in range [0, 255]"; break;
+			case SpecialOperationNodeType::HSV_RGB:				m_Tooltip = "HSV to RGB color conversion\nOutput Type: same as Input\nOnly Vec3 & Vec4\nInput must be in range [0, 100 (360 for H)]"; break;
+			case SpecialOperationNodeType::COLNR:				m_Tooltip = "Color normalization [0, 255]>[0.0, 1.0]\nOutput Type: same as Input\nInput must be in range [0, 255]"; break;
+			case SpecialOperationNodeType::COLUNR:				m_Tooltip = "Color Unnormalization [0.0, 1.0]>[0, 255]\nOutput Type: same as Input\nInput must be in range [0.0, 1.0]"; break;
+			case SpecialOperationNodeType::L_SRGB:				m_Tooltip = "Linear to sRGB conversion\nOutput Type: same as Input"; break;
+			case SpecialOperationNodeType::SRGB_L:				m_Tooltip = "sRGB to Linear conversion\nOutput Type: same as Input"; break;
+			// Trigonometry
+			case SpecialOperationNodeType::SIN:					m_Tooltip = "Sine of a value\nOutput Type: same as Input\nInput must be in RADIANS"; break;
+			case SpecialOperationNodeType::COS:					m_Tooltip = "Cosine of a value\nOutput Type: same as Input\nInput must be in RADIANS"; break;
+			case SpecialOperationNodeType::TAN:					m_Tooltip = "Tangent of a value\nOutput Type: same as Input\nInput must be in RADIANS"; break;
+			case SpecialOperationNodeType::ASIN:				m_Tooltip = "ArcSine of a value\nOutput Type: same as Input\nOutput in RADIANS\nInput must be in range [-1.0, 1.0]"; break;
+			case SpecialOperationNodeType::ACOS:				m_Tooltip = "ArcCosine of a value\nOutput Type: same as Input\nOutput in RADIANS\nInput must be in range [-1.0, 1.0]"; break;
+			case SpecialOperationNodeType::ATAN:				m_Tooltip = "ArcTangent of a value\nOutput Type: same as Input"; break;
+			// Hiperbolic Trigonometry
+			case SpecialOperationNodeType::HSIN:				m_Tooltip = "Hyperbolic Sine of a value\nOutput Type: same as Input\nInput must be in RADIANS"; break;
+			case SpecialOperationNodeType::HCOS:				m_Tooltip = "Hyperbolic Cosine of a value\nOutput Type: same as Input\nInput must be in RADIANS"; break;
+			case SpecialOperationNodeType::HTAN:				m_Tooltip = "Hyperbolic Tangent of a value\nOutput Type: same as Input\nInput must be in RADIANS"; break;
+			case SpecialOperationNodeType::HASIN:				m_Tooltip = "Hyperbolic ArcSine of a value\nOutput Type: same as Input\nOutput in RADIANS"; break;
+			case SpecialOperationNodeType::HACOS:				m_Tooltip = "Hyperbolic ArcCosine of a value\nOutput Type: same as Input\nOutput in RADIANS\nInput must be >= 1.0"; break;
+			case SpecialOperationNodeType::HATAN:				m_Tooltip = "Hyperbolic ArcTangent of a value\nOutput Type: same as Input\nOutput in RADIANS\nInput must be in range [-1.0, 1.0]"; break;
+			// Shaders (Ceil, Floor, Clamp, ...)
+			case SpecialOperationNodeType::CEIL:				m_Tooltip = "Ceil operation on a value\nOutput Type: same as Input"; break;
+			case SpecialOperationNodeType::FLOOR:				m_Tooltip = "Floor operation on a value\nOutput Type: same as Input"; break;
+			case SpecialOperationNodeType::CLAMP:				m_Tooltip = "Clamps between two values\nOutput Type: same as Input"; break;
+			case SpecialOperationNodeType::ROUND:				m_Tooltip = "Returns nearest int of a value\nOutput Type: same as Input"; break;
+			case SpecialOperationNodeType::SIGN:				m_Tooltip = "Returns -1 if value < 0, 1 otherwise\nOutput Type: same as Input"; break;
+			case SpecialOperationNodeType::FRACTAL:				m_Tooltip = "Fractal operation on a value (x-floor(x))\nOutput Type: same as Input"; break;
+			// Step, Smoothstep
+			case SpecialOperationNodeType::FLOAT_STEP:			m_Tooltip = "Returns 0.0 if value is under an edge, 1.0 otherwise\nOutput Type: same as vec Input\nEdge1 must be < Edge2"; break;
+			case SpecialOperationNodeType::VEC_STEP:			m_Tooltip = "Returns 0.0 if value is under an edge, 1.0 otherwise\nOutput Type: same as Input\nEdge1 must be < Edge2"; break;
+			case SpecialOperationNodeType::FLOAT_SMOOTHSTEP:	m_Tooltip = "Hermite Interpolation between edges by a Float value\nOutput Type: same as vec Input"; break;
+			case SpecialOperationNodeType::VEC_SMOOTHSTEP:		m_Tooltip = "Hermite Interpolation between edges by a Vec value\nOutput Type: same as Input"; break;
+			// Vector Ops.
+			case SpecialOperationNodeType::VEC_NORMALIZE:		m_Tooltip = "Returns a vec of length 1 with same direction than value\nOutput Type: same as Input\nInput must be non-zero"; break;
+			case SpecialOperationNodeType::VEC_MAGNITUDE:		m_Tooltip = "Length (or magnitude or modulus) of a vector\nOutput Type: Float"; break;
+			case SpecialOperationNodeType::VEC_DIST:			m_Tooltip = "Distance between 2 vectors\nOutput Type: Float"; break;
+			case SpecialOperationNodeType::VEC_DOT:				m_Tooltip = "Dot product of 2 vectors\nOutput Type: Float"; break;
+			case SpecialOperationNodeType::VEC_CROSS:			m_Tooltip = "Cross product of 2 vectors\nOutput Type: same as Input\nVec2 computes a rotation along Z axis\nVec4 computes a Vec3 Cross with w = 1.0"; break;
+			// Vector Angles
+			case SpecialOperationNodeType::SHT_ANGLE_NVECS:		m_Tooltip = "Shortest angle between 2 normalized vectors\nOutput Type: Float\nInputs must be in range [0.0, 1.0]"; break;
+			case SpecialOperationNodeType::SHT_ANGLE_VECS:		m_Tooltip = "Shortest angle between 2 vectors\nOutput Type: Float\nInputs must be non-zero"; break;
+			case SpecialOperationNodeType::LNG_ANGLE_NVECS:		m_Tooltip = "Longest angle between 2 normalized vectors\nOutput Type: Float\nInputs must be in range [0.0, 1.0]"; break;
+			case SpecialOperationNodeType::LNG_ANGLE_VECS:		m_Tooltip = "Longest angle between 2 vectors\nOutput Type: Float\nInputs must be non-zero"; break;
+			// Vector Rotations
+			case SpecialOperationNodeType::VEC_ROTX:			m_Tooltip = "Rotates a vec around X axis given an angle\nOutput Type: same as vec Input\nAngle Input & Output in RADIANS"; break;
+			case SpecialOperationNodeType::VEC_ROTY:			m_Tooltip = "Rotates a vec around Y axis given an angle\nOutput Type: same as vec Input\nAngle Input & Output in RADIANS"; break;
+			case SpecialOperationNodeType::VEC_ROTZ:			m_Tooltip = "Rotates a vec around Z axis given an angle\nOutput Type: same as vec Input\nAngle Input & Output in RADIANS"; break;
+			// Advanced Vector Ops.
+			case SpecialOperationNodeType::FLOAT_LERP:			m_Tooltip = "Linear Interpolation (mix in glsl) between 2 values by another float value\nOutput Type: same as vec Input"; break;
+			case SpecialOperationNodeType::VEC_LERP:			m_Tooltip = "Linear Interpolation (mix in glsl) between 2 vec values by another vec value\nOutput Type: same as Input"; break;
+			case SpecialOperationNodeType::FLOAT_MOD:			m_Tooltip = "Modulo of a value respect another float value\nOutput Type: same as vec Input"; break;
+			case SpecialOperationNodeType::VEC_MOD:				m_Tooltip = "Modulo of a vec value respect another vec value\nOutput Type: same as Input"; break;
+			case SpecialOperationNodeType::VEC_REFLECT:			m_Tooltip = "Reflection direction for a given Incident and Surface Normal vectors\nOutput Type: same as Input"; break;
+			case SpecialOperationNodeType::VEC_REFRACT:			m_Tooltip = "Refraction direction for a given Incident and Surface Normal vectors\nOutput Type: same as Input\nUses float value as the index of refraction (eta: 1.0 in air)"; break;
+		}
 	}
 }
