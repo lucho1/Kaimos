@@ -692,8 +692,17 @@ namespace Kaimos::MaterialEditor {
 	void ConstantMaterialNode::SetNodeVariables()
 	{
 		SetNodeTooltip();
-		m_NodeColor = glm::ivec3(172, 172, 43);
-		m_HighlightColor = glm::ivec3(215, 215, 65);
+		if (m_ConstantType == ConstantNodeType::INT || m_ConstantType == ConstantNodeType::FLOAT || m_ConstantType == ConstantNodeType::VEC2
+			|| m_ConstantType == ConstantNodeType::VEC3 || m_ConstantType == ConstantNodeType::VEC4)
+		{
+			m_NodeColor = glm::ivec3(126, 40, 140);
+			m_HighlightColor = glm::ivec3(177, 65, 191);
+		}
+		else
+		{
+			m_NodeColor = glm::ivec3(172, 172, 43);
+			m_HighlightColor = glm::ivec3(215, 215, 65);
+		}
 	}
 
 
