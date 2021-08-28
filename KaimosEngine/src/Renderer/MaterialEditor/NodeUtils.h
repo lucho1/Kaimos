@@ -121,7 +121,7 @@ namespace Kaimos::MaterialEditor {
 
 
 		// --- UI Methods ---
-		void DrawPinWidget(PinDataType pin_data_type, glm::vec4& value, float widget_speed = 0.05f, float widget_min = 0.0f, float widget_max = 0.0f, const char* widget_format = "%.2f");
+		bool DrawPinWidget(PinDataType pin_data_type, glm::vec4& value, float widget_speed = 0.05f, float widget_min = 0.0f, float widget_max = 0.0f, const char* widget_format = "%.2f", bool color_inputs = false);
 	}
 }
 

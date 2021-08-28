@@ -108,7 +108,7 @@ namespace Kaimos::MaterialEditor {
 
 		~NodeInputPin();
 
-		void DrawUI(bool& allow_node_drag, bool is_vtxattribute = false, bool modify_value = false, glm::vec4& value_to_modify = glm::vec4(0.0f), float widget_speed = 0.05f, float widget_min = 0.0f, float widget_max = 0.0f, const char* widget_format = "%.2f");
+		bool DrawUI(bool& allow_node_drag, bool is_vtxattribute = false, bool modify_value = false, glm::vec4& value_to_modify = glm::vec4(0.0f), float widget_speed = 0.05f, float widget_min = 0.0f, float widget_max = 0.0f, const char* widget_format = "%.2f", bool color_inputs = false);
 
 
 	public:

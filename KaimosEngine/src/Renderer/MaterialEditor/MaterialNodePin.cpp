@@ -90,7 +90,7 @@ namespace Kaimos::MaterialEditor {
 			case PinDataType::INT:		ImGui::Text("Value: %i", static_cast<int>(m_Value.x)); return;
 			case PinDataType::VEC2:		ImGui::Text("Value: %.1f, %.1f", m_Value.x, m_Value.y); return;
 			case PinDataType::VEC3:		ImGui::Text("Value: %.1f, %.1f, %.1f", m_Value.x, m_Value.y, m_Value.z); return;
-			case PinDataType::VEC4:		ImGui::Text("Value: %.2f, %.2f, %.2f, %.2f", m_Value.x, m_Value.y, m_Value.z, m_Value.w); return;
+			case PinDataType::VEC4:		ImGui::Text("Value: %.2f, %.2f\n\t\t\t %.2f, %.2f", m_Value.x, m_Value.y, m_Value.z, m_Value.w); return;
 		}
 
 		KS_FATAL_ERROR("Tried to draw a non-supported PinType!");
@@ -215,8 +215,10 @@ namespace Kaimos::MaterialEditor {
 	}
 
 
-	void NodeInputPin::DrawUI(bool& allow_node_drag, bool is_vtxattribute, bool modify_value, glm::vec4& value_to_modify, float widget_speed, float widget_min, float widget_max, const char* widget_format)
+	bool NodeInputPin::DrawUI(bool& allow_node_drag, bool is_vtxattribute, bool modify_value, glm::vec4& value_to_modify, float widget_speed, float widget_min, float widget_max, const char* widget_format, bool color_inputs)
 	{
+		bool ret = false;
+
 		ImGui::PushID(m_ID);
 		ImNodes::BeginInputAttribute(m_ID);
 		ImGui::Text(m_Name.c_str());
@@ -229,18 +231,15 @@ namespace Kaimos::MaterialEditor {
 			SetValue(m_OutputLinked->m_Value); // TODO: Don't calculate this each frame
 		else if(!is_vtxattribute)
 		{
-			//ImGui::PushID(m_ID);
-
-			NodeUtils::DrawPinWidget(m_PinDataType, m_Value, widget_speed, widget_min, widget_max, widget_format);
+			ret = NodeUtils::DrawPinWidget(m_PinDataType, m_Value, widget_speed, widget_min, widget_max, widget_format, color_inputs);
 			SetDefaultValue(m_Value);
 
 			if (ImGui::IsItemHovered() || ImGui::IsItemFocused() || ImGui::IsItemActive() || ImGui::IsItemEdited() || ImGui::IsItemClicked())
 				allow_node_drag = false;
-
-			//ImGui::PopID();
 		}
 
 		ImGui::PopID();
+		return ret;
 	}
 
 

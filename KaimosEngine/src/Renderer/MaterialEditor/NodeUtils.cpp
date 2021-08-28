@@ -1208,44 +1208,54 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 
 
 	// ----------------------- UI Methods -----------------------------------------------------------------
-	void DrawPinWidget(PinDataType pin_data_type, glm::vec4& value, float widget_speed, float widget_min, float widget_max, const char* widget_format)
+	bool DrawPinWidget(PinDataType pin_data_type, glm::vec4& value, float widget_speed, float widget_min, float widget_max, const char* widget_format, bool color_inputs)
 	{
+		bool ret = false;
+
 		ImGui::SameLine();
 		switch (pin_data_type)
 		{
-		case PinDataType::FLOAT:
-		{
-			ImGui::SetNextItemWidth(30.0f);
-			ImGui::DragFloat("###float_val", &value.x, widget_speed, widget_min, widget_max, widget_format);
-			return;
-		}
-		case PinDataType::INT:
-		{
-			ImGui::SetNextItemWidth(30.0f);
-			ImGui::DragFloat("###int_val", &value.x, 1.0f, widget_min, widget_max, "%.0f");
-			return;
-		}
-		case PinDataType::VEC2:
-		{
-			ImGui::SetNextItemWidth(60.0f);
-			ImGui::DragFloat2("###v2_val", glm::value_ptr(value), widget_speed, widget_min, widget_max, widget_format);
-			return;
-		}
-		case PinDataType::VEC3:
-		{
-			ImGui::SetNextItemWidth(90.0f);
-			ImGui::DragFloat3("###v3_val", glm::value_ptr(value), widget_speed, widget_min, widget_max, widget_format);
-			return;
-		}
-		case PinDataType::VEC4:
-		{
-			ImGui::SetNextItemWidth(150.0f);
-			ImGuiColorEditFlags flags = ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_Float | ImGuiColorEditFlags_AlphaPreview | ImGuiColorEditFlags_NoInputs;
-			ImGui::ColorEdit4("Value", glm::value_ptr(value), flags);
-			return;
-		}
+			case PinDataType::FLOAT:
+			{
+				ImGui::SetNextItemWidth(30.0f);
+				ret = ImGui::DragFloat("###float_val", &value.x, widget_speed, widget_min, widget_max, widget_format);
+				return ret;
+			}
+			case PinDataType::INT:
+			{
+				ImGui::SetNextItemWidth(30.0f);
+				ret = ImGui::DragFloat("###int_val", &value.x, 1.0f, widget_min, widget_max, "%.0f");
+				return ret;
+			}
+			case PinDataType::VEC2:
+			{
+				ImGui::SetNextItemWidth(60.0f);
+				ret = ImGui::DragFloat2("###v2_val", glm::value_ptr(value), widget_speed, widget_min, widget_max, widget_format);
+				return ret;
+			}
+			case PinDataType::VEC3:
+			{
+				ImGui::SetNextItemWidth(90.0f);
+				ret = ImGui::DragFloat3("###v3_val", glm::value_ptr(value), widget_speed, widget_min, widget_max, widget_format);
+				return ret;
+			}
+			case PinDataType::VEC4:
+			{
+				ImGui::SetNextItemWidth(150.0f);
+				ImGuiColorEditFlags flags = ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreview;
+
+				if (color_inputs)
+					flags |= ImGuiColorEditFlags_NoInputs;
+				
+				glm::vec4 col = value/255.0f;
+				if (ret = ImGui::ColorEdit4("###colorv4_val", glm::value_ptr(col), flags))
+					value = col*255.0f;
+
+				return ret;
+			}
 		}
 
 		KS_FATAL_ERROR("Tried to draw a non-supported PinType!");
+		return ret;
 	}
 }

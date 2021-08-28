@@ -181,7 +181,7 @@ namespace Kaimos::MaterialEditor {
 		m_VertexPositionPin =		CreateRef<NodeInputPin>(this, PinDataType::VEC3, false, "Vertex Position (Vec3)");
 		m_VertexNormalPin =			CreateRef<NodeInputPin>(this, PinDataType::VEC3, false, "Vertex Normal (Vec3)");
 		m_TextureCoordinatesPin =	CreateRef<NodeInputPin>(this, PinDataType::VEC2, false, "Texture Coordinates (Vec2)");
-		m_ColorPin =				CreateRef<NodeInputPin>(this, PinDataType::VEC4, false, "Color (Vec4)", 1.0f);
+		m_ColorPin =				CreateRef<NodeInputPin>(this, PinDataType::VEC4, false, "Color (Vec4)", 255.0f);
 		m_SmoothnessPin =			CreateRef<NodeInputPin>(this, PinDataType::FLOAT, false, "Smoothness (Float)", 0.5f);
 		m_SpecularityPin =			CreateRef<NodeInputPin>(this, PinDataType::FLOAT, false, "Specularity (Float)", 1.0f);
 		m_BumpinessPin =			CreateRef<NodeInputPin>(this, PinDataType::FLOAT, false, "Bumpiness (Float)", 1.0f);
@@ -289,7 +289,10 @@ namespace Kaimos::MaterialEditor {
 
 		// -- Draw Texture "Input" (Button) & Pins --
 		ImGui::NewLine();
-		m_ColorPin->DrawUI(set_node_draggable, false, true, m_AttachedMaterial->Color);
+		
+		glm::vec4 col = m_ColorPin->GetValue();
+		if (m_ColorPin->DrawUI(set_node_draggable, false, true, col, 0.05f, 0.0f, 0.0f, "%.2f", true))
+			m_AttachedMaterial->Color = col / 255.0f;
 
 		glm::vec4 smoothness_vec = glm::vec4(m_AttachedMaterial->Smoothness);
 		m_SmoothnessPin->DrawUI(set_node_draggable, false, true, smoothness_vec, 0.01f, 0.01f, 4.0f, "%.2f");
@@ -456,7 +459,7 @@ namespace Kaimos::MaterialEditor {
 
 	void MainMaterialNode::SyncValuesWithMaterial()
 	{
-		m_ColorPin->SetInputValue(m_AttachedMaterial->Color);
+		m_ColorPin->SetInputValue(m_AttachedMaterial->Color * 255.0f);
 		m_SmoothnessPin->SetInputValue(glm::vec4(m_AttachedMaterial->Smoothness));
 		m_SpecularityPin->SetInputValue(glm::vec4(m_AttachedMaterial->Specularity));
 		m_BumpinessPin->SetInputValue(glm::vec4(m_AttachedMaterial->Bumpiness));
@@ -464,7 +467,7 @@ namespace Kaimos::MaterialEditor {
 
 	void MainMaterialNode::SyncMaterialValues()
 	{
-		m_AttachedMaterial->Color = m_ColorPin->GetValue();
+		m_AttachedMaterial->Color = m_ColorPin->GetValue() / 255.0f;
 		m_AttachedMaterial->Smoothness = m_SmoothnessPin->GetValue().x;
 		m_AttachedMaterial->Specularity = m_SpecularityPin->GetValue().x;
 		m_AttachedMaterial->Bumpiness = m_BumpinessPin->GetValue().x;
@@ -602,7 +605,7 @@ namespace Kaimos::MaterialEditor {
 			case ConstantNodeType::VEC4:
 			{
 				m_Name = "Vec4";
-				AddInputPin(PinDataType::VEC4, false, "Value");
+				AddInputPin(PinDataType::VEC4, false, "Value", 255.0f);
 				AddOutputPin(PinDataType::VEC4, "Value");
 				break;
 			}
@@ -718,7 +721,6 @@ namespace Kaimos::MaterialEditor {
 
 			// Variables
 			case ConstantNodeType::INT:		// Falls into float case
-			case ConstantNodeType::VEC4:	// Falls into float case
 			case ConstantNodeType::FLOAT:
 			{
 				ret.x = GetInputValue(0).x;
@@ -735,6 +737,11 @@ namespace Kaimos::MaterialEditor {
 				ret.x = GetInputValue(0).x;
 				ret.y = GetInputValue(1).x;
 				ret.z = GetInputValue(2).x;
+				break;
+			}
+			case ConstantNodeType::VEC4:
+			{
+				ret = GetInputValue(0);
 				break;
 			}
 
