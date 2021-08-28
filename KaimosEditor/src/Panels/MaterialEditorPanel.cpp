@@ -333,6 +333,12 @@ namespace Kaimos {
 				if (ImGui::BeginMenu("RGB Denormalize"))
 					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::COLUNR, popup_pos, false);
 
+				if (ImGui::BeginMenu("HSV Normalize"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::HSVNR, popup_pos, true, false);
+
+				if (ImGui::BeginMenu("HSV Denormalize"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::HSVUNR, popup_pos, true, false);
+
 				if (ImGui::BeginMenu("Linear to sRGB"))
 					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::L_SRGB, popup_pos, false);
 

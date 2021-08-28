@@ -166,6 +166,7 @@ namespace Kaimos {
 		// Save Entities as a sequence (like an array)
 		output << YAML::Key << "Entities" << YAML::Value << YAML::BeginSeq;											// Save Entities as a sequence (like an array)
 
+		uint entities_deserialized = 0;
 		m_Scene->m_Registry.each([&](auto entityID)
 			{
 				Entity entity = { entityID, m_Scene.get() };
@@ -173,6 +174,7 @@ namespace Kaimos {
 					return;
 				
 				SerializeEntity(output, entity);
+				++entities_deserialized;
 			});
 
 		output << YAML::EndSeq;
@@ -181,6 +183,7 @@ namespace Kaimos {
 		std::ofstream file(filepath);
 		file << output.c_str();
 		m_Scene->SetPath(filepath);
+		KS_TRACE("Finished Serializing {0} Entities in '{1}' Scene", entities_deserialized, m_Scene->GetName());
 	}
 
 
@@ -374,8 +377,7 @@ namespace Kaimos {
 			}
 		}
 
-		KS_TRACE("Finished Deserializing {0} Entities", entities_deserialized);
-		KS_TRACE("Finished Deserializing {0} Scene", scene_name);
+		KS_TRACE("Finished Deserializing {0} Entities in '{1}' Scene", entities_deserialized, m_Scene->GetName());
 		return true;
 	}
 }

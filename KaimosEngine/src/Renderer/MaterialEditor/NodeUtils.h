@@ -25,8 +25,8 @@ namespace Kaimos::MaterialEditor {
 
 		glm::vec4 CalculateRGBtoHSV(const glm::vec4& a);
 		glm::vec4 CalculateHSVtoRGB(const glm::vec4& a);
-		float CalculateLinearToSRGB(const float a);
-		float CalculateSRGBToLinear(const float a);
+		float CalculateLinearToSRGB(const float a, const float gamma);
+		float CalculateSRGBToLinear(const float a, const float gamma);
 
 		// --- Data Operations ---
 		// - Basics -
@@ -61,8 +61,10 @@ namespace Kaimos::MaterialEditor {
 		glm::vec4 HSVtoRGB(PinDataType op_type, const glm::vec4& a);
 		glm::vec4 ColorNorm(PinDataType op_type, const glm::vec4& a);
 		glm::vec4 ColorUnnorm(PinDataType op_type, const glm::vec4& a);
-		glm::vec4 LinearToSRGB(PinDataType op_type, const glm::vec4& a);
-		glm::vec4 SRGBToLinear(PinDataType op_type, const glm::vec4& a);
+		glm::vec4 HSVNorm(PinDataType op_type, const glm::vec4& a);
+		glm::vec4 HSVUnnorm(PinDataType op_type, const glm::vec4& a);
+		glm::vec4 LinearToSRGB(PinDataType op_type, const glm::vec4& a, float gamma);
+		glm::vec4 SRGBToLinear(PinDataType op_type, const glm::vec4& a, float gamma);
 
 		// - Trigonometry -
 		glm::vec4 Sin(PinDataType op_type, const glm::vec4& a);
@@ -119,7 +121,7 @@ namespace Kaimos::MaterialEditor {
 
 
 		// --- UI Methods ---
-		void DrawPinWidget(PinDataType pin_data_type, glm::vec4& value, float widget_speed = 0.05f, float widget_min = 0.0f, float widget_max = 0.0f, const char* widget_format = "%.2f");
+		bool DrawPinWidget(PinDataType pin_data_type, glm::vec4& value, float widget_speed = 0.05f, float widget_min = 0.0f, float widget_max = 0.0f, const char* widget_format = "%.2f", bool color_inputs = false);
 	}
 }
 

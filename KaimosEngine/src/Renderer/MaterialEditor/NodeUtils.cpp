@@ -176,19 +176,19 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 		return glm::vec4(rgb, sva.z * 2.55f);
 	}
 
-	float CalculateLinearToSRGB(const float a)
+	float CalculateLinearToSRGB(const float a, const float gamma)
 	{
 		float ret;
 		if (a > 0.0031308f)
-			return 1.055f * (glm::pow(a, (1.0f/2.4f))) - 0.055f;
+			return 1.055f * (glm::pow(a, (1.0f/gamma))) - 0.055f;
 		else
 			return 12.92f*a;
 	}
 
-	float CalculateSRGBToLinear(const float a)
+	float CalculateSRGBToLinear(const float a, const float gamma)
 	{
 		if (a > 0.04045f)
-			return glm::pow((a + 0.055f) / 1.055f, 2.4f);
+			return glm::pow((a + 0.055f) / 1.055f, gamma);
 		else
 			return a/12.92f;
 	}
@@ -377,10 +377,10 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 		switch (op_type)
 		{
 			case PinDataType::FLOAT:
-			case PinDataType::INT:		return glm::vec4(glm::sqrt(a.x), 0.0f, 0.0f, 0.0f);
-			case PinDataType::VEC2:		return glm::vec4(glm::sqrt(glm::vec2(a)), 0.0f, 0.0f);
-			case PinDataType::VEC3:		return glm::vec4(glm::sqrt(glm::vec3(a)), 0.0f);
-			case PinDataType::VEC4:		return glm::sqrt(a);
+			case PinDataType::INT:		return glm::vec4(glm::sqrt(glm::max(a.x, 0.0f)), 0.0f, 0.0f, 0.0f);
+			case PinDataType::VEC2:		return glm::vec4(glm::sqrt(glm::max(glm::vec2(a), 0.0f)), 0.0f, 0.0f);
+			case PinDataType::VEC3:		return glm::vec4(glm::sqrt(glm::max(glm::vec3(a), 0.0f)), 0.0f);
+			case PinDataType::VEC4:		return glm::sqrt(glm::max(a, 0.0f));
 		}
 
 		KS_FATAL_ERROR("Tried to perform a non-supported Squared operation!");
@@ -392,10 +392,10 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 		switch (op_type)
 		{
 			case PinDataType::FLOAT:
-			case PinDataType::INT:		return glm::vec4(glm::inversesqrt(a.x), 0.0f, 0.0f, 0.0f);
-			case PinDataType::VEC2:		return glm::vec4(glm::inversesqrt(glm::vec2(a)), 0.0f, 0.0f);
-			case PinDataType::VEC3:		return glm::vec4(glm::inversesqrt(glm::vec3(a)), 0.0f);
-			case PinDataType::VEC4:		return glm::inversesqrt(a);
+			case PinDataType::INT:		return glm::vec4(glm::inversesqrt(glm::max(a.x, 0.0f)), 0.0f, 0.0f, 0.0f);
+			case PinDataType::VEC2:		return glm::vec4(glm::inversesqrt(glm::max(glm::vec2(a), 0.0f)), 0.0f, 0.0f);
+			case PinDataType::VEC3:		return glm::vec4(glm::inversesqrt(glm::max(glm::vec3(a), 0.0f)), 0.0f);
+			case PinDataType::VEC4:		return glm::inversesqrt(glm::max(a, 0.0f));
 		}
 
 		KS_FATAL_ERROR("Tried to perform a non-supported Inverse Squared operation!");
@@ -548,30 +548,56 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 		return {};
 	}
 
-	glm::vec4 LinearToSRGB(PinDataType op_type, const glm::vec4& a)
+	glm::vec4 HSVNorm(PinDataType op_type, const glm::vec4& a)
 	{
 		switch (op_type)
 		{
+			case PinDataType::VEC3:		return glm::vec4(glm::vec3(a.x / 360.0f, a.y / 100.0f, a.z / 100.f), 0.0f);
+			case PinDataType::VEC4:		return glm::vec4(glm::vec3(a.x / 360.0f, a.y / 100.0f, a.z / 100.f), 100.0f);
+		}
+
+		KS_FATAL_ERROR("Tried to perform a non-supported HSV Normalization operation!");
+		return {};
+	}
+
+	glm::vec4 HSVUnnorm(PinDataType op_type, const glm::vec4& a)
+	{
+		switch (op_type)
+		{
+			case PinDataType::VEC3:		return glm::vec4(glm::vec3(a.x * 360.0f, a.y * 100.0f, a.z * 100.f), 0.0f);
+			case PinDataType::VEC4:		return glm::vec4(glm::vec3(a.x * 360.0f, a.y * 100.0f, a.z * 100.f), 100.0f);
+		}
+
+		KS_FATAL_ERROR("Tried to perform a non-supported HSV Unnormalization operation!");
+		return {};
+	}
+
+	glm::vec4 LinearToSRGB(PinDataType op_type, const glm::vec4& a, float gamma)
+	{
+		float g = Maths::CompareFloats(gamma, 0.0f) ? 1.0f : gamma;
+		switch (op_type)
+		{
 			case PinDataType::FLOAT:
-			case PinDataType::INT:		return glm::vec4(CalculateLinearToSRGB(a.x), 0.0f, 0.0f, 0.0f);
-			case PinDataType::VEC2:		return glm::vec4(CalculateLinearToSRGB(a.x), CalculateLinearToSRGB(a.y), 0., 0.0f);
-			case PinDataType::VEC3:		return glm::vec4(CalculateLinearToSRGB(a.x), CalculateLinearToSRGB(a.y), CalculateLinearToSRGB(a.z), 0.0f);
-			case PinDataType::VEC4:		return glm::vec4(CalculateLinearToSRGB(a.x), CalculateLinearToSRGB(a.y), CalculateLinearToSRGB(a.z), a.a);
+			case PinDataType::INT:		return glm::vec4(CalculateLinearToSRGB(a.x, g), 0.0f, 0.0f, 0.0f);
+			case PinDataType::VEC2:		return glm::vec4(CalculateLinearToSRGB(a.x, g), CalculateLinearToSRGB(a.y, g), 0., 0.0f);
+			case PinDataType::VEC3:		return glm::vec4(CalculateLinearToSRGB(a.x, g), CalculateLinearToSRGB(a.y, g), CalculateLinearToSRGB(a.z, g), 0.0f);
+			case PinDataType::VEC4:		return glm::vec4(CalculateLinearToSRGB(a.x, g), CalculateLinearToSRGB(a.y, g), CalculateLinearToSRGB(a.z, g), a.a);
 		}
 
 		KS_FATAL_ERROR("Tried to perform a non-supported LinearToSRGB operation!");
 		return {};
 	}
 
-	glm::vec4 SRGBToLinear(PinDataType op_type, const glm::vec4& a)
+	glm::vec4 SRGBToLinear(PinDataType op_type, const glm::vec4& a, float gamma)
 	{
+		float g = Maths::CompareFloats(gamma, 0.0f) ? 0.1f : gamma;
 		switch (op_type)
 		{
 			case PinDataType::FLOAT:
-			case PinDataType::INT:		return glm::vec4(CalculateSRGBToLinear(a.x), 0.0f, 0.0f, 0.0f);
-			case PinDataType::VEC2:		return glm::vec4(CalculateSRGBToLinear(a.x), CalculateSRGBToLinear(a.y), 0., 0.0f);
-			case PinDataType::VEC3:		return glm::vec4(CalculateSRGBToLinear(a.x), CalculateSRGBToLinear(a.y), CalculateSRGBToLinear(a.z), 0.0f);
-			case PinDataType::VEC4:		return glm::vec4(CalculateSRGBToLinear(a.x), CalculateSRGBToLinear(a.y), CalculateSRGBToLinear(a.z), a.a);
+			case PinDataType::INT:		return glm::vec4(CalculateSRGBToLinear(a.x, g), 0.0f, 0.0f, 0.0f);
+			case PinDataType::VEC2:		return glm::vec4(CalculateSRGBToLinear(a.x, g), CalculateSRGBToLinear(a.y, g), 0., 0.0f);
+			case PinDataType::VEC3:		return glm::vec4(CalculateSRGBToLinear(a.x, g), CalculateSRGBToLinear(a.y, g), CalculateSRGBToLinear(a.z, g), 0.0f);
+			case PinDataType::VEC4:		return glm::vec4(CalculateSRGBToLinear(a.x, g), CalculateSRGBToLinear(a.y, g), CalculateSRGBToLinear(a.z, g), a.a);
 		}
 
 		KS_FATAL_ERROR("Tried to perform a non-supported SRGBToLinear operation!");
@@ -1182,44 +1208,54 @@ namespace Kaimos::MaterialEditor::NodeUtils {
 
 
 	// ----------------------- UI Methods -----------------------------------------------------------------
-	void DrawPinWidget(PinDataType pin_data_type, glm::vec4& value, float widget_speed, float widget_min, float widget_max, const char* widget_format)
+	bool DrawPinWidget(PinDataType pin_data_type, glm::vec4& value, float widget_speed, float widget_min, float widget_max, const char* widget_format, bool color_inputs)
 	{
+		bool ret = false;
+
 		ImGui::SameLine();
 		switch (pin_data_type)
 		{
-		case PinDataType::FLOAT:
-		{
-			ImGui::SetNextItemWidth(30.0f);
-			ImGui::DragFloat("###float_val", &value.x, widget_speed, widget_min, widget_max, widget_format);
-			return;
-		}
-		case PinDataType::INT:
-		{
-			ImGui::SetNextItemWidth(30.0f);
-			ImGui::DragFloat("###int_val", &value.x, 1.0f, widget_min, widget_max, "%.0f");
-			return;
-		}
-		case PinDataType::VEC2:
-		{
-			ImGui::SetNextItemWidth(60.0f);
-			ImGui::DragFloat2("###v2_val", glm::value_ptr(value), widget_speed, widget_min, widget_max, widget_format);
-			return;
-		}
-		case PinDataType::VEC3:
-		{
-			ImGui::SetNextItemWidth(90.0f);
-			ImGui::DragFloat3("###v3_val", glm::value_ptr(value), widget_speed, widget_min, widget_max, widget_format);
-			return;
-		}
-		case PinDataType::VEC4:
-		{
-			ImGui::SetNextItemWidth(150.0f);
-			ImGuiColorEditFlags flags = ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_Float | ImGuiColorEditFlags_AlphaPreview | ImGuiColorEditFlags_NoInputs;
-			ImGui::ColorEdit4("Value", glm::value_ptr(value), flags);
-			return;
-		}
+			case PinDataType::FLOAT:
+			{
+				ImGui::SetNextItemWidth(30.0f);
+				ret = ImGui::DragFloat("###float_val", &value.x, widget_speed, widget_min, widget_max, widget_format);
+				return ret;
+			}
+			case PinDataType::INT:
+			{
+				ImGui::SetNextItemWidth(30.0f);
+				ret = ImGui::DragFloat("###int_val", &value.x, 1.0f, widget_min, widget_max, "%.0f");
+				return ret;
+			}
+			case PinDataType::VEC2:
+			{
+				ImGui::SetNextItemWidth(60.0f);
+				ret = ImGui::DragFloat2("###v2_val", glm::value_ptr(value), widget_speed, widget_min, widget_max, widget_format);
+				return ret;
+			}
+			case PinDataType::VEC3:
+			{
+				ImGui::SetNextItemWidth(90.0f);
+				ret = ImGui::DragFloat3("###v3_val", glm::value_ptr(value), widget_speed, widget_min, widget_max, widget_format);
+				return ret;
+			}
+			case PinDataType::VEC4:
+			{
+				ImGui::SetNextItemWidth(150.0f);
+				ImGuiColorEditFlags flags = ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreview;
+
+				if (color_inputs)
+					flags |= ImGuiColorEditFlags_NoInputs;
+				
+				glm::vec4 col = value/255.0f;
+				if (ret = ImGui::ColorEdit4("###colorv4_val", glm::value_ptr(col), flags))
+					value = col*255.0f;
+
+				return ret;
+			}
 		}
 
 		KS_FATAL_ERROR("Tried to draw a non-supported PinType!");
+		return ret;
 	}
 }

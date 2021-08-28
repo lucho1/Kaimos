@@ -26,7 +26,7 @@ namespace Kaimos::MaterialEditor {
 		NONE,
 		DELTATIME, PI, GOLDEN_RATIO,											// Constants
 		INT, FLOAT, VEC2, VEC3, VEC4,											// Variables
-		SCREEN_RES, SCENE_COLOR, ENVIRO_RES, ENVIRO_W, ENVIRO_H,				// Screen, Scene, ...
+		SCENE_COLOR, SCREEN_RES, ENVIRO_RES, ENVIRO_W, ENVIRO_H,				// Screen, Scene, ...
 		CAMERA_FOV, CAMERA_AR, CAMERA_PLANES, CAMERA_ORTHOSIZE,					// Camera
 		INT_RANDOM, FLOAT_RANDOM, VEC2_RANDOM, VEC3_RANDOM, VEC4_RANDOM			// Randoms
 	};
@@ -34,25 +34,26 @@ namespace Kaimos::MaterialEditor {
 	enum class OperationNodeType
 	{
 		NONE,
-		ADDITION, SUBTRACTION, DIVISION, MULTIPLICATION,						// Basic Operations (with same types)
-		FLOATVEC_MULTIPLY, FLOATVEC_DIVIDE,										// Different-Types Operations
+		ADDITION, SUBTRACTION, DIVISION, MULTIPLICATION,					// Basic Operations (with same types)
+		FLOATVEC_MULTIPLY, FLOATVEC_DIVIDE,									// Different-Types Operations
 	};
 
 	enum class SpecialOperationNodeType
 	{
 		NONE,
-		ABS, MIN, MAX, NEGATE,													// Basics
-		POW, SQRT, INV_SQRT, LOG, LOG2, EXP, EXP2,								// Powers
-		RTOD, DTOR, RGB_HSV, HSV_RGB, COLNR, COLUNR, L_SRGB, SRGB_L, INTF, FINT,// Conversions
-		SIN, COS, TAN, ASIN, ACOS, ATAN,										// Trigonometry
-		HSIN, HCOS, HTAN, HASIN, HACOS, HATAN,									// Hiperbolic Trigonometry
-		CEIL, FLOOR, CLAMP, ROUND, SIGN, FRACTAL,								// Shaders (Ceil, Floor, Clamp, ...)
-		FLOAT_STEP, VEC_STEP, FLOAT_SMOOTHSTEP, VEC_SMOOTHSTEP,					// Step, Smoothstep
-		VEC_NORMALIZE, VEC_MAGNITUDE, VEC_DIST, VEC_DOT, VEC_CROSS,				// Vector Ops.
-		SHT_ANGLE_NVECS, SHT_ANGLE_VECS, LNG_ANGLE_NVECS, LNG_ANGLE_VECS,		// Vector Angles
-		VEC_ROTX, VEC_ROTY, VEC_ROTZ,											// Vector Rotations
-		FLOAT_LERP, VEC_LERP, FLOAT_MOD, VEC_MOD, VEC_REFLECT, VEC_REFRACT,		// Advanced Vector Ops.
-		VEC_X, VEC_Y, VEC_Z, VEC_W												// Vector Components
+		ABS, MIN, MAX, NEGATE,																	// Basics
+		POW, SQRT, INV_SQRT, LOG, LOG2, EXP, EXP2,												// Powers
+		RTOD, DTOR, RGB_HSV, HSV_RGB, COLNR, COLUNR, HSVNR, HSVUNR,								// Conversions
+		L_SRGB, SRGB_L, INTF, FINT,
+		SIN, COS, TAN, ASIN, ACOS, ATAN,														// Trigonometry
+		HSIN, HCOS, HTAN, HASIN, HACOS, HATAN,													// Hiperbolic Trigonometry
+		CEIL, FLOOR, CLAMP, ROUND, SIGN, FRACTAL,												// Shaders (Ceil, Floor, Clamp, ...)
+		FLOAT_STEP, VEC_STEP, FLOAT_SMOOTHSTEP, VEC_SMOOTHSTEP,									// Step, Smoothstep
+		VEC_NORMALIZE, VEC_MAGNITUDE, VEC_DIST, VEC_DOT, VEC_CROSS,								// Vector Ops.
+		SHT_ANGLE_NVECS, SHT_ANGLE_VECS, LNG_ANGLE_NVECS, LNG_ANGLE_VECS,						// Vector Angles
+		VEC_ROTX, VEC_ROTY, VEC_ROTZ,															// Vector Rotations
+		FLOAT_LERP, VEC_LERP, FLOAT_MOD, VEC_MOD, VEC_REFLECT, VEC_REFRACT,						// Advanced Vector Ops.
+		VEC_X, VEC_Y, VEC_Z, VEC_W																// Vector Components
 	};
 
 
@@ -61,6 +62,9 @@ namespace Kaimos::MaterialEditor {
 	// ---- Base Material Node ----
 	class MaterialNode
 	{
+	private:
+		virtual void SetNodeVariables() {}
+		virtual void SetNodeTooltip() = 0;
 	protected:
 
 		// --- Protected Class Methods ---
@@ -115,8 +119,9 @@ namespace Kaimos::MaterialEditor {
 
 		// --- Variables ---
 		uint m_ID = 0;
-		std::string m_Name = "unnamed";
+		std::string m_Name = "unnamed", m_Tooltip = "";
 		MaterialNodeType m_Type = MaterialNodeType::NONE;
+		glm::ivec3 m_NodeColor = glm::ivec3(1), m_HighlightColor = glm::ivec3(1);
 
 		std::vector<Ref<NodeInputPin>> m_NodeInputPins;
 		Ref<NodeOutputPin> m_NodeOutputPin = nullptr;
@@ -125,16 +130,17 @@ namespace Kaimos::MaterialEditor {
 
 
 	// ---- Main Material Node ----
-
 	class MainMaterialNode : public MaterialNode
 	{
 		friend class MaterialGraph;
+	private:
+		virtual void SetNodeTooltip() override;
 	public:
 
 		// --- Public Class Methods ---
 		MainMaterialNode(Material* attached_material);
 		MainMaterialNode(Material* attached_material, uint id)
-			: MaterialNode("Main Node", MaterialNodeType::MAIN, id), m_AttachedMaterial(attached_material) {}
+			: MaterialNode("Main Node", MaterialNodeType::MAIN, id), m_AttachedMaterial(attached_material) { SetNodeTooltip(); }
 
 		~MainMaterialNode();
 
@@ -205,11 +211,14 @@ namespace Kaimos::MaterialEditor {
 	// ---- Vertex Parameter Node ----
 	class VertexParameterMaterialNode : public MaterialNode
 	{
+	private:
+		virtual void SetNodeVariables() override;
+		virtual void SetNodeTooltip() override;
 	public:
 
 		VertexParameterMaterialNode(VertexParameterNodeType parameter_type);
 		VertexParameterMaterialNode(const std::string& name, VertexParameterNodeType parameter_type, uint id)
-			: MaterialNode(name, MaterialNodeType::VERTEX_PARAMETER, id), m_ParameterType(parameter_type) {}
+			: MaterialNode(name, MaterialNodeType::VERTEX_PARAMETER, id), m_ParameterType(parameter_type) { SetNodeVariables(); }
 		
 		void SetNodeOutputResult(const glm::vec4& value);
 		virtual void AddOutputPin(PinDataType pin_data_type, const std::string& name, float default_value = 1.0f) override;
@@ -229,11 +238,14 @@ namespace Kaimos::MaterialEditor {
 	// ---- Constant Node ----
 	class ConstantMaterialNode : public MaterialNode
 	{
+	private:
+		virtual void SetNodeVariables() override;
+		virtual void SetNodeTooltip() override;
 	public:
 
 		ConstantMaterialNode(ConstantNodeType constant_type);
 		ConstantMaterialNode(const std::string& name, ConstantNodeType constant_type, uint id)
-			: MaterialNode(name, MaterialNodeType::CONSTANT, id), m_ConstantType(constant_type) {}
+			: MaterialNode(name, MaterialNodeType::CONSTANT, id), m_ConstantType(constant_type) { SetNodeVariables(); }
 
 		bool IsTimeNode() const { return m_ConstantType == ConstantNodeType::DELTATIME; }
 
@@ -250,14 +262,19 @@ namespace Kaimos::MaterialEditor {
 	// ---- Operation Node ----
 	class OperationMaterialNode : public MaterialNode
 	{
+	private:
+		virtual void SetNodeVariables() override;
+		virtual void SetNodeTooltip() override;
 	public:
 
 		OperationMaterialNode(OperationNodeType operation_type, PinDataType operation_data_type);
 		OperationMaterialNode(const std::string& name, OperationNodeType operation_type, PinDataType vec_operation_type, uint id)
-			: MaterialNode(name, MaterialNodeType::OPERATION, id), m_OperationType(operation_type), m_VecOperationType(vec_operation_type) {}
+			: MaterialNode(name, MaterialNodeType::OPERATION, id), m_OperationType(operation_type), m_VecOperationType(vec_operation_type) { SetNodeVariables(); }
 
 		OperationNodeType GetOperationType() const { return m_OperationType; }
 		PinDataType GetVecOperationType() const { return m_VecOperationType; }
+
+		void AddExtraInputPin();
 
 	private:
 
@@ -275,12 +292,15 @@ namespace Kaimos::MaterialEditor {
 	// ---- Special Operation Node ----
 	class SpecialOperationNode : public MaterialNode
 	{
+	private:
+		virtual void SetNodeVariables() override;
+		virtual void SetNodeTooltip() override;
 	public:
 
 		SpecialOperationNode(SpecialOperationNodeType operation_type, PinDataType operation_data_type);
 		SpecialOperationNode(const std::string& name, SpecialOperationNodeType operation_type, uint id, uint inputs_n, PinDataType op_out_type)
 			: MaterialNode(name, MaterialNodeType::SPECIAL_OPERATION, id)
-			, m_OperationType(operation_type), m_InputsN(inputs_n), m_OperationOutputType(op_out_type) {}
+			, m_OperationType(operation_type), m_InputsN(inputs_n), m_OperationOutputType(op_out_type) { SetNodeVariables(); }
 
 		SpecialOperationNodeType GetOperationType() const { return m_OperationType; }
 
@@ -288,6 +308,7 @@ namespace Kaimos::MaterialEditor {
 
 		virtual glm::vec4 CalculateNodeResult() override;
 		virtual void SerializeNode(YAML::Emitter& output_emitter) const override;
+
 		glm::vec4 ProcessOperation(PinDataType op_type, const glm::vec4& a, const glm::vec4& b = glm::vec4(0.0f), const glm::vec4& c = glm::vec4(0.0f)) const;
 
 		// vec_comp must be VEC_X, VEC_Y, VEC_Z or VEC_W
