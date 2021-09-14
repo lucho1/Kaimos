@@ -1,0 +1,42 @@
+KaimosSaveFile: KaimosResources
+Models:
+  - Model: 1034409430
+    Path: assets\models\Cube.fbx
+    RootMesh:
+      Mesh: 1608911527
+      Name: Cube
+      Material: 1049825518
+      Submeshes:
+        []
+  - Model: 1975875678
+    Path: assets\models\Sphere.FBX
+    RootMesh:
+      Mesh: 702618780
+      Name: Sphere
+      Material: 1049825518
+      Submeshes:
+        []
+  - Model: 959796597
+    Path: assets\models\Plane.FBX
+    RootMesh:
+      Mesh: 1094153259
+      Name: Plane
+      Material: 1049825518
+      Submeshes:
+        []
+  - Model: 1549354693
+    Path: assets\models\bakerhouse\BakerHouse.fbx
+    RootMesh:
+      Mesh: 1085828767
+      Name: BakerHouse
+      Material: 2008691940
+      Submeshes:
+        []
+  - Model: 246663808
+    Path: assets\models\SkinnedHead\head.OBJ
+    RootMesh:
+      Mesh: 536106025
+      Name: SkinnedHead
+      Material: 1793989737
+      Submeshes:
+        []
