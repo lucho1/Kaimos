@@ -1,0 +1,1621 @@
+KaimosSaveFile: KaimosRenderer
+DefaultMaterialID: 1049825518
+Materials:
+  - Material: 1049825518
+    Name: DefaultMaterial
+    AttachedGraph:
+      MaterialGraph: 464095264
+      MainRootNode:
+        TextureFile: ""
+        NormalTextureFile: ""
+        SpecularTextureFile: ""
+        Node: 1823861949
+        Name: Main Node
+        Type: 1
+        InputPins:
+          - Pin: 1960670658
+            Name: Roughness (Float)
+            DataType: 1
+            Value: [0.5, 0.5, 0.5, 0.5]
+            AllowsMultipleTypes: false
+            DefValue: [0.5, 0.5, 0.5, 0.5]
+          - Pin: 2041244107
+            Name: Metallic (Float)
+            DataType: 1
+            Value: [0.5, 0.5, 0.5, 0.5]
+            AllowsMultipleTypes: false
+            DefValue: [0.5, 0.5, 0.5, 0.5]
+          - Pin: 932197120
+            Name: Amb. Occ. (Float)
+            DataType: 1
+            Value: [0.200000003, 0.200000003, 0.200000003, 0.200000003]
+            AllowsMultipleTypes: false
+            DefValue: [0.200000003, 0.200000003, 0.200000003, 0.200000003]
+          - Pin: 1663170875
+            Name: Roughness (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 1404542984
+            Name: Metallic (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 199254090
+            Name: Amb. Occ. (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 270511700
+            Name: Roughness (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 867160626
+            Name: Metallic (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 972928775
+            Name: Amb. Occ. (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 415333830
+            Name: Specularity (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 2134438034
+            Name: Bumpiness (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 1092370698
+            Name: Specularity (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 1322478559
+            Name: Bumpiness (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 855522715
+            Name: Smoothness (Float)
+            DataType: 1
+            Value: [0.5, 0.5, 0.5, 0.5]
+            AllowsMultipleTypes: false
+            DefValue: [0.5, 0.5, 0.5, 0.5]
+          - Pin: 560444448
+            Name: Vertex Position (Vec3)
+            DataType: 4
+            Value: [0, 0, 0, 0]
+            AllowsMultipleTypes: false
+            DefValue: [0, 0, 0, 0]
+          - Pin: 1546704399
+            Name: Vertex Normal (Vec3)
+            DataType: 4
+            Value: [0, 0, 0, 0]
+            AllowsMultipleTypes: false
+            DefValue: [0, 0, 0, 0]
+          - Pin: 1943800770
+            Name: Texture Coordinates (Vec2)
+            DataType: 3
+            Value: [0, 0, 0, 0]
+            AllowsMultipleTypes: false
+            DefValue: [0, 0, 0, 0]
+          - Pin: 1294205302
+            Name: Color (Vec4)
+            DataType: 5
+            Value: [65025, 65025, 65025, 65025]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+      Nodes:
+        - Node: 1321728223
+          Name: VertexPos
+          Type: 2
+          OutputPin:
+            Pin: 995221499
+            Name: XYZ (Vec3)
+            DataType: 4
+            Value: [100, 100.000015, 99.9999847, 0]
+            IsVertexParam: true
+            InputPinsLinkedIDs:
+              - 560444448
+          InputPins:
+            []
+          VParamNodeType: 2
+        - Node: 605704400
+          Name: VertexNorm
+          Type: 2
+          OutputPin:
+            Pin: 1824766588
+            Name: XYZ  (Vec3)
+            DataType: 4
+            Value: [0, 1, -1.62920671e-07, 0]
+            IsVertexParam: true
+            InputPinsLinkedIDs:
+              - 1546704399
+          InputPins:
+            []
+          VParamNodeType: 3
+        - Node: 1211971116
+          Name: TCoords
+          Type: 2
+          OutputPin:
+            Pin: 1751024334
+            Name: XY (Vec2)
+            DataType: 3
+            Value: [0.625, 0.25, 0, 0]
+            IsVertexParam: true
+            InputPinsLinkedIDs:
+              - 1943800770
+          InputPins:
+            []
+          VParamNodeType: 1
+  - Material: 676505225
+    Name: GreenCheckeredMaterial
+    AttachedGraph:
+      MaterialGraph: 321416116
+      MainRootNode:
+        TextureFile: assets\textures\Checkerboard.png
+        NormalTextureFile: ""
+        SpecularTextureFile: ""
+        Node: 1072906908
+        Name: Main Node
+        Type: 1
+        InputPins:
+          - Pin: 340384168
+            Name: Roughness (Float)
+            DataType: 1
+            Value: [0.5, 0.5, 0.5, 0.5]
+            AllowsMultipleTypes: false
+            DefValue: [0.5, 0.5, 0.5, 0.5]
+          - Pin: 380803747
+            Name: Metallic (Float)
+            DataType: 1
+            Value: [0.5, 0.5, 0.5, 0.5]
+            AllowsMultipleTypes: false
+            DefValue: [0.5, 0.5, 0.5, 0.5]
+          - Pin: 1797254964
+            Name: Amb. Occ. (Float)
+            DataType: 1
+            Value: [0.200000003, 0.200000003, 0.200000003, 0.200000003]
+            AllowsMultipleTypes: false
+            DefValue: [0.200000003, 0.200000003, 0.200000003, 0.200000003]
+          - Pin: 1672301086
+            Name: Roughness (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 235869781
+            Name: Metallic (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 406031408
+            Name: Amb. Occ. (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 995661586
+            Name: Roughness (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 1430693969
+            Name: Metallic (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 1840494238
+            Name: Amb. Occ. (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 544512409
+            Name: Specularity (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 1201323745
+            Name: Bumpiness (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 145492624
+            Name: Specularity (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 573504324
+            Name: Bumpiness (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 1033409967
+            Name: Smoothness (Float)
+            DataType: 1
+            Value: [0.5, 0.5, 0.5, 0.5]
+            AllowsMultipleTypes: false
+            DefValue: [0.5, 0.5, 0.5, 0.5]
+          - Pin: 626130312
+            Name: Vertex Position (Vec3)
+            DataType: 4
+            Value: [-0.5, 0.5, 0, 0]
+            AllowsMultipleTypes: false
+            DefValue: [0, 0, 0, 0]
+          - Pin: 1640273208
+            Name: Vertex Normal (Vec3)
+            DataType: 4
+            Value: [0, 0, 1, 0]
+            AllowsMultipleTypes: false
+            DefValue: [0, 0, 0, 0]
+          - Pin: 1301937836
+            Name: Texture Coordinates (Vec2)
+            DataType: 3
+            Value: [0, 1, 0, 0]
+            AllowsMultipleTypes: false
+            DefValue: [0, 0, 0, 0]
+          - Pin: 1578901485
+            Name: Color (Vec4)
+            DataType: 5
+            Value: [255, 254.997452, 254.997452, 65025]
+            AllowsMultipleTypes: false
+            DefValue: [255, 254.997452, 254.997452, 65025]
+      Nodes:
+        - Node: 136623076
+          Name: VertexPos
+          Type: 2
+          OutputPin:
+            Pin: 69909805
+            Name: XYZ (Vec3)
+            DataType: 4
+            Value: [-0.5, 0.5, 0, 0]
+            IsVertexParam: true
+            InputPinsLinkedIDs:
+              - 626130312
+          InputPins:
+            []
+          VParamNodeType: 2
+        - Node: 1660487098
+          Name: VertexNorm
+          Type: 2
+          OutputPin:
+            Pin: 1817323721
+            Name: XYZ  (Vec3)
+            DataType: 4
+            Value: [0, 0, 1, 0]
+            IsVertexParam: true
+            InputPinsLinkedIDs:
+              - 1640273208
+          InputPins:
+            []
+          VParamNodeType: 3
+        - Node: 119309160
+          Name: TCoords
+          Type: 2
+          OutputPin:
+            Pin: 893622623
+            Name: XY (Vec2)
+            DataType: 3
+            Value: [0, 1, 0, 0]
+            IsVertexParam: true
+            InputPinsLinkedIDs:
+              - 1301937836
+          InputPins:
+            []
+          VParamNodeType: 1
+  - Material: 1911314598
+    Name: DarkBlueMaterial
+    AttachedGraph:
+      MaterialGraph: 861830923
+      MainRootNode:
+        TextureFile: ""
+        NormalTextureFile: ""
+        SpecularTextureFile: ""
+        Node: 1326440861
+        Name: Main Node
+        Type: 1
+        InputPins:
+          - Pin: 1980564555
+            Name: Roughness (Float)
+            DataType: 1
+            Value: [0.5, 0.5, 0.5, 0.5]
+            AllowsMultipleTypes: false
+            DefValue: [0.5, 0.5, 0.5, 0.5]
+          - Pin: 453038312
+            Name: Metallic (Float)
+            DataType: 1
+            Value: [0.5, 0.5, 0.5, 0.5]
+            AllowsMultipleTypes: false
+            DefValue: [0.5, 0.5, 0.5, 0.5]
+          - Pin: 1882039628
+            Name: Amb. Occ. (Float)
+            DataType: 1
+            Value: [0.200000003, 0.200000003, 0.200000003, 0.200000003]
+            AllowsMultipleTypes: false
+            DefValue: [0.200000003, 0.200000003, 0.200000003, 0.200000003]
+          - Pin: 723143114
+            Name: Roughness (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 1085505737
+            Name: Metallic (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 892047405
+            Name: Amb. Occ. (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 1045347636
+            Name: Roughness (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 1725219788
+            Name: Metallic (Float)
+            DataType: 1
+            Value: [0.00999999978, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [0.00999999978, 1, 1, 1]
+          - Pin: 2025282764
+            Name: Amb. Occ. (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 1514340338
+            Name: Specularity (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 1132062945
+            Name: Bumpiness (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 878320007
+            Name: Specularity (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 1557673912
+            Name: Bumpiness (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 1496110329
+            Name: Smoothness (Float)
+            DataType: 1
+            Value: [0.5, 0.5, 0.5, 0.5]
+            AllowsMultipleTypes: false
+            DefValue: [0.5, 0.5, 0.5, 0.5]
+          - Pin: 570638882
+            Name: Vertex Position (Vec3)
+            DataType: 4
+            Value: [0, -39.370079, 1.72092086e-06, 0]
+            AllowsMultipleTypes: false
+            DefValue: [0, 0, 0, 0]
+          - Pin: 443939548
+            Name: Vertex Normal (Vec3)
+            DataType: 4
+            Value: [2.69408718e-09, -1, 2.93429228e-08, 0]
+            AllowsMultipleTypes: false
+            DefValue: [0, 0, 0, 0]
+          - Pin: 978748983
+            Name: Texture Coordinates (Vec2)
+            DataType: 3
+            Value: [0.968750179, 1.00000012, 0, 0]
+            AllowsMultipleTypes: false
+            DefValue: [0, 0, 0, 0]
+          - Pin: 734547385
+            Name: Color (Vec4)
+            DataType: 5
+            Value: [0, 5.13525724, 255, 65025]
+            AllowsMultipleTypes: false
+            DefValue: [0, 5.13525724, 255, 65025]
+      Nodes:
+        - Node: 1999425850
+          Name: VertexPos
+          Type: 2
+          OutputPin:
+            Pin: 903612693
+            Name: XYZ (Vec3)
+            DataType: 4
+            Value: [-0.5, 0.5, 0, 0]
+            IsVertexParam: true
+            InputPinsLinkedIDs:
+              - 570638882
+          InputPins:
+            []
+          VParamNodeType: 2
+        - Node: 1971536927
+          Name: VertexNorm
+          Type: 2
+          OutputPin:
+            Pin: 2024822787
+            Name: XYZ  (Vec3)
+            DataType: 4
+            Value: [0, 0, 1, 0]
+            IsVertexParam: true
+            InputPinsLinkedIDs:
+              - 443939548
+          InputPins:
+            []
+          VParamNodeType: 3
+        - Node: 430108545
+          Name: TCoords
+          Type: 2
+          OutputPin:
+            Pin: 1383058147
+            Name: XY (Vec2)
+            DataType: 3
+            Value: [0, 1, 0, 0]
+            IsVertexParam: true
+            InputPinsLinkedIDs:
+              - 978748983
+          InputPins:
+            []
+          VParamNodeType: 1
+  - Material: 1169275854
+    Name: ChernoMaterial
+    AttachedGraph:
+      MaterialGraph: 876177254
+      MainRootNode:
+        TextureFile: assets\textures\ChernoLogo.png
+        NormalTextureFile: ""
+        SpecularTextureFile: ""
+        Node: 1151624965
+        Name: Main Node
+        Type: 1
+        InputPins:
+          - Pin: 1097764461
+            Name: Roughness (Float)
+            DataType: 1
+            Value: [0.5, 0.5, 0.5, 0.5]
+            AllowsMultipleTypes: false
+            DefValue: [0.5, 0.5, 0.5, 0.5]
+          - Pin: 1393421895
+            Name: Metallic (Float)
+            DataType: 1
+            Value: [0.5, 0.5, 0.5, 0.5]
+            AllowsMultipleTypes: false
+            DefValue: [0.5, 0.5, 0.5, 0.5]
+          - Pin: 475352835
+            Name: Amb. Occ. (Float)
+            DataType: 1
+            Value: [0.200000003, 0.200000003, 0.200000003, 0.200000003]
+            AllowsMultipleTypes: false
+            DefValue: [0.200000003, 0.200000003, 0.200000003, 0.200000003]
+          - Pin: 179491721
+            Name: Roughness (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 1857300067
+            Name: Metallic (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 505651791
+            Name: Amb. Occ. (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 994624084
+            Name: Roughness (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 1562818216
+            Name: Metallic (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 613760593
+            Name: Amb. Occ. (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 323150464
+            Name: Specularity (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 1737436842
+            Name: Bumpiness (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 462491393
+            Name: Specularity (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 899086650
+            Name: Bumpiness (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 1842917227
+            Name: Smoothness (Float)
+            DataType: 1
+            Value: [0.5, 0.5, 0.5, 0.5]
+            AllowsMultipleTypes: false
+            DefValue: [0.5, 0.5, 0.5, 0.5]
+          - Pin: 1063844372
+            Name: Vertex Position (Vec3)
+            DataType: 4
+            Value: [-0.5, 0.5, 0, 0]
+            AllowsMultipleTypes: false
+            DefValue: [0, 0, 0, 0]
+          - Pin: 552182889
+            Name: Vertex Normal (Vec3)
+            DataType: 4
+            Value: [0, 0, 1, 0]
+            AllowsMultipleTypes: false
+            DefValue: [0, 0, 0, 0]
+          - Pin: 1160227781
+            Name: Texture Coordinates (Vec2)
+            DataType: 3
+            Value: [0, 1, 0, 0]
+            AllowsMultipleTypes: false
+            DefValue: [0, 0, 0, 0]
+          - Pin: 804012023
+            Name: Color (Vec4)
+            DataType: 5
+            Value: [255, 254.997452, 254.997452, 65025]
+            AllowsMultipleTypes: false
+            DefValue: [255, 254.997452, 254.997452, 65025]
+      Nodes:
+        - Node: 2133377961
+          Name: VertexNorm
+          Type: 2
+          OutputPin:
+            Pin: 1014325554
+            Name: XYZ  (Vec3)
+            DataType: 4
+            Value: [0, 0, 1, 0]
+            IsVertexParam: true
+            InputPinsLinkedIDs:
+              - 552182889
+          InputPins:
+            []
+          VParamNodeType: 3
+        - Node: 1121189017
+          Name: TCoords
+          Type: 2
+          OutputPin:
+            Pin: 1099301581
+            Name: XY (Vec2)
+            DataType: 3
+            Value: [0, 1, 0, 0]
+            IsVertexParam: true
+            InputPinsLinkedIDs:
+              - 1160227781
+          InputPins:
+            []
+          VParamNodeType: 1
+        - Node: 778318221
+          Name: VertexPos
+          Type: 2
+          OutputPin:
+            Pin: 571826210
+            Name: XYZ (Vec3)
+            DataType: 4
+            Value: [-0.5, 0.5, 0, 0]
+            IsVertexParam: true
+            InputPinsLinkedIDs:
+              - 1063844372
+          InputPins:
+            []
+          VParamNodeType: 2
+  - Material: 1793989737
+    Name: headMat
+    AttachedGraph:
+      MaterialGraph: 1631171057
+      MainRootNode:
+        TextureFile: assets\models\SkinnedHead/lambertian.jpg
+        NormalTextureFile: ""
+        SpecularTextureFile: ""
+        Node: 2013763483
+        Name: Main Node
+        Type: 1
+        InputPins:
+          - Pin: 928334894
+            Name: Roughness (Float)
+            DataType: 1
+            Value: [0.5, 0.5, 0.5, 0.5]
+            AllowsMultipleTypes: false
+            DefValue: [0.5, 0.5, 0.5, 0.5]
+          - Pin: 986571263
+            Name: Metallic (Float)
+            DataType: 1
+            Value: [0.5, 0.5, 0.5, 0.5]
+            AllowsMultipleTypes: false
+            DefValue: [0.5, 0.5, 0.5, 0.5]
+          - Pin: 2044208017
+            Name: Amb. Occ. (Float)
+            DataType: 1
+            Value: [0.200000003, 0.200000003, 0.200000003, 0.200000003]
+            AllowsMultipleTypes: false
+            DefValue: [0.200000003, 0.200000003, 0.200000003, 0.200000003]
+          - Pin: 1251756988
+            Name: Roughness (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 1131187802
+            Name: Metallic (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 1271072170
+            Name: Amb. Occ. (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 712163733
+            Name: Roughness (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 2145886829
+            Name: Metallic (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 1463522246
+            Name: Amb. Occ. (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 690497754
+            Name: Specularity (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 637491823
+            Name: Bumpiness (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 1031176992
+            Name: Specularity (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 892538857
+            Name: Bumpiness (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 546883342
+            Name: Smoothness (Float)
+            DataType: 1
+            Value: [0.5, 0.5, 0.5, 0.5]
+            AllowsMultipleTypes: false
+            DefValue: [0.5, 0.5, 0.5, 0.5]
+          - Pin: 1555299361
+            Name: Vertex Position (Vec3)
+            DataType: 4
+            Value: [0, -39.370079, 1.72092086e-06, 0]
+            AllowsMultipleTypes: false
+            DefValue: [0, 0, 0, 0]
+          - Pin: 168872482
+            Name: Vertex Normal (Vec3)
+            DataType: 4
+            Value: [2.69408718e-09, -1, 2.93429228e-08, 0]
+            AllowsMultipleTypes: false
+            DefValue: [0, 0, 0, 0]
+          - Pin: 1102972099
+            Name: Texture Coordinates (Vec2)
+            DataType: 3
+            Value: [0.968750179, 1.00000012, 0, 0]
+            AllowsMultipleTypes: false
+            DefValue: [0, 0, 0, 0]
+          - Pin: 1398755303
+            Name: Color (Vec4)
+            DataType: 5
+            Value: [65025, 65025, 65025, 65025]
+            AllowsMultipleTypes: false
+            DefValue: [0.600000024, 0.600000024, 0.600000024, 1]
+      Nodes:
+        - Node: 1600478168
+          Name: VertexPos
+          Type: 2
+          OutputPin:
+            Pin: 1257530421
+            Name: XYZ (Vec3)
+            DataType: 4
+            Value: [0, -39.370079, 1.72092086e-06, 0]
+            IsVertexParam: true
+            InputPinsLinkedIDs:
+              - 1555299361
+          InputPins:
+            []
+          VParamNodeType: 2
+        - Node: 247434181
+          Name: VertexNorm
+          Type: 2
+          OutputPin:
+            Pin: 326247447
+            Name: XYZ  (Vec3)
+            DataType: 4
+            Value: [2.69408718e-09, -1, 2.93429228e-08, 0]
+            IsVertexParam: true
+            InputPinsLinkedIDs:
+              - 168872482
+          InputPins:
+            []
+          VParamNodeType: 3
+        - Node: 1441939598
+          Name: TCoords
+          Type: 2
+          OutputPin:
+            Pin: 1726089075
+            Name: XY (Vec2)
+            DataType: 3
+            Value: [0.968750179, 1.00000012, 0, 0]
+            IsVertexParam: true
+            InputPinsLinkedIDs:
+              - 1102972099
+          InputPins:
+            []
+          VParamNodeType: 1
+  - Material: 1703891235
+    Name: LightBlueMaterial
+    AttachedGraph:
+      MaterialGraph: 1921307506
+      MainRootNode:
+        TextureFile: ""
+        NormalTextureFile: ""
+        SpecularTextureFile: ""
+        Node: 325474736
+        Name: Main Node
+        Type: 1
+        InputPins:
+          - Pin: 529679588
+            Name: Roughness (Float)
+            DataType: 1
+            Value: [0.5, 0.5, 0.5, 0.5]
+            AllowsMultipleTypes: false
+            DefValue: [0.5, 0.5, 0.5, 0.5]
+          - Pin: 1510222486
+            Name: Metallic (Float)
+            DataType: 1
+            Value: [0.5, 0.5, 0.5, 0.5]
+            AllowsMultipleTypes: false
+            DefValue: [0.5, 0.5, 0.5, 0.5]
+          - Pin: 467138517
+            Name: Amb. Occ. (Float)
+            DataType: 1
+            Value: [0.200000003, 0.200000003, 0.200000003, 0.200000003]
+            AllowsMultipleTypes: false
+            DefValue: [0.200000003, 0.200000003, 0.200000003, 0.200000003]
+          - Pin: 536890861
+            Name: Roughness (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 186690987
+            Name: Metallic (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 135898559
+            Name: Amb. Occ. (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 955232701
+            Name: Roughness (Float)
+            DataType: 1
+            Value: [0.219999999, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [0.219999999, 1, 1, 1]
+          - Pin: 1066044070
+            Name: Metallic (Float)
+            DataType: 1
+            Value: [0.00999999978, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [0.00999999978, 1, 1, 1]
+          - Pin: 1092237903
+            Name: Amb. Occ. (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 2017906979
+            Name: Specularity (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 1002844415
+            Name: Bumpiness (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 46850076
+            Name: Specularity (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 487839946
+            Name: Bumpiness (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 119005709
+            Name: Smoothness (Float)
+            DataType: 1
+            Value: [0.5, 0.5, 0.5, 0.5]
+            AllowsMultipleTypes: false
+            DefValue: [0.5, 0.5, 0.5, 0.5]
+          - Pin: 1336218933
+            Name: Vertex Position (Vec3)
+            DataType: 4
+            Value: [0, -39.370079, 1.72092086e-06, 0]
+            AllowsMultipleTypes: false
+            DefValue: [0, 0, 0, 0]
+          - Pin: 81506064
+            Name: Vertex Normal (Vec3)
+            DataType: 4
+            Value: [2.69408718e-09, -1, 2.93429228e-08, 0]
+            AllowsMultipleTypes: false
+            DefValue: [0, 0, 0, 0]
+          - Pin: 1638909631
+            Name: Texture Coordinates (Vec2)
+            DataType: 3
+            Value: [0.968750179, 1.00000012, 0, 0]
+            AllowsMultipleTypes: false
+            DefValue: [0, 0, 0, 0]
+          - Pin: 1890143709
+            Name: Color (Vec4)
+            DataType: 5
+            Value: [0, 255, 229.196411, 255]
+            AllowsMultipleTypes: false
+            DefValue: [0, 255, 229.196411, 255]
+      Nodes:
+        - Node: 1930458051
+          Name: VertexPos
+          Type: 2
+          OutputPin:
+            Pin: 1372157598
+            Name: XYZ (Vec3)
+            DataType: 4
+            Value: [-0.5, 0.5, 0, 0]
+            IsVertexParam: true
+            InputPinsLinkedIDs:
+              - 1336218933
+          InputPins:
+            []
+          VParamNodeType: 2
+        - Node: 1525608285
+          Name: VertexNorm
+          Type: 2
+          OutputPin:
+            Pin: 1780193443
+            Name: XYZ  (Vec3)
+            DataType: 4
+            Value: [0, 0, 1, 0]
+            IsVertexParam: true
+            InputPinsLinkedIDs:
+              - 81506064
+          InputPins:
+            []
+          VParamNodeType: 3
+        - Node: 641765044
+          Name: TCoords
+          Type: 2
+          OutputPin:
+            Pin: 2094617413
+            Name: XY (Vec2)
+            DataType: 3
+            Value: [0, 1, 0, 0]
+            IsVertexParam: true
+            InputPinsLinkedIDs:
+              - 1638909631
+          InputPins:
+            []
+          VParamNodeType: 1
+  - Material: 1165219968
+    Name: BlueMaterial
+    AttachedGraph:
+      MaterialGraph: 1681535055
+      MainRootNode:
+        TextureFile: ""
+        NormalTextureFile: ""
+        SpecularTextureFile: ""
+        Node: 169205499
+        Name: Main Node
+        Type: 1
+        InputPins:
+          - Pin: 521931372
+            Name: Roughness (Float)
+            DataType: 1
+            Value: [0.5, 0.5, 0.5, 0.5]
+            AllowsMultipleTypes: false
+            DefValue: [0.5, 0.5, 0.5, 0.5]
+          - Pin: 1705251563
+            Name: Metallic (Float)
+            DataType: 1
+            Value: [0.5, 0.5, 0.5, 0.5]
+            AllowsMultipleTypes: false
+            DefValue: [0.5, 0.5, 0.5, 0.5]
+          - Pin: 317808205
+            Name: Amb. Occ. (Float)
+            DataType: 1
+            Value: [0.200000003, 0.200000003, 0.200000003, 0.200000003]
+            AllowsMultipleTypes: false
+            DefValue: [0.200000003, 0.200000003, 0.200000003, 0.200000003]
+          - Pin: 446183909
+            Name: Roughness (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 486675392
+            Name: Metallic (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 324653401
+            Name: Amb. Occ. (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 399158987
+            Name: Roughness (Float)
+            DataType: 1
+            Value: [0.119999997, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [0.119999997, 1, 1, 1]
+          - Pin: 1268947692
+            Name: Metallic (Float)
+            DataType: 1
+            Value: [0.569999993, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [0.569999993, 1, 1, 1]
+          - Pin: 350702933
+            Name: Amb. Occ. (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 399927062
+            Name: Specularity (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 1778905704
+            Name: Bumpiness (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 597226214
+            Name: Specularity (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 941411478
+            Name: Bumpiness (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 1732676613
+            Name: Smoothness (Float)
+            DataType: 1
+            Value: [0.5, 0.5, 0.5, 0.5]
+            AllowsMultipleTypes: false
+            DefValue: [0.5, 0.5, 0.5, 0.5]
+          - Pin: 1465985725
+            Name: Vertex Position (Vec3)
+            DataType: 4
+            Value: [0, -39.370079, 1.72092086e-06, 0]
+            AllowsMultipleTypes: false
+            DefValue: [0, 0, 0, 0]
+          - Pin: 675368377
+            Name: Vertex Normal (Vec3)
+            DataType: 4
+            Value: [2.69408718e-09, -1, 2.93429228e-08, 0]
+            AllowsMultipleTypes: false
+            DefValue: [0, 0, 0, 0]
+          - Pin: 414937507
+            Name: Texture Coordinates (Vec2)
+            DataType: 3
+            Value: [0.968750179, 1.00000012, 0, 0]
+            AllowsMultipleTypes: false
+            DefValue: [0, 0, 0, 0]
+          - Pin: 396413956
+            Name: Color (Vec4)
+            DataType: 5
+            Value: [0, 25.2632332, 255, 255]
+            AllowsMultipleTypes: false
+            DefValue: [0, 25.2632332, 255, 255]
+      Nodes:
+        - Node: 563992205
+          Name: VertexPos
+          Type: 2
+          OutputPin:
+            Pin: 115866906
+            Name: XYZ (Vec3)
+            DataType: 4
+            Value: [-0.5, 0.5, 0, 0]
+            IsVertexParam: true
+            InputPinsLinkedIDs:
+              - 1465985725
+          InputPins:
+            []
+          VParamNodeType: 2
+        - Node: 1193848341
+          Name: VertexNorm
+          Type: 2
+          OutputPin:
+            Pin: 1013460333
+            Name: XYZ  (Vec3)
+            DataType: 4
+            Value: [0, 0, 1, 0]
+            IsVertexParam: true
+            InputPinsLinkedIDs:
+              - 675368377
+          InputPins:
+            []
+          VParamNodeType: 3
+        - Node: 1546157306
+          Name: TCoords
+          Type: 2
+          OutputPin:
+            Pin: 374083269
+            Name: XY (Vec2)
+            DataType: 3
+            Value: [0, 1, 0, 0]
+            IsVertexParam: true
+            InputPinsLinkedIDs:
+              - 414937507
+          InputPins:
+            []
+          VParamNodeType: 1
+  - Material: 1847285407
+    Name: WallCube
+    AttachedGraph:
+      MaterialGraph: 749430907
+      MainRootNode:
+        TextureFile: assets\textures\brickwall.jpg
+        NormalTextureFile: assets\textures\brickwall_normal.jpg
+        SpecularTextureFile: ""
+        Node: 1935266663
+        Name: Main Node
+        Type: 1
+        InputPins:
+          - Pin: 641852862
+            Name: Roughness (Float)
+            DataType: 1
+            Value: [0.5, 0.5, 0.5, 0.5]
+            AllowsMultipleTypes: false
+            DefValue: [0.5, 0.5, 0.5, 0.5]
+          - Pin: 1698038946
+            Name: Metallic (Float)
+            DataType: 1
+            Value: [0.5, 0.5, 0.5, 0.5]
+            AllowsMultipleTypes: false
+            DefValue: [0.5, 0.5, 0.5, 0.5]
+          - Pin: 471601063
+            Name: Amb. Occ. (Float)
+            DataType: 1
+            Value: [0.200000003, 0.200000003, 0.200000003, 0.200000003]
+            AllowsMultipleTypes: false
+            DefValue: [0.200000003, 0.200000003, 0.200000003, 0.200000003]
+          - Pin: 1675776096
+            Name: Roughness (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 1098942313
+            Name: Metallic (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 2036395172
+            Name: Amb. Occ. (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 2130096854
+            Name: Roughness (Float)
+            DataType: 1
+            Value: [0.330000013, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [0.330000013, 1, 1, 1]
+          - Pin: 1107552988
+            Name: Metallic (Float)
+            DataType: 1
+            Value: [0.00999999978, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [0.00999999978, 1, 1, 1]
+          - Pin: 1117963022
+            Name: Amb. Occ. (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 629666180
+            Name: Specularity (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 1472295818
+            Name: Bumpiness (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 49
+            Name: Specularity (Float)
+            DataType: 1
+            Value: [1.08000004, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1.08000004, 1, 1, 1]
+          - Pin: 2028770363
+            Name: Bumpiness (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 1036254025
+            Name: Smoothness (Float)
+            DataType: 1
+            Value: [0.0900000036, 0.5, 0.5, 0.5]
+            AllowsMultipleTypes: false
+            DefValue: [0.0900000036, 0.5, 0.5, 0.5]
+          - Pin: 1096423134
+            Name: Vertex Position (Vec3)
+            DataType: 4
+            Value: [0, -39.370079, 1.72092086e-06, 0]
+            AllowsMultipleTypes: false
+            DefValue: [0, 0, 0, 0]
+          - Pin: 710740875
+            Name: Vertex Normal (Vec3)
+            DataType: 4
+            Value: [2.69408718e-09, -1, 2.93429228e-08, 0]
+            AllowsMultipleTypes: false
+            DefValue: [0, 0, 0, 0]
+          - Pin: 1288413294
+            Name: Texture Coordinates (Vec2)
+            DataType: 3
+            Value: [0.968750179, 1.00000012, 0, 0]
+            AllowsMultipleTypes: false
+            DefValue: [0, 0, 0, 0]
+          - Pin: 1742812302
+            Name: Color (Vec4)
+            DataType: 5
+            Value: [255, 254.997452, 254.997452, 255]
+            AllowsMultipleTypes: false
+            DefValue: [255, 254.997452, 254.997452, 255]
+      Nodes:
+        - Node: 1682350097
+          Name: VertexPos
+          Type: 2
+          OutputPin:
+            Pin: 407896517
+            Name: XYZ (Vec3)
+            DataType: 4
+            Value: [100, 100.000015, 99.9999847, 0]
+            IsVertexParam: true
+            InputPinsLinkedIDs:
+              - 1096423134
+          InputPins:
+            []
+          VParamNodeType: 2
+        - Node: 304213046
+          Name: VertexNorm
+          Type: 2
+          OutputPin:
+            Pin: 1027878752
+            Name: XYZ  (Vec3)
+            DataType: 4
+            Value: [0, 1, -1.62920671e-07, 0]
+            IsVertexParam: true
+            InputPinsLinkedIDs:
+              - 710740875
+          InputPins:
+            []
+          VParamNodeType: 3
+        - Node: 743313885
+          Name: TCoords
+          Type: 2
+          OutputPin:
+            Pin: 1546468070
+            Name: XY (Vec2)
+            DataType: 3
+            Value: [0.625, 0.25, 0, 0]
+            IsVertexParam: true
+            InputPinsLinkedIDs:
+              - 1288413294
+          InputPins:
+            []
+          VParamNodeType: 1
+  - Material: 2008691940
+    Name: Baker_house
+    AttachedGraph:
+      MaterialGraph: 93504989
+      MainRootNode:
+        TextureFile: assets\models\bakerhouse/Baker_house.png
+        NormalTextureFile: ""
+        SpecularTextureFile: ""
+        Node: 80772160
+        Name: Main Node
+        Type: 1
+        InputPins:
+          - Pin: 42605918
+            Name: Roughness (Float)
+            DataType: 1
+            Value: [0.5, 0.5, 0.5, 0.5]
+            AllowsMultipleTypes: false
+            DefValue: [0.5, 0.5, 0.5, 0.5]
+          - Pin: 415293455
+            Name: Metallic (Float)
+            DataType: 1
+            Value: [0.5, 0.5, 0.5, 0.5]
+            AllowsMultipleTypes: false
+            DefValue: [0.5, 0.5, 0.5, 0.5]
+          - Pin: 618285089
+            Name: Amb. Occ. (Float)
+            DataType: 1
+            Value: [0.200000003, 0.200000003, 0.200000003, 0.200000003]
+            AllowsMultipleTypes: false
+            DefValue: [0.200000003, 0.200000003, 0.200000003, 0.200000003]
+          - Pin: 809294517
+            Name: Roughness (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 1663724463
+            Name: Metallic (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 809022879
+            Name: Amb. Occ. (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 452600616
+            Name: Roughness (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 345511526
+            Name: Metallic (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 1508136361
+            Name: Amb. Occ. (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 1876438594
+            Name: Specularity (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 973338522
+            Name: Bumpiness (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 949531490
+            Name: Specularity (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 1327900582
+            Name: Bumpiness (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 1338595424
+            Name: Smoothness (Float)
+            DataType: 1
+            Value: [0.5, 0.5, 0.5, 0.5]
+            AllowsMultipleTypes: false
+            DefValue: [0.5, 0.5, 0.5, 0.5]
+          - Pin: 64428721
+            Name: Vertex Position (Vec3)
+            DataType: 4
+            Value: [71.6699142, -38.5306206, -199.866791, 0]
+            AllowsMultipleTypes: false
+            DefValue: [0, 0, 0, 0]
+          - Pin: 86380808
+            Name: Vertex Normal (Vec3)
+            DataType: 4
+            Value: [4.52108679e-06, 1, 2.92887936e-09, 0]
+            AllowsMultipleTypes: false
+            DefValue: [0, 0, 0, 0]
+          - Pin: 886496060
+            Name: Texture Coordinates (Vec2)
+            DataType: 3
+            Value: [0.505023897, 0.400630236, 0, 0]
+            AllowsMultipleTypes: false
+            DefValue: [0, 0, 0, 0]
+          - Pin: 330288007
+            Name: Color (Vec4)
+            DataType: 5
+            Value: [65025, 65025, 65025, 65025]
+            AllowsMultipleTypes: false
+            DefValue: [0.470400006, 0.470400006, 0.470400006, 1]
+      Nodes:
+        - Node: 82510913
+          Name: VertexPos
+          Type: 2
+          OutputPin:
+            Pin: 99588217
+            Name: XYZ (Vec3)
+            DataType: 4
+            Value: [71.6699142, -38.5306206, -199.866791, 0]
+            IsVertexParam: true
+            InputPinsLinkedIDs:
+              - 64428721
+          InputPins:
+            []
+          VParamNodeType: 2
+        - Node: 1790618275
+          Name: VertexNorm
+          Type: 2
+          OutputPin:
+            Pin: 853693326
+            Name: XYZ  (Vec3)
+            DataType: 4
+            Value: [4.52108679e-06, 1, 2.92887936e-09, 0]
+            IsVertexParam: true
+            InputPinsLinkedIDs:
+              - 86380808
+          InputPins:
+            []
+          VParamNodeType: 3
+        - Node: 1816743316
+          Name: TCoords
+          Type: 2
+          OutputPin:
+            Pin: 2114527991
+            Name: XY (Vec2)
+            DataType: 3
+            Value: [0.505023897, 0.599369764, 0, 0]
+            IsVertexParam: true
+            InputPinsLinkedIDs:
+              - 886496060
+          InputPins:
+            []
+          VParamNodeType: 1
+  - Material: 1819530451
+    Name: ContainerMaterial
+    AttachedGraph:
+      MaterialGraph: 454677768
+      MainRootNode:
+        TextureFile: assets\textures\container.png
+        NormalTextureFile: ""
+        SpecularTextureFile: assets\textures\container_specular.png
+        Node: 1289598753
+        Name: Main Node
+        Type: 1
+        InputPins:
+          - Pin: 652943800
+            Name: Roughness (Float)
+            DataType: 1
+            Value: [0.5, 0.5, 0.5, 0.5]
+            AllowsMultipleTypes: false
+            DefValue: [0.5, 0.5, 0.5, 0.5]
+          - Pin: 859293389
+            Name: Metallic (Float)
+            DataType: 1
+            Value: [0.5, 0.5, 0.5, 0.5]
+            AllowsMultipleTypes: false
+            DefValue: [0.5, 0.5, 0.5, 0.5]
+          - Pin: 318516804
+            Name: Amb. Occ. (Float)
+            DataType: 1
+            Value: [0.200000003, 0.200000003, 0.200000003, 0.200000003]
+            AllowsMultipleTypes: false
+            DefValue: [0.200000003, 0.200000003, 0.200000003, 0.200000003]
+          - Pin: 1353512615
+            Name: Roughness (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 1303166867
+            Name: Metallic (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 1845614494
+            Name: Amb. Occ. (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 1474002874
+            Name: Roughness (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+          - Pin: 1597029545
+            Name: Metallic (Float)
+            DataType: 1
+            Value: [0.00999999978, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [0.00999999978, 1, 1, 1]
+          - Pin: 1543782300
+            Name: Amb. Occ. (Float)
+            DataType: 1
+            Value: [0.0399999991, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [0.0399999991, 1, 1, 1]
+          - Pin: 1734724941
+            Name: Vertex Position (Vec3)
+            DataType: 4
+            Value: [100, 100.000015, 99.9999847, 0]
+            AllowsMultipleTypes: false
+            DefValue: [0, 0, 0, 0]
+          - Pin: 1271066937
+            Name: Vertex Normal (Vec3)
+            DataType: 4
+            Value: [0, 1, -1.62920671e-07, 0]
+            AllowsMultipleTypes: false
+            DefValue: [0, 0, 0, 0]
+          - Pin: 1070594654
+            Name: Texture Coordinates (Vec2)
+            DataType: 3
+            Value: [0.625, 0.25, 0, 0]
+            AllowsMultipleTypes: false
+            DefValue: [0, 0, 0, 0]
+          - Pin: 545907540
+            Name: Color (Vec4)
+            DataType: 5
+            Value: [255, 254.997452, 254.997452, 255]
+            AllowsMultipleTypes: false
+            DefValue: [255, 254.997452, 254.997452, 255]
+          - Pin: 1417595192
+            Name: Smoothness (Float)
+            DataType: 1
+            Value: [0.340000004, 0.5, 0.5, 0.5]
+            AllowsMultipleTypes: false
+            DefValue: [0.340000004, 0.5, 0.5, 0.5]
+          - Pin: 1755854132
+            Name: Specularity (Float)
+            DataType: 1
+            Value: [13.1700001, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [13.1700001, 1, 1, 1]
+          - Pin: 580779233
+            Name: Bumpiness (Float)
+            DataType: 1
+            Value: [1, 1, 1, 1]
+            AllowsMultipleTypes: false
+            DefValue: [1, 1, 1, 1]
+      Nodes:
+        - Node: 758195432
+          Name: VertexPos
+          Type: 2
+          OutputPin:
+            Pin: 1268467289
+            Name: XYZ (Vec3)
+            DataType: 4
+            Value: [-0.5, 0.5, 0, 0]
+            IsVertexParam: true
+            InputPinsLinkedIDs:
+              - 1734724941
+          InputPins:
+            []
+          VParamNodeType: 2
+        - Node: 139984777
+          Name: VertexNorm
+          Type: 2
+          OutputPin:
+            Pin: 682722362
+            Name: XYZ  (Vec3)
+            DataType: 4
+            Value: [0, 0, 1, 0]
+            IsVertexParam: true
+            InputPinsLinkedIDs:
+              - 1271066937
+          InputPins:
+            []
+          VParamNodeType: 3
+        - Node: 716618297
+          Name: TCoords
+          Type: 2
+          OutputPin:
+            Pin: 1133663
+            Name: XY (Vec2)
+            DataType: 3
+            Value: [0, 1, 0, 0]
+            IsVertexParam: true
+            InputPinsLinkedIDs:
+              - 1070594654
+          InputPins:
+            []
+          VParamNodeType: 1

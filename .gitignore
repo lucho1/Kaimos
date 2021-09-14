@@ -9,7 +9,7 @@ bin-int/
 **.vcxproj
 **.vcxproj.filters
 **.vcxproj.user
-**.ini
+#**.ini
 **.sln
 
 # Unnecessary Files
@@ -18,4 +18,4 @@ bin-int/
 *.json
 *.psd
 #*.kaimos
-*.kaimossave
+#*.kaimossave
