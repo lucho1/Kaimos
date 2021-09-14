@@ -9,6 +9,9 @@ Materials:
         TextureFile: ""
         NormalTextureFile: ""
         SpecularTextureFile: ""
+        RoughnessTextureFile: ""
+        MetallicTextureFile: ""
+        AmbientOccTextureFile: ""
         Node: 1823861949
         Name: Main Node
         Type: 1
@@ -172,6 +175,9 @@ Materials:
         TextureFile: assets\textures\Checkerboard.png
         NormalTextureFile: ""
         SpecularTextureFile: ""
+        RoughnessTextureFile: ""
+        MetallicTextureFile: ""
+        AmbientOccTextureFile: ""
         Node: 1072906908
         Name: Main Node
         Type: 1
@@ -335,6 +341,9 @@ Materials:
         TextureFile: ""
         NormalTextureFile: ""
         SpecularTextureFile: ""
+        RoughnessTextureFile: ""
+        MetallicTextureFile: ""
+        AmbientOccTextureFile: ""
         Node: 1326440861
         Name: Main Node
         Type: 1
@@ -498,6 +507,9 @@ Materials:
         TextureFile: assets\textures\ChernoLogo.png
         NormalTextureFile: ""
         SpecularTextureFile: ""
+        RoughnessTextureFile: ""
+        MetallicTextureFile: ""
+        AmbientOccTextureFile: ""
         Node: 1151624965
         Name: Main Node
         Type: 1
@@ -661,6 +673,9 @@ Materials:
         TextureFile: assets\models\SkinnedHead/lambertian.jpg
         NormalTextureFile: ""
         SpecularTextureFile: ""
+        RoughnessTextureFile: ""
+        MetallicTextureFile: ""
+        AmbientOccTextureFile: ""
         Node: 2013763483
         Name: Main Node
         Type: 1
@@ -824,6 +839,9 @@ Materials:
         TextureFile: ""
         NormalTextureFile: ""
         SpecularTextureFile: ""
+        RoughnessTextureFile: ""
+        MetallicTextureFile: ""
+        AmbientOccTextureFile: ""
         Node: 325474736
         Name: Main Node
         Type: 1
@@ -987,6 +1005,9 @@ Materials:
         TextureFile: ""
         NormalTextureFile: ""
         SpecularTextureFile: ""
+        RoughnessTextureFile: ""
+        MetallicTextureFile: ""
+        AmbientOccTextureFile: ""
         Node: 169205499
         Name: Main Node
         Type: 1
@@ -1150,6 +1171,9 @@ Materials:
         TextureFile: assets\textures\brickwall.jpg
         NormalTextureFile: assets\textures\brickwall_normal.jpg
         SpecularTextureFile: ""
+        RoughnessTextureFile: ""
+        MetallicTextureFile: ""
+        AmbientOccTextureFile: ""
         Node: 1935266663
         Name: Main Node
         Type: 1
@@ -1241,19 +1265,19 @@ Materials:
           - Pin: 1096423134
             Name: Vertex Position (Vec3)
             DataType: 4
-            Value: [0, -39.370079, 1.72092086e-06, 0]
+            Value: [100, 100.000015, 99.9999847, 0]
             AllowsMultipleTypes: false
             DefValue: [0, 0, 0, 0]
           - Pin: 710740875
             Name: Vertex Normal (Vec3)
             DataType: 4
-            Value: [2.69408718e-09, -1, 2.93429228e-08, 0]
+            Value: [0, 1, -1.62920671e-07, 0]
             AllowsMultipleTypes: false
             DefValue: [0, 0, 0, 0]
           - Pin: 1288413294
             Name: Texture Coordinates (Vec2)
             DataType: 3
-            Value: [0.968750179, 1.00000012, 0, 0]
+            Value: [0.625, 0.25, 0, 0]
             AllowsMultipleTypes: false
             DefValue: [0, 0, 0, 0]
           - Pin: 1742812302
@@ -1313,6 +1337,9 @@ Materials:
         TextureFile: assets\models\bakerhouse/Baker_house.png
         NormalTextureFile: ""
         SpecularTextureFile: ""
+        RoughnessTextureFile: ""
+        MetallicTextureFile: ""
+        AmbientOccTextureFile: ""
         Node: 80772160
         Name: Main Node
         Type: 1
@@ -1476,6 +1503,9 @@ Materials:
         TextureFile: assets\textures\container.png
         NormalTextureFile: ""
         SpecularTextureFile: assets\textures\container_specular.png
+        RoughnessTextureFile: ""
+        MetallicTextureFile: ""
+        AmbientOccTextureFile: ""
         Node: 1289598753
         Name: Main Node
         Type: 1

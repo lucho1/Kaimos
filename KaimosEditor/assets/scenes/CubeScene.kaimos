@@ -1,7 +1,10 @@
 KaimosScene: CubeScene
 SceneColor: [0.999989986, 0.999992967, 1]
-CameraPos: [0.125338018, 4.72314787, 10.386466]
+PBRPipeline: false
+CameraPos: [0.111096025, 4.62855005, 10.2042465]
 CameraRot: [0.477599889, -0.0779998451]
+EnvironmentMapTexture: ""
+EnviroMapRes: 1024
 Entities:
   - Entity: 323991192
     TagComponent:
