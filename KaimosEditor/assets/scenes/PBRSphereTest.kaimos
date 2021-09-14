@@ -1,0 +1,64 @@
+KaimosScene: PBRSphereTest
+SceneColor: [1, 0.999989986, 0.999989986]
+PBRPipeline: true
+CameraPos: [11.2094898, 7.48554277, 15.9131317]
+CameraRot: [0.403199464, 5.72039986]
+EnvironmentMapTexture: C:\Users\lucho.suaya\Documents\GitHub\Kaimos\KaimosEditor\assets\ibl_maps\lilienstein_4k.hdr
+EnviroMapRes: 1024
+Entities:
+  - Entity: 798913986
+    TagComponent:
+      Tag: Point Light
+    TransformComponent:
+      EntityActive: true
+      Translation: [7.00546885, 4.69259501, 7.81293201]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    PointLightComponent:
+      Visible: true
+      Light:
+        Radiance: [1, 0.999989986, 0.999989986, 1]
+        Intensity: 100
+        SpecularStrength: 1
+        FalloffMultiplier: 1
+        MinRadius: 50
+        MaxRadius: 100
+  - Entity: 1524259394
+    TagComponent:
+      Tag: Directional Light
+    TransformComponent:
+      EntityActive: true
+      Translation: [0, 0, 0]
+      Rotation: [1.43159616, 0.0799377039, 0.518023252]
+      Scale: [0.999999285, 0.999997497, 0.999997497]
+    DirectionalLightComponent:
+      Visible: true
+      StoredLightMinRadius: 50
+      StoredLightMaxRadius: 100
+      StoredLightFalloff: 1
+      Light:
+        Radiance: [1, 1, 1, 1]
+        Intensity: 0.589999974
+        SpecularStrength: 1
+  - Entity: 176584122
+    TagComponent:
+      Tag: Cerberus00_Fixed
+    TransformComponent:
+      EntityActive: true
+      Translation: [-1.49458694, 1.36295034e-06, -4]
+      Rotation: [-3.14159226, 0, -3.14159226]
+      Scale: [0.100000001, 0.100000001, 0.100000001]
+    MeshRendererComponent:
+      Material: 1702432448
+      Mesh: 0
+  - Entity: 142982618
+    TagComponent:
+      Tag: PBRSphere
+    TransformComponent:
+      EntityActive: true
+      Translation: [5.73887205, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [0.100000001, 0.100000001, 0.100000001]
+    MeshRendererComponent:
+      Material: 1407032464
+      Mesh: 702618780
