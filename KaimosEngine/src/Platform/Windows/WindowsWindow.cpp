@@ -177,6 +177,7 @@ namespace Kaimos {
 					glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
 			#endif
 
+			glfwWindowHint(GLFW_AUTO_ICONIFY, GLFW_FALSE); // This flag makes the fullscreen window to not lose the focus
 			m_Window = glfwCreateWindow((int)m_Data.Width, (int)m_Data.Height, m_Data.Title.c_str(), nullptr, nullptr);
 			glfwSetWindowPos(m_Window, 50, 50);
 			++s_WindowCount;
