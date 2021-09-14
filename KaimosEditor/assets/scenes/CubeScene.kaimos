@@ -1,0 +1,215 @@
+KaimosScene: CubeScene
+SceneColor: [0.999989986, 0.999992967, 1]
+CameraPos: [-4.57548857, 6.26966572, 10.4233332]
+CameraRot: [0.395999879, 0.475200236]
+Entities:
+  - Entity: 323991192
+    TagComponent:
+      Tag: Container2
+    TransformComponent:
+      EntityActive: true
+      Translation: [2.58284974, 0.319999993, 3.06999993]
+      Rotation: [0, -0.166155756, 0]
+      Scale: [0.999999225, 1, 0.999999225]
+    SpriteRendererComponent:
+      Material: 1819530451
+  - Entity: 1687093060
+    TagComponent:
+      Tag: Directional Light
+    TransformComponent:
+      EntityActive: true
+      Translation: [0, 0, 0]
+      Rotation: [2.52505064, 0.317869127, -0.217980713]
+      Scale: [1, 1.00000072, 1.00000072]
+    DirectionalLightComponent:
+      Visible: true
+      StoredLightMinRadius: 50
+      StoredLightMaxRadius: 100
+      StoredLightFalloff: 1
+      Light:
+        Radiance: [0.892925441, 0.418292046, 0.418292046, 1]
+        Intensity: 1.61000001
+        SpecularStrength: 3.63000011
+  - Entity: 322880829
+    TagComponent:
+      Tag: Sphere2
+    TransformComponent:
+      EntityActive: true
+      Translation: [-2.40313482, 0, 0.556716204]
+      Rotation: [0, 0, 0]
+      Scale: [0.00999999978, 0.00999999978, 0.00999999978]
+    MeshRendererComponent:
+      Material: 1113069815
+      Mesh: 702618780
+  - Entity: 1835881001
+    TagComponent:
+      Tag: Camera
+    TransformComponent:
+      EntityActive: true
+      Translation: [-0.62097621, 3.26867437, 6.6850071]
+      Rotation: [-0.404916406, 0, 0]
+      Scale: [1, 1, 1]
+    CameraComponent:
+      Camera:
+        ProjectionType: 0
+        ViewSize: [1280, 720]
+        FOV: 45
+        FarClip: 9915
+        NearClip: 0.36500001
+        OrthoSize: 10
+      PrimaryCamera: true
+      FixedAR: false
+  - Entity: 70065788
+    TagComponent:
+      Tag: Sprite
+    TransformComponent:
+      EntityActive: true
+      Translation: [0.786720276, 1.62795997, -2.1951828]
+      Rotation: [0, -0.351046503, 0]
+      Scale: [0.999999881, 1, 0.999999881]
+    SpriteRendererComponent:
+      Material: 1169275854
+  - Entity: 74182393
+    TagComponent:
+      Tag: LeftSquare
+    TransformComponent:
+      EntityActive: true
+      Translation: [-0.343958557, 0, 0.343958825]
+      Rotation: [0, -0.785398245, 0]
+      Scale: [1, 1, 1]
+    SpriteRendererComponent:
+      Material: 1703891235
+  - Entity: 244040104
+    TagComponent:
+      Tag: GreenSprite1
+    TransformComponent:
+      EntityActive: true
+      Translation: [-0.400000006, 2, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    SpriteRendererComponent:
+      Material: 676505225
+  - Entity: 1931086791
+    TagComponent:
+      Tag: Cube
+    TransformComponent:
+      EntityActive: true
+      Translation: [-0.749579668, -0.318000793, 2.66330338]
+      Rotation: [0, 0, 0]
+      Scale: [0.00499999663, 0.00499999058, 0.00499999989]
+    MeshRendererComponent:
+      Material: 1847285407
+      Mesh: 1608911527
+  - Entity: 476626698
+    TagComponent:
+      Tag: TopSquare
+    TransformComponent:
+      EntityActive: true
+      Translation: [0, 0.5, 0]
+      Rotation: [-1.57079637, 0.785398245, -3.37174811e-07]
+      Scale: [0.99999994, 0.999999166, 0.99999845]
+    SpriteRendererComponent:
+      Material: 1165219968
+  - Entity: 552047957
+    TagComponent:
+      Tag: Point Light
+    TransformComponent:
+      EntityActive: true
+      Translation: [1.70098627, 0.202026591, 4.83934736]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    PointLightComponent:
+      Visible: true
+      Light:
+        Radiance: [0.212693661, 0.0874459296, 0.896749496, 1]
+        Intensity: 1.83000004
+        SpecularStrength: 2.4000001
+        FalloffMultiplier: 1.36000001
+        MinRadius: 52.5999985
+        MaxRadius: 101.599998
+  - Entity: 327544930
+    TagComponent:
+      Tag: Wall
+    TransformComponent:
+      EntityActive: true
+      Translation: [0, 0, -6.99842882]
+      Rotation: [0, 0, 0]
+      Scale: [0.0903990939, 0.129999995, 0.00597493444]
+    MeshRendererComponent:
+      Material: 1437792846
+      Mesh: 1608911527
+  - Entity: 249924087
+    TagComponent:
+      Tag: GreenSprite2
+    TransformComponent:
+      EntityActive: true
+      Translation: [2.0999999, 1.29999995, 0]
+      Rotation: [-0.720043838, -0.890098691, 0.217138842]
+      Scale: [0.999999881, 0.999999762, 0.99999994]
+    SpriteRendererComponent:
+      Material: 676505225
+  - Entity: 1329917436
+    TagComponent:
+      Tag: Sphere4
+    TransformComponent:
+      EntityActive: true
+      Translation: [-1.80655718, 0, 2.0659585]
+      Rotation: [0, 0, 0]
+      Scale: [0.00999999978, 0.00999999978, 0.00999999978]
+    MeshRendererComponent:
+      Material: 1272239447
+      Mesh: 702618780
+  - Entity: 1689503948
+    TagComponent:
+      Tag: Sphere1
+    TransformComponent:
+      EntityActive: true
+      Translation: [0.465763539, 1.65283723e-07, 2.74530172]
+      Rotation: [0, 0, 0]
+      Scale: [0.00999999978, 0.00999999978, 0.00999999978]
+    MeshRendererComponent:
+      Material: 1847285407
+      Mesh: 702618780
+  - Entity: 1924290077
+    TagComponent:
+      Tag: RightSquare
+    TransformComponent:
+      EntityActive: true
+      Translation: [0.349999994, 0, 0.349999994]
+      Rotation: [0, 0.785398185, 0]
+      Scale: [1, 1, 1]
+    SpriteRendererComponent:
+      Material: 1911314598
+  - Entity: 1317155305
+    TagComponent:
+      Tag: Floor
+    TransformComponent:
+      EntityActive: true
+      Translation: [0, -2.2142992, -3.25383472]
+      Rotation: [0, 0, 0]
+      Scale: [0.088224344, 0.00375505467, 0.133594885]
+    MeshRendererComponent:
+      Material: 1437792846
+      Mesh: 1608911527
+  - Entity: 1521556414
+    TagComponent:
+      Tag: Sphere3
+    TransformComponent:
+      EntityActive: true
+      Translation: [-2.98865986, 0, 2.6568718]
+      Rotation: [0, 0, 0]
+      Scale: [0.00999999978, 0.00999999978, 0.00999999978]
+    MeshRendererComponent:
+      Material: 795132287
+      Mesh: 702618780
+  - Entity: 698361379
+    TagComponent:
+      Tag: Container1
+    TransformComponent:
+      EntityActive: true
+      Translation: [1.65063477, 0.315501601, 3.06672668]
+      Rotation: [1.5707972, -0.166082114, 3.02181249e-08]
+      Scale: [0.0100000035, 0.00999999512, 0.00999998115]
+    MeshRendererComponent:
+      Material: 1819530451
+      Mesh: 1094153259

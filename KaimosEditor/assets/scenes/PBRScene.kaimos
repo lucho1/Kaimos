@@ -1,0 +1,148 @@
+KaimosScene: KaimosUnnamedScene
+SceneColor: [9.99999997e-07, 9.99989993e-07, 9.99989993e-07]
+PBRPipeline: true
+CameraPos: [-49.7575607, 149.576218, 263.945068]
+CameraRot: [0.398400366, 0.351599753]
+EnvironmentMapTexture: C:\Users\lucho.suaya\Documents\GitHub\Kaimos\KaimosEditor\assets\ibl_maps\lilienstein_4k.hdr
+EnviroMapRes: 1024
+Entities:
+  - Entity: 1444897642
+    TagComponent:
+      Tag: Camera
+    TransformComponent:
+      EntityActive: true
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    CameraComponent:
+      Camera:
+        ProjectionType: 0
+        ViewSize: [1280, 720]
+        FOV: 45
+        FarClip: 10000
+        NearClip: 0.100000001
+        OrthoSize: 10
+      PrimaryCamera: true
+      FixedAR: false
+  - Entity: 920594598
+    TagComponent:
+      Tag: Sphere1
+    TransformComponent:
+      EntityActive: true
+      Translation: [-56.9519691, 65.9100037, -26.4087753]
+      Rotation: [0, 0, 0]
+      Scale: [0.679999948, 0.680000007, 0.680000007]
+    MeshRendererComponent:
+      Material: 1847285407
+      Mesh: 702618780
+  - Entity: 533607912
+    TagComponent:
+      Tag: Sphere5
+    TransformComponent:
+      EntityActive: true
+      Translation: [55.8600006, 65.9100037, 183.800461]
+      Rotation: [0, 0, 0]
+      Scale: [0.680000007, 0.680000007, 0.680000007]
+    MeshRendererComponent:
+      Material: 1911314598
+      Mesh: 702618780
+  - Entity: 1407050293
+    TagComponent:
+      Tag: Directional Light
+    TransformComponent:
+      EntityActive: true
+      Translation: [0, 139.527542, 43.6226006]
+      Rotation: [2.21411943, 0, 0]
+      Scale: [1, 1, 1]
+    DirectionalLightComponent:
+      Visible: true
+      StoredLightMinRadius: 50
+      StoredLightMaxRadius: 100
+      StoredLightFalloff: 1
+      Light:
+        Radiance: [1, 1, 1, 1]
+        Intensity: 2.0999999
+        SpecularStrength: 1.01999998
+  - Entity: 1838007800
+    TagComponent:
+      Tag: Wall
+    TransformComponent:
+      EntityActive: true
+      Translation: [0, 96.6748047, -108.968681]
+      Rotation: [1.57079637, 0, 0]
+      Scale: [1, 0.0999991894, 0.999988794]
+    MeshRendererComponent:
+      Material: 1049825518
+      Mesh: 1608911527
+  - Entity: 1262282549
+    TagComponent:
+      Tag: Floor
+    TransformComponent:
+      EntityActive: true
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 0.100000001, 2.30606985]
+    MeshRendererComponent:
+      Material: 978735255
+      Mesh: 1608911527
+  - Entity: 726401953
+    TagComponent:
+      Tag: Point Light
+    TransformComponent:
+      EntityActive: true
+      Translation: [-38.8514175, 90.2068558, 222.154114]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    PointLightComponent:
+      Visible: true
+      Light:
+        Radiance: [0.98470366, 0.0433043949, 0.0433043949, 1]
+        Intensity: 2.33999991
+        SpecularStrength: 1
+        FalloffMultiplier: 1
+        MinRadius: 50
+        MaxRadius: 132.600006
+  - Entity: 1762207970
+    TagComponent:
+      Tag: Cube
+    TransformComponent:
+      EntityActive: true
+      Translation: [0, 60.0602875, 82.954155]
+      Rotation: [0, 0, 0]
+      Scale: [0.200000003, 0.200000003, 0.200000003]
+    MeshRendererComponent:
+      Material: 1819530451
+      Mesh: 1608911527
+  - Entity: 1540892064
+    TagComponent:
+      Tag: Sphere4
+    TransformComponent:
+      EntityActive: true
+      Translation: [-52.4718857, 65.9100037, 183.800003]
+      Rotation: [3.09247971, 0, 0]
+      Scale: [0.680000007, 0.679999948, 0.679999948]
+    MeshRendererComponent:
+      Material: 350853290
+      Mesh: 702618780
+  - Entity: 1539614616
+    TagComponent:
+      Tag: Sphere2
+    TransformComponent:
+      EntityActive: true
+      Translation: [55.8588524, 65.9055099, -26.4099998]
+      Rotation: [0, 0, 0]
+      Scale: [0.680000007, 0.680000007, 0.680000007]
+    MeshRendererComponent:
+      Material: 1703891235
+      Mesh: 702618780
+  - Entity: 1233207455
+    TagComponent:
+      Tag: Sphere3
+    TransformComponent:
+      EntityActive: true
+      Translation: [-1.70652199, 65.9100037, -26.4099998]
+      Rotation: [0, 0, 0]
+      Scale: [0.496400028, 0.496400028, 0.496400028]
+    MeshRendererComponent:
+      Material: 1165219968
+      Mesh: 702618780
