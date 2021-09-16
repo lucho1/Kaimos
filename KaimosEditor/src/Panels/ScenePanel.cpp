@@ -54,12 +54,15 @@ namespace Kaimos {
 			m_SelectedEntity = m_SceneContext->DuplicateEntity(m_SelectedEntity);
 			m_DuplicatingEntity = true;
 		}
+
+		if (ev.GetKeyCode() == KEY::DEL)
+			m_DeleteSelectedEntity = true;
 	}
 
 
 
 	// ----------------------- Public Class Methods -------------------------------------------------------
-	void ScenePanel::OnUIRender(bool& closing_bool)
+	void ScenePanel::OnUIRender(bool& closing_bool, bool is_viewport_focused)
 	{
 		// -- Scene Tab --
 		ImGui::Begin("Scene", &closing_bool);
@@ -70,13 +73,17 @@ namespace Kaimos {
 		else
 			ImGui::Text("Current camera: NULL");
 
-		// -- Entity Display --
+		// -- Entity Display & Deletion --
+		bool can_delete_entity = is_viewport_focused;
+		if (ImGui::IsWindowFocused())
+			can_delete_entity = true;
+
 		m_SceneContext->m_Registry.each([&](auto entity_id)
 			{
 				Entity entity{ entity_id , m_SceneContext.get() };
 
 				ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(12.0f, 1.0f));
-				DrawEntityNode(entity);
+				DrawEntityNode(entity, can_delete_entity);
 				ImGui::PopStyleVar();
 			});
 
@@ -146,7 +153,7 @@ namespace Kaimos {
 
 
 	// ----------------------- Private Scene Methods -----------------------------------------------------
-	void ScenePanel::DrawEntityNode(Entity entity)
+	void ScenePanel::DrawEntityNode(Entity entity, bool can_delete_entity)
 	{
 		TagComponent& tag_comp = entity.GetComponent<TagComponent>();
 
@@ -198,6 +205,12 @@ namespace Kaimos {
 			ImGui::TreePop();
 
 		// -- Delete Entity --
+		if (m_DeleteSelectedEntity && m_SelectedEntity == entity && can_delete_entity)
+		{
+			entity_deleted = true;
+			m_DeleteSelectedEntity = false;
+		}
+
 		if (entity_deleted)
 		{
 			if (m_SelectedEntity == entity)

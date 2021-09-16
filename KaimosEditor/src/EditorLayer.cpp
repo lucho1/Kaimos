@@ -290,10 +290,10 @@ namespace Kaimos {
 			float right_boundary = std::min(left_boundary, 1500.0f);
 			m_ToolbarPanel.OnUIRender(m_IconsArray, m_CurrentScene->GetEditorCamera(), right_boundary);
 		}
-
+		
 		// -- Scene Panel Rendering --
 		if(show_scene_panel)
-			m_ScenePanel.OnUIRender(show_scene_panel);
+			m_ScenePanel.OnUIRender(show_scene_panel, m_ViewportFocused);
 
 		// -- Settings Panel Rendering --
 		m_SettingsPanel.OnUIRender(m_HoveredEntity, show_settings_panel, show_performance_panel);
@@ -363,6 +363,7 @@ namespace Kaimos {
 						
 			m_ViewportFocused = ImGui::IsWindowFocused();
 			m_ViewportHovered = ImGui::IsWindowHovered();
+
 			Application::Get().GetImGuiLayer()->SetBlockEvents(!m_ViewportFocused && !m_ViewportHovered);
 
 			// Get the position where the next window begins (including Tab Bar)
@@ -400,7 +401,9 @@ namespace Kaimos {
 	void EditorLayer::OnEvent(Event& ev)
 	{
 		m_CurrentScene->GetEditorCamera().OnEvent(ev);
-		m_ScenePanel.OnEvent(ev);
+
+		if(!ImGuizmo::IsUsing() && !ImGuizmo::IsOver())
+			m_ScenePanel.OnEvent(ev);
 
 		EventDispatcher dispatcher(ev);
 		dispatcher.Dispatch<KeyPressedEvent>(KS_BIND_EVENT_FN(EditorLayer::OnKeyPressed));
