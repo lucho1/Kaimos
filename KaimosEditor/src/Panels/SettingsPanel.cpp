@@ -209,6 +209,11 @@ namespace Kaimos {
 		if (!stop)
 			SetFPSMetrics();
 
+		// -- VSYNC Checkbox --
+		static bool vsync = Application::Get().GetWindow().IsVSync();
+		if (ImGui::Checkbox("VSYNC", &vsync))
+			Application::Get().GetWindow().SetVSync(vsync);
+
 		// -- Printing --
 		float text_separation = ImGui::GetContentRegionAvailWidth() / 3.0f + 25.0f;
 		ImGui::NewLine();

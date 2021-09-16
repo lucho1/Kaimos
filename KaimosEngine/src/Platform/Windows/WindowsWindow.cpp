@@ -42,6 +42,7 @@ namespace Kaimos {
 		// -- Set Fullscreen if Dist Build --
 		#if KS_DIST
 			SetFullscreen(true);
+			SetVSync(true);
 		#endif
 	}
 

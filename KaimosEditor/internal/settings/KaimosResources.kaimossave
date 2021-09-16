@@ -1,13 +1,5 @@
 KaimosSaveFile: KaimosResources
 Models:
-  - Model: 1034409430
-    Path: assets\models\Cube.fbx
-    RootMesh:
-      Mesh: 1608911527
-      Name: Cube
-      Material: 1049825518
-      Submeshes:
-        []
   - Model: 1975875678
     Path: assets\models\Sphere.FBX
     RootMesh:
@@ -16,11 +8,11 @@ Models:
       Material: 1049825518
       Submeshes:
         []
-  - Model: 959796597
-    Path: assets\models\Plane.FBX
+  - Model: 1034409430
+    Path: assets\models\Cube.fbx
     RootMesh:
-      Mesh: 1094153259
-      Name: Plane
+      Mesh: 1608911527
+      Name: Cube
       Material: 1049825518
       Submeshes:
         []
@@ -30,6 +22,14 @@ Models:
       Mesh: 1085828767
       Name: BakerHouse
       Material: 2008691940
+      Submeshes:
+        []
+  - Model: 959796597
+    Path: assets\models\Plane.FBX
+    RootMesh:
+      Mesh: 1094153259
+      Name: Plane
+      Material: 1049825518
       Submeshes:
         []
   - Model: 246663808
