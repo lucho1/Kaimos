@@ -88,6 +88,10 @@ namespace Kaimos {
 					enviromap_path = enviromap_path.substr(enviromap_path.find("assets"), enviromap_path.size() - 1);
 				}
 
+				// Skybox HDR Warn
+				if(!Renderer::IsSceneInPBRPipeline())
+					ImGui::TextColored({ 0.8f, 0.8f, 0.2f, 1.0f }, "Non-PBR Skybox must be in HDR format too");
+
 				// Texture Button (to change enviro. map)
 				ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { 0.0f, 0.0f });
 				if (KaimosUI::UIFunctionalities::DrawTexturedButton("###enviromap", enviromap_id, glm::vec2(50.0f), glm::vec3(0.1f)))
