@@ -363,12 +363,12 @@ namespace Kaimos {
 				ImGui::NewLine();
 				KaimosUI::UIFunctionalities::SetTextCursorAndWidth("Radiance");
 				ImGui::ColorEdit4("###light_radiance", glm::value_ptr(light->Radiance), flags);
-				
-				float light_int_max = 1000.0f, light_int_pow = 1.5f;
+
+				float light_int_max = 100.0f, light_int_pow = 0.8f;
 				if (Renderer::IsSceneInPBRPipeline())
 				{
-					light_int_max = 10.0f;
-					light_int_pow = 1.0f;
+					light_int_max = 100000.0f;
+					light_int_pow = 2.5f;
 				}
 
 				Kaimos::KaimosUI::UIFunctionalities::DrawInlineSlider("Intensity", "###light_intensity", &light->Intensity, 0.0f, 2.0, light_int_max, 0.01f, "%.2f", light_int_pow);
