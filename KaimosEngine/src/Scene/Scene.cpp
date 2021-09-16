@@ -294,6 +294,50 @@ namespace Kaimos {
 		return entity;
 	}
 
+	Entity Scene::DuplicateEntity(const Entity& entity)
+	{
+		uint id = (uint)Random::GetRandomInt();
+		Entity duplicate = { m_Registry.create(entt::entity{id}), this };
+
+		if (entity.HasComponent<TagComponent>())
+		{
+			TagComponent& tag_comp = entity.GetComponent<TagComponent>();
+			duplicate.AddComponent<TagComponent>(tag_comp.Tag + std::to_string(tag_comp.DuplicationCount));
+			++tag_comp.DuplicationCount;
+		}
+
+		if (entity.HasComponent<TransformComponent>())
+			duplicate.AddComponent<TransformComponent>(entity.GetComponent<TransformComponent>());
+
+		if (entity.HasComponent<CameraComponent>())
+			duplicate.AddComponent<CameraComponent>(entity.GetComponent<CameraComponent>());
+
+		if (entity.HasComponent<DirectionalLightComponent>())
+			duplicate.AddComponent<DirectionalLightComponent>(entity.GetComponent<DirectionalLightComponent>());
+
+		if (entity.HasComponent<PointLightComponent>())
+			duplicate.AddComponent<PointLightComponent>(entity.GetComponent<PointLightComponent>());
+
+		if (entity.HasComponent<NativeScriptComponent>())
+			duplicate.AddComponent<NativeScriptComponent>(entity.GetComponent<NativeScriptComponent>());
+
+		if (entity.HasComponent<SpriteRendererComponent>())
+		{
+			const SpriteRendererComponent& sprite_comp = entity.GetComponent<SpriteRendererComponent>();
+			uint sprite_mat_id = sprite_comp.SpriteMaterialID;
+			duplicate.AddComponent<SpriteRendererComponent>(sprite_comp).SetMaterial(sprite_mat_id);
+		}
+
+		if (entity.HasComponent<MeshRendererComponent>())
+		{
+			const MeshRendererComponent& mesh_comp = entity.GetComponent<MeshRendererComponent>();
+			uint mesh_mat_id = mesh_comp.MaterialID;
+			duplicate.AddComponent<MeshRendererComponent>(mesh_comp).SetMaterial(mesh_mat_id);
+		}
+
+		return duplicate;
+	}
+
 	void Scene::DestroyEntity(Entity entity)
 	{
 		m_Registry.destroy((entt::entity)entity.GetID());

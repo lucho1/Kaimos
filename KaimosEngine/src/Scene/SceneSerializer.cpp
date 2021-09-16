@@ -28,8 +28,9 @@ namespace Kaimos {
 			output << YAML::Key << "TagComponent";
 			output << YAML::BeginMap;
 
-			std::string& tag = entity.GetComponent<TagComponent>().Tag;
-			output << YAML::Key << "Tag" << YAML::Value << tag;
+			TagComponent& tag = entity.GetComponent<TagComponent>();
+			output << YAML::Key << "Tag" << YAML::Value << tag.Tag;
+			output << YAML::Key << "DuplicationCount" << YAML::Value << tag.DuplicationCount;
 			output << YAML::EndMap;
 		}
 
@@ -253,12 +254,17 @@ namespace Kaimos {
 				uint entity_id = entity["Entity"].as<uint>();
 				
 				std::string name;
+				uint duplication_count = 1;
 				auto tag_component = entity["TagComponent"];
 				if (tag_component)
+				{
 					name = tag_component["Tag"].as<std::string>();
+					duplication_count = tag_component["DuplicationCount"].as<uint>();
+				}
 
 				KS_TRACE("Deserialized Entity '{0}' (ID: {1})", name, entity_id);
 				Entity deserialized_entity = m_Scene->CreateEntity(name, entity_id);
+				deserialized_entity.GetComponent<TagComponent>().DuplicationCount = duplication_count;
 
 				YAML::Node transform_node = entity["TransformComponent"];
 				if (transform_node)

@@ -400,6 +400,7 @@ namespace Kaimos {
 	void EditorLayer::OnEvent(Event& ev)
 	{
 		m_CurrentScene->GetEditorCamera().OnEvent(ev);
+		m_ScenePanel.OnEvent(ev);
 
 		EventDispatcher dispatcher(ev);
 		dispatcher.Dispatch<KeyPressedEvent>(KS_BIND_EVENT_FN(EditorLayer::OnKeyPressed));

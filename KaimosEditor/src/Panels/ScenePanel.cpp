@@ -37,6 +37,27 @@ namespace Kaimos {
 
 
 
+	// ----------------------- Event Methods --------------------------------------------------------------
+	void ScenePanel::OnEvent(Event& ev)
+	{
+		EventDispatcher dispatcher(ev);
+		dispatcher.Dispatch<KeyPressedEvent>(KS_BIND_EVENT_FN(ScenePanel::OnKeyPressed));
+	}
+
+	bool ScenePanel::OnKeyPressed(KeyPressedEvent& ev)
+	{
+		if (ev.GetRepeatCount() > 0 || !m_SelectedEntity)
+			return false;
+
+		if (ev.GetKeyCode() == KEY::D && (Input::IsKeyPressed(KEY::LEFT_CONTROL) || Input::IsKeyPressed(KEY::RIGHT_CONTROL)))
+		{
+			m_SelectedEntity = m_SceneContext->DuplicateEntity(m_SelectedEntity);
+			m_DuplicatingEntity = true;
+		}
+	}
+
+
+
 	// ----------------------- Public Class Methods -------------------------------------------------------
 	void ScenePanel::OnUIRender(bool& closing_bool)
 	{
@@ -142,6 +163,12 @@ namespace Kaimos {
 		bool entity_deleted = false;
 		if (ImGui::BeginPopupContextItem())
 		{
+			if (ImGui::MenuItem("Duplicate", "Ctrl+D"))
+			{
+				m_SelectedEntity = m_SceneContext->DuplicateEntity(entity);
+				m_DuplicatingEntity = true;
+			}
+
 			if (ImGui::MenuItem("Rename"))
 				tag_comp.Rename = true;
 
@@ -152,7 +179,7 @@ namespace Kaimos {
 		}
 
 		// -- Entity Rename --
-		if (tag_comp.Rename)
+		if (tag_comp.Rename && !m_DuplicatingEntity)
 		{
 			// Input Text
 			KaimosUI::UIFunctionalities::DrawInputText("##Tag", tag_comp.Tag);
@@ -181,6 +208,9 @@ namespace Kaimos {
 
 			m_SceneContext->DestroyEntity(entity);
 		}
+
+		// -- Set Duplicating Entity Bool --
+		m_DuplicatingEntity = false;
 	}
 
 

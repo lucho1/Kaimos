@@ -40,6 +40,7 @@ namespace Kaimos {
 
 		// --- Public Entities Methods ---
 		Entity CreateEntity(const std::string& name = "unnamed", uint entity_id = 0);
+		Entity DuplicateEntity(const Entity& entity);
 		void DestroyEntity(Entity entity);
 		void UpdateMeshAndSpriteComponentsVertices(uint material_id);
 

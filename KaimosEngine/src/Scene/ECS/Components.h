@@ -27,6 +27,7 @@ namespace Kaimos {
 		// --- Variables ---
 		std::string Tag = "Unnamed";
 		bool Rename = false;
+		uint DuplicationCount = 1;
 
 		// --- Constructors ---
 		TagComponent() = default;

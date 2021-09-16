@@ -22,6 +22,10 @@ namespace Kaimos {
 		Entity GetSelectedEntity()						const	{ return m_SelectedEntity; }
 		void SetSelectedEntity(Entity entity)					{ m_SelectedEntity = entity; }
 
+		// --- Event Methods ---
+		void OnEvent(Event& ev);
+		bool OnKeyPressed(KeyPressedEvent& ev);
+
 	private:
 
 		// --- Private Scene Methods ---
@@ -36,6 +40,7 @@ namespace Kaimos {
 		MaterialEditorPanel* m_KMEPanel = nullptr;
 		Ref<Scene> m_SceneContext = nullptr;
 		Entity m_SelectedEntity = {};
+		bool m_DuplicatingEntity = false;
 	};
 }
 
