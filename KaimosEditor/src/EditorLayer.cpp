@@ -208,9 +208,9 @@ namespace Kaimos {
 		static bool fullscreen = Application::Get().GetWindow().IsFullscreen();
 		static bool show_toolbar = true;
 		static bool show_scene_panel = true;
-		static bool show_project_panel = true;
+		//static bool show_project_panel = true;
 		static bool show_console_panel = true;
-		static bool show_files_panel = true;
+		//static bool show_files_panel = true;
 		static bool show_settings_panel = true;
 		static bool show_performance_panel = true;
 		static bool show_viewport_panel = true;
@@ -253,10 +253,13 @@ namespace Kaimos {
 				ImGui::MenuItem("Material Editor", nullptr, &m_KMEPanel.ShowPanel);
 				ImGui::MenuItem("Settings Panel", nullptr, &show_settings_panel);
 				ImGui::MenuItem("Performance Panel", nullptr, &show_performance_panel);
-				ImGui::MenuItem("Project Panel", nullptr, &show_project_panel);
+				//ImGui::MenuItem("Project Panel", nullptr, &show_project_panel);
 				ImGui::MenuItem("Console Panel", nullptr, &show_console_panel);
-				ImGui::MenuItem("Files Panel", nullptr, &show_files_panel);
-				ImGui::MenuItem("UI Demo", nullptr, &show_uidemo);
+				//ImGui::MenuItem("Files Panel", nullptr, &show_files_panel);
+
+				#if !KS_DIST
+					ImGui::MenuItem("UI Demo", nullptr, &show_uidemo);
+				#endif
 
 				ImGui::EndMenu();
 			}
@@ -281,9 +284,12 @@ namespace Kaimos {
 
 		// -- Toolbar --
 		static float viewport_endpos = 500.0f;
-		float left_boundary = std::max(500.0f, viewport_endpos - 100.0f);
-		float right_boundary = std::min(left_boundary, 1500.0f);
-		m_ToolbarPanel.OnUIRender(m_IconsArray, m_CurrentScene->GetEditorCamera(), right_boundary);
+		if (show_toolbar)
+		{
+			float left_boundary = std::max(500.0f, viewport_endpos - 100.0f);
+			float right_boundary = std::min(left_boundary, 1500.0f);
+			m_ToolbarPanel.OnUIRender(m_IconsArray, m_CurrentScene->GetEditorCamera(), right_boundary);
+		}
 
 		// -- Scene Panel Rendering --
 		if(show_scene_panel)
@@ -293,13 +299,14 @@ namespace Kaimos {
 		m_SettingsPanel.OnUIRender(m_HoveredEntity, show_settings_panel, show_performance_panel);
 
 		// -- Project & Console Panels --
-		if (show_files_panel)
-		{
-			ImGui::Begin("Folders", &show_files_panel);
-			ImGui::End();
-		}
+		//if (show_files_panel)
+		//{
+		//	ImGui::Begin("Folders", &show_files_panel);
+		//	ImGui::End();
+		//}
 
-		m_ProjectPanel.OnUIRender(show_project_panel, show_console_panel);
+		bool proj_panel = false; // TODO: Temporary until we have a proper project panel
+		m_ProjectPanel.OnUIRender(proj_panel, show_console_panel); //proj_panel = show_project_panel
 
 		// -- Game Panels --
 		if (show_game_panel)
