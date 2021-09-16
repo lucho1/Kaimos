@@ -195,6 +195,14 @@ namespace Kaimos {
 		KS_PROFILE_FUNCTION();
 		KS_INFO("\n\n--- DESERIALIZING KAIMOS SCENE ---");
 
+		// -- Fail Safe --
+		std::filesystem::path spath = filepath;
+		if (!std::filesystem::exists(spath) && filepath.find("assets") != std::string::npos)
+		{
+			KS_ERROR("Error Loading '{0}' scene file\nError: Invalid Scene File", filepath);
+			return false;
+		}
+
 		// -- File Load --
 		YAML::Node data;
 		try { data = YAML::LoadFile(filepath); }
