@@ -1,0 +1,44 @@
+[Header]
+ICOfile = "HDR_111_Parking_Space_2_Thumb.jpg"
+Name = "HDR 111 Parking Lot 2"
+Author = "HDRI Hub"
+Location = "Cologne, Germany"
+GEOlat = 52.6556789875030520
+GEOlong = 8.4282530844211578
+Comment = "parking space, place, concrete, trees, clear"
+PREVIEWfile = "HDR_111_Parking_Lot_2_Prev.jpg"
+Link = "http://www.hdri-hub.com"
+Date = "2012:05:07"
+Time = "16:31:59"
+
+[Background]
+BGfile = "HDR_111_Parking_Lot_2_Bg.jpg"
+BGmap = 1
+BGu = 0.000000
+BGv = 0.000000
+BGheight = 4096
+
+[Enviroment]
+EVfile = "HDR_111_Parking_Lot_2_Env.hdr"
+EVmap = 1
+EVu = 0.000000
+EVv = 0.000000
+EVheight = 256
+EVmulti = 1.000000
+EVgamma = 2.200000
+
+[Reflection]
+REFfile = "HDR_111_Parking_Lot_2_Ref.hdr"
+REFmap = 1
+REFu = 0.000000
+REFv = 0.000000
+REFheight = 2560
+REFmulti = 1.000000
+REFgamma = 2.200000
+
+[Sun]
+SUNcolor = 254,240,234
+SUNmulti = 1.586010
+SUNu = 0.492000
+SUNv = 0.352000
+

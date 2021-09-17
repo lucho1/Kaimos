@@ -1,0 +1,5 @@
+Camera: Canon 7D
+Lens: Canon 17-55mm 2.8f
+Sensor: 22,3 mm x 14,9 mm
+
+Reference Object: Side Length = 1.0 m / 3.281 ft
