@@ -46,12 +46,12 @@ namespace Kaimos {
 		m_Window = Window::Create(name);
 		//m_Window = Window::Create(WindowProps(name));
 
+		m_ImGuiLayer = new ImGuiLayer(); // It will be deleted with all the other layers in the ~LayerStack()
+		PushOverlay(m_ImGuiLayer);
+
 		Renderer::CreateRenderer();
 		Deserialize();
 		Renderer::Init();
-
-		m_ImGuiLayer = new ImGuiLayer(); // It will be deleted with all the other layers in the ~LayerStack()
-		PushOverlay(m_ImGuiLayer);
 
 		// This will bind the Application::OnEvent function to SetEventCallback(), so the callback when
 		// an event happens will be Application::OnEvent. The placeholder will be replaced by whatever argument
