@@ -407,7 +407,7 @@ namespace Kaimos {
 				KaimosUI::UIFunctionalities::SetTextCursorAndWidth("Radiance");
 				ImGui::ColorEdit4("###light_radiance", glm::value_ptr(light->Radiance), flags);
 
-				float light_int_max = 100.0f, light_int_pow = 0.8f;
+				float light_int_max = 10.0f, light_int_pow = 0.8f;
 				if (Renderer::IsSceneInPBRPipeline())
 				{
 					light_int_max = 100000.0f;
