@@ -175,7 +175,7 @@ namespace Kaimos {
 			dir = glm::vec3(up.x, 0.0f, up.z);
 
 		// -- Move --
-		m_Position += dir * movement.y * m_MoveSpeed * m_ZoomLevel * 1.2f;
+		m_Position += dir * movement.y * m_MoveSpeed * m_ZoomLevel * 2.0f;
 		m_FocalPoint = m_Position + GetForwardVector() * m_ZoomLevel;
 		RecalculateView();
 	}
