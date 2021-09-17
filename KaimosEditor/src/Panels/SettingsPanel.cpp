@@ -28,7 +28,7 @@ namespace Kaimos {
 
 			// -- Camera Display Options --
 			// Title
-			static uint current_option_type = 0;
+			uint current_option_type = Renderer::GetCameraUIDisplayOption();
 			const std::vector<std::string> camera_viewport_display_options = { "Always Show Primary Camera", "Show Only on Camera Selected", "Never Show" };
 			std::string current_option = camera_viewport_display_options[current_option_type];
 
@@ -41,14 +41,14 @@ namespace Kaimos {
 
 			// Display Options Dropdown
 			if (KaimosUI::UIFunctionalities::DrawDropDown("Display Options", camera_viewport_display_options, 3, current_option, current_option_type, ImGui::CalcItemWidth() / 2.0f))
+				SetCameraDisplayOption(current_option_type);
+
+			// Make sure we set it at the beginning
+			static bool set_camera_display = true;
+			if (set_camera_display)
 			{
-				switch (current_option_type)
-				{
-					case 0:		ShowCameraMiniScreen = true; ShowCameraWhenSelected = false;	break;
-					case 1:		ShowCameraMiniScreen = true; ShowCameraWhenSelected = true;		break;
-					case 2:		ShowCameraMiniScreen = false; ShowCameraWhenSelected = false;	break;
-					default:	ShowCameraMiniScreen = true; ShowCameraWhenSelected = false;	break;
-				}
+				SetCameraDisplayOption(current_option_type);
+				set_camera_display = false;
 			}
 
 			// -- Renderer Options --
@@ -177,6 +177,23 @@ namespace Kaimos {
 
 
 	// ----------------------- Private Class Methods ------------------------------------------------------
+	void SettingsPanel::SetCameraDisplayOption(uint display_option)
+	{
+		if (display_option >= 3)
+			return;
+
+		switch (display_option)
+		{
+			case 0:		ShowCameraMiniScreen = true; ShowCameraWhenSelected = false;	break;
+			case 1:		ShowCameraMiniScreen = true; ShowCameraWhenSelected = true;		break;
+			case 2:		ShowCameraMiniScreen = false; ShowCameraWhenSelected = false;	break;
+			default:	ShowCameraMiniScreen = true; ShowCameraWhenSelected = false;	break;
+		}
+
+		Renderer::SetCameraUIDisplayOption(display_option);
+	}
+
+
 	void SettingsPanel::SetFPSMetrics()
 	{
 		if (m_FPSAllocationsIndex == METRICS_ALLOCATIONS_SAMPLES)

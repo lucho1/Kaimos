@@ -38,6 +38,9 @@ namespace Kaimos {
 		// --- Getters ---
 		inline static const RendererAPI::API GetRendererAPI() { return RendererAPI::GetAPI(); }
 
+		static uint GetCameraUIDisplayOption();
+		static void SetCameraUIDisplayOption(uint option);
+
 		static uint GetMaxTextureSlots();
 		static uint GetCurrentTextureSlot();
 

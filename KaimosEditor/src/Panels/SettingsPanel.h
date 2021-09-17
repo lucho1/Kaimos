@@ -18,6 +18,8 @@ namespace Kaimos {
 	private:
 
 		// --- Private Scene Methods ---
+		void SetCameraDisplayOption(uint display_option);
+
 		void SetFPSMetrics();
 		void DisplayFPSMetrics();
 		void SetMemoryMetrics();

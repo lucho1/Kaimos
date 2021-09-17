@@ -26,6 +26,7 @@ namespace Kaimos {
 		glm::vec3 SceneColor = glm::vec3(1.0f);
 		const uint MaxDirLights = 10, MaxPointLights = 100;
 		bool PBR_Pipeline = false;
+		uint CameraUIDisplayOption = 0;
 		
 		// Shaders & Materials
 		ShaderLibrary Shaders;
@@ -367,6 +368,17 @@ namespace Kaimos {
 
 	
 	// ----------------------- Public Getters & Renderer Shaders Methods -------------------------------------
+	uint Renderer::GetCameraUIDisplayOption()
+	{
+		return s_RendererData->CameraUIDisplayOption;
+	}
+
+	void Renderer::SetCameraUIDisplayOption(uint option)
+	{
+		if(option < 3)
+			s_RendererData->CameraUIDisplayOption = option;
+	}
+
 	uint Renderer::GetMaxTextureSlots()
 	{
 		return s_RendererData->MaxTextureSlots;

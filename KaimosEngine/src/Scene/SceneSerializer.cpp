@@ -161,9 +161,10 @@ namespace Kaimos {
 		output << YAML::BeginMap;
 		output << YAML::Key << "KaimosScene" << YAML::Value << m_Scene->GetName().c_str();							// Save Scene as Key + SceneName as value
 		output << YAML::Key << "SceneColor" << YAML::Value << Renderer::GetSceneColor();							// Save Scene Color
+		output << YAML::Key << "CamUIDisplay" << YAML::Value << Renderer::GetCameraUIDisplayOption();				// Save Camera UI Display Option
 		output << YAML::Key << "PBRPipeline" << YAML::Value << Renderer::IsSceneInPBRPipeline();					// Save if scene is PBR or not
-		output << YAML::Key << "EnvironmentMapTexture" << YAML::Value << Renderer::GetEnvironmentMapFilepath();		// Save Scene Camera Orientation
-		output << YAML::Key << "EnviroMapRes" << YAML::Value << Renderer::GetEnvironmentMapResolution();
+		output << YAML::Key << "EnvironmentMapTexture" << YAML::Value << Renderer::GetEnvironmentMapFilepath();		// Save Enviro Texture
+		output << YAML::Key << "EnviroMapRes" << YAML::Value << Renderer::GetEnvironmentMapResolution();			// Save Enviro Texture Res
 
 		// Save editor camera as a sequence (like an array)
 		output << YAML::Key << "EditorCamera" << YAML::Value << YAML::BeginSeq;
@@ -247,6 +248,9 @@ namespace Kaimos {
 
 		if (data["SceneColor"])
 			Renderer::SetSceneColor(data["SceneColor"].as<glm::vec3>());
+
+		if (data["CamUIDisplay"])
+			Renderer::SetCameraUIDisplayOption(data["CamUIDisplay"].as<uint>());
 
 		if (data["PBRPipeline"])
 			Renderer::SetPBRPipeline(data["PBRPipeline"].as<bool>());
