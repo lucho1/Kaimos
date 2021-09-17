@@ -410,7 +410,7 @@ namespace Kaimos {
 				float light_int_max = 10.0f, light_int_pow = 0.8f;
 				if (Renderer::IsSceneInPBRPipeline())
 				{
-					light_int_max = 100000.0f;
+					light_int_max = 2000.0f;
 					light_int_pow = 2.5f;
 				}
 
