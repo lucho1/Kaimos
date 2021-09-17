@@ -15,6 +15,7 @@ namespace Kaimos {
 	class CameraController
 	{
 		friend class ToolbarPanel;
+		friend class SceneSerializer;
 	public:
 
 		// --- Public Class/Event Methods ---

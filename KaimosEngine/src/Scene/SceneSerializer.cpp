@@ -154,18 +154,39 @@ namespace Kaimos {
 		KS_PROFILE_FUNCTION();
 		KS_INFO("\n\n--- SERIALIZING KAIMOS SCENE ---");
 		
+		const CameraController& camera_control = m_Scene->GetEditorCamera();
+		const Camera& camera = m_Scene->GetEditorCamera().GetCamera();
+
 		YAML::Emitter output;
 		output << YAML::BeginMap;
 		output << YAML::Key << "KaimosScene" << YAML::Value << m_Scene->GetName().c_str();							// Save Scene as Key + SceneName as value
 		output << YAML::Key << "SceneColor" << YAML::Value << Renderer::GetSceneColor();							// Save Scene Color
 		output << YAML::Key << "PBRPipeline" << YAML::Value << Renderer::IsSceneInPBRPipeline();					// Save if scene is PBR or not
-		output << YAML::Key << "CameraPos" << YAML::Value << m_Scene->GetEditorCamera().GetPosition();				// Save Scene Camera Position
-		output << YAML::Key << "CameraRot" << YAML::Value << m_Scene->GetEditorCamera().GetOrientationAngles();		// Save Scene Camera Orientation
 		output << YAML::Key << "EnvironmentMapTexture" << YAML::Value << Renderer::GetEnvironmentMapFilepath();		// Save Scene Camera Orientation
 		output << YAML::Key << "EnviroMapRes" << YAML::Value << Renderer::GetEnvironmentMapResolution();
 
+		// Save editor camera as a sequence (like an array)
+		output << YAML::Key << "EditorCamera" << YAML::Value << YAML::BeginSeq;
+		output << YAML::BeginMap;
+
+		output << YAML::Key << "CameraPos" << YAML::Value << camera_control.GetPosition();
+		output << YAML::Key << "CameraRot" << YAML::Value << camera_control.GetOrientationAngles();
+
+		output << YAML::Key << "CameraMovSpeed" << YAML::Value << camera_control.m_MoveSpeed;
+		output << YAML::Key << "CameraSpeedMulti" << YAML::Value << camera_control.GetSpeedMultiplier();
+		output << YAML::Key << "CameraRotSpeed" << YAML::Value << camera_control.m_RotationSpeed;
+		output << YAML::Key << "CameraRotLock" << YAML::Value << camera_control.IsRotationLocked();
+		output << YAML::Key << "CameraPanSpeed" << YAML::Value << camera_control.m_PanSpeed;
+		output << YAML::Key << "CameraZoom" << YAML::Value << camera_control.m_ZoomLevel;
+		output << YAML::Key << "CameraMaxZoom" << YAML::Value << camera_control.m_MaxZoomSpeed;
+		output << YAML::Key << "CameraFOV" << YAML::Value << camera.GetFOV();
+		output << YAML::Key << "CameraNPlane" << YAML::Value << camera.GetNearPlane();
+		output << YAML::Key << "CameraFPlane" << YAML::Value << camera.GetFarPlane();
+		output << YAML::EndMap;
+		output << YAML::EndSeq;
+
 		// Save Entities as a sequence (like an array)
-		output << YAML::Key << "Entities" << YAML::Value << YAML::BeginSeq;											// Save Entities as a sequence (like an array)
+		output << YAML::Key << "Entities" << YAML::Value << YAML::BeginSeq;
 
 		uint entities_deserialized = 0;
 		m_Scene->m_Registry.each([&](auto entityID)
@@ -232,12 +253,6 @@ namespace Kaimos {
 		else
 			Renderer::SetPBRPipeline(false);
 
-		if (data["CameraPos"])
-			m_Scene->GetEditorCamera().SetPosition(data["CameraPos"].as<glm::vec3>());
-		
-		if (data["CameraRot"])
-			m_Scene->GetEditorCamera().SetOrientation(data["CameraRot"].as<glm::vec2>());
-
 		if (data["EnvironmentMapTexture"])
 		{
 			uint map_res = data["EnviroMapRes"] ? data["EnviroMapRes"].as<uint>() : 1024;
@@ -250,6 +265,31 @@ namespace Kaimos {
 		}
 		else
 			Renderer::RemoveEnvironmentMap();
+
+		// -- Deserialize Editor Camera --
+		YAML::Node camera_node = data["EditorCamera"];
+		if (camera_node)
+		{
+			auto cam_values = camera_node[0];
+
+			m_Scene->GetEditorCamera().SetPosition(cam_values["CameraPos"].as<glm::vec3>());
+			m_Scene->GetEditorCamera().SetOrientation(cam_values["CameraRot"].as<glm::vec2>());
+
+			m_Scene->GetEditorCamera().SetMoveSpeed(cam_values["CameraMovSpeed"].as<float>());
+			m_Scene->GetEditorCamera().SetSpeedMultiplier(cam_values["CameraSpeedMulti"].as<float>());
+			m_Scene->GetEditorCamera().SetRotationSpeed(cam_values["CameraRotSpeed"].as<float>());
+
+			m_Scene->GetEditorCamera().LockRotation(cam_values["CameraRotLock"].as<bool>());
+			m_Scene->GetEditorCamera().m_PanSpeed = cam_values["CameraPanSpeed"].as<float>();
+
+			m_Scene->GetEditorCamera().SetZoomLevel(cam_values["CameraZoom"].as<float>());
+			m_Scene->GetEditorCamera().SetMaxZoomSpeed(cam_values["CameraMaxZoom"].as<float>()); //TODO: change name
+
+			m_Scene->GetEditorCamera().m_Camera.SetFOV(cam_values["CameraFOV"].as<float>());
+			m_Scene->GetEditorCamera().m_Camera.SetNearPlane(cam_values["CameraNPlane"].as<float>());
+			m_Scene->GetEditorCamera().m_Camera.SetFarPlane(cam_values["CameraFPlane"].as<float>());
+		}
+		
 
 		// -- Entities Load --
 		uint entities_deserialized = 0;
