@@ -45,6 +45,8 @@ namespace Kaimos {
 		Ref<VertexArray> QuadVArray = nullptr;
 
 		uint EnvironmentMapResolution = 1024;
+		uint EnvrionmentPrefilteredMapResolution = 128;
+		uint EnvironmentIrradianceMapResolution = 32;
 		std::string EnvironmentMapFilepath = "";
 		Ref<HDRTexture2D> EnvironmentHDRMap = nullptr;
 		Ref<CubemapTexture> EnvironmentCubemap = nullptr, IrradianceCubemap = nullptr, PrefilterCubemap = nullptr;
@@ -445,6 +447,16 @@ namespace Kaimos {
 		return s_RendererData->EnvironmentMapResolution;
 	}
 
+	uint Renderer::GetEnviroPrefilterMapResolution()
+	{
+		return s_RendererData->EnvrionmentPrefilteredMapResolution;
+	}
+
+	uint Renderer::GetEnviroIrradianceMapResolution()
+	{
+		return s_RendererData->EnvironmentIrradianceMapResolution;
+	}
+
 	std::string Renderer::GetEnvironmentMapFilepath()
 	{
 		if (s_RendererData->EnvironmentHDRMap)
@@ -453,7 +465,7 @@ namespace Kaimos {
 		return "";
 	}
 
-	void Renderer::SetEnvironmentMapFilepath(const std::string& filepath, uint environment_map_resolution)
+	void Renderer::SetEnvironmentMapFilepath(const std::string& filepath, uint environment_map_resolution, uint prefiltered_map_resolution, uint irradiance_map_resolution)
 	{
 		// -- Check Path Validity --
 		KS_PROFILE_FUNCTION();
@@ -473,17 +485,21 @@ namespace Kaimos {
 		// -- Set Data & Recompile --
 		KS_TRACE("Compiling Environment Map, please wait...");
 		s_RendererData->EnvironmentMapResolution = environment_map_resolution;
+		s_RendererData->EnvrionmentPrefilteredMapResolution = prefiltered_map_resolution;
+		s_RendererData->EnvironmentIrradianceMapResolution = irradiance_map_resolution;
 		s_RendererData->EnvironmentMapFilepath = filepath;
 		s_CompileEnvironmentMap = true;
 	}
 
-	void Renderer::ForceEnvironmentMapRecompile(uint environment_map_resolution)
+	void Renderer::ForceEnvironmentMapRecompile(uint environment_map_resolution, uint prefiltered_map_resolution, uint irradiance_map_resolution)
 	{
 		// -- Check Map, Set Data & Recompile --
 		if (s_RendererData->EnvironmentHDRMap && Resources::ResourceManager::CheckValidPathForHDRTexture(s_RendererData->EnvironmentMapFilepath))
 		{
 			KS_TRACE("Recompiling Environment Map, please wait...");
 			s_RendererData->EnvironmentMapResolution = environment_map_resolution;
+			s_RendererData->EnvrionmentPrefilteredMapResolution = prefiltered_map_resolution;
+			s_RendererData->EnvironmentIrradianceMapResolution = irradiance_map_resolution;
 			s_CompileEnvironmentMap = true;
 		}
 		else
@@ -505,13 +521,15 @@ namespace Kaimos {
 		}
 
 		// -- Remove Previous Environment Map --
-		Sleep(2000);
+		//Sleep(2000);
 		RemoveEnvironmentMap();
 
 		// -- Setup Variables --
 		// We're dealing with cubes, so all faces have = size or resolution
 		uint envmap_res = s_RendererData->EnvironmentMapResolution;
-		uint irradiancemap_res = 32, prefiltermap_res = 256, lut_res = 128;
+		uint prefiltermap_res = s_RendererData->EnvrionmentPrefilteredMapResolution;
+		uint irradiancemap_res = s_RendererData->EnvironmentIrradianceMapResolution;
+		uint lut_res = 128;
 
 		glm::mat4 capture_projection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
 		glm::mat4 capture_views[] =

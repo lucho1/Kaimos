@@ -165,6 +165,8 @@ namespace Kaimos {
 		output << YAML::Key << "PBRPipeline" << YAML::Value << Renderer::IsSceneInPBRPipeline();					// Save if scene is PBR or not
 		output << YAML::Key << "EnvironmentMapTexture" << YAML::Value << Renderer::GetEnvironmentMapFilepath();		// Save Enviro Texture
 		output << YAML::Key << "EnviroMapRes" << YAML::Value << Renderer::GetEnvironmentMapResolution();			// Save Enviro Texture Res
+		output << YAML::Key << "EnviroMapPrefRes" << YAML::Value << Renderer::GetEnviroPrefilterMapResolution();	// Save Enviro Prefiltered Texture Res
+		output << YAML::Key << "EnviroMapIrrRes" << YAML::Value << Renderer::GetEnviroIrradianceMapResolution();	// Save Enviro Irradiance Texture Res
 
 		// Save editor camera as a sequence (like an array)
 		output << YAML::Key << "EditorCamera" << YAML::Value << YAML::BeginSeq;
@@ -259,11 +261,15 @@ namespace Kaimos {
 
 		if (data["EnvironmentMapTexture"])
 		{
-			uint map_res = data["EnviroMapRes"] ? data["EnviroMapRes"].as<uint>() : 1024;
 			std::string filepath = data["EnvironmentMapTexture"].as<std::string>();
-
 			if (!filepath.empty())
-				Renderer::SetEnvironmentMapFilepath(filepath, map_res);
+			{
+				uint map_res = data["EnviroMapRes"] ? data["EnviroMapRes"].as<uint>() : 1024;
+				uint pref_res = data["EnviroMapPrefRes"] ? data["EnviroMapPrefRes"].as<uint>() : 128;
+				uint irr_res = data["EnviroMapIrrRes"] ? data["EnviroMapIrrRes"].as<uint>() : 32;
+
+				Renderer::SetEnvironmentMapFilepath(filepath, map_res, pref_res, irr_res);
+			}
 			else
 				KS_ENGINE_TRACE("Scene has no Environment Map to load");
 		}

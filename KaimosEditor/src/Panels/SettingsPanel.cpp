@@ -11,6 +11,34 @@
 #include <glm/gtc/type_ptr.hpp>
 
 namespace Kaimos {
+	namespace
+	{
+		const char* const k_ResolutionChars[] = { "16", "32", "64", "96", "128", "192", "256", "512", "1024", "2048", "4096", "8192" };
+		const uint k_ResolutionNums[12] = { 16, 32, 64, 96, 128, 192, 256, 512, 1024, 2048, 4096, 8192 };
+	}
+
+	int GetResolutionsIndex(const uint resolution_value)
+	{
+		switch (resolution_value)
+		{
+			case 16:	return 0;
+			case 32:	return 1;
+			case 64:	return 2;
+			case 96:	return 3;
+			case 128:	return 4;
+			case 192:	return 5;
+			case 256:	return 6;
+			case 512:	return 7;
+			case 1024:	return 8;
+			case 2048:	return 9;
+			case 4096:	return 10;
+			case 8192:	return 11;
+			default:	return -1;
+		}
+
+		return -1;
+	}
+
 
 	// ----------------------- Public Class Methods -------------------------------------------------------
 	void SettingsPanel::OnUIRender(const Entity& hovered_entity, bool& closing_settings, bool& closing_performance)
@@ -78,6 +106,8 @@ namespace Kaimos {
 				// Get Data
 				uint enviromap_id = Renderer::GetEnvironmentMapID();
 				uint enviromap_res = Renderer::GetEnvironmentMapResolution();
+				uint prefiltered_res = Renderer::GetEnviroPrefilterMapResolution();
+				uint irradiance_res = Renderer::GetEnviroIrradianceMapResolution();
 				glm::ivec2 enviromap_size = Renderer::GetEnvironmentMapSize();
 				std::string enviromap_path = Renderer::GetEnvironmentMapFilepath();
 				std::string enviromap_name = enviromap_path;
@@ -98,7 +128,7 @@ namespace Kaimos {
 				{
 					std::string texture_file = FileDialogs::OpenFile("HDR Textures (*.hdr)\0*.hdr\0");
 					if (!texture_file.empty())
-						Renderer::SetEnvironmentMapFilepath(texture_file, enviromap_res);
+						Renderer::SetEnvironmentMapFilepath(texture_file, enviromap_res, prefiltered_res, irradiance_res);
 				}
 
 				KaimosUI::UIFunctionalities::PopButton(false);
@@ -111,28 +141,35 @@ namespace Kaimos {
 				KaimosUI::UIFunctionalities::PopButton(true);
 				ImGui::PopStyleVar();
 
-				// Cubemap Resolution Picker
+				// IBL Resolution Pickers
 				ImGui::NewLine();
-				static int res_ix = 2;
-				const char* resolution_items[] = { "256", "512", "1024", "2048"/*, "4096", "8192"*/ };
+				static int res_ix = GetResolutionsIndex(enviromap_res);
+				static int pres_ix = GetResolutionsIndex(prefiltered_res);
+				static int ires_ix = GetResolutionsIndex(irradiance_res);
+
+				res_ix = res_ix == -1 ? 8 : res_ix;
+				pres_ix = pres_ix == -1 ? 5 : pres_ix;
+				ires_ix = ires_ix == -1 ? 1 : ires_ix;
 
 				ImGui::Text("Map Resolution"); ImGui::SameLine();
 				ImGui::SetNextItemWidth(75.0f);
-				ImGui::Combo("###environment_map_res", &res_ix, resolution_items, IM_ARRAYSIZE(resolution_items));
-				ImGui::SameLine();
+				ImGui::Combo("###environment_map_res", &res_ix, k_ResolutionChars, IM_ARRAYSIZE(k_ResolutionChars));
+
+				ImGui::Text("Diffuse Resolution"); ImGui::SameLine(); // Irradiance Map Resolution
+				ImGui::SetNextItemWidth(75.0f);
+				ImGui::Combo("###enviro_irr_map_res", &ires_ix, k_ResolutionChars, IM_ARRAYSIZE(k_ResolutionChars));
+
+				ImGui::Text("Specular Resolution"); ImGui::SameLine(); // Prefiltered Map Resolution
+				ImGui::SetNextItemWidth(75.0f);
+				ImGui::Combo("###enviro_pref_map_res", &pres_ix, k_ResolutionChars, IM_ARRAYSIZE(k_ResolutionChars));
 
 				if (ImGui::Button("Recompile Map"))
-				{
-					uint environmentmap_resolutions[4] = { 256, 512, 1024, 2048 /*4096, 8192*/ };
-					enviromap_res = (res_ix >= 0 && res_ix < 4) ? environmentmap_resolutions[res_ix] : 1024;
-					Renderer::ForceEnvironmentMapRecompile(enviromap_res);
-				}
+					Renderer::ForceEnvironmentMapRecompile(k_ResolutionNums[res_ix], k_ResolutionNums[pres_ix], k_ResolutionNums[ires_ix]);
 
 				if (ImGui::IsItemHovered())
 					KaimosUI::UIFunctionalities::DrawTooltip("Press to apply resolution changes");
 
 				// Display Texture Data
-				//ImGui::NewLine();
 				ImGui::Text("Texture Name: %s", enviromap_name.c_str());
 				ImGui::Text("Texture Filepath: %s", enviromap_path.c_str());
 				ImGui::Text("Texture Size (ID): %ix%i (%i)", enviromap_size.x, enviromap_size.y, enviromap_id);
