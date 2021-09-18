@@ -55,7 +55,7 @@ namespace Kaimos {
 		inline void SetZoomLevel(float zoom_level)					{ m_ZoomLevel = zoom_level; }
 		inline void SetMoveSpeed(float speed)						{ m_MoveSpeed = speed; }
 		inline void SetRotationSpeed(float speed)					{ m_RotationSpeed = speed; }
-		inline void SetSpeedMultiplier(float multiplier)			{ m_SpeedMultiplier = multiplier; m_SpeedMultiplier = std::clamp(m_SpeedMultiplier, 0.05f, 20.0f); }
+		inline void SetSpeedMultiplier(float multiplier)			{ m_SpeedMultiplier = multiplier; m_SpeedMultiplier = std::clamp(m_SpeedMultiplier, 0.05f, m_MaxSpeedMultiplier); }
 		inline void SetMaxZoomSpeed(float speed)					{ m_MaxZoomSpeed = speed; }
 
 		inline void UsingGuizmo(bool using_guizmo)					{ m_UsingGuizmo = using_guizmo; }
@@ -98,7 +98,7 @@ namespace Kaimos {
 
 		// --- Camera Parameters ---
 		float m_ZoomLevel = 10.0f, m_MoveSpeed = 1.0f, m_RotationSpeed = 0.8f, m_PanSpeed = 2.4f;
-		float m_SpeedMultiplier = 1.0f, m_MaxZoomSpeed = 100.0f;
+		float m_SpeedMultiplier = 1.0f, m_MaxSpeedMultiplier = 50.0f,  m_MaxZoomSpeed = 100.0f, m_AdvanceCameraSpeed = 2.0f;
 
 		bool m_LockRotation = false;
 		bool m_UsingGuizmo = false;

@@ -177,9 +177,11 @@ namespace Kaimos {
 
 		output << YAML::Key << "CameraMovSpeed" << YAML::Value << camera_control.m_MoveSpeed;
 		output << YAML::Key << "CameraSpeedMulti" << YAML::Value << camera_control.GetSpeedMultiplier();
+		output << YAML::Key << "MaxSpeedMultiplier" << YAML::Value << camera_control.m_MaxSpeedMultiplier;
 		output << YAML::Key << "CameraRotSpeed" << YAML::Value << camera_control.m_RotationSpeed;
 		output << YAML::Key << "CameraRotLock" << YAML::Value << camera_control.IsRotationLocked();
 		output << YAML::Key << "CameraPanSpeed" << YAML::Value << camera_control.m_PanSpeed;
+		output << YAML::Key << "CameraAdvanceSpeed" << YAML::Value << camera_control.m_AdvanceCameraSpeed;
 		output << YAML::Key << "CameraZoom" << YAML::Value << camera_control.m_ZoomLevel;
 		output << YAML::Key << "CameraMaxZoom" << YAML::Value << camera_control.m_MaxZoomSpeed;
 		output << YAML::Key << "CameraFOV" << YAML::Value << camera.GetFOV();
@@ -287,10 +289,12 @@ namespace Kaimos {
 
 			m_Scene->GetEditorCamera().SetMoveSpeed(cam_values["CameraMovSpeed"].as<float>());
 			m_Scene->GetEditorCamera().SetSpeedMultiplier(cam_values["CameraSpeedMulti"].as<float>());
+			m_Scene->GetEditorCamera().m_MaxSpeedMultiplier = cam_values["MaxSpeedMultiplier"].as<float>();
 			m_Scene->GetEditorCamera().SetRotationSpeed(cam_values["CameraRotSpeed"].as<float>());
 
 			m_Scene->GetEditorCamera().LockRotation(cam_values["CameraRotLock"].as<bool>());
 			m_Scene->GetEditorCamera().m_PanSpeed = cam_values["CameraPanSpeed"].as<float>();
+			m_Scene->GetEditorCamera().m_AdvanceCameraSpeed = cam_values["CameraAdvanceSpeed"].as<float>();
 
 			m_Scene->GetEditorCamera().SetZoomLevel(cam_values["CameraZoom"].as<float>());
 			m_Scene->GetEditorCamera().SetMaxZoomSpeed(cam_values["CameraMaxZoom"].as<float>()); //TODO: change name
