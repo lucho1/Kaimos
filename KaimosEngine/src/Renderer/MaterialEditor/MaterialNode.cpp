@@ -395,7 +395,7 @@ namespace Kaimos::MaterialEditor {
 		{
 			// Roughness Pin & Texture
 			uint rough_id = m_AttachedMaterial->GetTextureID(MATERIAL_TEXTURES::ROUGHNESS);
-			DrawFloatPin(set_node_draggable, m_RoughnessPin, m_AttachedMaterial->Roughness, 0.03f, 1.0f);
+			DrawFloatPin(set_node_draggable, m_RoughnessPin, m_AttachedMaterial->Roughness, 0.00f, 2.0f);
 			DrawTextureButton(rough_id, MATERIAL_TEXTURES::ROUGHNESS, "Roughness", "###mt_rough_btn");
 
 			if (m_AttachedMaterial->HasRoughness())
@@ -404,7 +404,7 @@ namespace Kaimos::MaterialEditor {
 			// Metallic Pin & Texture
 			ImGui::NewLine();
 			uint met_id = m_AttachedMaterial->GetTextureID(MATERIAL_TEXTURES::METALLIC);
-			DrawFloatPin(set_node_draggable, m_MetallicPin, m_AttachedMaterial->Metallic, 0.01f, 1.0f);
+			DrawFloatPin(set_node_draggable, m_MetallicPin, m_AttachedMaterial->Metallic, 0.00f, 2.0f);
 			DrawTextureButton(met_id, MATERIAL_TEXTURES::METALLIC, "Metallic", "###mt_met_btn");
 
 			if (m_AttachedMaterial->HasMetallic())
