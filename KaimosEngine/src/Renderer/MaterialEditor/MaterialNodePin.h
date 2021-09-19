@@ -28,7 +28,7 @@ namespace Kaimos::MaterialEditor {
 
 		// --- Public Pin Methods ---
 		virtual bool IsInput() const = 0;
-		virtual void LinkPin(NodePin* output_pin) = 0;
+		virtual void LinkPin(NodePin* output_pin, bool deserializing = false) = 0;
 		virtual void SerializePin(YAML::Emitter& output_emitter) const = 0;
 
 		void DeleteLink(int input_pin_id = -1);
@@ -73,11 +73,11 @@ namespace Kaimos::MaterialEditor {
 	public:
 
 		// --- Public Pin Methods ---
-		virtual bool IsInput()										const override { return false; }
-		virtual void LinkPin(NodePin* input_pin)					override;
-		virtual void SerializePin(YAML::Emitter& output_emitter)	const override;
+		virtual bool IsInput()													const override { return false; }
+		virtual void LinkPin(NodePin* input_pin, bool deserializing = false)	override;
+		virtual void SerializePin(YAML::Emitter& output_emitter)				const override;
 
-		void SetOutputValue(const glm::vec4& value)					{ SetValue(value); }
+		void SetOutputValue(const glm::vec4& value)								{ SetValue(value); }
 		void SetOutputDataType(PinDataType datatype_to_set);
 		
 		void DisconnectInputPin(uint input_pinID);
@@ -114,9 +114,9 @@ namespace Kaimos::MaterialEditor {
 	public:
 
 		// --- Public Pin Methods ---
-		virtual bool IsInput()										const override { return true; }
-		virtual void LinkPin(NodePin* output_pin)					override;
-		virtual void SerializePin(YAML::Emitter& output_emitter)	const override;
+		virtual bool IsInput()													const override { return true; }
+		virtual void LinkPin(NodePin* output_pin, bool deserializing = false)	override;
+		virtual void SerializePin(YAML::Emitter& output_emitter)				const override;
 
 		void DisconnectOutputPin(bool is_destroying = false);
 		glm::vec4 CalculateInputValue();

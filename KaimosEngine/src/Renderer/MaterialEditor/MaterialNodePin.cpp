@@ -134,10 +134,10 @@ namespace Kaimos::MaterialEditor {
 
 
 	// ----------------------- Public Pin Methods ---------------------------------------------------------
-	void NodeOutputPin::LinkPin(NodePin* input_pin)
+	void NodeOutputPin::LinkPin(NodePin* input_pin, bool deserializing)
 	{
 		if (input_pin && input_pin->IsInput())
-			static_cast<NodeInputPin*>(input_pin)->LinkPin(this);
+			static_cast<NodeInputPin*>(input_pin)->LinkPin(this, deserializing);
 	}
 
 
@@ -284,9 +284,9 @@ namespace Kaimos::MaterialEditor {
 
 
 	// ----------------------- Public Pin Methods ---------------------------------------------------------
-	void NodeInputPin::LinkPin(NodePin* output_pin)
+	void NodeInputPin::LinkPin(NodePin* output_pin, bool deserializing)
 	{
-		if (CheckLinkage(output_pin))
+		if (deserializing || CheckLinkage(output_pin))
 		{
 			// Check if this pin's node is connected to the node of the output_pin	// TODO: Handle unavailable connections (loops, ...) // TODO!
 			//NodeOutputPin* node_output = m_OwnerNode->GetOutputPin();

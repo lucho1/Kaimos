@@ -39,7 +39,7 @@ namespace Kaimos::MaterialEditor {
 		MaterialNode* CreateNode(OperationNodeType operation_type, PinDataType operation_data_type, const ImVec2& node_pos);
 		MaterialNode* CreateNode(SpecialOperationNodeType operation_type, PinDataType operation_data_type, const ImVec2& node_pos);
 
-		void CreateLink(uint output_pinID, uint input_pinID);
+		void CreateLink(uint output_pinID, uint input_pinID, bool deserializing = false);
 
 		// --- Deletion Methods ---
 		void DeleteNode(uint nodeID);

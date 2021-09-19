@@ -103,11 +103,11 @@ namespace Kaimos::MaterialEditor {
 		return node;
 	}
 
-	void MaterialGraph::CreateLink(uint output_pinID, uint input_pinID)
+	void MaterialGraph::CreateLink(uint output_pinID, uint input_pinID, bool deserializing)
 	{
 		NodePin* pin = FindNodePin(input_pinID);
 		if (pin)
-			pin->LinkPin(FindNodePin(output_pinID));
+			pin->LinkPin(FindNodePin(output_pinID), deserializing);
 	}
 
 
@@ -355,7 +355,7 @@ namespace Kaimos::MaterialEditor {
 			}
 
 			for (auto link_pair : links_vector)
-				CreateLink(link_pair.first, link_pair.second);
+				CreateLink(link_pair.first, link_pair.second, true);
 		}
 	}
 
