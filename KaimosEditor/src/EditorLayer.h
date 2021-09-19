@@ -41,6 +41,7 @@ namespace Kaimos {
 		bool OnMouseScrolled(MouseScrolledEvent& ev);
 
 		// --- Private Editor Methods ---
+		void CreateScene(bool set_viewport = true, bool set_rendering_pipeline = false, bool pbr_pipeline = false, const std::string& scene_name = "KaimosScene");
 		void NewSceneScreen();
 		void SetSceneParameters(bool set_viewport = true);
 

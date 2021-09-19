@@ -51,11 +51,10 @@ namespace Kaimos {
 		m_PrimaryCameraFramebuffer = Framebuffer::Create(primcam_fbo_settings);
 
 		// -- Create & Load Scene --
-		m_CurrentScene = CreateRef<Scene>();
-		SetSceneParameters(false);
+		CreateScene(false);
 
 		SceneSerializer m_Serializer(m_CurrentScene);
-		m_Serializer.Deserialize("assets/scenes/PBRDefaultScene.kaimos");
+		m_Serializer.Deserialize("assets/scenes/PBRWaterScene.kaimos");
 		m_KMEPanel = MaterialEditorPanel(m_CurrentScene);
 		m_ScenePanel = ScenePanel(m_CurrentScene, &m_KMEPanel);
 	}
@@ -654,6 +653,17 @@ namespace Kaimos {
 
 	
 	// ----------------------- Private Editor Methods -----------------------------------------------------
+	void EditorLayer::CreateScene(bool set_viewport, bool set_rendering_pipeline, bool pbr_pipeline, const std::string& scene_name)
+	{
+		if(set_rendering_pipeline)
+			m_CurrentScene = CreateRef<Scene>(scene_name, pbr_pipeline);
+		else
+			m_CurrentScene = CreateRef<Scene>();
+
+		SetSceneParameters(set_viewport);
+		Renderer::RemoveEnvironmentMap();
+	}
+
 	void EditorLayer::NewSceneScreen()
 	{
 		if (ImGui::BeginPopupModal("Create Scene", NULL, ImGuiWindowFlags_NoResize))
@@ -694,8 +704,7 @@ namespace Kaimos {
 						close_popup = true;
 						ImGui::CloseCurrentPopup();
 
-						m_CurrentScene = CreateRef<Scene>(scene_name_str, render_pipeline);
-						SetSceneParameters();
+						CreateScene(true, true, render_pipeline, scene_name_str);
 						memset(scene_name, 0, sizeof(scene_name));
 					}
 				}
@@ -782,9 +791,7 @@ namespace Kaimos {
 		std::string filepath = FileDialogs::OpenFile("Kaimos Scene (*.kaimos)\0*.kaimos\0");
 		if (!filepath.empty() && filepath != m_CurrentScene->GetPath()) // TODO: Compare the relative paths or scenes ids/names! Requires filesystem or scene IDs
 		{
-			m_CurrentScene = CreateRef<Scene>();
-			SetSceneParameters();
-
+			CreateScene();
 			SceneSerializer m_Serializer(m_CurrentScene);
 			m_Serializer.Deserialize(filepath);
 		}
