@@ -253,7 +253,7 @@ namespace Kaimos {
 			// -- Update Mesh Timed Vertices --
 			static float accumulated_dt = 0.0f;
 			accumulated_dt += dt.GetMilliseconds();
-			if (accumulated_dt > 200.0f)
+			if (accumulated_dt > 30.0f)
 			{
 				mesh_component.UpdateTimedVertices();
 				accumulated_dt = 0.0f;
