@@ -29,7 +29,7 @@ namespace Kaimos {
 		open_file_name.nMaxFile = sizeof(file);
 		open_file_name.lpstrFilter = filter;
 		open_file_name.nFilterIndex = 1;
-		open_file_name.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR; // If this is not here, it will change the working directory
+		open_file_name.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_EXPLORER | OFN_NOCHANGEDIR; // If this is not here, it will change the working directory
 
 		// -- Check for current directory and set it if exists --
 		CHAR directory[260] = { 0 };
