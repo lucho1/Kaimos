@@ -61,7 +61,19 @@ In terms of Software (...)
 
 In terms of art (icons, images, ...), we have used the next resources, all with licence to use them (mostly without comercial attribution).
 
-## ICONS
+## Resources
+PBR Materials & Textures
+  - Learn OpenGL (https://learnopengl.com/)
+  - Free PBR (https://freepbr.com/)
+  - Polyhaven (https://polyhaven.com/)
+  - Quixel Bridge (Megascans - https://quixel.com/bridge)
+
+IBL Textures
+  - HDR Labs (http://www.hdrlabs.com/sibl/archive.html)
+  - HRRI Hub (https://www.hdri-hub.com/)
+  - Polyhaven (https://polyhaven.com/)
+
+## Icons
 Toolbar Icons
   - 3D shape by mynamepong from the Noun Project
   - 3D by pictohaven from the Noun Project
