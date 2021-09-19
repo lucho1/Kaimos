@@ -236,6 +236,9 @@ namespace Kaimos::MaterialEditor {
 
 			if (ImGui::IsItemHovered() || ImGui::IsItemFocused() || ImGui::IsItemActive() || ImGui::IsItemEdited() || ImGui::IsItemClicked())
 				allow_node_drag = false;
+
+			if (modify_value)
+				value_to_modify = m_Value;
 		}
 
 		ImGui::PopID();
