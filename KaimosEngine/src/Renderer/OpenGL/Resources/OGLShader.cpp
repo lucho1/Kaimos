@@ -352,7 +352,7 @@ namespace Kaimos {
 		int location = glGetUniformLocation(m_ShaderID, name.c_str());
 		if (location == -1)
 		{
-			KS_WARN("Tried to retrieve an unexisting uniform at Shader '{0}' ('{1}')", m_Name, name);
+			//KS_WARN("Tried to retrieve an unexisting uniform at Shader '{0}' ('{1}')", m_Name, name);
 			return location;
 		}
 
