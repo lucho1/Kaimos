@@ -36,14 +36,19 @@ namespace Kaimos {
 		uint width = (uint)(mode->width / 1.4f);
 		uint height = (uint)(mode->height / 1.4f);
 
+		#if KS_DIST
+			width *= 1.4f /1.05f;
+			height *= 1.4f/1.1f;
+		#endif
+
 		// -- Set Props & Initialize Window --
 		Init(WindowProps(window_name, width, height));
 
 		// -- Set Fullscreen if Dist Build --
-		#if KS_DIST
-			SetFullscreen(true);
-			SetVSync(true);
-		#endif
+		//#if KS_DIST
+			//SetFullscreen(true);
+			//SetVSync(true);
+		//#endif
 	}
 
 	WindowsWindow::WindowsWindow(const WindowProps& window_props)
