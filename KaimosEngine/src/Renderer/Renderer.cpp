@@ -508,6 +508,8 @@ namespace Kaimos {
 
 	void Renderer::CompileEnvironmentMap()
 	{
+		KS_PROFILE_FUNCTION();
+
 		// -- Get Needed Shaders --
 		Ref<Shader> recttocube_shader		= GetShader("EquirectangularToCubemap");
 		Ref<Shader> irradiance_shader		= GetShader("CubemapConvolution");
