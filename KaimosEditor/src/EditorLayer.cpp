@@ -54,7 +54,7 @@ namespace Kaimos {
 		CreateScene(false);
 
 		SceneSerializer m_Serializer(m_CurrentScene);
-		m_Serializer.Deserialize("assets/scenes/PBRWaterScene.kaimos");
+		m_Serializer.Deserialize("assets/scenes/PBRDefaultScene.kaimos");
 		m_KMEPanel = MaterialEditorPanel(m_CurrentScene);
 		m_ScenePanel = ScenePanel(m_CurrentScene, &m_KMEPanel);
 	}
@@ -295,7 +295,7 @@ namespace Kaimos {
 			m_ScenePanel.OnUIRender(show_scene_panel, m_ViewportFocused);
 
 		// -- Settings Panel Rendering --
-		m_SettingsPanel.OnUIRender(m_HoveredEntity, show_settings_panel, show_performance_panel);
+		m_SettingsPanel.OnUIRender(m_CurrentScene, m_HoveredEntity, show_settings_panel, show_performance_panel);
 
 		// -- Project & Console Panels --
 		//if (show_files_panel)

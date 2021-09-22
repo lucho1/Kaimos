@@ -153,9 +153,14 @@ namespace Kaimos {
 		s_RenderingEditor = true;
 
 		// -- Render Meshes --
+		m_RenderingTime.Start();
 		if (!BeginScene(s_EditorCamera.GetCamera(), s_EditorCamera.GetPosition(), true))
+		{
+			m_RenderingTime.Stop();
 			return;
+		}
 		
+
 		RenderMeshes(dt);
 		Renderer3D::EndScene();
 
@@ -165,6 +170,7 @@ namespace Kaimos {
 		Renderer2D::EndScene();
 
 		Renderer::EndScene(s_EditorCamera.GetCamera().GetView(), s_EditorCamera.GetCamera().GetProjection());
+		m_RenderingTime.Stop();
 	}
 
 

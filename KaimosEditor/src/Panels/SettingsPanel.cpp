@@ -5,6 +5,7 @@
 
 #include "ImGui/ImGuiUtils.h"
 #include "Core/Utils/PlatformUtils.h"
+#include "Scene/Scene.h"
 
 #include <ImGui/imgui.h>
 #include <glm/glm.hpp>
@@ -40,8 +41,14 @@ namespace Kaimos {
 	}
 
 
+
 	// ----------------------- Public Class Methods -------------------------------------------------------
-	void SettingsPanel::OnUIRender(const Entity& hovered_entity, bool& closing_settings, bool& closing_performance)
+	SettingsPanel::SettingsPanel()
+	{
+		m_RenderingAvgMeasureUpdateTimer.Start();
+	}
+
+	void SettingsPanel::OnUIRender(const Ref<Scene>& current_scene, const Entity& hovered_entity, bool& closing_settings, bool& closing_performance)
 	{
 		// -- World Settings --
 		if (closing_settings)
@@ -190,7 +197,7 @@ namespace Kaimos {
 
 			// FPS
 			if (ImGui::CollapsingHeader("Framerate", flags))
-				DisplayFPSMetrics();
+				DisplayFPSMetrics(current_scene);
 
 			// Memory
 			ImGui::NewLine();
@@ -240,9 +247,18 @@ namespace Kaimos {
 		++m_FPSAllocationsIndex;
 	}
 
-	void SettingsPanel::DisplayFPSMetrics()
+	void SettingsPanel::SetRenderTimeMetrics(const Ref<Scene>& current_scene)
 	{
-		// -- Metrics Gathering --
+		if (m_RenderingAllocationsIndex == METRICS_ALLOCATIONS_SAMPLES)
+			m_RenderingAllocationsIndex = 0;
+
+		m_RenderingAllocations[m_RenderingAllocationsIndex] = current_scene->GetRenderingTime();
+		++m_RenderingAllocationsIndex;
+	}
+
+	void SettingsPanel::DisplayFPSMetrics(const Ref<Scene>& current_scene)
+	{
+		// -- FPS Metrics Gathering --
 		float float_fps_allocs[METRICS_ALLOCATIONS_SAMPLES];
 		for (uint i = 0; i < METRICS_ALLOCATIONS_SAMPLES; ++i)
 			float_fps_allocs[i] = (float)m_FPSAllocations[i];
@@ -272,12 +288,55 @@ namespace Kaimos {
 		if (ImGui::Checkbox("VSYNC", &vsync))
 			Application::Get().GetWindow().SetVSync(vsync);
 
+
+		// -- Rendering Metrics Gathering --
+		if (current_scene)
+		{
+			float float_rend_allocs[METRICS_ALLOCATIONS_SAMPLES];
+			for (uint i = 0; i < METRICS_ALLOCATIONS_SAMPLES; ++i)
+				float_rend_allocs[i] = m_RenderingAllocations[i];
+
+			// -- Plots --
+			// Plots Text
+			ImGui::NewLine();
+			ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[1]);
+			font_size = ImGui::GetFontSize() * 4.5f; // 4.5 is half the characters of "Avg. Time"
+			ImGui::SameLine(ImGui::GetWindowSize().x / 2 - font_size + (font_size / 2));
+			ImGui::Text("Avg. Time");
+			ImGui::PopFont();
+
+			static float render_time = current_scene->GetRenderingTime();
+			if (m_RenderingAvgMeasureUpdateTimer.GetSeconds() > 1.5f)
+			{
+				render_time = current_scene->GetRenderingTime();
+				m_RenderingAvgMeasureUpdateTimer.Start();
+			}
+
+			// Plot
+			char overlay2[50];
+			sprintf(overlay2, "Avg. Render Time: %.2fms", render_time);
+			ImGui::PlotHistogram("###RenderingTimeHistogram", float_rend_allocs, IM_ARRAYSIZE(float_rend_allocs), 0, overlay2, 0.0f, 15.0f, ImVec2(ImGui::GetContentRegionAvailWidth(), 100.0f));
+
+			// -- Memory Metrics Gathering Stop --
+			static bool stop2 = false;
+			ImGui::Checkbox("Stop Rendering Time Count", &stop2);
+			if (!stop2)
+				SetRenderTimeMetrics(current_scene);
+		}
+
+
 		// -- Printing --
 		float text_separation = ImGui::GetContentRegionAvailWidth() / 3.0f + 25.0f;
 		ImGui::NewLine();
 
 		ImGui::Text("Avg. Frame ms: "); ImGui::SameLine(text_separation);
 		ImGui::Text("%.2fms", Application::Get().GetLastFrameTime());
+
+		if (current_scene)
+		{
+			ImGui::Text("Avg. Render ms: "); ImGui::SameLine(text_separation);
+			ImGui::Text("%.2fms", current_scene->GetRenderingTime());
+		}
 
 		ImGui::Text("Timestep: "); ImGui::SameLine(text_separation);
 		ImGui::Text("%.2fms", Application::Get().GetTimestep());

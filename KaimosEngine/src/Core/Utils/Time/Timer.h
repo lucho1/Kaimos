@@ -24,7 +24,7 @@ public:
 		}
 	}
 
-	float GetNanoseconds()
+	float GetNanoseconds() const
 	{
 		std::chrono::time_point<std::chrono::high_resolution_clock> end_time;
 
@@ -39,17 +39,17 @@ public:
 
 
 
-	float GetMicroseconds()
+	float GetMicroseconds() const
 	{
 		return GetNanoseconds() / 1000.0f;
 	}
 
-	float GetMilliseconds()
+	float GetMilliseconds() const
 	{
 		return GetMicroseconds() / 1000.0f;
 	}
 
-	float GetSeconds()
+	float GetSeconds() const
 	{
 		return GetMilliseconds() / 1000.0f;
 	}

@@ -2,6 +2,7 @@
 #define _SCENE_H_
 
 #include "Core/Utils/Time/Timestep.h"
+#include "Core/Utils/Time/Timer.h"
 #include "Renderer/Cameras/Camera.h"
 #include "Renderer/Cameras/CameraController.h"
 
@@ -58,6 +59,8 @@ namespace Kaimos {
 		static float GetCameraOrthoSize();
 		static glm::vec2 GetCameraPlanes();
 
+		inline float GetRenderingTime()					const { return m_RenderingTime.GetMilliseconds(); }
+
 		inline const std::string GetName()				const { return m_Name; }
 		inline const std::string GetPath()				const { return m_Path; }
 		inline void SetName(const std::string& name)	{ m_Name = name; }
@@ -89,6 +92,8 @@ namespace Kaimos {
 		std::string m_Path = "";
 		entt::registry m_Registry = {};
 		uint m_ViewportWidth = 0, m_ViewportHeight = 0;
+
+		Timer m_RenderingTime = {};
 	};
 }
 #endif //_SCENE_H_
