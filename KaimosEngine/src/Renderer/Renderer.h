@@ -62,6 +62,11 @@ namespace Kaimos {
 		static void ForceEnvironmentMapRecompile(uint environment_map_resolution = 1024, uint prefiltered_map_resolution = 128, uint irradiance_map_resolution = 32);
 		static void RemoveEnvironmentMap();
 
+		static uint GetEnvironmentRenderingSetting();
+		static void SetEnvironmentRenderingSetting(uint setting);
+		static float GetEnvironmentPrefilterMipmap();
+		static void SetEnvironmentPrefilterMipmap(float mip_level);
+
 
 		// --- Event Methods ---
 		static void OnWindowResize(uint width, uint height);

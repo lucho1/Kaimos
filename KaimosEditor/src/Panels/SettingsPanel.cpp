@@ -125,6 +125,27 @@ namespace Kaimos {
 					enviromap_path = enviromap_path.substr(enviromap_path.find("assets"), enviromap_path.size() - 1);
 				}
 
+				// Environment Rendering Settings
+				const char* const enviro_render_settings[] = { "Standard", "Render Irradiance Map", "Render Prefiltered Map" };
+				static int env_rend_op = Renderer::GetEnvironmentRenderingSetting();
+
+				ImGui::Text("Environment Rendering"); ImGui::SameLine();
+				ImGui::SetNextItemWidth(75.0f);
+				if (ImGui::Combo("###environment_rendering_settings", &env_rend_op, enviro_render_settings, IM_ARRAYSIZE(enviro_render_settings)))
+					Renderer::SetEnvironmentRenderingSetting(env_rend_op);
+
+				if (env_rend_op == 2)
+				{
+					const char* const enviro_pref_mipmaps[] = { "0", "1", "2", "3", "4" };
+					static float enviro_pref_mipmap = Renderer::GetEnvironmentPrefilterMipmap();
+
+					ImGui::Text("Prefilter Level"); ImGui::SameLine();
+					ImGui::SetNextItemWidth(45.0f);
+					if(ImGui::DragFloat("###enviro_prefilter_mipmap", &enviro_pref_mipmap, 0.1f, 0.0f, 10.0f, "%.1f"))
+						Renderer::SetEnvironmentPrefilterMipmap(enviro_pref_mipmap);
+				}
+
+
 				// Skybox HDR Warn
 				if(!Renderer::IsSceneInPBRPipeline())
 					ImGui::TextColored({ 0.8f, 0.8f, 0.2f, 1.0f }, "Non-PBR Skybox must be in HDR format too");

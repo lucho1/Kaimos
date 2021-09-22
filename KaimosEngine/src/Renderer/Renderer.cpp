@@ -52,6 +52,8 @@ namespace Kaimos {
 		Ref<CubemapTexture> EnvironmentCubemap = nullptr, IrradianceCubemap = nullptr, PrefilterCubemap = nullptr;
 		Ref<LUTTexture> BRDF_LutTexture = nullptr;
 		Ref<Framebuffer> EnvironmentMapFBO = nullptr;
+		uint EnvironmentRenderingSetting = 0;
+		float PrefilterDisplayMipmap = 0;
 	};
 
 	static RendererData* s_RendererData = nullptr;
@@ -234,9 +236,18 @@ namespace Kaimos {
 			skybox_shader->SetUniformMat4("u_ViewProjection", view_proj);
 			skybox_shader->SetUniformFloat3("u_SceneColor", s_RendererData->SceneColor);
 
-			s_RendererData->EnvironmentCubemap->Bind();
-			//s_RendererData->IrradianceCubemap->Bind();
-			//s_RendererData->PrefilterCubemap->Bind();
+			skybox_shader->SetUniformInt("u_DisplayPrefiltering", 0);
+			if(s_RendererData->EnvironmentRenderingSetting == 0)
+				s_RendererData->EnvironmentCubemap->Bind();
+			else if(s_RendererData->EnvironmentRenderingSetting == 1)
+				s_RendererData->IrradianceCubemap->Bind();
+			else
+			{
+				skybox_shader->SetUniformInt("u_DisplayPrefiltering", 1);
+				s_RendererData->PrefilterCubemap->Bind();
+				skybox_shader->SetUniformFloat("u_PrefilterMipmap", s_RendererData->PrefilterDisplayMipmap);
+			}
+
 			skybox_shader->SetUniformInt("u_Cubemap", 0);
 			RenderCube();
 			skybox_shader->Unbind();
@@ -432,6 +443,28 @@ namespace Kaimos {
 			return s_RendererData->EnvironmentHDRMap->GetTextureID();
 
 		return 0;
+	}
+
+	uint Renderer::GetEnvironmentRenderingSetting()
+	{
+		return s_RendererData->EnvironmentRenderingSetting;
+	}
+
+	void Renderer::SetEnvironmentRenderingSetting(uint setting)
+	{
+		if(setting < 3)
+			s_RendererData->EnvironmentRenderingSetting = setting;
+	}
+
+	float Renderer::GetEnvironmentPrefilterMipmap()
+	{
+		return s_RendererData->PrefilterDisplayMipmap;
+	}
+
+	void Renderer::SetEnvironmentPrefilterMipmap(float mip_level)
+	{
+		if (mip_level < 10.1f)
+			s_RendererData->PrefilterDisplayMipmap = mip_level;
 	}
 
 	glm::ivec2 Renderer::GetEnvironmentMapSize()
