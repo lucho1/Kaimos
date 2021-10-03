@@ -29,8 +29,8 @@ namespace Kaimos {
 			case GL_DEBUG_SEVERITY_NOTIFICATION:	KS_TRACE(error_message + " - Notification -" + msg);	return;
 		}
 
-		KS_CRITICAL(error_message + " - UNKNOWN SEVERITY -" + msg);
-		KS_FATAL_ERROR("Error of Unknown Severity Level!");
+		KS_ENGINE_CRITICAL(error_message + " - UNKNOWN SEVERITY -" + msg);
+		KS_ENGINE_CRITICAL("Error of Unknown Severity Level!");
 	}
 
 
