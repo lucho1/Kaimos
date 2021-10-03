@@ -53,6 +53,11 @@ namespace Kaimos {
 		Renderer::SetSceneColor(glm::vec3(1.0f));
 		Renderer::SetPBRPipeline(pbr_pipeline);
 	}
+
+	Scene::~Scene()
+	{
+		m_Registry.clear();
+	}
 	
 
 
@@ -349,14 +354,16 @@ namespace Kaimos {
 		m_Registry.destroy((entt::entity)entity.GetID());
 	}
 
+
 	void Scene::UpdateMeshAndSpriteComponentsVertices(uint material_id)
 	{
 		KS_PROFILE_FUNCTION();
-		auto mesh_view = m_Registry.view<MeshRendererComponent>();
-		for (auto ent : mesh_view)
+
+		auto mesh_group = m_Registry.group<TransformComponent>(entt::get<MeshRendererComponent>);
+		for (auto ent : mesh_group)
 		{
-			MeshRendererComponent& mesh_comp = mesh_view.get<MeshRendererComponent>(ent);
-			if(mesh_comp.MaterialID == material_id)
+			MeshRendererComponent& mesh_comp = mesh_group.get<MeshRendererComponent>(ent);
+			if (mesh_comp.MaterialID == material_id)
 				mesh_comp.UpdateModifiedVertices();
 		}
 

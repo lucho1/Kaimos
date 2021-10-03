@@ -29,7 +29,7 @@ namespace Kaimos {
 		// --- Public Class Methods ---
 		Scene();
 		Scene(const std::string& name, bool pbr_pipeline = false);
-		~Scene() = default;
+		~Scene();
 
 		// --- Public Scene Methods ---
 		void OnUpdateEditor(Timestep dt);
