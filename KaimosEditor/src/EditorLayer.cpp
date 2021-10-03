@@ -53,8 +53,17 @@ namespace Kaimos {
 		// -- Create & Load Scene --
 		CreateScene(false);
 
+		std::string s_path = "assets/scenes/PBRDefaultScene.kaimos";
+		std::string scenep = Renderer::GetLastScene();
+		std::filesystem::path fpath = scenep;
+
+		if (!std::filesystem::exists(fpath) || scenep.find("assets") == std::string::npos)
+			KS_ENGINE_ERROR("Couldn't load scene");
+		else
+			s_path = scenep;
+
 		SceneSerializer m_Serializer(m_CurrentScene);
-		m_Serializer.Deserialize("assets/scenes/PBRDefaultScene.kaimos");
+		m_Serializer.Deserialize(s_path);
 		m_KMEPanel = MaterialEditorPanel(m_CurrentScene);
 		m_ScenePanel = ScenePanel(m_CurrentScene, &m_KMEPanel);
 	}
@@ -748,6 +757,8 @@ namespace Kaimos {
 		else
 			m_Serializer.Serialize(m_CurrentScene->GetPath());
 
+		Renderer::SetLastScene(m_CurrentScene->GetPath());
+
 		// -- Save Editor Settings (ini files) --
 		ImGui::SaveIniSettingsToDisk("imgui.ini");
 	}
@@ -779,6 +790,8 @@ namespace Kaimos {
 			m_KMEPanel.SerializeGraphs();
 			SceneSerializer m_Serializer(m_CurrentScene);
 			m_Serializer.Serialize(filepath);
+
+			Renderer::SetLastScene(m_CurrentScene->GetPath());
 
 			// -- Save Editor Settings (ini file) --
 			ImGui::SaveIniSettingsToDisk("imgui.ini");

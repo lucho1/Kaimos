@@ -64,7 +64,20 @@ namespace Kaimos {
 		inline const std::string GetName()				const { return m_Name; }
 		inline const std::string GetPath()				const { return m_Path; }
 		inline void SetName(const std::string& name)	{ m_Name = name; }
-		inline void SetPath(const std::string& path)	{ m_Path = path; }
+		void SetPath(const std::string& path)
+		{
+			std::filesystem::path spath = path;
+			if (std::filesystem::exists(spath))
+			{
+				size_t n = path.find("assets");
+				if (n != std::string::npos)
+					m_Path = path.substr(n, path.size());
+				else
+					KS_ERROR("Couldn't set scene path, it was invalid");
+			}
+			else
+				KS_ERROR("Couldn't set scene path, it was unexisting");
+		}
 
 	private:
 

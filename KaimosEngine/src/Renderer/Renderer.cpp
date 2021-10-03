@@ -21,6 +21,8 @@ namespace Kaimos {
 
 	struct RendererData
 	{
+		std::string LastScene = "";
+
 		// Renderer Stuff
 		glm::mat4 ViewProjectionMatrix = glm::mat4(1.0f);
 		glm::vec3 SceneColor = glm::vec3(1.0f);
@@ -280,6 +282,7 @@ namespace Kaimos {
 		output << YAML::Key << "KaimosSaveFile" << YAML::Value << "KaimosRenderer";
 		
 		// -- Serialize Materials (as Sequence) --
+		output << YAML::Key << "LastScene" << YAML::Value << s_RendererData->LastScene;
 		output << YAML::Key << "DefaultMaterialID" << YAML::Value << s_RendererData->DefaultMaterialID;
 		output << YAML::Key << "Materials" << YAML::Value << YAML::BeginSeq;
 		for (auto& mat : s_RendererData->Materials)
@@ -333,6 +336,9 @@ namespace Kaimos {
 		}
 
 		// -- Setup --
+		if (data["LastScene"])
+			SetLastScene(data["LastScene"].as<std::string>());
+
 		if (data["DefaultMaterialID"])
 			CreateDefaultMaterial(data["DefaultMaterialID"].as<uint>());
 		else
@@ -381,6 +387,24 @@ namespace Kaimos {
 
 	
 	// ----------------------- Public Getters & Renderer Shaders Methods -------------------------------------
+	std::string Renderer::GetLastScene()
+	{
+		return s_RendererData->LastScene;
+	}
+
+	void Renderer::SetLastScene(const std::string& scene_path)
+	{
+		std::filesystem::path fpath = scene_path;
+		if (!std::filesystem::exists(fpath) || scene_path.find("assets") == std::string::npos)
+		{
+			KS_ENGINE_ERROR("Couldn't change Last Scene");
+			return;
+		}
+
+
+		s_RendererData->LastScene = scene_path;
+	}
+
 	uint Renderer::GetCameraUIDisplayOption()
 	{
 		return s_RendererData->CameraUIDisplayOption;

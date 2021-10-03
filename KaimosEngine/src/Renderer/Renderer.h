@@ -38,6 +38,9 @@ namespace Kaimos {
 		// --- Getters ---
 		inline static const RendererAPI::API GetRendererAPI() { return RendererAPI::GetAPI(); }
 
+		static std::string GetLastScene();
+		static void SetLastScene(const std::string& scene_path);
+
 		static uint GetCameraUIDisplayOption();
 		static void SetCameraUIDisplayOption(uint option);
 
