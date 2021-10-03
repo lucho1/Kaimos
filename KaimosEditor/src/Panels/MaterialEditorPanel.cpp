@@ -34,12 +34,24 @@ namespace Kaimos {
 			m_Resize = false;
 		}
 		
+		// -- Set Focus if Interacted --
+		static bool focus_window = false;
+		if (focus_window)
+		{
+			ImGui::SetNextWindowFocus();
+			focus_window = false;
+		}
+
+
 		// -- Begin Window --
 		ImGui::Begin("Kaimos Material Editor", &ShowPanel);
 		if (Maths::CompareFloats(ImGui::GetWindowViewport()->Size.x, ImGui::GetWindowWidth()) && Maths::CompareFloats(ImGui::GetWindowViewport()->Size.y, ImGui::GetWindowHeight()))
 			m_Maximized = true;
 		else
 			m_Maximized = false;
+
+		if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Left) || ImGui::IsMouseClicked(ImGuiMouseButton_Right) || ImGui::IsMouseClicked(ImGuiMouseButton_Middle))
+			focus_window = true;
 
 		// -- Right Click Options --
 		if (!m_EditorHovered)
