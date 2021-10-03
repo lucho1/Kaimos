@@ -410,7 +410,7 @@ namespace Kaimos {
 	{
 		m_CurrentScene->GetEditorCamera().OnEvent(ev);
 
-		if(!ImGuizmo::IsUsing() && !ImGuizmo::IsOver())
+		if(m_ViewportFocused && !ImGuizmo::IsUsing() && !ImGuizmo::IsOver())
 			m_ScenePanel.OnEvent(ev);
 
 		EventDispatcher dispatcher(ev);
