@@ -84,6 +84,9 @@ namespace Kaimos::MaterialEditor {
 	{
 		ImGui::NewLine(); ImGui::SameLine(text_indent);
 
+		if (m_OwnerNode->IsNodeTimeDependant())
+			return;
+
 		switch (m_PinDataType)
 		{
 			case PinDataType::FLOAT:	ImGui::Text("Value: %.1f", m_Value.x); return;
