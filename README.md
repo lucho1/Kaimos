@@ -1,9 +1,9 @@
 # Kaimos Engine
-Kaimos Engine is a basic 3D engine for educational purposes. It aims to be a 3D Geometry visualizer with an OpenGL renderer to serve as a basis for the development of the Degree Thesis (TFG) of my degree in Videogames Design and Development at CITM-UPC.
+Kaimos Engine is a 3D engine with an OpenGL renderer supporting PBR & IBL made from scratch in C++ to serve as a basis for the development of the Degree Thesis (TFG) of my degree in Videogames Design and Development at CITM-UPC.
 
 Check the presentation video: https://www.youtube.com/watch?v=nbP7d8Ai8Oo&
 
-Its purposes is to have a a node-based Material Editor in order to make the understanding and creation of materials and environments edition easy for anyone without having a deep understanding of the subject and without having to write any kind of code. As well, my purpose is to gather the documentation to made this in the mentioned thesis (found [here](https://drive.google.com/file/d/1xbDRZB10k20QQi_Jhxhc_i64FvKP7dUs/view?usp=sharing)).
+Its purpose is to have a a node-based Material Editor in order to make the understanding and creation of materials and environments edition easy for anyone without having a deep understanding of the subject and without having to write any kind of code. As well, my purpose is to gather the documentation to made this in the mentioned thesis (found [here](https://drive.google.com/file/d/1xbDRZB10k20QQi_Jhxhc_i64FvKP7dUs/view?usp=sharing)).
 
 Besides, it supports various rendering techniques of which we would like to higlight PBR and IBL support. Also, it supports models loading from FBX and OBJ extensions (the first might give some problems) and the loading of HDR maps.
 
