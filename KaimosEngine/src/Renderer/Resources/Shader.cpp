@@ -14,10 +14,10 @@ namespace Kaimos {
 		switch (Renderer::GetRendererAPI())
 		{
 			case RendererAPI::API::OPENGL:		return CreateRef<OGLShader>(filepath);
-			case RendererAPI::API::NONE:		KS_ENGINE_ASSERT(false, "RendererAPI is set to NONE (unsupported)!"); return nullptr;
+			case RendererAPI::API::NONE:		KS_FATAL_ERROR("RendererAPI is set to NONE (unsupported)!"); return nullptr;
 		}
 
-		KS_ENGINE_ASSERT(false, "RendererAPI is unknown, not selected, or failed!");
+		KS_FATAL_ERROR("RendererAPI is unknown, not selected, or failed!");
 		return nullptr;
 	}
 
@@ -27,10 +27,10 @@ namespace Kaimos {
 		switch (Renderer::GetRendererAPI())
 		{
 			case RendererAPI::API::OPENGL:		return CreateRef<OGLShader>(name, vertex_src, fragment_src);
-			case RendererAPI::API::NONE:		KS_ENGINE_ASSERT(false, "RendererAPI is set to NONE (unsupported)!"); return nullptr;
+			case RendererAPI::API::NONE:		KS_FATAL_ERROR("RendererAPI is set to NONE (unsupported)!"); return nullptr;
 		}
 
-		KS_ENGINE_ASSERT(false, "RendererAPI is unknown, not selected, or failed!");
+		KS_FATAL_ERROR("RendererAPI is unknown, not selected, or failed!");
 		return nullptr;
 	}
 
@@ -53,7 +53,7 @@ namespace Kaimos {
 	void ShaderLibrary::Add(const std::string name, const Ref<Shader>& shader)
 	{
 		// -- Check name doesn't exists already --
-		KS_ENGINE_ASSERT(Exists(name), "Shader Already Exists!");
+		KS_ENGINE_ASSERT(!Exists(name), "Shader Already Exists!");
 		m_Shaders[name] = shader;
 	}
 
@@ -80,5 +80,11 @@ namespace Kaimos {
 		// -- Check name doesn't exists already --
 		KS_ENGINE_ASSERT(Exists(name), "Shader Not Found!");
 		return m_Shaders[name];
+	}
+
+	void ShaderLibrary::ForEachShader(std::function<void(const Ref<Shader>&)> for_body)
+	{
+		for (auto& shader : m_Shaders)
+			for_body(shader.second);
 	}
 }

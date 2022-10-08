@@ -23,6 +23,9 @@ namespace Kaimos::KaimosUI {
 		// Draw a Help Marker with a Text as popup
 		static void DrawHelpMarker(const std::string& help_text);
 
+		// Draw a Tooltip with a Text as popup
+		static void DrawTooltip(const std::string& text);
+
 		// - Drag Floats/Sliders -
 		// Draw a Drag Float in the same line than 'text' - label is the "widget id"
 		static bool DrawInlineDragFloat(const char* text, const char* label, float* value, float speed = 1.0f, float width = 0.0f, float spacing = 2.0f, float min = 0.0f, float max = 0.0f, const char* fmt = "%.2f", float pow = 1.0f);
@@ -52,12 +55,15 @@ namespace Kaimos::KaimosUI {
 		// - Others -
 		// Draw Dropdown: options = array of options (needs a size specification), selected_option = name of current selected opt. (needs its index in options[])
 		// the width is the width that the dropdown will occupy, if left to 0 will be the half of its imgui-calculated width
-		static bool DrawDropDown(const char* label, const char* options[], uint options_size, const char* selected_option, uint& selected_index, float width = 0.0f, float spacing = 2.0f);
+		static bool DrawDropDown(const char* label, const std::vector<std::string>& options, uint options_size, std::string& selected_option, uint& selected_index, float width = 0.0f, float spacing = 2.0f);
 
 		// Draw controller of vec3 (ue4-like): name = label ("position"), value = ref to vec3, xyz colors = vec3 axis colors,
 		// reset value = reset on pressing axis button, labels = names for axis (xyz, rgb...), column width = width of controller elements
 		static void DrawVec3UI(const std::string& name, glm::vec3& value, const glm::vec3& xcolor, const glm::vec3& ycolor, const glm::vec3& zcolor, float reset_value = 0.0f, const std::string& labels = {"XYZ"}, float column_width = 100.0f);
-		
+
+		// Draw Text + Set Cursor & Width for a next item
+		static void SetTextCursorAndWidth(const char* text, float width = 0.0f, float spacing = 2.0f);
+
 	private:
 
 		// --- Private UI Methods ---
@@ -65,7 +71,6 @@ namespace Kaimos::KaimosUI {
 		static void PushButtonSettings(const glm::vec3& active_color, const glm::vec3& hover_color, ImFont* font = nullptr);
 		
 		static void SetItemWidth(float width);
-		static void SetTextCursorAndWidth(const char* text, float width, float spacing);
 		
 		static void InlineDragFloat(const char* label, float* value, float speed);
 	};

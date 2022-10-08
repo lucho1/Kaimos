@@ -15,10 +15,14 @@ namespace Kaimos {
 		inline static void Init()																		{ s_RendererAPI->Init(); }
 
 		// --- Public RendererAPI Methods ---
+		inline static void EnableDepth()																{ s_RendererAPI->EnableDepth(); }
+		inline static void EnableCubemapFiltering()														{ s_RendererAPI->EnableCubemapFiltering(); }
+
 		inline static void Clear()																		{ s_RendererAPI->Clear(); }
 		inline static void SetClearColor(const glm::vec4& color)										{ s_RendererAPI->SetClearColor(color); }
 
 		inline static void DrawIndexed(const Ref<VertexArray>& vertex_array, uint index_count = 0)		{ s_RendererAPI->DrawIndexed(vertex_array, index_count); }
+		inline static void DrawUnindexed(const Ref<VertexArray>& vertex_array, uint count)				{ s_RendererAPI->DrawUnindexed(vertex_array, count); }
 		inline static void SetViewport(uint x, uint y, uint width, uint height)							{ s_RendererAPI->SetViewport(x, y, width, height); }
 
 	private:

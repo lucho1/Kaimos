@@ -4,9 +4,8 @@
 // Temporary Includes (DELETE THEM!)
 #include "Input/Input.h"
 #include "Renderer/Renderer.h"
+#include "Core/Resources/ResourceManager.h"
 #include <GLFW/glfw3.h>
-
-#include "Core/Utils/Maths/RandomGenerator.h"
 
 
 // ----------------------- Memory Usage ---------------------------------------------------------------
@@ -44,11 +43,15 @@ namespace Kaimos {
 		KS_ENGINE_ASSERT(!s_Instance, "One instance of Application already Exists!");
 		s_Instance = this;
 		
-		m_Window = Window::Create(WindowProps(name));
-		Renderer::Init();
+		m_Window = Window::Create(name);
+		//m_Window = Window::Create(WindowProps(name));
 
 		m_ImGuiLayer = new ImGuiLayer(); // It will be deleted with all the other layers in the ~LayerStack()
 		PushOverlay(m_ImGuiLayer);
+
+		Renderer::CreateRenderer();
+		Deserialize();
+		Renderer::Init();
 
 		// This will bind the Application::OnEvent function to SetEventCallback(), so the callback when
 		// an event happens will be Application::OnEvent. The placeholder will be replaced by whatever argument
@@ -59,7 +62,25 @@ namespace Kaimos {
 	Application::~Application()
 	{
 		KS_PROFILE_FUNCTION();
+		Serialize();
 		Renderer::Shutdown();
+	}
+
+
+
+	// ----------------------- Public Application Methods -------------------------------------------------
+	void Application::Serialize()
+	{
+		KS_INFO("\n\n--- SERIALIZING KAIMOS ENGINE ---");
+		Renderer::SerializeRenderer();
+		Resources::ResourceManager::SerializeResources();
+	}
+
+	void Application::Deserialize()
+	{
+		KS_INFO("\n\n--- DESERIALIZING KAIMOS ENGINE ---");
+		Renderer::DeserializeRenderer();
+		Resources::ResourceManager::DeserializeResources();
 	}
 
 
@@ -93,21 +114,25 @@ namespace Kaimos {
 		//else if (e.IsInCategory(EVENT_CATEGORY_INPUT))
 		//	KS_EDITOR_TRACE(e);
 
+		float last_sec_time = (float)glfwGetTime();
+		uint frame_count = 0;
+
 		while (m_Running)
 		{
 			KS_PROFILE_SCOPE("Run Loop");
+			++frame_count;
 
 			// -- Delta Time --
-			float time = (float)glfwGetTime();			//QueryPerformanceFrequency(); QueryPerformanceCounter(); // Platform::GetTime() !!!!!!
-			Timestep timestep = time - m_LastFrameTime;	// How long this frame is (dt, current time vs last frame time)
-			m_LastFrameTime = time;
+			m_Time = (float)glfwGetTime();			//QueryPerformanceFrequency(); QueryPerformanceCounter(); // Platform::GetTime() !!!!!!
+			m_Timestep = m_Time - m_LastFrameTime;	// How long this frame is (dt, current time vs last frame time)
+			m_LastFrameTime = m_Time;
 
 			// -- Layers Update --
 			if (!m_Minimized)
 			{
 				KS_PROFILE_SCOPE("LayerStack Update");
 				for (Layer* layer : m_LayerStack)
-					layer->OnUpdate(timestep);
+					layer->OnUpdate(m_Timestep);
 			}
 
 			// -- UI & Rendering --
@@ -122,15 +147,22 @@ namespace Kaimos {
 				m_ImGuiLayer->End();
 			}
 
-			// -- Input Test --
-			//auto [x, y] = Input::GetMousePos();
-			//KS_ENGINE_TRACE(" {0}, {1}", x, y);
-
 			// -- Window & Input Update --
 			{
 				KS_PROFILE_SCOPE("Window & Input Update");
 				Input::OnUpdate();
 				m_Window->OnUpdate();
+			}
+
+			// -- Debug Performance Metrics --
+			float sec = m_Time - last_sec_time;
+
+			if (sec >= 1.0f)
+			{
+				m_FPS = (uint)((float)frame_count / sec);
+				m_LastFrameMs = 1000.0f / (float)frame_count;
+				frame_count = 0;
+				last_sec_time = m_Time;
 			}
 		}
 	}
@@ -145,7 +177,6 @@ namespace Kaimos {
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<WindowCloseEvent>(KS_BIND_EVENT_FN(Application::OnWindowClose)); // If there's a WindowCloseEvent (checked in Dispatch()), dispatcher will call OnWindowClose function (same than a Lambda)
 		dispatcher.Dispatch<WindowResizeEvent>(KS_BIND_EVENT_FN(Application::OnWindowResize));
-		//KS_ENGINE_TRACE("{0}", e);
 
 		// -- Layers Events Handling --
 		for (auto it = m_LayerStack.rbegin(); it != m_LayerStack.rend(); ++it)

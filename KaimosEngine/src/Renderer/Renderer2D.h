@@ -1,32 +1,56 @@
 #ifndef _RENDERER_2D_
 #define _RENDERER_2D_
 
+#include "Core/Utils/Time/Timestep.h"
 #include "Cameras/Camera.h"
-
-#include "Resources/Texture.h"
-#include "Scene/ECS/Components.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 
 namespace Kaimos {
 
+	class Material;
+
+	struct SpriteRendererComponent;
 	struct QuadVertex
 	{
 		// --- Vertex Variables ---
 		glm::vec3 Pos		= glm::vec3(0.0f);
+		glm::vec3 Normal	= glm::vec3(0.0f);
+		glm::vec3 Tangent	= glm::vec3(0.0f);
 		glm::vec2 TexCoord	= glm::vec2(0.0f);
 		glm::vec4 Color		= glm::vec4(1.0f);
-		float TexIndex		= 0.0f;
-		float TilingFactor	= 1.0f;
+		float Bumpiness		= 0.5f;
+
+		int TexIndex		= 0.0f;
+		int NormTexIndex	= 0.0f;
 
 		// --- Editor Variables ---
 		int EntityID		= 0;
 	};
 
+	struct NonPBRQuadVertex : QuadVertex
+	{
+		float Shininess		= 0.5f;
+		float Specularity	= 0.5f;
+
+		int SpecTexIndex	= 0.0f;
+	};
+
+	struct PBRQuadVertex : QuadVertex
+	{
+		float Roughness		= 0.5f;
+		float Metallic		= 0.5f;
+		float AmbientOcc	= 0.5f;
+
+		int RoughTexIndex	= 0.0f;
+		int MetalTexIndex	= 0.0f;
+		int AOTexIndex		= 0.0f;
+	};
+
 
 
 	//A renderer is a high-level class, a full-on renderer: doesn't deals with commands such as ClearScene, deals with high-level constructs (scenes, meshes...)
-	//RenderCommands should NOT do multiple things, they are just commands (unless specifically suposed-to)
+	//RenderCommands should NOT do multiple things, they are just commands (unless specifically supposed-to)
 	class Renderer2D // Won't deal with Storage (will have 0 storage), no static stuff, just render commands
 	{
 		friend struct Renderer2DData;
@@ -37,29 +61,25 @@ namespace Kaimos {
 		static void Shutdown();
 
 		// --- Public Renderer Methods ---
-		static void BeginScene(const CameraComponent& camera_component, const TransformComponent& transform_component);
-		static void BeginScene(const Camera& camera);
+		static void BeginScene();
 		static void EndScene();
-		static void Flush();
 
 		// --- Public Drawing Methods ---
-		static void DrawSprite(const glm::mat4& transform, const SpriteRendererComponent& sprite, int entity_id);
-		
-		static void DrawQuad(const glm::mat4& transform, const glm::vec4& color, int entity_id = -1);
-		static void DrawQuad(const glm::mat4& transform, const Ref<Texture2D> texture, int entity_id, const glm::vec4& tintColor = glm::vec4(1.0f), float tiling = 1.0f, glm::vec2 texture_uvoffset = glm::vec2(0.0f));
+		static void DrawSprite(Timestep dt, const glm::mat4& transform, SpriteRendererComponent& sprite_component, int entity_id);
 
 	private:
 
 		// --- Private Renderer Methods ---
+		static void Flush();
 		static void StartBatch();
 		static void NextBatch();
-		static void SetupVertexArray(const glm::mat4& transform, const glm::vec4& color, int entity_id, float texture_index = 0.0f, float texture_tiling = 1.0f, glm::vec2 texture_uvoffset = glm::vec2(0.0f));
+
+		static void SetBaseVertexData(QuadVertex* dynamic_vertex, const QuadVertex& quad_vertex, const glm::mat4& transform, const Ref<Material>& material, uint albedo_ix, uint norm_ix, uint ent_id);
 
 		// --- Renderer Statistics ---
 		struct Statistics
 		{
 			uint DrawCalls = 0, QuadCount = 0;
-
 			uint GetTotalVerticesCount()	const { return QuadCount * 4; }
 			uint GetTotalIndicesCount()		const { return QuadCount * 6; }
 			uint GetTotalTrianglesCount()	const { return QuadCount * 2; }

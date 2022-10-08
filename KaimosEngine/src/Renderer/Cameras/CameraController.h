@@ -15,6 +15,7 @@ namespace Kaimos {
 	class CameraController
 	{
 		friend class ToolbarPanel;
+		friend class SceneSerializer;
 	public:
 
 		// --- Public Class/Event Methods ---
@@ -28,31 +29,33 @@ namespace Kaimos {
 	public:
 
 		// --- Camera Parameters Getters ---
-		inline float GetSpeedMultiplier()	const { return m_SpeedMultiplier; }
+		inline float GetSpeedMultiplier()		const { return m_SpeedMultiplier; }
 
 		// --- Camera Transform Getters ---
-		inline glm::vec3 GetPosition()		const { return m_Position; }
-		inline glm::quat GetOrientation()	const { return glm::quat(glm::vec3(-m_Pitch, -m_Yaw, 0.0f)); }
+		inline glm::vec3 GetPosition()			const { return m_Position; }
+		inline glm::quat GetOrientation()		const { return glm::quat(glm::vec3(-m_Pitch, -m_Yaw, 0.0f)); }
+		inline glm::vec2 GetOrientationAngles()	const { return glm::vec2(m_Pitch, m_Yaw); }
 
-		glm::vec3 GetUpVector()				const { return glm::rotate(GetOrientation(), glm::vec3(0.0f, 1.0f, 0.0f)); }
-		glm::vec3 GetRightVector()			const { return glm::rotate(GetOrientation(), glm::vec3(1.0f, 0.0f, 0.0f)); }
-		glm::vec3 GetForwardVector()		const { return glm::rotate(GetOrientation(), glm::vec3(0.0f, 0.0f,-1.0f)); }
+		glm::vec3 GetUpVector()					const { return glm::rotate(GetOrientation(), glm::vec3(0.0f, 1.0f, 0.0f)); }
+		glm::vec3 GetRightVector()				const { return glm::rotate(GetOrientation(), glm::vec3(1.0f, 0.0f, 0.0f)); }
+		glm::vec3 GetForwardVector()			const { return glm::rotate(GetOrientation(), glm::vec3(0.0f, 0.0f,-1.0f)); }
 		
 		// --- Camera Getters/Setters ---
-		inline const Camera& GetCamera()	const { return m_Camera; }
+		inline const Camera& GetCamera()		const { return m_Camera; }
 		inline void SetCameraViewport(uint width, uint height) { m_Camera.SetViewport(width, height); }
 		
 	public:
 
 		// --- Camera Transform Setters ---
 		void SetOrientation(float x_angle, float y_angle);
+		void SetOrientation(const glm::vec2& angles);
 		void SetPosition(const glm::vec3& position);
 
 		// --- Camera Parameters Setters ---
 		inline void SetZoomLevel(float zoom_level)					{ m_ZoomLevel = zoom_level; }
 		inline void SetMoveSpeed(float speed)						{ m_MoveSpeed = speed; }
 		inline void SetRotationSpeed(float speed)					{ m_RotationSpeed = speed; }
-		inline void SetSpeedMultiplier(float multiplier)			{ m_SpeedMultiplier = multiplier; m_SpeedMultiplier = std::clamp(m_SpeedMultiplier, 0.05f, 20.0f); }
+		inline void SetSpeedMultiplier(float multiplier)			{ m_SpeedMultiplier = multiplier; m_SpeedMultiplier = std::clamp(m_SpeedMultiplier, 0.05f, m_MaxSpeedMultiplier); }
 		inline void SetMaxZoomSpeed(float speed)					{ m_MaxZoomSpeed = speed; }
 
 		inline void UsingGuizmo(bool using_guizmo)					{ m_UsingGuizmo = using_guizmo; }
@@ -95,7 +98,7 @@ namespace Kaimos {
 
 		// --- Camera Parameters ---
 		float m_ZoomLevel = 10.0f, m_MoveSpeed = 1.0f, m_RotationSpeed = 0.8f, m_PanSpeed = 2.4f;
-		float m_SpeedMultiplier = 1.0f, m_MaxZoomSpeed = 100.0f;
+		float m_SpeedMultiplier = 1.0f, m_MaxSpeedMultiplier = 50.0f,  m_MaxZoomSpeed = 100.0f, m_AdvanceCameraSpeed = 2.0f;
 
 		bool m_LockRotation = false;
 		bool m_UsingGuizmo = false;

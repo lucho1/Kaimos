@@ -6,15 +6,27 @@
 
 namespace Kaimos {
 
-	Ref<Framebuffer> Framebuffer::Create(const FramebufferSettings& settings)
+	Ref<Framebuffer> Framebuffer::Create(const FramebufferSettings& settings, bool generate_depth_renderbuffer)
 	{
 		switch (Renderer::GetRendererAPI())
 		{
-			case RendererAPI::API::OPENGL:		return CreateRef<OGLFramebuffer>(settings);
-			case RendererAPI::API::NONE:		KS_ENGINE_ASSERT(false, "RendererAPI is set to NONE (unsupported)!"); return nullptr;
+			case RendererAPI::API::OPENGL:		return CreateRef<OGLFramebuffer>(settings, generate_depth_renderbuffer);
+			case RendererAPI::API::NONE:		KS_FATAL_ERROR("RendererAPI is set to NONE (unsupported)!"); return nullptr;
 		}
 
-		KS_ENGINE_ASSERT(false, "RendererAPI is unknown, not selected or failed!");
+		KS_FATAL_ERROR("RendererAPI is unknown, not selected or failed!");
+		return nullptr;
+	}
+
+	Ref<Framebuffer> Framebuffer::CreateEmptyAndBind(uint width, uint height, bool generate_depth_renderbuffer)
+	{
+		switch (Renderer::GetRendererAPI())
+		{
+		case RendererAPI::API::OPENGL:		return CreateRef<OGLFramebuffer>(width, height, generate_depth_renderbuffer);
+		case RendererAPI::API::NONE:		KS_FATAL_ERROR("RendererAPI is set to NONE (unsupported)!"); return nullptr;
+		}
+
+		KS_FATAL_ERROR("RendererAPI is unknown, not selected or failed!");
 		return nullptr;
 	}
 }

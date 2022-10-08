@@ -1,146 +1,730 @@
 #include "kspch.h"
 #include "MaterialEditorPanel.h"
+#include "Core/Utils/Maths/Maths.h"
+#include "Renderer/Renderer.h"
 
 #include <ImGui/imgui.h>
 #include <ImNodes/imnodes.h>
-#include <glm/gtc/type_ptr.hpp>
+
 
 namespace Kaimos {
-
+	
+	
+	// ----------------------- Public Class Methods -------------------------------------------------------
 	void MaterialEditorPanel::OnUIRender()
 	{
-		ImGui::Begin("Kaimos Material Editor");
-		if (!m_MaterialToModify)
+		// -- Set Window Always on Top --
+		ImGuiWindowClass wnd_class;
+		wnd_class.ViewportFlagsOverrideSet = ImGuiViewportFlags_TopMost;
+		ImGui::SetNextWindowClass(&wnd_class);
+		
+		// -- Set size if needed --
+		static ImVec2 original_size = ImVec2(720.0f, 406.0f);
+		if (m_Resize)
 		{
+			if (m_Maximized)
+				ImGui::SetNextWindowSize(original_size);
+			else
+			{
+				ImGui::SetNextWindowSize(ImGui::GetWindowViewport()->Size);
+				ImGui::SetNextWindowPos(ImGui::GetMainViewport()->Pos);
+			}
+
+			m_Maximized = !m_Maximized;
+			m_Resize = false;
+		}
+		
+		// -- Set Focus if Interacted --
+		static bool focus_window = false;
+		if (focus_window)
+		{
+			ImGui::SetNextWindowFocus();
+			focus_window = false;
+		}
+
+
+		// -- Begin Window --
+		ImGui::Begin("Kaimos Material Editor", &ShowPanel);
+		if (Maths::CompareFloats(ImGui::GetWindowViewport()->Size.x, ImGui::GetWindowWidth()) && Maths::CompareFloats(ImGui::GetWindowViewport()->Size.y, ImGui::GetWindowHeight()))
+			m_Maximized = true;
+		else
+			m_Maximized = false;
+
+		if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Left) || ImGui::IsMouseClicked(ImGuiMouseButton_Right) || ImGui::IsMouseClicked(ImGuiMouseButton_Middle))
+			focus_window = true;
+
+		// -- Right Click Options --
+		if (!m_EditorHovered)
+		{
+			if (ImGui::BeginPopupContextWindow())
+			{
+				if (m_Maximized)
+				{
+					if (ImGui::MenuItem("Restore"))
+						m_Resize = true;
+				}
+				else
+				{
+					if (ImGui::MenuItem("Maximize"))
+					{
+						float x = ImGui::GetWindowPos().x + ImGui::GetWindowSize().x;
+						float y = ImGui::GetWindowPos().y + ImGui::GetWindowSize().y;
+						original_size = ImVec2(x, y);
+						m_Resize = true;
+					}
+				}
+
+				ImGui::EndPopup();
+			}
+		}
+
+		// -- Early Exit if !Graph --
+		if (!m_CurrentGraph)
+		{
+			m_EditorHovered = false;
 			ImGui::End();
 			return;
 		}
 
+		// -- Compile Material Button --
+		if (ImGui::Button("Compile"))
+			m_SceneContext->UpdateMeshAndSpriteComponentsVertices(m_CurrentGraph->GetMaterialAttachedID());
+
+		if (m_CurrentGraph)
+		{
+			ImGui::SameLine();
+			ImGui::Text("Material: %s", m_CurrentGraph->GetMaterialAttachedName().c_str());
+		}
+		else
+			ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "No Material Opened");
+
 		// -- Begin Editor --
 		ImNodes::BeginNodeEditor();
+		m_EditorHovered = ImNodes::IsEditorHovered();
 
-		bool set_draggable = true;
-		float indent = 5.0f, width = 30.0f;
+		uint pushvars_num = PushImGuiStyleVars();
+		ImNodes::PushColorStyle(ImNodesCol_NodeOutline, IM_COL32(0.0f, 142.0f, 255.0f, 40.0f));
+		ImNodes::PushStyleVar(ImNodesStyleVar_NodeBorderThickness, 2.0f);
+		ImNodes::PushStyleVar(ImNodesStyleVar_PinCircleRadius, 4.5f);
+		ImNodes::PushStyleVar(ImNodesStyleVar_PinHoverRadius, 4.5f);
 
-		// -- Central Node Beginning --
-		ImNodes::BeginNode(1);
-		ImNodes::BeginNodeTitleBar();
-		ImGui::Text("Central");
-		ImNodes::EndNodeTitleBar();
-
-		// -- Color Node --
-		ImGui::Text("Color");
-		ImGuiColorEditFlags color_flags = ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreview | ImGuiColorEditFlags_NoInputs;
-		ImGui::SameLine();
-		ImGui::ColorEdit4("##spcompcolor", glm::value_ptr(m_MaterialToModify->Color), color_flags);
-
-		if (ImGui::IsItemHovered() || ImGui::IsItemFocused() || ImGui::IsItemActive() || ImGui::IsItemEdited() || ImGui::IsItemClicked())
-			set_draggable = false;
-
-		// -- Texture Node --
-		if (m_MaterialToModify->SpriteTexture)
+		// -- Right-Click Popup (for Nodes Creation) --
+		if (ImGui::BeginPopupContextWindow(0, 1, false))
 		{
-			std::string tex_path = m_MaterialToModify->TextureFilepath;
-			std::string tex_name = tex_path.substr(tex_path.find_last_of("/\\" + 1, tex_path.size() - 1));
-
-			ImGui::Text("Texture");
-			ImGui::Indent(indent);
-			ImGui::Text("Texture %i: '%s'", m_MaterialToModify->SpriteTexture->GetTextureID(), tex_name.c_str());
-			ImGui::SameLine();
-			ImGui::Text("(%ix%i)", m_MaterialToModify->SpriteTexture->GetWidth(), m_MaterialToModify->SpriteTexture->GetHeight());
+			ImVec2 popup_pos = ImGui::GetMousePosOnOpeningCurrentPopup();
+			DrawRightClickPopup(popup_pos);
+			ImGui::EndPopup();
 		}
 
+		// -- Draw Nodes, Pins & Links --
+		m_CurrentGraph->DrawNodes();
 
-		// -- Texture Tiling Node --
-		ImGui::Text("Texture Tiling");
-		ImGui::SameLine(); ImGui::SetNextItemWidth(width);
-		ImGui::DragFloat("##spcomptextiling", &m_MaterialToModify->TextureTiling, 0.2f);
-
-		if (ImGui::IsItemHovered() || ImGui::IsItemFocused() || ImGui::IsItemActive() || ImGui::IsItemEdited() || ImGui::IsItemClicked())
-			set_draggable = false;
-
-
-		// -- Texture UV Offset Node --
-		ImGui::Text("Texture Offset");
-		ImGui::SameLine(); ImGui::SetNextItemWidth(width * 2.0f);
-		ImGui::DragFloat2("##spcomptexoffx", glm::value_ptr(m_MaterialToModify->TextureUVOffset), 0.2f);
-
-		if (ImGui::IsItemHovered() || ImGui::IsItemFocused() || ImGui::IsItemActive() || ImGui::IsItemEdited() || ImGui::IsItemClicked())
-			set_draggable = false;
-
-		// -- Central Node Dragging & Ending --
-		ImNodes::SetNodeDraggable(1, set_draggable);
-		ImNodes::EndNode();
-
-
-		// -------- EXAMPLE OF LINKING --------
-		//ImNodes::BeginNode();
-		//ImNodes::BeginInputAttribute(3);
-		//ImGui::Text("Input Pin (%.1f, %.1f)", 5.0f, 4.0f);
-		//ImNodes::EndInputAttribute();
-		//
-		//
-		//ImNodes::BeginOutputAttribute(4);
-		//ImGui::Indent(40.0f);
-		//ImGui::Text("Output Pin");
-		//ImNodes::EndOutputAttribute();
-		//
-		//ImNodes::EndNode();
-		//
-		//ImNodes::BeginNode(2);
-		//
-		//ImNodes::BeginInputAttribute(1);
-		//ImGui::Text("Input Pin");
-		//ImNodes::EndInputAttribute();
-		//
-		//ImNodes::BeginOutputAttribute(2);
-		//ImGui::Text("Output Pin");
-		//ImNodes::EndOutputAttribute();
-		//
-		//ImNodes::EndNode();
-		//
-		//static std::vector<std::pair<int, int>> links;
-		//for (int i = 0; i < links.size(); ++i)
-		//	ImNodes::Link(i, links[i].first, links[i].second);
-
+		// -- End Material Node Editor --
+		ImGui::PopStyleVar(static_cast<int>(pushvars_num));
+		ImNodes::PopColorStyle();
+		ImNodes::PopStyleVar();
 		ImNodes::EndNodeEditor();
+		
+		// -- Create Links between Node Pins --
+		int start, end;
+		if (ImNodes::IsLinkCreated(&start, &end))
+			m_CurrentGraph->CreateLink(start, end); // Input pin is always end while Output pin is always start
 
-		//int start = 4, end = 1;
-		//if (ImNodes::IsLinkCreated(&start, &end))
-		//{
-		//	links.push_back({ 4, 1 });
-		//}
+		// -- Check for Links & Nodes Destroys --
+		// Link dragged to empty space
+		int destroyed_id;
+		if (ImNodes::IsLinkDestroyed(&destroyed_id))
+			m_CurrentGraph->DeleteLink((uint)destroyed_id);
 
+		// Link is double right-clicked
+		int item_hovered;
+		if (ImGui::GetIO().MouseDoubleClicked[2] && ImNodes::IsLinkHovered(&item_hovered))
+			m_CurrentGraph->DeleteLink((uint)item_hovered);
+		
+		// Node is double right-clicked
+		if (ImGui::GetIO().MouseDoubleClicked[2] && ImNodes::IsNodeHovered(&item_hovered))
+			m_CurrentGraph->DeleteNode((uint)item_hovered);
+
+		// SUPR/DEL pressed + nodes/link selection
+		if (Input::IsKeyDown(KEY::DEL) || ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_Delete)))
+		{
+			int selected_links = ImNodes::NumSelectedLinks(), selected_nodes = ImNodes::NumSelectedNodes();
+			if (selected_links > 0 || selected_nodes > 0)
+				DeleteSelection(selected_links, selected_nodes);
+		}
 
 		// -- End Editor --
+		ImNodes::PopStyleVar();
+		ImNodes::PopStyleVar();
 		ImGui::End();
 	}
 
-	void MaterialEditorPanel::LoadIniEditorSettings() const
+
+	
+	// ----------------------- Private Material Editor Panel Methods --------------------------------------
+	void MaterialEditorPanel::DeleteSelection(int selected_links, int selected_nodes)
 	{
-		UnsetMaterialToModify();
-		ImNodes::LoadCurrentEditorStateFromIniFile("imnode.ini");
+		if (selected_links > 0)
+		{
+			int* del_links = new int[selected_links];
+			ImNodes::GetSelectedLinks(del_links);
+			for (uint i = 0; i < selected_links; ++i)
+				m_CurrentGraph->DeleteLink((uint)del_links[i]);
+
+			delete[] del_links;
+		}
+		
+		if (selected_nodes > 0)
+		{
+			int* del_nodes = new int[selected_nodes];
+			ImNodes::GetSelectedNodes(del_nodes);
+			for (uint i = 0; i < selected_nodes; ++i)
+				m_CurrentGraph->DeleteNode((uint)del_nodes[i]);
+
+			delete[] del_nodes;
+		}
 	}
 
-	void MaterialEditorPanel::SaveIniEditorSettings() const
+
+	uint MaterialEditorPanel::PushImGuiStyleVars()
 	{
-		ImNodes::SaveCurrentEditorStateToIniFile("imnode.ini");
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 10.0f);
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 4.0f);
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(20.0f, 12.0f));
+		ImGui::PushStyleVar(ImGuiStyleVar_ChildBorderSize, 2.0f);
+		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(1.0f, 1.0f));
+		ImGui::PushStyleVar(ImGuiStyleVar_PopupBorderSize, 2.0f);
+		ImGui::PushStyleVar(ImGuiStyleVar_PopupRounding, 5.0f);
+
+		// Num of PushStyleVar() calls to pop them later
+		return 7;
 	}
 
-	void MaterialEditorPanel::UnsetMaterialToModify() const
-	{
-		if (m_MaterialToModify)
-			m_MaterialToModify->InMaterialEditor = false;
 
-		m_MaterialToModify = nullptr;
+	void MaterialEditorPanel::DrawRightClickPopup(ImVec2 popup_pos)
+	{
+		// Global Nodes
+		if (ImGui::BeginMenu("Vertex Attributes"))
+		{
+			if (ImGui::MenuItem("TCoords"))			m_CurrentGraph->CreateNode(MaterialEditor::VertexParameterNodeType::TEX_COORDS, popup_pos);
+			if (ImGui::MenuItem("Vertex Position"))	m_CurrentGraph->CreateNode(MaterialEditor::VertexParameterNodeType::POSITION, popup_pos);
+			if (ImGui::MenuItem("Vertex Normal"))	m_CurrentGraph->CreateNode(MaterialEditor::VertexParameterNodeType::NORMAL, popup_pos);
+			ImGui::EndMenu();
+		}
+
+		if (ImGui::BeginMenu("Constants"))
+		{
+			if (ImGui::MenuItem("Time"))				m_CurrentGraph->CreateNode(MaterialEditor::ConstantNodeType::DELTATIME, popup_pos);
+			if (ImGui::MenuItem("PI"))					m_CurrentGraph->CreateNode(MaterialEditor::ConstantNodeType::PI, popup_pos);
+			if (ImGui::MenuItem("TAU (Golden Ratio)"))	m_CurrentGraph->CreateNode(MaterialEditor::ConstantNodeType::GOLDEN_RATIO, popup_pos);
+			if (ImGui::MenuItem("Scene Color"))			m_CurrentGraph->CreateNode(MaterialEditor::ConstantNodeType::SCENE_COLOR, popup_pos);
+			if (ImGui::MenuItem("Screen Resolution"))	m_CurrentGraph->CreateNode(MaterialEditor::ConstantNodeType::SCREEN_RES, popup_pos);
+			if (ImGui::MenuItem("Enviro. Map Resolution"))	m_CurrentGraph->CreateNode(MaterialEditor::ConstantNodeType::ENVIRO_RES, popup_pos);
+			if (ImGui::MenuItem("Enviro. Map Width"))	m_CurrentGraph->CreateNode(MaterialEditor::ConstantNodeType::ENVIRO_W, popup_pos);
+			if (ImGui::MenuItem("Enviro. Map Height"))	m_CurrentGraph->CreateNode(MaterialEditor::ConstantNodeType::ENVIRO_H, popup_pos);
+			ImGui::EndMenu();
+		}
+
+		if (ImGui::BeginMenu("Camera"))
+		{
+			if (ImGui::MenuItem("FOV"))			m_CurrentGraph->CreateNode(MaterialEditor::ConstantNodeType::CAMERA_FOV, popup_pos);
+			if (ImGui::MenuItem("Aspect Ratio"))m_CurrentGraph->CreateNode(MaterialEditor::ConstantNodeType::CAMERA_AR, popup_pos);
+			if (ImGui::MenuItem("Clip Planes"))	m_CurrentGraph->CreateNode(MaterialEditor::ConstantNodeType::CAMERA_PLANES, popup_pos);
+			if (ImGui::MenuItem("Ortho Size"))	m_CurrentGraph->CreateNode(MaterialEditor::ConstantNodeType::CAMERA_ORTHOSIZE, popup_pos);
+			ImGui::EndMenu();
+		}
+
+		if (ImGui::BeginMenu("Variables"))
+		{
+			if (ImGui::MenuItem("Int"))		m_CurrentGraph->CreateNode(MaterialEditor::ConstantNodeType::INT, popup_pos);
+			if (ImGui::MenuItem("Float"))	m_CurrentGraph->CreateNode(MaterialEditor::ConstantNodeType::FLOAT, popup_pos);
+			if (ImGui::MenuItem("Vec2"))	m_CurrentGraph->CreateNode(MaterialEditor::ConstantNodeType::VEC2, popup_pos);
+			if (ImGui::MenuItem("Vec3"))	m_CurrentGraph->CreateNode(MaterialEditor::ConstantNodeType::VEC3, popup_pos);
+			if (ImGui::MenuItem("Vec4"))	m_CurrentGraph->CreateNode(MaterialEditor::ConstantNodeType::VEC4, popup_pos);
+			ImGui::EndMenu();
+		}
+
+		// Maths Nodes
+		ImGui::Separator();
+		if (ImGui::BeginMenu("Maths"))
+		{
+			if (ImGui::BeginMenu("Random"))
+			{
+				if (ImGui::MenuItem("Int"))		m_CurrentGraph->CreateNode(MaterialEditor::ConstantNodeType::INT_RANDOM, popup_pos);
+				if (ImGui::MenuItem("Float"))	m_CurrentGraph->CreateNode(MaterialEditor::ConstantNodeType::FLOAT_RANDOM, popup_pos);
+				if (ImGui::MenuItem("Vec2"))	m_CurrentGraph->CreateNode(MaterialEditor::ConstantNodeType::VEC2_RANDOM, popup_pos);
+				if (ImGui::MenuItem("Vec3"))	m_CurrentGraph->CreateNode(MaterialEditor::ConstantNodeType::VEC3_RANDOM, popup_pos);
+				if (ImGui::MenuItem("Vec4"))	m_CurrentGraph->CreateNode(MaterialEditor::ConstantNodeType::VEC4_RANDOM, popup_pos);
+				ImGui::EndMenu();
+			}
+
+			if (ImGui::BeginMenu("Basics"))
+			{
+				if (ImGui::BeginMenu("Sum"))
+					DrawSameTypesOperationNodesMenu(MaterialEditor::OperationNodeType::ADDITION, "+", popup_pos);
+
+				if (ImGui::BeginMenu("Subtract"))
+					DrawSameTypesOperationNodesMenu(MaterialEditor::OperationNodeType::SUBTRACTION, "-", popup_pos);
+
+				if (ImGui::BeginMenu("Multiply"))
+					DrawSameTypesOperationNodesMenu(MaterialEditor::OperationNodeType::MULTIPLICATION, "*", popup_pos);
+
+				if (ImGui::BeginMenu("Divide"))
+					DrawSameTypesOperationNodesMenu(MaterialEditor::OperationNodeType::DIVISION, "/", popup_pos);
+
+				if (ImGui::BeginMenu("Num * Vec"))
+					DrawFloatVecOperationNodesMenu(MaterialEditor::OperationNodeType::FLOATVEC_MULTIPLY, "*", popup_pos);
+
+				if (ImGui::BeginMenu("Num / Vec"))
+					DrawFloatVecOperationNodesMenu(MaterialEditor::OperationNodeType::FLOATVEC_DIVIDE, "/", popup_pos);
+
+				ImGui::EndMenu();
+			}
+
+			if (ImGui::BeginMenu("Advanced"))
+			{
+				if (ImGui::BeginMenu("Absolute"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::ABS, popup_pos, false);
+
+				if (ImGui::BeginMenu("Min"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::MIN, popup_pos, false);
+
+				if (ImGui::BeginMenu("Max"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::MAX, popup_pos, false);
+
+				if (ImGui::BeginMenu("Negate"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::NEGATE, popup_pos, false);
+
+				if (ImGui::BeginMenu("Power"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::POW, popup_pos, false);
+
+				if (ImGui::BeginMenu("Sqrt"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::SQRT, popup_pos, false);
+
+				if (ImGui::BeginMenu("Inv. Sqrt"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::INV_SQRT, popup_pos, false);
+
+				if (ImGui::BeginMenu("Log"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::LOG, popup_pos, false);
+
+				if (ImGui::BeginMenu("Log2"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::LOG2, popup_pos, false);
+
+				if (ImGui::BeginMenu("Exp"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::EXP, popup_pos, false);
+
+				if (ImGui::BeginMenu("Exp2"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::EXP2, popup_pos, false);
+
+				ImGui::EndMenu();
+			}
+
+			if(ImGui::BeginMenu("Conversions"))
+			{
+				if (ImGui::MenuItem("Int to Float"))
+					m_CurrentGraph->CreateNode(MaterialEditor::SpecialOperationNodeType::INTF, MaterialEditor::PinDataType::INT, popup_pos);
+
+				if (ImGui::MenuItem("Float to Int"))
+					m_CurrentGraph->CreateNode(MaterialEditor::SpecialOperationNodeType::FINT, MaterialEditor::PinDataType::FLOAT, popup_pos);
+
+				if (ImGui::BeginMenu("Rad to Deg"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::RTOD, popup_pos, false);
+
+				if (ImGui::BeginMenu("Deg to Rad"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::DTOR, popup_pos, false);
+
+				if (ImGui::BeginMenu("RGB to HSV"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::RGB_HSV, popup_pos, true, false);
+
+				if (ImGui::BeginMenu("HSV to RGB"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::HSV_RGB, popup_pos, true, false);
+
+				if (ImGui::BeginMenu("RGB Normalize"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::COLNR, popup_pos, false);
+
+				if (ImGui::BeginMenu("RGB Denormalize"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::COLUNR, popup_pos, false);
+
+				if (ImGui::BeginMenu("HSV Normalize"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::HSVNR, popup_pos, true, false);
+
+				if (ImGui::BeginMenu("HSV Denormalize"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::HSVUNR, popup_pos, true, false);
+
+				if (ImGui::BeginMenu("Linear to sRGB"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::L_SRGB, popup_pos, false);
+
+				if (ImGui::BeginMenu("sRGB To Linear"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::SRGB_L, popup_pos, false);
+
+				ImGui::EndMenu();
+			}
+
+			if (ImGui::BeginMenu("Trigonometry"))
+			{
+				if (ImGui::BeginMenu("Standard"))
+				{
+					if (ImGui::BeginMenu("Sin"))
+						DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::SIN, popup_pos, false);
+
+					if (ImGui::BeginMenu("Cos"))
+						DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::COS, popup_pos, false);
+
+					if (ImGui::BeginMenu("Tan"))
+						DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::TAN, popup_pos, false);
+
+					if (ImGui::BeginMenu("ArcSin"))
+						DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::ASIN, popup_pos, false);
+
+					if (ImGui::BeginMenu("ArcCos"))
+						DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::ACOS, popup_pos, false);
+
+					if (ImGui::BeginMenu("ArcTan"))
+						DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::ATAN, popup_pos, false);
+
+					ImGui::EndMenu();
+				}
+
+				if (ImGui::BeginMenu("Hyperbolic"))
+				{
+					if (ImGui::BeginMenu("H Sin"))
+						DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::HSIN, popup_pos, false);
+
+					if (ImGui::BeginMenu("H Cos"))
+						DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::HCOS, popup_pos, false);
+
+					if (ImGui::BeginMenu("H Tan"))
+						DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::HTAN, popup_pos, false);
+
+					if (ImGui::BeginMenu("H ArcSin"))
+						DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::HASIN, popup_pos, false);
+
+					if (ImGui::BeginMenu("H ArcCos"))
+						DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::HACOS, popup_pos, false);
+
+					if (ImGui::BeginMenu("H ArcTan"))
+						DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::HATAN, popup_pos, false);
+
+					ImGui::EndMenu();
+				}
+
+				ImGui::EndMenu();
+			}
+
+			if (ImGui::BeginMenu("Shaders Functions"))
+			{
+				if (ImGui::BeginMenu("Ceil"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::CEIL, popup_pos, false);
+
+				if (ImGui::BeginMenu("Floor"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::FLOOR, popup_pos, false);
+
+				if (ImGui::BeginMenu("Clamp"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::CLAMP, popup_pos, false);
+
+				if (ImGui::BeginMenu("Round"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::ROUND, popup_pos, false);
+
+				if (ImGui::BeginMenu("Sign"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::SIGN, popup_pos, false);
+
+				if (ImGui::BeginMenu("Fractal"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::FRACTAL, popup_pos, false);
+
+				if (ImGui::BeginMenu("Step by Float"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::FLOAT_STEP, popup_pos, false);
+
+				if (ImGui::BeginMenu("Step by Vec"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::VEC_STEP, popup_pos, true);
+
+				if (ImGui::BeginMenu("Smoothstep by Float"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::FLOAT_SMOOTHSTEP, popup_pos, false);
+
+				if (ImGui::BeginMenu("Smoothstep by Vec"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::VEC_SMOOTHSTEP, popup_pos, true);
+
+				ImGui::EndMenu();
+			}
+
+			ImGui::EndMenu();
+		}
+
+		if (ImGui::BeginMenu("Vectors"))
+		{
+			if (ImGui::BeginMenu("Break Vector"))
+			{
+				DrawBreakVectorSubmenu(popup_pos);
+				ImGui::EndMenu();
+			}
+
+			if (ImGui::BeginMenu("Basics"))
+			{
+				if (ImGui::BeginMenu("Vec Normalize"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::VEC_NORMALIZE, popup_pos, true);
+
+				if (ImGui::BeginMenu("Vec Magnitude"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::VEC_MAGNITUDE, popup_pos, true);
+
+				if (ImGui::BeginMenu("Vec Distance"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::VEC_DIST, popup_pos, true);
+
+				if (ImGui::BeginMenu("Vec Dot"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::VEC_DOT, popup_pos, true);
+
+				if (ImGui::BeginMenu("Vec Cross"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::VEC_CROSS, popup_pos, true);
+
+				if (ImGui::BeginMenu("Norm. Vec-Vec Angle"))
+				{
+					if (ImGui::BeginMenu("Short"))
+						DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::SHT_ANGLE_NVECS, popup_pos, true);
+
+					if (ImGui::BeginMenu("Long"))
+						DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::LNG_ANGLE_NVECS, popup_pos, true);
+
+					ImGui::EndMenu();
+				}
+
+				if (ImGui::BeginMenu("Vec-Vec Angle"))
+				{
+					if (ImGui::BeginMenu("Short"))
+						DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::SHT_ANGLE_VECS, popup_pos, true);
+
+					if (ImGui::BeginMenu("Long"))
+						DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::LNG_ANGLE_VECS, popup_pos, true);
+
+					ImGui::EndMenu();
+				}
+
+				if (ImGui::BeginMenu("Rotate Vec"))
+				{
+					if (ImGui::BeginMenu("Rotate X"))
+						DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::VEC_ROTX, popup_pos, true);
+
+					if (ImGui::BeginMenu("Rotate Y"))
+						DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::VEC_ROTY, popup_pos, true);
+
+					if (ImGui::BeginMenu("Rotate Z"))
+						DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::VEC_ROTZ, popup_pos, true);
+
+					ImGui::EndMenu();
+				}
+
+				ImGui::EndMenu();
+			}
+
+			if (ImGui::BeginMenu("Advanced"))
+			{
+				if (ImGui::BeginMenu("Vec Reflect"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::VEC_REFLECT, popup_pos, true);
+
+				if (ImGui::BeginMenu("Vec Refract"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::VEC_REFRACT, popup_pos, true);
+
+				if (ImGui::BeginMenu("Lerp by Float"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::FLOAT_LERP, popup_pos, false);
+
+				if (ImGui::BeginMenu("Lerp by Vec"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::VEC_LERP, popup_pos, true);
+
+				if (ImGui::BeginMenu("Mod by Float"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::FLOAT_MOD, popup_pos, false);
+
+				if (ImGui::BeginMenu("Mod by Vec"))
+					DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType::VEC_MOD, popup_pos, true);
+
+				ImGui::EndMenu();
+			}
+
+			ImGui::EndMenu();
+		}
 	}
 
-	void MaterialEditorPanel::SetMaterialToModify(SpriteRendererComponent* sprite_component) const
-	{
-		if(m_MaterialToModify)
-			m_MaterialToModify->InMaterialEditor = false;
 
-		m_MaterialToModify = sprite_component;
-		m_MaterialToModify->InMaterialEditor = true;
+	void MaterialEditorPanel::DrawSameTypesOperationNodesMenu(MaterialEditor::OperationNodeType op_type, const std::string& operator_str, ImVec2 popup_pos)
+	{
+		if (ImGui::MenuItem(std::string("Float " + operator_str + " Float").c_str()))
+			m_CurrentGraph->CreateNode(op_type, MaterialEditor::PinDataType::FLOAT, popup_pos);
+
+		if (ImGui::MenuItem(std::string("Int " + operator_str + " Int").c_str()))
+			m_CurrentGraph->CreateNode(op_type, MaterialEditor::PinDataType::INT, popup_pos);
+
+		if (ImGui::MenuItem(std::string("Vec2 " + operator_str + " Vec2").c_str()))
+			m_CurrentGraph->CreateNode(op_type, MaterialEditor::PinDataType::VEC2, popup_pos);
+
+		if (ImGui::MenuItem(std::string("Vec3 " + operator_str + " Vec3").c_str()))
+			m_CurrentGraph->CreateNode(op_type, MaterialEditor::PinDataType::VEC3, popup_pos);
+
+		if (ImGui::MenuItem(std::string("Vec4 " + operator_str + " Vec4").c_str()))
+			m_CurrentGraph->CreateNode(op_type, MaterialEditor::PinDataType::VEC4, popup_pos);
+
+		ImGui::EndMenu();
 	}
+
+	void MaterialEditorPanel::DrawFloatVecOperationNodesMenu(MaterialEditor::OperationNodeType op_type, const std::string& operator_str, ImVec2 popup_pos)
+	{
+		if (ImGui::MenuItem(std::string("Num " + operator_str + " Vec2").c_str()))
+			m_CurrentGraph->CreateNode(op_type, MaterialEditor::PinDataType::VEC2, popup_pos);
+		
+		if (ImGui::MenuItem(std::string("Num " + operator_str + " Vec3").c_str()))
+			m_CurrentGraph->CreateNode(op_type, MaterialEditor::PinDataType::VEC3, popup_pos);
+		
+		if (ImGui::MenuItem(std::string("Num " + operator_str + " Vec4").c_str()))
+			m_CurrentGraph->CreateNode(op_type, MaterialEditor::PinDataType::VEC4, popup_pos);
+
+		ImGui::EndMenu();
+	}
+
+	void MaterialEditorPanel::DrawSpecialOperationNodesMenu(MaterialEditor::SpecialOperationNodeType op_type, ImVec2 popup_pos, bool only_vec_types, bool add_vec2)
+	{
+		if (!only_vec_types)
+		{
+			if (ImGui::MenuItem("Int"))
+				m_CurrentGraph->CreateNode(op_type, MaterialEditor::PinDataType::INT, popup_pos);
+
+			if (ImGui::MenuItem("Float"))
+				m_CurrentGraph->CreateNode(op_type, MaterialEditor::PinDataType::FLOAT, popup_pos);
+		}
+
+		if (add_vec2)
+		{
+			if (ImGui::MenuItem("Vec2"))
+				m_CurrentGraph->CreateNode(op_type, MaterialEditor::PinDataType::VEC2, popup_pos);
+		}
+
+		if (ImGui::MenuItem("Vec3"))
+			m_CurrentGraph->CreateNode(op_type, MaterialEditor::PinDataType::VEC3, popup_pos);
+
+		if (ImGui::MenuItem("Vec4"))
+			m_CurrentGraph->CreateNode(op_type, MaterialEditor::PinDataType::VEC4, popup_pos);
+
+		ImGui::EndMenu();
+	}
+
+	void MaterialEditorPanel::DrawBreakVectorSubmenu(ImVec2 popup_pos)
+	{
+		if (ImGui::BeginMenu("Break Vec2"))
+		{
+			if(ImGui::MenuItem("Get X"))
+				m_CurrentGraph->CreateNode(MaterialEditor::SpecialOperationNodeType::VEC_X, MaterialEditor::PinDataType::VEC2, popup_pos);
+
+			if (ImGui::MenuItem("Get Y"))
+				m_CurrentGraph->CreateNode(MaterialEditor::SpecialOperationNodeType::VEC_Y, MaterialEditor::PinDataType::VEC2, popup_pos);
+
+			ImGui::EndMenu();
+		}
+
+		if (ImGui::BeginMenu("Break Vec3"))
+		{
+			if (ImGui::MenuItem("Get X"))
+				m_CurrentGraph->CreateNode(MaterialEditor::SpecialOperationNodeType::VEC_X, MaterialEditor::PinDataType::VEC3, popup_pos);
+
+			if (ImGui::MenuItem("Get Y"))
+				m_CurrentGraph->CreateNode(MaterialEditor::SpecialOperationNodeType::VEC_Y, MaterialEditor::PinDataType::VEC3, popup_pos);
+
+			if (ImGui::MenuItem("Get Z"))
+				m_CurrentGraph->CreateNode(MaterialEditor::SpecialOperationNodeType::VEC_Z, MaterialEditor::PinDataType::VEC3, popup_pos);
+
+			ImGui::EndMenu();
+		}
+
+		if (ImGui::BeginMenu("Break Vec4"))
+		{
+			if (ImGui::MenuItem("Get X"))
+				m_CurrentGraph->CreateNode(MaterialEditor::SpecialOperationNodeType::VEC_X, MaterialEditor::PinDataType::VEC4, popup_pos);
+
+			if (ImGui::MenuItem("Get Y"))
+				m_CurrentGraph->CreateNode(MaterialEditor::SpecialOperationNodeType::VEC_Y, MaterialEditor::PinDataType::VEC4, popup_pos);
+
+			if (ImGui::MenuItem("Get Z"))
+				m_CurrentGraph->CreateNode(MaterialEditor::SpecialOperationNodeType::VEC_Z, MaterialEditor::PinDataType::VEC4, popup_pos);
+
+			if (ImGui::MenuItem("Get W"))
+				m_CurrentGraph->CreateNode(MaterialEditor::SpecialOperationNodeType::VEC_W, MaterialEditor::PinDataType::VEC4, popup_pos);
+
+			ImGui::EndMenu();
+		}
+
+		if (ImGui::BeginMenu("Break it!"))
+		{
+			ImVec2 pos = popup_pos;
+			float diff = 130.0f;
+
+			if (ImGui::MenuItem("Vec2"))
+			{
+				m_CurrentGraph->CreateNode(MaterialEditor::SpecialOperationNodeType::VEC_X, MaterialEditor::PinDataType::VEC2, pos);
+				m_CurrentGraph->CreateNode(MaterialEditor::SpecialOperationNodeType::VEC_Y, MaterialEditor::PinDataType::VEC2, ImVec2(pos.x, pos.y + diff));
+			}
+
+			if (ImGui::MenuItem("Vec3"))
+			{
+				m_CurrentGraph->CreateNode(MaterialEditor::SpecialOperationNodeType::VEC_X, MaterialEditor::PinDataType::VEC3, pos);
+				m_CurrentGraph->CreateNode(MaterialEditor::SpecialOperationNodeType::VEC_Y, MaterialEditor::PinDataType::VEC3, ImVec2(pos.x, pos.y + diff));
+				m_CurrentGraph->CreateNode(MaterialEditor::SpecialOperationNodeType::VEC_Z, MaterialEditor::PinDataType::VEC3, ImVec2(pos.x, pos.y + diff * 2.0f));
+			}
+			
+			if (ImGui::MenuItem("Vec4"))
+			{
+				m_CurrentGraph->CreateNode(MaterialEditor::SpecialOperationNodeType::VEC_X, MaterialEditor::PinDataType::VEC4, pos);
+				m_CurrentGraph->CreateNode(MaterialEditor::SpecialOperationNodeType::VEC_Y, MaterialEditor::PinDataType::VEC4, ImVec2(pos.x, pos.y + diff));
+				m_CurrentGraph->CreateNode(MaterialEditor::SpecialOperationNodeType::VEC_Z, MaterialEditor::PinDataType::VEC4, ImVec2(pos.x, pos.y + diff * 2.0f));
+				m_CurrentGraph->CreateNode(MaterialEditor::SpecialOperationNodeType::VEC_W, MaterialEditor::PinDataType::VEC4, ImVec2(pos.x, pos.y + diff * 3.0f));
+			}
+
+			ImGui::EndMenu();
+		}
+	}
+
+
+
+	// ----------------------- Public Material Editor Panel Methods ---------------------------------------
+	void MaterialEditorPanel::UnsetGraphToModify()
+	{
+		SaveCurrentGraphSettings();
+		m_CurrentGraph = nullptr;
+	}
+	
+	void MaterialEditorPanel::SetGraphToModifyFromMaterial(uint material_id)
+	{
+		SaveCurrentGraphSettings();
+		Ref<Material> mat = Renderer::GetMaterial(material_id);
+		if (mat && (mat)->m_AttachedGraph)
+		{
+			m_CurrentGraph = (mat)->m_AttachedGraph.get();
+			LoadCurrentGraphSettings();
+			ShowPanel = true;
+		}
+	}
+
+	bool MaterialEditorPanel::IsModifyingMaterialGraph(Material* material)
+	{
+		if (material && m_CurrentGraph && m_CurrentGraph->GetID() == material->GetAttachedGraphID())
+			return true;
+
+		return false;
+	}
+
+	void MaterialEditorPanel::SerializeGraphs()
+	{
+		uint material_modifying = 0;
+		if (m_CurrentGraph)
+			material_modifying = m_CurrentGraph->GetMaterialAttachedID();
+
+		uint materials_size = Renderer::GetMaterialsQuantity();
+		for (uint i = 0; i < materials_size; ++i)
+		{
+			Ref<Material> mat = Renderer::GetMaterialFromIndex(i);
+			if (mat)
+			{
+				SetGraphToModifyFromMaterial(mat->GetID());
+				m_CurrentGraph->SaveEditorSettings();
+			}
+		}
+
+		if (material_modifying != 0)
+			SetGraphToModifyFromMaterial(material_modifying);
+		else
+			UnsetGraphToModify();
+	}
+
 }

@@ -1,7 +1,10 @@
 #include "ScenePanel.h"
 
 #include "Core/Utils/PlatformUtils.h"
+#include "Core/Resources/ResourceManager.h"
 #include "ImGui/ImGuiUtils.h"
+
+#include "Renderer/Resources/Mesh.h"
 
 #include <ImGui/imgui.h>
 #include <ImGui/imgui_internal.h>
@@ -34,8 +37,32 @@ namespace Kaimos {
 
 
 
+	// ----------------------- Event Methods --------------------------------------------------------------
+	void ScenePanel::OnEvent(Event& ev)
+	{
+		EventDispatcher dispatcher(ev);
+		dispatcher.Dispatch<KeyPressedEvent>(KS_BIND_EVENT_FN(ScenePanel::OnKeyPressed));
+	}
+
+	bool ScenePanel::OnKeyPressed(KeyPressedEvent& ev)
+	{
+		if (ev.GetRepeatCount() > 0 || !m_SelectedEntity)
+			return false;
+
+		if (ev.GetKeyCode() == KEY::D && (Input::IsKeyPressed(KEY::LEFT_CONTROL) || Input::IsKeyPressed(KEY::RIGHT_CONTROL)))
+		{
+			m_SelectedEntity = m_SceneContext->DuplicateEntity(m_SelectedEntity);
+			m_DuplicatingEntity = true;
+		}
+
+		if (ev.GetKeyCode() == KEY::DEL)
+			m_DeleteSelectedEntity = true;
+	}
+
+
+
 	// ----------------------- Public Class Methods -------------------------------------------------------
-	void ScenePanel::OnUIRender(bool& closing_bool)
+	void ScenePanel::OnUIRender(bool& closing_bool, bool is_viewport_focused)
 	{
 		// -- Scene Tab --
 		ImGui::Begin("Scene", &closing_bool);
@@ -46,13 +73,17 @@ namespace Kaimos {
 		else
 			ImGui::Text("Current camera: NULL");
 
-		// -- Entity Display --
+		// -- Entity Display & Deletion --
+		bool can_delete_entity = is_viewport_focused;
+		if (ImGui::IsWindowFocused())
+			can_delete_entity = true;
+
 		m_SceneContext->m_Registry.each([&](auto entity_id)
 			{
 				Entity entity{ entity_id , m_SceneContext.get() };
 
 				ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(12.0f, 1.0f));
-				DrawEntityNode(entity);
+				DrawEntityNode(entity, can_delete_entity);
 				ImGui::PopStyleVar();
 			});
 
@@ -73,10 +104,37 @@ namespace Kaimos {
 				m_SelectedEntity.AddComponent<CameraComponent>();
 			}
 
-			if (ImGui::MenuItem("Create 2D Sprite"))
+			if (ImGui::BeginMenu("Create Geometry"))
 			{
-				m_SelectedEntity = m_SceneContext->CreateEntity("Sprite");
-				m_SelectedEntity.AddComponent<SpriteRendererComponent>();
+				if (ImGui::MenuItem("2D Sprite"))
+				{
+					m_SelectedEntity = m_SceneContext->CreateEntity("Sprite");
+					m_SelectedEntity.AddComponent<SpriteRendererComponent>();
+				}
+
+				if (ImGui::MenuItem("3D Mesh"))
+				{
+					m_SelectedEntity = m_SceneContext->CreateEntity("Mesh");
+					m_SelectedEntity.AddComponent<MeshRendererComponent>();
+				}
+				ImGui::EndMenu();
+			}
+
+			if (ImGui::BeginMenu("Create Light"))
+			{
+				if (ImGui::MenuItem("Directional Light"))
+				{
+					m_SelectedEntity = m_SceneContext->CreateEntity("Directional Light");
+					m_SelectedEntity.AddComponent<DirectionalLightComponent>();
+				}
+
+				if (ImGui::MenuItem("Point Light"))
+				{
+					m_SelectedEntity = m_SceneContext->CreateEntity("Point Light");
+					m_SelectedEntity.AddComponent<PointLightComponent>();
+				}
+
+				ImGui::EndMenu();
 			}
 
 			ImGui::EndPopup();
@@ -95,7 +153,7 @@ namespace Kaimos {
 
 
 	// ----------------------- Private Scene Methods -----------------------------------------------------
-	void ScenePanel::DrawEntityNode(Entity entity)
+	void ScenePanel::DrawEntityNode(Entity entity, bool can_delete_entity)
 	{
 		TagComponent& tag_comp = entity.GetComponent<TagComponent>();
 
@@ -112,6 +170,12 @@ namespace Kaimos {
 		bool entity_deleted = false;
 		if (ImGui::BeginPopupContextItem())
 		{
+			if (ImGui::MenuItem("Duplicate", "Ctrl+D"))
+			{
+				m_SelectedEntity = m_SceneContext->DuplicateEntity(entity);
+				m_DuplicatingEntity = true;
+			}
+
 			if (ImGui::MenuItem("Rename"))
 				tag_comp.Rename = true;
 
@@ -122,7 +186,7 @@ namespace Kaimos {
 		}
 
 		// -- Entity Rename --
-		if (tag_comp.Rename)
+		if (tag_comp.Rename && !m_DuplicatingEntity)
 		{
 			// Input Text
 			KaimosUI::UIFunctionalities::DrawInputText("##Tag", tag_comp.Tag);
@@ -141,20 +205,25 @@ namespace Kaimos {
 			ImGui::TreePop();
 
 		// -- Delete Entity --
+		if (m_DeleteSelectedEntity && m_SelectedEntity == entity && can_delete_entity)
+		{
+			entity_deleted = true;
+			m_DeleteSelectedEntity = false;
+		}
+
 		if (entity_deleted)
 		{
-			if (entity.HasComponent<SpriteRendererComponent>())
-			{
-				SpriteRendererComponent& comp = entity.GetComponent<SpriteRendererComponent>();
-				if (comp.InMaterialEditor)
-					m_KMEPanel->UnsetMaterialToModify();
-			}
-
 			if (m_SelectedEntity == entity)
 				m_SelectedEntity = {};
 
+			if (entity.HasComponent<CameraComponent>() && entity.GetComponent<CameraComponent>().Primary)
+				m_SceneContext->UnsetPrimaryCamera();
+
 			m_SceneContext->DestroyEntity(entity);
 		}
+
+		// -- Set Duplicating Entity Bool --
+		m_DuplicatingEntity = false;
 	}
 
 
@@ -195,7 +264,7 @@ namespace Kaimos {
 			bool remove_component = false;
 			if (ImGui::BeginPopup("ComponentSettings"))
 			{
-				if (!std::is_same<T, TransformComponent>::value)
+				if (!std::is_same<T, TransformComponent>::value && !std::is_same<T, TagComponent>::value)
 				{
 					if (ImGui::MenuItem("Remove Component"))
 						remove_component = true;
@@ -214,11 +283,8 @@ namespace Kaimos {
 			// -- Remove Component --
 			if (remove_component)
 			{
-				if (std::is_same<T, SpriteRendererComponent>::value)
-				{
-					if (entity.GetComponent<SpriteRendererComponent>().InMaterialEditor)
-						m_KMEPanel->UnsetMaterialToModify();
-				}
+				if (entity.HasComponent<CameraComponent>() && entity.GetComponent<CameraComponent>().Primary)
+					m_SceneContext->UnsetPrimaryCamera();
 
 				entity.RemoveComponent<T>();
 			}
@@ -272,6 +338,36 @@ namespace Kaimos {
 				ImGui::CloseCurrentPopup();
 			}
 
+			if (ImGui::MenuItem("Mesh Renderer"))
+			{
+				if (!m_SelectedEntity.HasComponent<MeshRendererComponent>())
+					m_SelectedEntity.AddComponent<MeshRendererComponent>();
+				else
+					KS_EDITOR_WARN("MeshRendererComponent already exists in the Entity!");
+
+				ImGui::CloseCurrentPopup();
+			}
+
+			if (ImGui::MenuItem("Directional Light"))
+			{
+				if (!m_SelectedEntity.HasComponent<DirectionalLightComponent>() && !m_SelectedEntity.HasComponent<PointLightComponent>())
+					m_SelectedEntity.AddComponent<DirectionalLightComponent>();
+				else
+					KS_EDITOR_WARN("Entity already has a Light Component!");
+
+				ImGui::CloseCurrentPopup();
+			}
+
+			if (ImGui::MenuItem("Point Light"))
+			{
+				if (!m_SelectedEntity.HasComponent<PointLightComponent>() && !m_SelectedEntity.HasComponent<DirectionalLightComponent>())
+					m_SelectedEntity.AddComponent<PointLightComponent>();
+				else
+					KS_EDITOR_WARN("Entity already has a Light Component!");
+
+				ImGui::CloseCurrentPopup();
+			}
+
 			ImGui::EndPopup();
 		}
 
@@ -292,6 +388,97 @@ namespace Kaimos {
 
 				// Scale
 				KaimosUI::UIFunctionalities::DrawVec3UI("Scale", component.Scale, xcol, ycol, zcol, 1.0f);
+			});
+
+
+		// -- Light Components --
+		DrawComponentUI<DirectionalLightComponent>("Directional Light", entity, [&](auto& component)
+			{
+				// Light Type Selector
+				int light_type = 0;
+				KaimosUI::UIFunctionalities::SetTextCursorAndWidth("Light Type");
+				ImGui::Combo("###lighttype", &light_type, "Directional\0Pointlight\0\0");
+
+				// Light Base Stuff
+				Light* light = component.Light.get();
+				ImGuiColorEditFlags flags = ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_Float | ImGuiColorEditFlags_AlphaPreview | ImGuiColorEditFlags_NoInputs;
+
+				ImGui::NewLine();
+				KaimosUI::UIFunctionalities::SetTextCursorAndWidth("Radiance");
+				ImGui::ColorEdit4("###light_radiance", glm::value_ptr(light->Radiance), flags);
+
+				float light_int_max = 10.0f, light_int_pow = 0.8f;
+				if (Renderer::IsSceneInPBRPipeline())
+				{
+					light_int_max = 2000.0f;
+					light_int_pow = 2.5f;
+				}
+
+				Kaimos::KaimosUI::UIFunctionalities::DrawInlineSlider("Intensity", "###light_intensity", &light->Intensity, 0.0f, 2.0, light_int_max, 0.01f, "%.2f", light_int_pow);
+				Kaimos::KaimosUI::UIFunctionalities::DrawInlineDragFloat("Specular Strength", "###light_specstrength", &light->SpecularStrength, 0.01f, 0.0f, 2.0f, 0.0f, FLT_MAX);
+
+				// Light Switch
+				if (light_type == 1)
+				{
+					PointLightComponent& plight = entity.AddComponent<PointLightComponent>();
+					plight.SetPointLightValues(component.StoredLightFalloff, component.StoredLightMinRadius, component.StoredLightMaxRadius);
+					plight.SetLightValues(light->Radiance, light->Intensity, light->SpecularStrength);
+
+					plight.Visible = component.Visible;
+					entity.RemoveComponent<DirectionalLightComponent>();
+				}
+			});
+
+		DrawComponentUI<PointLightComponent>("Point Light", entity, [&](auto& component)
+			{
+				// Light Type Selector
+				int light_type = 1;
+				KaimosUI::UIFunctionalities::SetTextCursorAndWidth("Light Type");
+				ImGui::Combo("###lighttype", &light_type, "Directional\0Pointlight\0\0");
+
+				// Light Base Stuff
+				PointLight* light = component.Light.get();
+				ImGuiColorEditFlags flags = ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_Float | ImGuiColorEditFlags_AlphaPreview | ImGuiColorEditFlags_NoInputs;
+
+				ImGui::NewLine();
+				KaimosUI::UIFunctionalities::SetTextCursorAndWidth("Radiance");
+				ImGui::ColorEdit4("###light_radiance", glm::value_ptr(light->Radiance), flags);
+
+				if (Renderer::IsSceneInPBRPipeline())
+				{
+					Kaimos::KaimosUI::UIFunctionalities::DrawInlineSlider("Intensity", "###light_intensity", &light->Intensity, 0.0f, 2.0f, 100000.0f, 0.01f, "%.2f", 2.5f);
+
+					// Point Light Stuff
+					float plight_minradius = light->GetMinRadius();
+					if (Kaimos::KaimosUI::UIFunctionalities::DrawInlineDragFloat("Radius", "###plight_minradius", &plight_minradius, 1.0f, 0.0f, 2.0f, 0.1f, FLT_MAX))
+						light->SetMinRadius(plight_minradius);
+				}
+				else
+				{
+					Kaimos::KaimosUI::UIFunctionalities::DrawInlineSlider("Intensity", "###light_intensity", &light->Intensity, 0.0f, 2.0f, 100.0f, 0.0f, "%.2f", 0.8f);
+
+					// Point Light Stuff
+					float plight_minradius = light->GetMinRadius(), plight_maxradius = light->GetMaxRadius();
+					if (Kaimos::KaimosUI::UIFunctionalities::DrawInlineDragFloat("Min Radius", "###plight_minradius", &plight_minradius, 0.1f, 0.0f, 2.0f, 0.0f, plight_maxradius))
+						light->SetMinRadius(plight_minradius);
+
+					if (Kaimos::KaimosUI::UIFunctionalities::DrawInlineDragFloat("Max Radius", "###plight_maxradius", &plight_maxradius, 0.1f, 0.0f, 2.0f, plight_minradius, FLT_MAX))
+						light->SetMaxRadius(plight_maxradius);
+				}
+
+				Kaimos::KaimosUI::UIFunctionalities::DrawInlineDragFloat("Falloff Intensity", "###plight_falloff", &light->FalloffMultiplier, 0.01f, 0.0f, 2.0f, 0.0f, FLT_MAX);
+				Kaimos::KaimosUI::UIFunctionalities::DrawInlineDragFloat("Specular Strength", "###light_specstrength", &light->SpecularStrength, 0.01f, 0.0f, 2.0f, 0.0f, FLT_MAX);
+
+				// Light Switch
+				if (light_type == 0)
+				{
+					DirectionalLightComponent& dlight = entity.AddComponent<DirectionalLightComponent>();
+					dlight.SetComponentValues(light->FalloffMultiplier, light->GetMinRadius(), light->GetMaxRadius());
+					dlight.SetLightValues(light->Radiance, light->Intensity, light->SpecularStrength);
+
+					dlight.Visible = component.Visible;
+					entity.RemoveComponent<PointLightComponent>();
+				}
 			});
 
 
@@ -316,8 +503,8 @@ namespace Kaimos {
 
 				// Projection Type Dropdown
 				uint current_proj_type = (uint)camera.GetProjectionType();
-				const char* projection_options[] = { "Perspective", "Orthographic" };				
-				const char* current_projection = projection_options[current_proj_type];
+				const std::vector<std::string> projection_options = { "Perspective", "Orthographic" };
+				std::string current_projection = projection_options[current_proj_type];
 
 				if (KaimosUI::UIFunctionalities::DrawDropDown("Projection", projection_options, 2, current_projection, current_proj_type, ImGui::CalcItemWidth() / 4.0f))
 				{
@@ -367,46 +554,302 @@ namespace Kaimos {
 		// -- Sprite Renderer Component --
 		DrawComponentUI<SpriteRendererComponent>("Sprite Renderer", entity, [&](auto& component)
 			{
-				// Color Picker for Sprite Color
-				ImGuiColorEditFlags color_flags = ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreview | ImGuiColorEditFlags_NoInputs;
-				ImGui::ColorEdit4("Color", glm::value_ptr(component.Color), color_flags);
+				ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_FramePadding
+					| ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_SpanAvailWidth;
 
-				// Texture Button for Sprite Texture
-				const uint id = component.SpriteTexture == nullptr ? 0 : component.SpriteTexture->GetTextureID();
-				ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { 0.0f, 0.0f });
-
-				ImGui::NewLine();
-				ImGui::Text("Texture");
-				ImGui::SameLine(ImGui::GetContentRegionAvail().x * 0.5f);
-
-				if (KaimosUI::UIFunctionalities::DrawTexturedButton("###sprite_texture_btn", id, glm::vec2(80.0f), glm::vec3(0.1f)))
+				bool open = ImGui::TreeNodeEx("###mattreenode", flags, "Material");
+				if (open)
 				{
-					std::string texture_file = FileDialogs::OpenFile("Texture (*.png)\0*.png\0");
-					if (!texture_file.empty())
-						component.SetTexture(texture_file);
+					Ref<Material> material = Renderer::GetMaterial(component.SpriteMaterialID);
+					if (!material)
+					{
+						ImGui::TreePop();
+						return;
+					}
+
+					// Materials Dropdown
+					uint current_material_index = 0;
+					std::string current_material_name = material->GetName();
+					std::vector<std::string> material_names;
+					uint mats_size = Renderer::GetMaterialsQuantity();
+
+					for (uint i = 0; i < mats_size; ++i)
+					{
+						Ref<Material> mat = Renderer::GetMaterialFromIndex(i);
+						if (mat)
+						{
+							material_names.push_back(mat->GetName());
+							if (mat->GetID() == material->GetID())
+								current_material_index = i;
+						}
+					}
+
+					if (KaimosUI::UIFunctionalities::DrawDropDown("Material", material_names, material_names.size(), current_material_name, current_material_index, 135.5f, 2.45f))
+					{
+						// Set Material
+						Ref<Material> selected_material = Renderer::GetMaterialFromIndex(current_material_index);
+						if (selected_material)
+						{
+							component.SetMaterial(selected_material->GetID());
+							material = selected_material;
+						}
+					}
+
+					// Create Material Modal Screen
+					ImGui::SameLine();
+					if (ImGui::Button("New Material", ImVec2(100.0f, 28.25f)))
+						ImGui::OpenPopup("Material Creation");
+					if (ImGui::BeginPopupModal("Material Creation", NULL, ImGuiWindowFlags_NoResize))
+					{
+						static char mtl_name[128] = "";
+						ImGui::Text("Choose a name for the new Material:");						
+						ImGui::PushItemWidth(ImGui::GetContentRegionAvailWidth());
+						bool entered_mtl = ImGui::InputTextWithHint("###MtlNameInputTxt", "Material Name", mtl_name, IM_ARRAYSIZE(mtl_name), ImGuiInputTextFlags_CharsNoBlank | ImGuiInputTextFlags_AutoSelectAll | ImGuiInputTextFlags_EnterReturnsTrue);
+						ImGui::PopItemWidth();
+
+						ImGui::NewLine();
+						if (ImGui::Button("Create", ImVec2(55.0f, 28.25f)) || entered_mtl)
+							ImGui::OpenPopup("Material Created");
+
+						bool close_popup = false, closing_warn = false;
+						if (ImGui::BeginPopupModal("Material Created", NULL, ImGuiWindowFlags_NoResize))
+						{
+							const std::string mtl_name_str = mtl_name;
+							if (mtl_name_str.empty())
+							{
+								ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "A Material without name cannot be created!");
+								ImGui::NewLine(); ImGui::NewLine();
+								ImGui::SameLine(ImGui::GetWindowSize().x / 2.0f - 47.0f / 2.0f);
+								if (closing_warn = (ImGui::Button("Close") || ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_Enter)) || ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Escape))))
+									ImGui::CloseCurrentPopup();
+							}
+							else
+							{
+								ImGui::Text("Material '%s' Created!", mtl_name);
+								ImGui::NewLine();
+								ImGui::SameLine(ImGui::GetWindowSize().x / 2.0f - 47.0f / 2.0f);
+								if (ImGui::Button("Close") || ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Enter)) && !entered_mtl || ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Escape)))
+								{
+									close_popup = true;
+									ImGui::CloseCurrentPopup();
+									Ref<Material> mtl = Renderer::CreateMaterial(mtl_name_str);
+
+									component.SetMaterial(mtl->GetID());
+									material = mtl;
+									memset(mtl_name, 0, sizeof(mtl_name));
+								}
+							}
+
+							ImGui::EndPopup();
+						}
+						
+						ImGui::SameLine(ImGui::GetWindowSize().x - 75.0f);
+						if (ImGui::Button("Cancel") || close_popup || ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Escape)) && !closing_warn)
+						{
+							ImGui::CloseCurrentPopup();
+							memset(mtl_name, 0, sizeof(mtl_name));
+						}
+
+						ImGui::EndPopup();
+					}
+
+
+					// Material Info
+					ImGui::Text("Material ID:\t\t\t %i", material->GetID());
+					ImGui::Text("Material Graph ID: %i", material->GetAttachedGraphID());
+
+					// Open in Material Editor Button
+					ImGui::NewLine(); ImGui::NewLine();
+					if (Renderer::IsDefaultMaterial(material->GetID()))
+					{
+						std::string no_def_mat_str = "Cannot Modify Default Material!";
+						float text_size_x = ImGui::CalcTextSize(no_def_mat_str.c_str()).x;
+
+						ImGui::SameLine(ImGui::GetWindowSize().x * 0.5f - text_size_x * 0.5f);
+						ImGui::TextColored({ 0.8f, 0.8f, 0.2f, 1.0f }, no_def_mat_str.c_str());
+					}
+					else
+					{
+						float btn_width = 196.0f;
+						ImGui::SameLine(ImGui::GetWindowContentRegionWidth() * 0.5f - btn_width * 0.5f);
+						if (ImGui::Button("Open in Material Editor", ImVec2(btn_width, 25.0f)))
+							m_KMEPanel->SetGraphToModifyFromMaterial(material->GetID());
+					}
+
+					ImGui::NewLine();
+					ImGui::TreePop();
+				}
+			});
+
+
+		// -- Mesh Renderer Component --
+		DrawComponentUI<MeshRendererComponent>("Mesh Renderer", entity, [&](auto& component)
+			{
+				// Push Font & Get Mesh
+				Ref<Mesh> mesh = Resources::ResourceManager::GetMesh(component.MeshID);
+
+				// Set Meshes Dropdown
+				const std::unordered_map<uint, Ref<Mesh>> meshes = Resources::ResourceManager::GetMeshesMap();
+
+				uint current_mesh_index = 0;
+				std::string current_mesh_name = mesh ? mesh->GetName() : "None";
+				std::vector<std::string> meshes_names;
+
+				uint ind = 0;
+				for (auto& m : meshes)
+				{
+					meshes_names.push_back(m.second->GetName());
+					if (mesh && m.second->GetID() == mesh->GetID())
+						current_mesh_index = ind;
+
+					++ind;
 				}
 
-				KaimosUI::UIFunctionalities::PopButton(false);
+				meshes_names.push_back("None");
 
-				// Remove Texture Button
+				// Draw Meshes Dropdown
+				if (KaimosUI::UIFunctionalities::DrawDropDown("Mesh", meshes_names, meshes_names.size(), current_mesh_name, current_mesh_index, 135.5f, 2.45f))
+				{
+					// Set Mesh
+					if (current_mesh_index == (meshes_names.size() - 1))
+						component.RemoveMesh();
+					else
+					{
+						Ref<Mesh> selected_mesh = Resources::ResourceManager::GetMeshFromIndex(current_mesh_index);
+						if (selected_mesh)
+						{
+							component.SetMesh(selected_mesh->GetID());
+							mesh = selected_mesh;
+						}
+					}
+				}
+
+				// Draw Mesh Info
+				if (!mesh)
+					return;
+
+				// Mesh Info.
+				ImGui::Text("Mesh:\t\t\t\t\t  %s", mesh->GetName().c_str());
+				ImGui::Text("Mesh ID:\t\t\t\t %i", mesh->GetID());
+				ImGui::Text("Parent Model:\t  %s", mesh->GetParentModelName().c_str());
+				ImGui::Text("Parent Mesh:\t\t%s", mesh->GetParentMeshName().c_str());
+
+				// Get Material
+				Ref<Material> material = Renderer::GetMaterial(component.MaterialID);
+				if (!material)
+					return;
+
+				// Set Materials Dropdown
+				uint mats_size = Renderer::GetMaterialsQuantity();
+
+				uint current_material_index = 0;
+				std::string current_material_name = material->GetName();
+				std::vector<std::string> material_names;
+
+				for (uint i = 0; i < mats_size; ++i)
+				{
+					Ref<Material> mat = Renderer::GetMaterialFromIndex(i);
+					if (mat)
+					{
+						material_names.push_back(mat->GetName());
+						if (mat->GetID() == material->GetID())
+							current_material_index = i;
+					}
+				}
+
+				// Draw Materials Dropdown
+				if (KaimosUI::UIFunctionalities::DrawDropDown("Material", material_names, material_names.size(), current_material_name, current_material_index, 135.5f, 2.45f))
+				{
+					// Set Material
+					Ref<Material> selected_material = Renderer::GetMaterialFromIndex(current_material_index);
+					if (selected_material)
+					{
+						component.SetMaterial(selected_material->GetID());
+						material = selected_material;
+					}
+				}
+
+				// Create Material Modal Screen
 				ImGui::SameLine();
-				if (KaimosUI::UIFunctionalities::DrawColoredButton("X", { 20.0f, 80.0f }, glm::vec3(0.2f), true))
-					component.RemoveTexture();
-				
-				KaimosUI::UIFunctionalities::PopButton(true);				
-				ImGui::PopStyleVar();
+				if (ImGui::Button("New Material", ImVec2(100.0f, 28.25f)))
+					ImGui::OpenPopup("Material Creation");
+				if (ImGui::BeginPopupModal("Material Creation", NULL, ImGuiWindowFlags_NoResize))
+				{
+					static char mtl_name[128] = "";
+					ImGui::Text("Choose a Name for the new Material:");
+					ImGui::PushItemWidth(ImGui::GetContentRegionAvailWidth());
+					bool entered_mtl = ImGui::InputTextWithHint("###MtlNameInputTxt", "Material Name", mtl_name, IM_ARRAYSIZE(mtl_name), ImGuiInputTextFlags_CharsNoBlank | ImGuiInputTextFlags_AutoSelectAll | ImGuiInputTextFlags_EnterReturnsTrue);
+					ImGui::PopItemWidth();
 
-				// Tiling & UV Offset Drag Floats
-				ImGui::NewLine();
-				KaimosUI::UIFunctionalities::DrawInlineDragFloat("Tiling", "##tiling", &component.TextureTiling, 0.1f, 100.0f);
-				KaimosUI::UIFunctionalities::DrawInlineDragFloat2("UV Offset", "##uv_offset", component.TextureUVOffset, 0.1f, 208.0f);
+					ImGui::NewLine();
+					if (ImGui::Button("Create", ImVec2(55.0f, 28.25f)) || entered_mtl)
+						ImGui::OpenPopup("MaterialCreated");
+
+					bool close_popup = false, closing_warn = false;
+					if (ImGui::BeginPopupModal("MaterialCreated", NULL, ImGuiWindowFlags_NoResize))
+					{
+						const std::string mtl_name_str = mtl_name;
+						if (mtl_name_str.empty())
+						{
+							ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "A Material without name cannot be created!");
+							ImGui::NewLine(); ImGui::NewLine();
+							ImGui::SameLine(ImGui::GetWindowSize().x / 2.0f - 47.0f / 2.0f);
+							if (closing_warn = (ImGui::Button("Close") || ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_Enter)) || ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Escape))))
+								ImGui::CloseCurrentPopup();
+						}
+						else
+						{
+							ImGui::Text("Material '%s' Created!", mtl_name);
+							ImGui::NewLine();
+							ImGui::SameLine(ImGui::GetWindowSize().x / 2.0f - 47.0f / 2.0f);
+							if (ImGui::Button("Close") || ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Enter)) && !entered_mtl || ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Escape)))
+							{
+								close_popup = true;
+								ImGui::CloseCurrentPopup();
+								Ref<Material> mtl = Renderer::CreateMaterial(mtl_name_str);
+
+								component.SetMaterial(mtl->GetID());
+								material = mtl;
+								memset(mtl_name, 0, sizeof(mtl_name));
+							}
+						}
+
+						ImGui::EndPopup();
+					}
+
+					ImGui::SameLine(ImGui::GetWindowSize().x - 75.0f);
+					if (ImGui::Button("Cancel") || close_popup || ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Escape)) && !closing_warn)
+					{
+						ImGui::CloseCurrentPopup();
+						memset(mtl_name, 0, sizeof(mtl_name));
+					}
+
+					ImGui::EndPopup();
+				}
+
+				// Material Info
+				ImGui::Text("Material ID:\t\t\t %i", material->GetID());
+				ImGui::Text("Material Graph ID: %i", material->GetAttachedGraphID());
 
 				// Open in Material Editor Button
-				float btn_width = 196.0f;
 				ImGui::NewLine(); ImGui::NewLine();
-				ImGui::SameLine(ImGui::GetWindowContentRegionWidth() * 0.5f - btn_width * 0.5f);
-				if (ImGui::Button("Open in Material Editor", ImVec2(btn_width, 25.0f)))
-					m_KMEPanel->SetMaterialToModify(&component);
+				if (Renderer::IsDefaultMaterial(material->GetID()))
+				{
+					std::string no_def_mat_str = "Cannot Modify Default Material!";
+					float text_size_x = ImGui::CalcTextSize(no_def_mat_str.c_str()).x;
+
+					ImGui::SameLine(ImGui::GetWindowSize().x * 0.5f - text_size_x * 0.5f);
+					ImGui::TextColored({ 0.8f, 0.8f, 0.2f, 1.0f }, no_def_mat_str.c_str());
+				}
+				else
+				{
+					float btn_width = 196.0f;
+					ImGui::SameLine(ImGui::GetWindowContentRegionWidth() * 0.5f - btn_width * 0.5f);
+					if (ImGui::Button("Open in Material Editor", ImVec2(btn_width, 25.0f)))
+						m_KMEPanel->SetGraphToModifyFromMaterial(material->GetID());
+				}
+
+				ImGui::NewLine();
 			});
 	}
 }

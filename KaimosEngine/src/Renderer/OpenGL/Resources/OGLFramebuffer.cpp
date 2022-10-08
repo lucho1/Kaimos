@@ -16,7 +16,7 @@ namespace Kaimos {
 			case TEXTURE_FORMAT::RGBA8:				return GL_RGBA8;
 		}
 
-		KS_ENGINE_ASSERT(false, "Invalid Format Passed!");
+		KS_FATAL_ERROR("Invalid Format Passed!");
 		return GL_NONE;
 	}
 
@@ -33,7 +33,7 @@ namespace Kaimos {
 
 	
 	// ----------------------- Public Class Methods -------------------------------------------------------
-	OGLFramebuffer::OGLFramebuffer(const FramebufferSettings& settings) : m_FBOSettings(settings)
+	OGLFramebuffer::OGLFramebuffer(const FramebufferSettings& settings, bool generate_depth_renderbuffer) : m_FBOSettings(settings)
 	{
 		KS_PROFILE_FUNCTION();
 		for (FramebufferTextureSettings settings : m_FBOSettings.FBOAttachments.TextureAttachments)
@@ -44,7 +44,17 @@ namespace Kaimos {
 				m_ColorAttachmentSettings.push_back(settings);
 		}
 
-		Resize(settings.Width, settings.Height);
+		Resize(settings.Width, settings.Height, generate_depth_renderbuffer);
+	}
+
+	OGLFramebuffer::OGLFramebuffer(uint width, uint height, bool generate_depth_renderbuffer)
+	{
+		FramebufferSettings settings;
+		settings.Width = width;
+		settings.Height = height;
+
+		m_FBOSettings = settings;
+		Generate(generate_depth_renderbuffer);
 	}
 	
 	OGLFramebuffer::~OGLFramebuffer()
@@ -58,11 +68,14 @@ namespace Kaimos {
 
 	
 	// ----------------------- Public FBO Methods ---------------------------------------------------------
-	void OGLFramebuffer::Bind()
+	void OGLFramebuffer::Bind(uint width, uint height)
 	{
 		KS_PROFILE_FUNCTION();
+		uint w = width == 0 ? m_FBOSettings.Width : width;
+		uint h = height == 0 ? m_FBOSettings.Height : height;
+
+		glViewport(0, 0, w, h);
 		glBindFramebuffer(GL_FRAMEBUFFER, m_ID);
-		glViewport(0, 0, m_FBOSettings.Width, m_FBOSettings.Height);
 	}
 
 	void OGLFramebuffer::Unbind()
@@ -78,35 +91,59 @@ namespace Kaimos {
 		glClearTexImage(m_ColorTextures[index], 0, GLTextureFormat(m_ColorAttachmentSettings[index].TextureFormat), GL_INT, &value);
 	}
 
+	void OGLFramebuffer::AttachColorTexture(TEXTURE_TARGET target, uint target_index, uint texture_id, uint mip_level)
+	{
+		KS_PROFILE_FUNCTION();
+		GLenum gl_target;
+		switch (target)
+		{
+			case TEXTURE_TARGET::TEXTURE_2D:		gl_target = GL_TEXTURE_2D; break;
+			case TEXTURE_TARGET::TEXTURE_CUBEMAP:	gl_target = GL_TEXTURE_CUBE_MAP_POSITIVE_X; break;
+			default: KS_FATAL_ERROR("Invalid Texture Target Attached to FBO!");
+		}
 
-	void OGLFramebuffer::Resize(uint width, uint height)
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, gl_target + target_index, texture_id, mip_level);
+	}
+
+	void OGLFramebuffer::CreateAndAttachRedTexture(uint target_index, uint width, uint height)
+	{
+		glCreateTextures(GL_TEXTURE_2D, 1, &m_RedID);
+		glBindTexture(GL_TEXTURE_2D, m_RedID);
+
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_R32I, width, height, 0, GL_RED_INTEGER, GL_UNSIGNED_BYTE, nullptr);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+		GLenum buffer = GL_COLOR_ATTACHMENT0 + target_index;
+		glFramebufferTexture2D(GL_FRAMEBUFFER, buffer, GL_TEXTURE_2D, m_RedID, 0);
+		glDrawBuffers(1, &buffer);
+	}
+
+	void OGLFramebuffer::ResizeAndBindRenderBuffer(uint width, uint height)
+	{
+		glBindFramebuffer(GL_FRAMEBUFFER, m_ID);
+		glBindRenderbuffer(GL_RENDERBUFFER, m_RBOID);
+		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, width, height);
+	}
+
+	void OGLFramebuffer::Resize(uint width, uint height, bool generate_depth_renderbuffer)
 	{
 		KS_PROFILE_FUNCTION();
 		if (width == 0 || height == 0 || width > s_MaxFBOSize || height > s_MaxFBOSize)
 		{
-			KS_ENGINE_CONSOLE_WARN("Warning: Tried to resize FBO to {0}x{1}, aborting operation", width, height);
+			KS_ENGINE_WARN("Warning: Tried to resize FBO to {0}x{1}, aborting operation", width, height);
 			return;
-		}
-
-		if (m_ID != 0)
-		{
-			glDeleteFramebuffers(1, &m_ID);
-			glDeleteTextures(m_ColorTextures.size(), m_ColorTextures.data());
-			glDeleteTextures(1, &m_DepthTexture);
-
-			m_ColorTextures.clear();
-			m_DepthTexture = 0;
 		}
 
 		m_FBOSettings.Width = width;
 		m_FBOSettings.Height = height;
-
-		// -- Create FBO --
-		GLenum FBOsampling = m_FBOSettings.Samples > 1 ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D;
-		glCreateFramebuffers(1, &m_ID);
-		glBindFramebuffer(GL_FRAMEBUFFER, m_ID);
+		Generate(generate_depth_renderbuffer);
 
 		// -- FBO Color Attachments --
+		GLenum FBOsampling = m_FBOSettings.Samples > 1 ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D;
 		if (m_ColorAttachmentSettings.size() > 0)
 		{
 			m_ColorTextures.resize(m_ColorAttachmentSettings.size());
@@ -160,7 +197,7 @@ namespace Kaimos {
 		KS_ENGINE_ASSERT(fbo_status, "Framebuffer Incompleted!");
 
 		if (!fbo_status)
-			KS_ENGINE_CONSOLE_WARN("Framebuffer Incompleted");
+			KS_ENGINE_WARN("Framebuffer Incompleted");
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
@@ -191,6 +228,33 @@ namespace Kaimos {
 
 
 	// ----------------------- Private FBO Methods --------------------------------------------------------
+	void OGLFramebuffer::Generate(bool generate_depth_renderbuffer)
+	{
+		// -- Delete Previous FBO (if any) --
+		KS_PROFILE_FUNCTION();
+		if (m_ID != 0)
+		{
+			glDeleteFramebuffers(1, &m_ID);
+			glDeleteTextures(m_ColorTextures.size(), m_ColorTextures.data());
+			glDeleteTextures(1, &m_DepthTexture);
+			m_ColorTextures.clear();
+			m_DepthTexture = 0;
+		}
+
+		// -- Create FBO --
+		glCreateFramebuffers(1, &m_ID);
+		glBindFramebuffer(GL_FRAMEBUFFER, m_ID);
+
+		if (generate_depth_renderbuffer)
+		{
+			glCreateRenderbuffers(1, &m_RBOID);
+			glBindRenderbuffer(GL_RENDERBUFFER, m_RBOID);
+			glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, m_FBOSettings.Width, m_FBOSettings.Height);
+			glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_RBOID);
+		}
+	}
+
+
 	void OGLFramebuffer::SetTexture(bool depth_texture, GLenum internal_format, GLenum format, uint width, uint height, uint samples)
 	{
 		KS_PROFILE_FUNCTION();

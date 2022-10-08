@@ -110,6 +110,11 @@ namespace Kaimos {
 
 
 	// ----------------------- Camera Getters/Setters -----------------------------------------------------	
+	void CameraController::SetOrientation(const glm::vec2& angles)
+	{
+		SetOrientation(angles.x, angles.y);
+	}
+
 	void CameraController::SetOrientation(float x_angle, float y_angle)
 	{
 		if (!m_LockRotation)
@@ -170,7 +175,7 @@ namespace Kaimos {
 			dir = glm::vec3(up.x, 0.0f, up.z);
 
 		// -- Move --
-		m_Position += dir * movement.y * m_MoveSpeed * m_ZoomLevel * 1.2f;
+		m_Position += dir * movement.y * m_MoveSpeed * m_ZoomLevel * m_AdvanceCameraSpeed;
 		m_FocalPoint = m_Position + GetForwardVector() * m_ZoomLevel;
 		RecalculateView();
 	}
@@ -206,8 +211,8 @@ namespace Kaimos {
 	{
 		// -- Pan Speed on X and Y --
 		glm::ivec2 viewport = m_Camera.GetViewportSize();
-		float x = std::min((float)viewport.x / 1000.0f, m_PanSpeed);
-		float y = std::min((float)viewport.y / 1000.0f, m_PanSpeed);
+		float x = std::min((float)viewport.x / 18.0f, m_PanSpeed);
+		float y = std::min((float)viewport.y / 18.0f, m_PanSpeed);
 
 		// This is a quadratic function: X squared - X * constant
 		float dx = 0.0366f * (x * x) - 0.1778f * x + 0.3021f;

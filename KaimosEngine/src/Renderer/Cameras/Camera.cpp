@@ -25,7 +25,7 @@ namespace Kaimos {
 	{
 		if (height == 0)
 		{
-			KS_ENGINE_WARN("Setting Camera Viewport to 0!");
+			KS_WARN("Setting Camera Viewport to 0!");
 			return;
 		}
 

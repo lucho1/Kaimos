@@ -1,5 +1,6 @@
 #include "kspch.h"
 #include "OGLShader.h"
+#include "Renderer/Renderer.h"
 
 #include <glad/glad.h>
 #include <glm/gtc/type_ptr.hpp>
@@ -15,18 +16,19 @@ namespace Kaimos {
 		if (shader_type == "FRAGMENT_SHADER" || shader_type == "PIXEL_SHADER")
 			return GL_FRAGMENT_SHADER;
 
-		KS_ENGINE_ASSERT(false, "Unknown Shader Type '{0}'", shader_type.c_str());
+		KS_FATAL_ERROR("Unknown Shader Type '{0}'", shader_type);
 		return 0;
 	}
 
 	static char* StringFromShaderType(const GLenum& shader_type)
 	{
-		if (shader_type == GL_VERTEX_SHADER)
-			return "Vertex";
-		if (shader_type == GL_FRAGMENT_SHADER)
-			return "Fragment/Pixel";
+		switch (shader_type)
+		{
+			case GL_VERTEX_SHADER:		return "Vertex";
+			case GL_FRAGMENT_SHADER:	return "Fragment/Pixel";
+		}
 
-		KS_ENGINE_ASSERT(false, "Unknown Shader Type '{0}'", shader_type);
+		KS_FATAL_ERROR("Unknown Shader Type '{0}'", shader_type);
 		return 0;
 	}
 
@@ -35,27 +37,9 @@ namespace Kaimos {
 	// ----------------------- Public Class Methods -------------------------------------------------------
 	OGLShader::OGLShader(const std::string& filepath)
 	{
-		KS_PROFILE_FUNCTION();
-
 		// -- Compile Shader --
+		KS_PROFILE_FUNCTION();
 		CompileShader(PreProcessShader(ReadShaderFile(filepath)));
-
-		// -- Shader Name --
-		// Shader name from filepath --> Substring between last '/' or '\' and the last '.' (assets/textureSh.glsl = textureSh)
-		// rfind is the same but will find exactly the character you pass (find_last will find any of the characters passed)
-		size_t last_slash = filepath.find_last_of("/\\");
-		size_t last_dot = filepath.rfind('.');
-
-		// lastSlash + 1 is to get "TextureSh" and not "/TextureSh" (and npos is in case we don't have slashes or previous paths)
-		// If no '.', then we take the end of the string until the last slash (assets/TextureSh --> TextureSh), otherwise, we take from the '.' pos to the lastSlash (remember we are dealing with sizes,
-		// if we begin the substr() at last "/" and end it at last "." and not "." - last"/", we will have errors of empty characters because the end pos will be bigger than it has to actually be!
-		last_slash = last_slash == std::string::npos ? 0 : last_slash + 1;
-		last_dot = (last_dot == std::string::npos ? filepath.size() : last_dot) - last_slash;
-		m_Name = filepath.substr(last_slash, last_dot);
-
-		// This might be better:
-		//std::filesystem::path path = filepath;
-		//m_Name = path.stem().string(); // Returns the file's name stripped of the extension.
 	}
 
 
@@ -97,9 +81,27 @@ namespace Kaimos {
 
 	
 	// ----------------------- Private OGL Shader Methods -------------------------------------------------
-	const std::string OGLShader::ReadShaderFile(const std::string& filepath)
+	std::string OGLShader::ReadShaderFile(const std::string& filepath)
 	{
 		KS_PROFILE_FUNCTION();
+
+		// -- Get Shader Name (to log it, ...) --
+		// Shader name from filepath --> Substring between last '/' or '\' and the last '.' (assets/textureSh.glsl = textureSh)
+		// rfind is the same but will find exactly the character you pass (find_last will find any of the characters passed)
+		size_t last_slash = filepath.find_last_of("/\\");
+		size_t last_dot = filepath.rfind('.');
+
+		// lastSlash + 1 is to get "TextureSh" and not "/TextureSh" (and npos is in case we don't have slashes or previous paths)
+		// If no '.', then we take the end of the string until the last slash (assets/TextureSh --> TextureSh), otherwise, we take from the '.' pos to the lastSlash (remember we are dealing with sizes,
+		// if we begin the substr() at last "/" and end it at last "." and not "." - last"/", we will have errors of empty characters because the end pos will be bigger than it has to actually be!
+		last_slash = last_slash == std::string::npos ? 0 : last_slash + 1;
+		last_dot = (last_dot == std::string::npos ? filepath.size() : last_dot) - last_slash;
+		std::string shader_name = filepath.substr(last_slash, last_dot);
+
+		// This might be better:
+		//std::filesystem::path path = filepath;
+		//m_Name = path.stem().string(); // Returns the file's name stripped of the extension
+
 
 		// -- Open Shader File --
 		// Input File Stream (to open a file) --> We give the filepath, tell it to process it as an input file
@@ -111,8 +113,8 @@ namespace Kaimos {
 		{
 			// -- File Size --
 			file.seekg(0, std::ios::end);				// seekg sets position in input sequence (in this case, place cursor at the very end of the file)
-			
 			size_t file_size = file.tellg();			// tellg says us where the file cursor is (since it's at the file end, it's the size of the file)
+
 			if (file_size != -1)
 			{
 				// -- Create a string with the size of file --				
@@ -122,30 +124,60 @@ namespace Kaimos {
 				// -- Load it all into that string --
 				file.read(&ret[0], file_size);			// Put it into the string (passing a ptr to the string beginning), and with the size of the string
 
+				// -- Set Name --
+				m_Name = shader_name;
+
 				// -- Close String --
 				//file.close();							// Actually not needed, ifstream closes itself due to RAII
 				return ret;
 			}
-			else { // Sorry for this {, it's needed because of the next define call
-				KS_ENGINE_ERROR("Couldn't read Shader file at path '{0}'", filepath);
-			}
+			else
+				KS_ERROR("Couldn't read Shader '{0}' file at path '{1}'", shader_name, filepath);
 		}
-		else {
-			KS_ENGINE_ERROR("Couldn't open Shader file at path '{0}'", filepath);
-		}
+		else
+			KS_ERROR("Couldn't open Shader '{0}' file at path '{1}'", shader_name, filepath);
 
 		return ret;
 	}
 
 
-	const std::unordered_map<GLenum, std::string> OGLShader::PreProcessShader(const std::string& source)
+	const std::unordered_map<GLenum, std::string> OGLShader::PreProcessShader(std::string& source)
 	{
 		KS_PROFILE_FUNCTION();
 
-		// -- Shader Sources to Return
+		// -- Shader Sources to Return --
 		std::unordered_map<GLenum, std::string> ret;
 
 		// -- Variables to Process Shader --
+		// Lighting Defines
+		std::string dirlights_define = "#define MAX_DIR_LIGHTS ";
+		std::string pointlights_define = "#define MAX_POINT_LIGHTS ";
+		std::string maxtextures_define = "#define MAX_TEXTURES ";
+
+		size_t define_dir_pos = source.find(dirlights_define, 0);
+		size_t define_point_pos = source.find(pointlights_define, 0);
+		size_t define_maxtex_pos = source.find(maxtextures_define, 0);
+
+		if (define_dir_pos != std::string::npos)
+		{
+			std::string new_dir_define = dirlights_define + std::to_string(Renderer::GetMaxDirLights()) + "\n";
+			source.replace(define_dir_pos, dirlights_define.size() + 1, new_dir_define);
+		}
+
+		if (define_point_pos != std::string::npos)
+		{
+			std::string new_point_define = pointlights_define + std::to_string(Renderer::GetMaxPointLights()) + "\n";
+			source.replace(define_point_pos, pointlights_define.size() + 3, new_point_define);
+		}
+
+		if (define_maxtex_pos != std::string::npos)
+		{
+			// Magic numbers here are because of the offsets created by this replaces
+			std::string new_maxtex_define = maxtextures_define + std::to_string(Renderer::GetMaxTextureSlots()) + "\n";
+			source.replace(define_maxtex_pos + 2, maxtextures_define.size() + 3, new_maxtex_define);
+		}
+
+		// Shader Type Token
 		const char* type_token = "#type";						// Token to designate the beginning of a new shader (check any .glsl file)
 		size_t type_token_length = strlen(type_token);			// Length of the token
 		size_t pos = source.find(type_token, 0);				// Start of shader type declaration line - Find the position of the token (to find the shader beginning) to use it as a cursor
@@ -163,7 +195,7 @@ namespace Kaimos {
 			KS_ENGINE_ASSERT(eol != std::string::npos, "Syntax Error");
 			if (eol == std::string::npos)
 			{
-				KS_ENGINE_ERROR("Shader Syntax Error - Shader End Of Line is null");
+				KS_ERROR("Syntax Error in Shader '{0}' - Shader End of Line is null", m_Name);
 				return {};
 			}
 			
@@ -183,7 +215,7 @@ namespace Kaimos {
 			KS_ENGINE_ASSERT(gl_shader_type, "Invalid ShaderType specification or not supported");
 			if (gl_shader_type == 0)
 			{
-				KS_ENGINE_ERROR("Shader Syntax Error - Invalid Shader Type specification or not supported");
+				KS_ERROR("Syntax Error in Shader '{0}' - Invalid Shader Type specification or not supported", m_Name);
 				return {};
 			}
 			
@@ -195,7 +227,7 @@ namespace Kaimos {
 			KS_ENGINE_ASSERT(next_line_pos != std::string::npos, "Syntax Error");
 			if (next_line_pos == std::string::npos)
 			{
-				KS_ENGINE_ERROR("Shader Syntax Error - The keyword #type (or the following lines), specificating the Shader Type, could not be found or was wrong");
+				KS_ERROR("Syntax Error in Shader '{0}' - The keyword #type (or the following lines), specificating the Shader Type, could not be found or was wrong", m_Name);
 				return {};
 			}
 
@@ -264,8 +296,8 @@ namespace Kaimos {
 				glDeleteShader(shader);
 
 				// -- InfoLog to print error & assert --
-				KS_ENGINE_CRITICAL("{0} Shader Compilation Error: {1}", StringFromShaderType(type), info_log.data());
-				KS_ENGINE_ASSERT(false, "Shader Compilation Failure!");
+				KS_CRITICAL("{0} Shader Compilation Error in Shader '{1}': {2}", StringFromShaderType(type), m_Name, info_log.data());
+				KS_FATAL_ERROR("Shader Compilation Failure in Shader '{0}'", m_Name);
 				break;
 			}
 
@@ -298,8 +330,8 @@ namespace Kaimos {
 				glDeleteShader(id);
 
 			// -- Print error & assert --
-			KS_ENGINE_CRITICAL("Shader Linking Error: {0}", info_log.data());
-			KS_ENGINE_ASSERT(false, "Shader Program Link Failure!");
+			KS_CRITICAL("Shader Linking Error in Shader '{0}': {0}", m_Name, info_log.data());
+			KS_FATAL_ERROR("Shader Program Link Failure in Shader '{0}'", m_Name);
 			return;
 		}
 
@@ -311,93 +343,65 @@ namespace Kaimos {
 		}
 	}
 
-
 	
+	int OGLShader::GetUniformLocation(const std::string& name)
+	{
+		if (m_UniformCache.find(name) != m_UniformCache.end())
+			return m_UniformCache[name];
+
+		int location = glGetUniformLocation(m_ShaderID, name.c_str());
+		if (location == -1)
+		{
+			//KS_WARN("Tried to retrieve an unexisting uniform at Shader '{0}' ('{1}')", m_Name, name);
+			return location;
+		}
+
+		m_UniformCache[name] = location;
+		return location;
+	}
+
+
+
 	// ----------------------- Uniforms -------------------------------------------------------------------
-	void OGLShader::SetUFloat(const std::string& name, float value)
+	void OGLShader::SetUniformFloat(const std::string& name, float value)
 	{
 		KS_PROFILE_FUNCTION();
-		UploadUniformFloat(name, value);
+		glUniform1f(GetUniformLocation(name), value);
 	}
 
-	void OGLShader::SetUFloat3(const std::string& name, const glm::vec3& value)
+	void OGLShader::SetUniformFloat2(const std::string& name, const glm::vec2& value)
 	{
 		KS_PROFILE_FUNCTION();
-		UploadUniformFloat3(name, value);
+		glUniform2f(GetUniformLocation(name), value.x, value.y);
 	}
 
-	void OGLShader::SetUFloat4(const std::string& name, const glm::vec4& value)
+	void OGLShader::SetUniformFloat3(const std::string& name, const glm::vec3& value)
 	{
 		KS_PROFILE_FUNCTION();
-		UploadUniformFloat4(name, value);
+		glUniform3f(GetUniformLocation(name), value.x, value.y, value.z);
 	}
 
-	void OGLShader::SetUMat4(const std::string& name, const glm::mat4& value)
+	void OGLShader::SetUniformFloat4(const std::string& name, const glm::vec4& value)
 	{
 		KS_PROFILE_FUNCTION();
-		UploadUniformMat4(name, value);
+		glUniform4f(GetUniformLocation(name), value.x, value.y, value.z, value.w);
+	}
+
+	void OGLShader::SetUniformMat4(const std::string& name, const glm::mat4& value)
+	{
+		KS_PROFILE_FUNCTION();
+		glUniformMatrix4fv(GetUniformLocation(name), 1, GL_FALSE, glm::value_ptr(value));
 	}
 	
-	void OGLShader::SetUInt(const std::string& name, int value)
+	void OGLShader::SetUniformInt(const std::string& name, int value)
 	{
 		KS_PROFILE_FUNCTION();
-		UploadUniformInt(name, value);
+		glUniform1i(GetUniformLocation(name), value);
 	}
 
-	void OGLShader::SetUIntArray(const std::string& name, int* values_array, uint size)
+	void OGLShader::SetUniformIntArray(const std::string& name, int* values_array, uint size)
 	{
 		KS_PROFILE_FUNCTION();
-		UploadUniformIntArray(name, values_array, size);
-	}
-
-
-
-	// ----------------------- Uniforms Upload ------------------------------------------------------------
-	void OGLShader::UploadUniformInt(const std::string& name, const int& value)
-	{
-		GLint loc = glGetUniformLocation(m_ShaderID, name.c_str());
-		glUniform1i(loc, value);
-	}
-
-	void OGLShader::UploadUniformIntArray(const std::string& name, const int* values_array, uint size)
-	{
-		GLint loc = glGetUniformLocation(m_ShaderID, name.c_str());
-		glUniform1iv(loc, size, values_array);
-	}
-
-	void OGLShader::UploadUniformFloat(const std::string& name, const float& value)
-	{
-		GLint loc = glGetUniformLocation(m_ShaderID, name.c_str());
-		glUniform1f(loc, value);
-	}
-
-	void OGLShader::UploadUniformFloat2(const std::string& name, const glm::vec2& value)
-	{
-		GLint loc = glGetUniformLocation(m_ShaderID, name.c_str());
-		glUniform2f(loc, value.x, value.y);
-	}
-
-	void OGLShader::UploadUniformFloat3(const std::string& name, const glm::vec3& value)
-	{
-		GLint loc = glGetUniformLocation(m_ShaderID, name.c_str());
-		glUniform3f(loc, value.x, value.y, value.z);
-	}
-
-	void OGLShader::UploadUniformFloat4(const std::string& name, const glm::vec4& value)
-	{
-		GLint loc = glGetUniformLocation(m_ShaderID, name.c_str());
-		glUniform4f(loc, value.x, value.y, value.z, value.w);
-	}
-
-	void OGLShader::UploadUniformMat3(const std::string& name, const glm::mat3& matrix)
-	{
-		GLint loc = glGetUniformLocation(m_ShaderID, name.c_str());
-		glUniformMatrix3fv(loc, 1, GL_FALSE, glm::value_ptr(matrix));
-	}
-
-	void OGLShader::UploadUniformMat4(const std::string& name, const glm::mat4& matrix)
-	{
-		GLint loc = glGetUniformLocation(m_ShaderID, name.c_str());
-		glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(matrix));
+		glUniform1iv(GetUniformLocation(name), size, values_array);
 	}
 }

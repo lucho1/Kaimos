@@ -10,6 +10,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "Scene/SceneSerializer.h"
+#include "Core/Resources/ResourceManager.h"
 #include "Core/Utils/PlatformUtils.h"
 
 namespace Kaimos {
@@ -26,20 +27,17 @@ namespace Kaimos {
 	{
 		KS_PROFILE_FUNCTION();
 
-		m_CheckerTexture = Texture2D::Create("assets/textures/Checkerboard.png");
-		m_LogoTexture = Texture2D::Create("assets/textures/ChernoLogo.png");
-
-		m_IconsArray[0] = Texture2D::Create("../KaimosEngine/res/icons/selection_icon.png");
-		m_IconsArray[1] = Texture2D::Create("../KaimosEngine/res/icons/transform_icon.png");
-		m_IconsArray[2] = Texture2D::Create("../KaimosEngine/res/icons/rotation_icon.png");
-		m_IconsArray[3] = Texture2D::Create("../KaimosEngine/res/icons/scale_icon.png");
-		m_IconsArray[4] = Texture2D::Create("../KaimosEngine/res/icons/snap_icon3.png");
-		m_IconsArray[5] = Texture2D::Create("../KaimosEngine/res/icons/local_trs_icon.png");
-		m_IconsArray[6] = Texture2D::Create("../KaimosEngine/res/icons/world_trs_icon.png");
-		m_IconsArray[7] = Texture2D::Create("../KaimosEngine/res/icons/camera_icon.png");
+		m_IconsArray[0] = Texture2D::Create(INTERNAL_ICONS_PATH + std::string("selection_icon.png"));
+		m_IconsArray[1] = Texture2D::Create(INTERNAL_ICONS_PATH + std::string("transform_icon.png"));
+		m_IconsArray[2] = Texture2D::Create(INTERNAL_ICONS_PATH + std::string("rotation_icon.png"));
+		m_IconsArray[3] = Texture2D::Create(INTERNAL_ICONS_PATH + std::string("scale_icon.png"));
+		m_IconsArray[4] = Texture2D::Create(INTERNAL_ICONS_PATH + std::string("snap_icon3.png"));
+		m_IconsArray[5] = Texture2D::Create(INTERNAL_ICONS_PATH + std::string("local_trs_icon.png"));
+		m_IconsArray[6] = Texture2D::Create(INTERNAL_ICONS_PATH + std::string("world_trs_icon.png"));
+		m_IconsArray[7] = Texture2D::Create(INTERNAL_ICONS_PATH + std::string("camera_icon.png"));
 
 		FramebufferSettings fbo_settings;
-		fbo_settings.FBOAttachments = { TEXTURE_FORMAT::RGBA8, TEXTURE_FORMAT::RED_INTEGER, TEXTURE_FORMAT::DEPTH};
+		fbo_settings.FBOAttachments = { TEXTURE_FORMAT::RGBA8, TEXTURE_FORMAT::RED_INTEGER, TEXTURE_FORMAT::DEPTH };
 		fbo_settings.Width = m_DefaultViewportResolution.x;
 		fbo_settings.Height = m_DefaultViewportResolution.y;
 		m_Framebuffer = Framebuffer::Create(fbo_settings);
@@ -53,9 +51,20 @@ namespace Kaimos {
 		m_PrimaryCameraFramebuffer = Framebuffer::Create(primcam_fbo_settings);
 
 		// -- Create & Load Scene --
-		NewScene(false);
+		CreateScene(false);
+
+		std::string s_path = "assets/scenes/PBRDefaultScene.kaimos";
+		std::string scenep = Renderer::GetLastScene();
+		std::filesystem::path fpath = scenep;
+
+		if (!std::filesystem::exists(fpath) || scenep.find("assets") == std::string::npos)
+			KS_ENGINE_ERROR("Couldn't load scene");
+		else
+			s_path = scenep;
+
 		SceneSerializer m_Serializer(m_CurrentScene);
-		m_Serializer.Deserialize("assets/scenes/CubeScene.kaimos");
+		m_Serializer.Deserialize(s_path);
+		m_KMEPanel = MaterialEditorPanel(m_CurrentScene);
 		m_ScenePanel = ScenePanel(m_CurrentScene, &m_KMEPanel);
 	}
 
@@ -77,7 +86,7 @@ namespace Kaimos {
 		{
 			m_Framebuffer->Resize((uint)m_ViewportSize.x, (uint)m_ViewportSize.y);
 			m_CurrentScene->SetViewportSize((uint)m_ViewportSize.x, (uint)m_ViewportSize.y);
-			m_EditorCamera.SetCameraViewport(m_ViewportSize.x, m_ViewportSize.y);
+			m_CurrentScene->GetEditorCamera().SetCameraViewport(m_ViewportSize.x, m_ViewportSize.y);
 		}
 
 		// -- Camera Update --
@@ -86,10 +95,11 @@ namespace Kaimos {
 		if (selected_entity)
 			focus_pos = selected_entity.GetComponent<TransformComponent>().Translation;
 
-		m_EditorCamera.OnUpdate(dt, m_ViewportFocused, focus_pos);
+		m_CurrentScene->GetEditorCamera().OnUpdate(dt, m_ViewportFocused, focus_pos);
 
 		// -- Render --
 		Renderer2D::ResetStats();
+		Renderer3D::ResetStats();
 
 		m_Framebuffer->Bind();
 		RenderCommand::SetClearColor(glm::vec4(0.15f, 0.15f, 0.15f, 1.0f));
@@ -99,7 +109,7 @@ namespace Kaimos {
 		m_Framebuffer->ClearFBOTexture(1, -1);
 
 		// -- Scene Update --
-		m_CurrentScene->OnUpdateEditor(dt, m_EditorCamera.GetCamera());
+		m_CurrentScene->OnUpdateEditor(dt);
 
 		// -- Mouse Picking --
 		// Get Mouse position with respect to the viewport boundaries
@@ -124,6 +134,8 @@ namespace Kaimos {
 		{
 			// -- Render --
 			Renderer2D::ResetStats();
+			Renderer3D::ResetStats();
+
 			m_GameFramebuffer->Bind();
 			RenderCommand::SetClearColor(glm::vec4(0.15f, 0.15f, 0.15f, 1.0f));
 			RenderCommand::Clear();
@@ -147,6 +159,8 @@ namespace Kaimos {
 			if (camera)
 			{
 				Renderer2D::ResetStats();
+				Renderer3D::ResetStats();
+
 				m_PrimaryCameraFramebuffer->Bind();
 				RenderCommand::SetClearColor(glm::vec4(0.08f, 0.08f, 0.08f, 1.0f));
 				RenderCommand::Clear();
@@ -199,25 +213,29 @@ namespace Kaimos {
 
 		
 		// -- Show Windows Booleans --
+		static bool fullscreen = Application::Get().GetWindow().IsFullscreen();
 		static bool show_toolbar = true;
 		static bool show_scene_panel = true;
-		static bool show_project_panel = true;
+		//static bool show_project_panel = true;
 		static bool show_console_panel = true;
-		static bool show_files_panel = true;
+		//static bool show_files_panel = true;
 		static bool show_settings_panel = true;
 		static bool show_performance_panel = true;
 		static bool show_viewport_panel = true;
 		static bool show_game_panel = true;
-		static bool show_materialeditor_panel = true;
 		static bool show_uidemo = false;
 		
 		// -- Upper Menu Tab Bar --
+		bool open_new_scenepopup = false;
 		if (ImGui::BeginMenuBar())
 		{
 			if (ImGui::BeginMenu("File"))
 			{
+				if (ImGui::MenuItem("Fullscreen", nullptr, &fullscreen))
+					Application::Get().GetWindow().SetFullscreen(fullscreen);
+
 				if (ImGui::MenuItem("New", "Ctrl+N"))
-					NewScene();
+					open_new_scenepopup = true;
 
 				if (ImGui::MenuItem("Open...", "Ctrl+O"))
 					OpenScene();
@@ -240,13 +258,16 @@ namespace Kaimos {
 				ImGui::MenuItem("Scene Panel", nullptr, &show_scene_panel);
 				ImGui::MenuItem("Viewport", nullptr, &show_viewport_panel);
 				ImGui::MenuItem("Game Panel", nullptr, &show_game_panel);
-				ImGui::MenuItem("Material Editor", nullptr, &show_materialeditor_panel);
+				ImGui::MenuItem("Material Editor", nullptr, &m_KMEPanel.ShowPanel);
 				ImGui::MenuItem("Settings Panel", nullptr, &show_settings_panel);
 				ImGui::MenuItem("Performance Panel", nullptr, &show_performance_panel);
-				ImGui::MenuItem("Project Panel", nullptr, &show_project_panel);
+				//ImGui::MenuItem("Project Panel", nullptr, &show_project_panel);
 				ImGui::MenuItem("Console Panel", nullptr, &show_console_panel);
-				ImGui::MenuItem("Files Panel", nullptr, &show_files_panel);
-				ImGui::MenuItem("UI Demo", nullptr, &show_uidemo);
+				//ImGui::MenuItem("Files Panel", nullptr, &show_files_panel);
+
+				#if !KS_DIST
+					ImGui::MenuItem("UI Demo", nullptr, &show_uidemo);
+				#endif
 
 				ImGui::EndMenu();
 			}
@@ -254,6 +275,15 @@ namespace Kaimos {
 			ImGui::EndMenuBar();
 		}
 		
+		// New Scene Popup
+		if (open_new_scenepopup)
+		{
+			ImGui::OpenPopup("Create Scene");
+			open_new_scenepopup = false;
+		}
+
+		NewSceneScreen();
+
 		ImGui::End();
 
 		// -- Demo Window --
@@ -262,34 +292,39 @@ namespace Kaimos {
 
 		// -- Toolbar --
 		static float viewport_endpos = 500.0f;
-		float left_boundary = std::max(500.0f, viewport_endpos - 100.0f);
-		float right_boundary = std::min(left_boundary, 1500.0f);
-		m_ToolbarPanel.OnUIRender(m_IconsArray, m_EditorCamera, right_boundary);
-
+		if (show_toolbar)
+		{
+			float left_boundary = std::max(500.0f, viewport_endpos - 100.0f);
+			float right_boundary = std::min(left_boundary, 1500.0f);
+			m_ToolbarPanel.OnUIRender(m_IconsArray, m_CurrentScene->GetEditorCamera(), right_boundary);
+		}
+		
 		// -- Scene Panel Rendering --
 		if(show_scene_panel)
-			m_ScenePanel.OnUIRender(show_scene_panel);
+			m_ScenePanel.OnUIRender(show_scene_panel, m_ViewportFocused);
 
 		// -- Settings Panel Rendering --
-		m_SettingsPanel.OnUIRender(m_HoveredEntity, show_settings_panel, show_performance_panel);
+		m_SettingsPanel.OnUIRender(m_CurrentScene, m_HoveredEntity, show_settings_panel, show_performance_panel);
 
 		// -- Project & Console Panels --
-		if (show_files_panel)
-		{
-			ImGui::Begin("Folders", &show_files_panel);
-			ImGui::End();
-		}
+		//if (show_files_panel)
+		//{
+		//	ImGui::Begin("Folders", &show_files_panel);
+		//	ImGui::End();
+		//}
 
-		m_ProjectPanel.OnUIRender(show_project_panel, show_console_panel);
+		bool proj_panel = false; // TODO: Temporary until we have a proper project panel
+		m_ProjectPanel.OnUIRender(proj_panel, show_console_panel); //proj_panel = show_project_panel
 
-		// -- Material Editor Panel --
-		if (show_materialeditor_panel)
-			m_KMEPanel.OnUIRender();
-
+		// -- Game Panels --
 		if (show_game_panel)
 		{
-			m_RenderGamePanel = true;
-			ImGui::Begin("Game", &show_game_panel, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+			if (ImGui::Begin("Game", &show_game_panel, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse))
+				m_RenderGamePanel = true;
+			else
+				m_RenderGamePanel = false;
+
+
 			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0.0f, 0.0f));
 
 			Entity camera = m_CurrentScene->GetPrimaryCamera();
@@ -313,9 +348,6 @@ namespace Kaimos {
 				ImGui::Image(reinterpret_cast<void*>(m_GameFramebuffer->GetFBOTextureID()), { size.x, size.y }, ImVec2(0, 1), ImVec2(1, 0));
 			}
 
-			if (!ImGui::IsItemVisible())
-				m_RenderGamePanel = false;
-
 			ImGui::PopStyleVar();
 			ImGui::End();
 		}
@@ -325,11 +357,21 @@ namespace Kaimos {
 		// -- Viewport --
 		if (show_viewport_panel)
 		{
-			ImGui::Begin("Viewport", &show_viewport_panel, ImGuiWindowFlags_NoScrollbar);
-			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0.0f, 0.0f));
+			// -- Primary Camera Mini-Screen --
+			if (ImGui::Begin("Viewport", &show_viewport_panel, ImGuiWindowFlags_NoScrollbar))
+			{
+				m_RenderViewport = true;
+				ShowPrimaryCameraDisplay();
+			}
+			else
+				m_RenderViewport = false;
 
+
+			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0.0f, 0.0f));
+						
 			m_ViewportFocused = ImGui::IsWindowFocused();
 			m_ViewportHovered = ImGui::IsWindowHovered();
+
 			Application::Get().GetImGuiLayer()->SetBlockEvents(!m_ViewportFocused && !m_ViewportHovered);
 
 			// Get the position where the next window begins (including Tab Bar)
@@ -348,16 +390,6 @@ namespace Kaimos {
 			m_ViewportSize = glm::vec2(viewportpanel_size.x, viewportpanel_size.y);
 			ImGui::Image(reinterpret_cast<void*>(m_Framebuffer->GetFBOTextureID()), viewportpanel_size, ImVec2(0, 1), ImVec2(1, 0));
 
-
-			// -- Primary Camera Mini-Screen --
-			if (ImGui::IsItemVisible())
-			{
-				m_RenderViewport = true;
-				ShowPrimaryCameraDisplay();
-			}
-			else
-				m_RenderViewport = false;
-
 			// -- Camera Speed Multiplier Modification --
 			ShowCameraSpeedMultiplier();
 
@@ -368,19 +400,25 @@ namespace Kaimos {
 			ImGui::End();
 		}
 
-		
+		// -- Material Editor Panel --
+		if (m_KMEPanel.ShowPanel)
+			m_KMEPanel.OnUIRender();
 	}
 
 
 	void EditorLayer::OnEvent(Event& ev)
 	{
-		m_EditorCamera.OnEvent(ev);
+		m_CurrentScene->GetEditorCamera().OnEvent(ev);
+
+		if(m_ViewportFocused && !ImGuizmo::IsUsing() && !ImGuizmo::IsOver())
+			m_ScenePanel.OnEvent(ev);
 
 		EventDispatcher dispatcher(ev);
 		dispatcher.Dispatch<KeyPressedEvent>(KS_BIND_EVENT_FN(EditorLayer::OnKeyPressed));
 		dispatcher.Dispatch<KeyReleasedEvent>(KS_BIND_EVENT_FN(EditorLayer::OnKeyReleased));
 		dispatcher.Dispatch<MouseButtonPressedEvent>(KS_BIND_EVENT_FN(EditorLayer::OnMouseButtonPressed));
 		dispatcher.Dispatch<MouseScrolledEvent>(KS_BIND_EVENT_FN(EditorLayer::OnMouseScrolled));
+		dispatcher.Dispatch<WindowDragDropEvent>(KS_BIND_EVENT_FN(EditorLayer::OnWindowDragAndDrop));
 	}
 
 
@@ -410,7 +448,7 @@ namespace Kaimos {
 
 		// Mini-Screen Pos
 		float mini_posX = ImGui::GetWindowPos().x + ImGui::GetWindowContentRegionMin().x - camera_img_size.x * 1.45f;
-		float mini_posY = ImGui::GetWindowPos().y + ImGui::GetWindowContentRegionMin().y - camera_img_size.y * 2.0f;
+		float mini_posY = ImGui::GetWindowPos().y + ImGui::GetWindowContentRegionMin().y - camera_img_size.y * 2.1f;
 		static glm::vec2 size_increase = glm::vec2(0.0f);
 
 		glm::vec2 mini_screen_pos = { mini_posX + ImGui::GetWindowSize().x, mini_posY + ImGui::GetWindowSize().y };
@@ -472,7 +510,7 @@ namespace Kaimos {
 				popup_size = ImGui::GetWindowSize();
 				ImGui::SetWindowFontScale(2);
 
-				float speed_multiplier = m_EditorCamera.GetSpeedMultiplier();
+				float speed_multiplier = m_CurrentScene->GetEditorCamera().GetSpeedMultiplier();
 				ImGui::Text("x%.2f", speed_multiplier);
 			}
 			ImGui::End();
@@ -486,7 +524,7 @@ namespace Kaimos {
 		if (selected_entity && m_ToolbarPanel.m_SelectedOperation != -1)
 		{
 			// Set Guizmo
-			m_EditorCamera.UsingGuizmo(ImGuizmo::IsOver());
+			m_CurrentScene->GetEditorCamera().UsingGuizmo(ImGuizmo::IsOver());
 			ImGuizmo::SetOrthographic(false);
 			ImGuizmo::SetDrawlist();
 			ImGuizmo::SetRect(m_ViewportLimits[0].x, m_ViewportLimits[0].y, m_ViewportLimits[1].x - m_ViewportLimits[0].x, m_ViewportLimits[1].y - m_ViewportLimits[0].y);
@@ -495,11 +533,11 @@ namespace Kaimos {
 			TransformComponent& transform = selected_entity.GetComponent<TransformComponent>();
 			glm::mat4 tr_mat = transform.GetTransform();
 
-			if (!m_EditorCamera.IsUsingLMB())
+			if (!m_CurrentScene->GetEditorCamera().IsUsingLMB())
 			{
 				// Camera
-				const glm::mat4& cam_proj = m_EditorCamera.GetCamera().GetProjection();
-				glm::mat4 cam_view = m_EditorCamera.GetCamera().GetView();
+				const glm::mat4& cam_proj = m_CurrentScene->GetEditorCamera().GetCamera().GetProjection();
+				glm::mat4 cam_view = m_CurrentScene->GetEditorCamera().GetCamera().GetView();
 
 				// Snapping
 				bool snap = Input::IsKeyPressed(KEY::LEFT_CONTROL) || Input::IsKeyPressed(KEY::RIGHT_CONTROL) || m_ToolbarPanel.m_Snap;
@@ -530,6 +568,21 @@ namespace Kaimos {
 
 	
 	// ----------------------- Event Methods --------------------------------------------------------------
+	bool EditorLayer::OnWindowDragAndDrop(WindowDragDropEvent& ev)
+	{
+		const std::vector<const char*>& paths = ev.GetPaths();
+		KS_TRACE(ev.ToString());
+
+		for (uint i = 0; i < paths.size(); ++i)
+		{
+			std::filesystem::path filepath = ev.GetPaths()[i];
+			if(Kaimos::Resources::IsExtensionValid(filepath.extension().string()))
+				m_CurrentScene->ConvertModelIntoEntities(Kaimos::Resources::ResourceManager::CreateModel(filepath.string()));
+		}		
+
+		return false;
+	}
+
 	bool EditorLayer::OnMouseButtonPressed(MouseButtonPressedEvent& ev)
 	{
 		if (ev.GetMouseButton() == MOUSE::BUTTON_LEFT && m_ViewportHovered && !ImGuizmo::IsUsing() && !ImGuizmo::IsOver() && !Input::IsKeyPressed(KEY::LEFT_ALT))
@@ -553,9 +606,9 @@ namespace Kaimos {
 	{
 		if (Input::IsMouseButtonPressed(MOUSE::BUTTON_RIGHT))
 		{
-			float current_multiplier = m_EditorCamera.GetSpeedMultiplier();
+			float current_multiplier = m_CurrentScene->GetEditorCamera().GetSpeedMultiplier();
 			float scroll_pow = ev.GetYOffset() * current_multiplier / 8.0f;
-			m_EditorCamera.SetSpeedMultiplier(current_multiplier + scroll_pow);
+			m_CurrentScene->GetEditorCamera().SetSpeedMultiplier(current_multiplier + scroll_pow);
 			m_MultiSpeedPanelAlpha = 0.75f;
 		}
 
@@ -566,14 +619,14 @@ namespace Kaimos {
 	bool EditorLayer::OnKeyPressed(KeyPressedEvent& ev)
 	{
 		// -- Shortcuts --
-		if (ev.GetRepeatCount() > 0 || m_EditorCamera.IsCameraMoving())
+		if (ev.GetRepeatCount() > 0 || m_CurrentScene->GetEditorCamera().IsCameraMoving())
 			return false;
 
 		bool control_pressed = Input::IsKeyPressed(KEY::LEFT_CONTROL) || Input::IsKeyPressed(KEY::RIGHT_CONTROL);
 		switch (ev.GetKeyCode())
 		{
 			case KEY::N:
-				if (control_pressed) NewScene();
+				if (control_pressed) NewSceneScreen();
 				break;
 			case KEY::O:
 				if (control_pressed) OpenScene();
@@ -609,19 +662,93 @@ namespace Kaimos {
 
 	
 	// ----------------------- Private Editor Methods -----------------------------------------------------
-	void EditorLayer::NewScene(bool set_viewport)
+	void EditorLayer::CreateScene(bool set_viewport, bool set_rendering_pipeline, bool pbr_pipeline, const std::string& scene_name)
 	{
-		m_CurrentScene = CreateRef<Scene>();
-		m_ScenePanel.SetContext(m_CurrentScene);		
+		if(set_rendering_pipeline)
+			m_CurrentScene = CreateRef<Scene>(scene_name, pbr_pipeline);
+		else
+			m_CurrentScene = CreateRef<Scene>();
+
+		SetSceneParameters(set_viewport);
+		Renderer::RemoveEnvironmentMap();
+	}
+
+	void EditorLayer::NewSceneScreen()
+	{
+		if (ImGui::BeginPopupModal("Create Scene", NULL, ImGuiWindowFlags_NoResize))
+		{
+			static char scene_name[128] = "";
+			ImGui::Text("Choose a Name for the new Scene:");
+			ImGui::PushItemWidth(ImGui::GetContentRegionAvailWidth());
+			bool entered_scene = ImGui::InputTextWithHint("###SceneNameInputTxt", "Scene Name", scene_name, IM_ARRAYSIZE(scene_name), ImGuiInputTextFlags_CharsNoBlank | ImGuiInputTextFlags_AutoSelectAll | ImGuiInputTextFlags_EnterReturnsTrue);
+			ImGui::PopItemWidth();
+
+			ImGui::Text("Scene Render Pipeline");
+			static int render_pipeline = 1;
+			ImGui::PushItemWidth(ImGui::GetContentRegionAvailWidth());
+			ImGui::Combo("###scenerenderpipeline", &render_pipeline, "Non-PBR\0PBR\0\0");
+
+			ImGui::NewLine();
+			if (ImGui::Button("Create", ImVec2(55.0f, 28.25f)) || entered_scene)
+				ImGui::OpenPopup("Scene Created");
+
+			bool close_popup = false, closing_warn = false;
+			if (ImGui::BeginPopupModal("Scene Created", NULL, ImGuiWindowFlags_NoResize))
+			{
+				const std::string scene_name_str = scene_name;
+				if (scene_name_str.empty())
+				{
+					ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "A Scene without name cannot be created!");
+					ImGui::NewLine(); ImGui::SameLine(ImGui::GetWindowSize().x / 2.0f - 47.0f / 2.0f);
+					if (closing_warn = (ImGui::Button("Close") || ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Enter)) || ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Escape))))
+						ImGui::CloseCurrentPopup();
+				}
+				else
+				{
+					ImGui::Text("Scene '%s' Created", scene_name);
+					ImGui::NewLine(); ImGui::NewLine();
+					ImGui::SameLine(ImGui::GetWindowSize().x / 2.0f - 47.0f / 2.0f);
+					if (ImGui::Button("Close") || ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Enter)) && !entered_scene || ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Escape)))
+					{
+						close_popup = true;
+						ImGui::CloseCurrentPopup();
+
+						CreateScene(true, true, render_pipeline, scene_name_str);
+						memset(scene_name, 0, sizeof(scene_name));
+					}
+				}
+
+				ImGui::EndPopup();
+			}
+
+			ImGui::SameLine(ImGui::GetWindowSize().x - 75.0f);
+			if (ImGui::Button("Cancel") || close_popup || ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Escape)) && !closing_warn)
+			{
+				ImGui::CloseCurrentPopup();
+				memset(scene_name, 0, sizeof(scene_name));
+			}
+
+			ImGui::EndPopup();
+		}
+	}
+
+	void EditorLayer::SetSceneParameters(bool set_viewport)
+	{
+		m_KMEPanel.UnsetGraphToModify();
+		m_ScenePanel.SetContext(m_CurrentScene);
+		m_CurrentScene->SetGlobalCurrentScene(m_CurrentScene);
+		
 		if(set_viewport)
 			m_CurrentScene->SetViewportSize((uint)m_ViewportSize.x, (uint)m_ViewportSize.y);
-
-		ImGui::LoadIniSettingsFromDisk("imgui.ini");
-		m_KMEPanel.LoadIniEditorSettings();
 	}
 
 	void EditorLayer::SaveScene()
 	{
+		// -- App Serialization --
+		Application::Get().Serialize();
+
+		// -- Scene Serialization --
+		m_KMEPanel.SerializeGraphs();
 		SceneSerializer m_Serializer(m_CurrentScene);
 
 		// TODO: This should be handled by a filepath class/assets class or something
@@ -630,13 +757,18 @@ namespace Kaimos {
 		else
 			m_Serializer.Serialize(m_CurrentScene->GetPath());
 
+		Renderer::SetLastScene(m_CurrentScene->GetPath());
+
 		// -- Save Editor Settings (ini files) --
 		ImGui::SaveIniSettingsToDisk("imgui.ini");
-		m_KMEPanel.SaveIniEditorSettings();
 	}
 
 	void EditorLayer::SaveSceneAs()
 	{
+		// -- App Serialization --
+		Application::Get().Serialize();
+
+		// -- Scene Serialization --
 		// "filter" arg is divided in 2 by the null-terminated string (\0). The 1st is the filter name to show and the 2nd is the actual filter to use
 		// So this will be shown in the filters tab as "Kaimos Scene (*.kaimos) and will filter all the .kaimos files
 		std::string filepath = FileDialogs::SaveFile("Kaimos Scene (*.kaimos)\0*.kaimos\0", m_CurrentScene->GetName().c_str());
@@ -654,13 +786,15 @@ namespace Kaimos {
 			m_CurrentScene->SetPath(filepath);
 			m_CurrentScene->SetName(filepath.substr(last_slash, last_dot - last_slash));
 
-			// -- Save --
+			// -- Save Graphs & Scene --
+			m_KMEPanel.SerializeGraphs();
 			SceneSerializer m_Serializer(m_CurrentScene);
 			m_Serializer.Serialize(filepath);
 
-			// -- Save Editor Settings (ini files) --
+			Renderer::SetLastScene(m_CurrentScene->GetPath());
+
+			// -- Save Editor Settings (ini file) --
 			ImGui::SaveIniSettingsToDisk("imgui.ini");
-			m_KMEPanel.SaveIniEditorSettings();
 		}
 	}
 
@@ -670,7 +804,7 @@ namespace Kaimos {
 		std::string filepath = FileDialogs::OpenFile("Kaimos Scene (*.kaimos)\0*.kaimos\0");
 		if (!filepath.empty() && filepath != m_CurrentScene->GetPath()) // TODO: Compare the relative paths or scenes ids/names! Requires filesystem or scene IDs
 		{
-			NewScene();
+			CreateScene();
 			SceneSerializer m_Serializer(m_CurrentScene);
 			m_Serializer.Deserialize(filepath);
 		}

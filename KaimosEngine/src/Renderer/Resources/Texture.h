@@ -13,16 +13,19 @@ namespace Kaimos {
 		virtual ~Texture() = default;
 
 		// --- Public Texture Methods ---
-		virtual void SetData(void* data, uint size) = 0;
 		virtual void Bind(uint slot = 0) const = 0;
 
 		// --- Getters ---
-		virtual uint GetWidth()		const = 0;
-		virtual uint GetHeight()	const = 0;
-		virtual uint GetTextureID()	const = 0;
+		uint GetWidth()		const { return m_Width; }
+		uint GetHeight()	const { return m_Height; }
+		uint GetTextureID()	const { return m_ID; }
 
 		// --- Operators ---
-		virtual bool operator==(const Texture& texture) const = 0;
+		bool operator==(const Texture& texture) const { return m_ID == ((Texture&)texture).m_ID; }
+
+	protected:
+		uint m_Height = 0, m_Width = 0;
+		uint m_ID = 0;
 	};
 
 
@@ -30,9 +33,37 @@ namespace Kaimos {
 	class Texture2D : public Texture
 	{
 	public:
-		// --- Public Texture2D Methods ---
-		static Ref<Texture2D> Create(const std::string& path);	//TODO/OJU: We might want to create textures from other things (colors, gradients...)
+		static Ref<Texture2D> Create(const std::string& filepath);	//TODO/OJU: We might want to create textures from other things (colors, gradients...)
 		static Ref<Texture2D> Create(uint width, uint height);
+
+		virtual void SetData(void* data, uint size) = 0;
+		virtual const std::string GetFilepath() const = 0;
+	};
+
+
+
+	class LUTTexture : public Texture
+	{
+	public:
+		static Ref<LUTTexture> Create(uint size);
+	};
+
+
+
+	class HDRTexture2D : public Texture
+	{
+	public:
+		static Ref<HDRTexture2D> Create(const std::string& filepath);
+		virtual const std::string GetFilepath() const = 0;
+	};
+
+
+
+	class CubemapTexture : public Texture
+	{
+	public:
+		static Ref<CubemapTexture> Create(uint width, uint height, bool linear_mipmap_filtering = false);
+		virtual void GenerateMipMap() const = 0;
 	};
 }
 

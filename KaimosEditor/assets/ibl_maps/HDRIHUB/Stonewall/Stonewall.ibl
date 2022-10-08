@@ -1,0 +1,46 @@
+[Header]
+ICOfile = "Stonewall_Thumb.jpg"
+Name = "Stonewall"
+Author = "HDRI Hub"
+Location = "Cologne, Germany"
+Comment = "walls, dawn, clear, stone, grass"
+PREVIEWfile = "Stonewall_Prev.jpg"
+GEOlat = 50.9488565184497450
+GEOlong = 6.9753313064575195
+Link = "http://www.hdri-hub.com/free-samples"
+Date = "2011:11:11"
+Time = "16:04:38"
+North = -180.000000
+Height = 1.600000
+
+[Background]
+BGfile = "Stonewall_Bg.jpg"
+BGmap = 1
+BGu = 0.000000
+BGv = 0.000000
+BGheight = 4000
+
+[Enviroment]
+EVfile = "Stonewall_Env.hdr"
+EVmap = 1
+EVu = 0.000000
+EVv = 0.000000
+EVheight = 256
+EVmulti = 1.000000
+EVgamma = 1.000000
+
+[Reflection]
+REFfile = "Stonewall_Ref.hdr"
+REFmap = 1
+REFu = 0.000000
+REFv = 0.000000
+REFheight = 2000
+REFmulti = 1.000000
+REFgamma = 1.000000
+
+[Sun]
+SUNcolor = 255,251,241
+SUNmulti = 0.977237
+SUNu = 0.674000
+SUNv = 0.428000
+

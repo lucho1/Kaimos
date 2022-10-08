@@ -25,12 +25,13 @@ namespace Kaimos {
 	public:
 
 		// --- Uniforms ---
-		virtual void SetUFloat(const std::string& name, float value) = 0;
-		virtual void SetUFloat3(const std::string& name, const glm::vec3& value) = 0;
-		virtual void SetUFloat4(const std::string& name, const glm::vec4& value) = 0;
-		virtual void SetUMat4(const std::string& name,  const glm::mat4& value) = 0;
-		virtual void SetUInt(const std::string& name, int value) = 0;
-		virtual void SetUIntArray(const std::string& name, int* values_array, uint size) = 0;
+		virtual void SetUniformFloat(const std::string& name, float value) = 0;
+		virtual void SetUniformFloat2(const std::string& name, const glm::vec2& value) = 0;
+		virtual void SetUniformFloat3(const std::string& name, const glm::vec3& value) = 0;
+		virtual void SetUniformFloat4(const std::string& name, const glm::vec4& value) = 0;
+		virtual void SetUniformMat4(const std::string& name,  const glm::mat4& value) = 0;
+		virtual void SetUniformInt(const std::string& name, int value) = 0;
+		virtual void SetUniformIntArray(const std::string& name, int* values_array, uint size) = 0;
 	};
 
 
@@ -50,6 +51,9 @@ namespace Kaimos {
 
 		// --- Getters ---
 		Ref<Shader> Get(const std::string& name);
+
+		// --- Public Functionality Methods ---
+		void ForEachShader(std::function<void(const Ref<Shader>&)> for_body);
 
 	private:
 

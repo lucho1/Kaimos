@@ -12,8 +12,8 @@ namespace Kaimos {
 	public:
 
 		// --- Keyboard Methods ---
-		static bool IsKeyPressed(const KEY_CODE key);
-		static bool IsKeyDown(const KEY_CODE key);
+		static bool IsKeyPressed(const KEY_CODE key);	// For key pressed down some time
+		static bool IsKeyDown(const KEY_CODE key);		// For key pressed and counted only once
 		static bool IsKeyUp(const KEY_CODE key);
 
 		// --- Mouse Methods ---

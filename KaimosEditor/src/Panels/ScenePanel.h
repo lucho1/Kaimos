@@ -14,7 +14,7 @@ namespace Kaimos {
 		ScenePanel() = default;
 		ScenePanel(const Ref<Scene>& context, MaterialEditorPanel* material_editor_panel);
 		
-		void OnUIRender(bool& closing_bool);
+		void OnUIRender(bool& closing_bool, bool is_viewport_focused);
 
 		// --- Getters/Setters ---
 		void SetContext(const Ref<Scene>& context);
@@ -22,10 +22,14 @@ namespace Kaimos {
 		Entity GetSelectedEntity()						const	{ return m_SelectedEntity; }
 		void SetSelectedEntity(Entity entity)					{ m_SelectedEntity = entity; }
 
+		// --- Event Methods ---
+		void OnEvent(Event& ev);
+		bool OnKeyPressed(KeyPressedEvent& ev);
+
 	private:
 
 		// --- Private Scene Methods ---
-		void DrawEntityNode(Entity entity);
+		void DrawEntityNode(Entity entity, bool can_delete_entity);
 		void DrawComponents(Entity& entity);
 
 		template<typename T, typename UIFunction>
@@ -36,6 +40,9 @@ namespace Kaimos {
 		MaterialEditorPanel* m_KMEPanel = nullptr;
 		Ref<Scene> m_SceneContext = nullptr;
 		Entity m_SelectedEntity = {};
+
+		bool m_DuplicatingEntity = false;
+		bool m_DeleteSelectedEntity = false;
 	};
 }
 

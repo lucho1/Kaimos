@@ -3,7 +3,11 @@
 
 #include "Foundations/RenderCommand.h"
 #include "Resources/Buffer.h"
-#include "Resources/Shader.h"
+#include "Resources/Material.h"
+
+#include "Scene/ECS/Components.h"
+
+#include <glm/gtc/type_ptr.hpp>
 
 
 namespace Kaimos {
@@ -14,23 +18,19 @@ namespace Kaimos {
 		Renderer2D::Statistics RendererStats;
 
 		static const uint MaxQuads = 20000;
-		static const uint MaxVertices = MaxQuads * 4;
 		static const uint MaxIndices = MaxQuads * 6;
-		static const uint MaxTextureSlots = 32; // TODO: RenderCapabilities - Variables based on what the hardware can do
 
 		uint QuadIndicesDrawCount = 0;
-		QuadVertex* QuadVBufferBase			= nullptr;
-		QuadVertex* QuadVBufferPtr			= nullptr;
+		NonPBRQuadVertex* NonPBR_QuadVBufferBase	= nullptr;
+		NonPBRQuadVertex* NonPBR_QuadVBufferPtr		= nullptr;
 
-		Ref<VertexArray> QuadVArray			= nullptr;
-		Ref<VertexBuffer> QuadVBuffer		= nullptr;
-		Ref<Shader> ColoredTextureShader	= nullptr;
-		Ref<Texture2D> WhiteTexture			= nullptr;
+		PBRQuadVertex* PBR_QuadVBufferBase			= nullptr;
+		PBRQuadVertex* PBR_QuadVBufferPtr			= nullptr;
 
-		std::array<Ref<Texture2D>, MaxTextureSlots> TextureSlots;
-		uint TextureSlotIndex = 1;									// Slot 0 is for White Texture 
-
-		glm::vec4 VerticesPositions[4] = {};						// It's a vec4 so it's easier to multiply by a matrix (4th has to be 1)
+		Ref<VertexArray> QuadVArray					= nullptr;
+		Ref<VertexBuffer> QuadVBuffer				= nullptr;
+		Ref<VertexArray> PBRQuadVArray				= nullptr;
+		Ref<VertexBuffer> PBRQuadVBuffer			= nullptr;
 	};
 	
 	static Renderer2DData* s_Data = nullptr;	// On shutdown, this is deleted, and ~VertexArray() called, freeing GPU Memory too
@@ -59,13 +59,8 @@ namespace Kaimos {
 	void Renderer2D::Init()
 	{
 		KS_PROFILE_FUNCTION();
+		KS_TRACE("Initializing 2D Renderer");
 		s_Data = new Renderer2DData();
-
-		// -- Vertices Positions --
-		s_Data->VerticesPositions[0] = { -0.5f, -0.5f, 0.0f, 1.0f };
-		s_Data->VerticesPositions[1] = {  0.5f, -0.5f, 0.0f, 1.0f };
-		s_Data->VerticesPositions[2] = {  0.5f,  0.5f, 0.0f, 1.0f };
-		s_Data->VerticesPositions[3] = { -0.5f,  0.5f, 0.0f, 1.0f };
 
 		// -- Index Buffer --
 		Ref<IndexBuffer> index_buffer;
@@ -86,84 +81,92 @@ namespace Kaimos {
 		}
 		
 		// -- Vertex Buffer & Array --
-		s_Data->QuadVBufferBase = new QuadVertex[s_Data->MaxVertices];
+		const uint max_vertices = s_Data->MaxQuads * 4;
+
+		s_Data->NonPBR_QuadVBufferBase = new NonPBRQuadVertex[max_vertices];
 		s_Data->QuadVArray = VertexArray::Create();
-		s_Data->QuadVBuffer = VertexBuffer::Create(s_Data->MaxVertices * sizeof(QuadVertex));
+		s_Data->QuadVBuffer = VertexBuffer::Create(max_vertices * sizeof(NonPBRQuadVertex));
+
+		s_Data->PBR_QuadVBufferBase = new PBRQuadVertex[max_vertices];
+		s_Data->PBRQuadVArray = VertexArray::Create();
+		s_Data->PBRQuadVBuffer = VertexBuffer::Create(max_vertices * sizeof(PBRQuadVertex));
 
 		// -- Vertex Layout & Index Buffer Creation --
 		index_buffer = IndexBuffer::Create(quad_indices, s_Data->MaxIndices);
-		BufferLayout layout = {
+		BufferLayout non_pbr_layout = {
 			{ SHADER_DATATYPE::FLOAT3,	"a_Position" },
+			{ SHADER_DATATYPE::FLOAT3,	"a_Normal" },
+			{ SHADER_DATATYPE::FLOAT3,	"a_Tangent" },
 			{ SHADER_DATATYPE::FLOAT2,	"a_TexCoord" },
 			{ SHADER_DATATYPE::FLOAT4,	"a_Color" },
-			{ SHADER_DATATYPE::FLOAT ,	"a_TexIndex" },
-			{ SHADER_DATATYPE::FLOAT ,	"a_TilingFactor" },
-			{ SHADER_DATATYPE::INT ,	"a_EntityID" }
+			{ SHADER_DATATYPE::FLOAT,	"a_NormalStrength" },
+			{ SHADER_DATATYPE::INT,		"a_TexIndex" },
+			{ SHADER_DATATYPE::INT,		"a_NormTexIndex" },
+			{ SHADER_DATATYPE::INT,		"a_EntityID" },
+
+			{ SHADER_DATATYPE::FLOAT ,	"a_Shininess" },
+			{ SHADER_DATATYPE::FLOAT ,	"a_SpecularStrength" },
+			{ SHADER_DATATYPE::INT ,	"a_SpecTexIndex" }
+		};
+
+		BufferLayout pbr_layout = {
+			{ SHADER_DATATYPE::FLOAT3,	"a_Position" },
+			{ SHADER_DATATYPE::FLOAT3,	"a_Normal" },
+			{ SHADER_DATATYPE::FLOAT3,	"a_Tangent" },
+			{ SHADER_DATATYPE::FLOAT2,	"a_TexCoord" },
+			{ SHADER_DATATYPE::FLOAT4,	"a_Color" },
+			{ SHADER_DATATYPE::FLOAT,	"a_NormalStrength" },
+			{ SHADER_DATATYPE::INT,		"a_TexIndex" },
+			{ SHADER_DATATYPE::INT,		"a_NormTexIndex" },
+			{ SHADER_DATATYPE::INT,		"a_EntityID" },
+
+			{ SHADER_DATATYPE::FLOAT,	"a_Roughness" },
+			{ SHADER_DATATYPE::FLOAT,	"a_Metallic" },
+			{ SHADER_DATATYPE::FLOAT,	"a_AmbientOcclusionValue" },
+			{ SHADER_DATATYPE::INT,		"a_RoughTexIndex" },
+			{ SHADER_DATATYPE::INT,		"a_MetalTexIndex" },
+			{ SHADER_DATATYPE::INT,		"a_AOTexIndex" }
 		};
 
 		// -- Vertex Array Filling --
-		s_Data->QuadVBuffer->SetLayout(layout);
+		s_Data->QuadVBuffer->SetLayout(non_pbr_layout);
 		s_Data->QuadVArray->AddVertexBuffer(s_Data->QuadVBuffer);
 		s_Data->QuadVArray->SetIndexBuffer(index_buffer);
 
-		// -- Arrays Unbinding & Indices Deletion --
 		s_Data->QuadVArray->Unbind();
 		s_Data->QuadVBuffer->Unbind();
+
+		s_Data->PBRQuadVBuffer->SetLayout(pbr_layout);
+		s_Data->PBRQuadVArray->AddVertexBuffer(s_Data->PBRQuadVBuffer);
+		s_Data->PBRQuadVArray->SetIndexBuffer(index_buffer);
+
+		// -- Arrays Unbinding & Indices Deletion --
+		s_Data->PBRQuadVArray->Unbind();
+		s_Data->PBRQuadVBuffer->Unbind();
 		index_buffer->Unbind();
 		delete[] quad_indices;
-		
-		// -- Shader Creation --
-		s_Data->ColoredTextureShader = Shader::Create("assets/shaders/ColoredTextureShader.glsl");
-		
-		// -- White Texture Creation --
-		uint whiteTextData = 0xffffffff; // Full Fs for every channel there (2x4 channels - rgba -)
-		s_Data->WhiteTexture = Texture2D::Create(1, 1);
-		s_Data->WhiteTexture->SetData(&whiteTextData, sizeof(whiteTextData)); // or sizeof(uint)
-
-		// -- Texture Slots Filling --
-		s_Data->TextureSlots[0] = s_Data->WhiteTexture;
-		int texture_samplers[s_Data->MaxTextureSlots];
-
-		for (uint i = 0; i < s_Data->MaxTextureSlots; ++i)
-			texture_samplers[i] = i;
-
-		// -- Shader Uniform of Texture Slots --
-		s_Data->ColoredTextureShader->Bind();
-		s_Data->ColoredTextureShader->SetUIntArray("u_Textures", texture_samplers, s_Data->MaxTextureSlots);
-		s_Data->ColoredTextureShader->Unbind();
 	}
 
 
 	void Renderer2D::Shutdown()
 	{
 		KS_PROFILE_FUNCTION();
+		KS_TRACE("Shutting Down 2D Renderer");
 
 		// This is deleted here (manually), and not treated as smart pointer, waiting for the end of the program lifetime
 		// because there is still some code of the graphics (OpenGL) that it has to run to free VRAM (for ex. deleting VArrays, Shaders...)
-		delete[] s_Data->QuadVBufferBase;
+		delete[] s_Data->NonPBR_QuadVBufferBase;
+		delete[] s_Data->PBR_QuadVBufferBase;
 		delete s_Data;
 	}
 
 
 	
 	// ----------------------- Public Renderer Methods ----------------------------------------------------
-	void Renderer2D::BeginScene(const CameraComponent& camera_component, const TransformComponent& transform_component)
+	void Renderer2D::BeginScene()
 	{
 		KS_PROFILE_FUNCTION();
-		glm::mat4 view_proj = camera_component.Camera.GetProjection() * glm::inverse(transform_component.GetTransform());
-
-		s_Data->QuadVArray->Bind();
-		s_Data->ColoredTextureShader->Bind();
-		s_Data->ColoredTextureShader->SetUMat4("u_ViewProjection", view_proj);
-		StartBatch();
-	}
-	
-	void Renderer2D::BeginScene(const Camera& camera)
-	{
-		KS_PROFILE_FUNCTION();
-		s_Data->QuadVArray->Bind();
-		s_Data->ColoredTextureShader->Bind();
-		s_Data->ColoredTextureShader->SetUMat4("u_ViewProjection", camera.GetViewProjection());
+		Renderer::IsSceneInPBRPipeline() ? s_Data->PBRQuadVArray->Bind() : s_Data->QuadVArray->Bind();
 		StartBatch();
 	}
 
@@ -173,6 +176,9 @@ namespace Kaimos {
 		Flush();
 	}
 
+
+
+	// ----------------------- Private Renderer Methods ---------------------------------------------------
 	void Renderer2D::Flush()
 	{
 		KS_PROFILE_FUNCTION();
@@ -181,31 +187,38 @@ namespace Kaimos {
 		if (s_Data->QuadIndicesDrawCount == 0)
 			return;
 
-		// -- Cast (uint8_t is 1 byte large, the substraction give us elements in terms of bytes) --
-		uint data_size = (uint)((uint8_t*)s_Data->QuadVBufferPtr - (uint8_t*)s_Data->QuadVBufferBase);
-
 		// -- Set Vertex Buffer Data --
-		s_Data->QuadVBuffer->SetData(s_Data->QuadVBufferBase, data_size);
+		// Data cast: uint8_t = 1 byte large, subtraction give elements in terms of bytes
+		Ref<VertexArray> v_array = nullptr;
+		if (Renderer::IsSceneInPBRPipeline())
+		{
+			uint data_size = (uint)((uint8_t*)s_Data->PBR_QuadVBufferPtr - (uint8_t*)s_Data->PBR_QuadVBufferBase);
+			s_Data->PBRQuadVBuffer->SetData(s_Data->PBR_QuadVBufferBase, data_size);
+			v_array = s_Data->PBRQuadVArray;
+		}
+		else
+		{
+			uint data_size = (uint)((uint8_t*)s_Data->NonPBR_QuadVBufferPtr - (uint8_t*)s_Data->NonPBR_QuadVBufferBase);
+			s_Data->QuadVBuffer->SetData(s_Data->NonPBR_QuadVBufferBase, data_size);
+			v_array = s_Data->QuadVArray;
+		}
 
-		// -- Bind all Textures --
-		for (uint i = 0; i < s_Data->TextureSlotIndex; ++i)
-			s_Data->TextureSlots[i]->Bind(i);
-
-		// -- Draw Vertex Array --
-		RenderCommand::DrawIndexed(s_Data->QuadVArray, s_Data->QuadIndicesDrawCount);
+		// -- Bind Textures & Draw Vertex Array --
+		Renderer::BindTextures();
+		RenderCommand::DrawIndexed(v_array, s_Data->QuadIndicesDrawCount);
 		++s_Data->RendererStats.DrawCalls;
 	}
-
-
 	
-	// ----------------------- Private Renderer Methods ---------------------------------------------------
 	void Renderer2D::StartBatch()
 	{
 		KS_PROFILE_FUNCTION();
 		s_Data->QuadIndicesDrawCount = 0;
-		s_Data->TextureSlotIndex = 1; // 0 is white texture
-		s_Data->QuadVBufferPtr = s_Data->QuadVBufferBase;
-	}		
+
+		if(Renderer::IsSceneInPBRPipeline())
+			s_Data->PBR_QuadVBufferPtr = s_Data->PBR_QuadVBufferBase;
+		else
+			s_Data->NonPBR_QuadVBufferPtr = s_Data->NonPBR_QuadVBufferBase;
+	}
 	
 	void Renderer2D::NextBatch()
 	{
@@ -214,85 +227,95 @@ namespace Kaimos {
 		StartBatch();
 	}
 
-	void Renderer2D::SetupVertexArray(const glm::mat4& transform, const glm::vec4& color, int entity_id, float texture_index, float texture_tiling, glm::vec2 texture_uvoffset)
+	void Renderer2D::SetBaseVertexData(QuadVertex* dynamic_vertex, const QuadVertex& quad_vertex, const glm::mat4& transform, const Ref<Material>& material, uint albedo_ix, uint norm_ix, uint ent_id)
 	{
-		constexpr size_t quad_vertex_count = 4;
-		constexpr glm::vec2 tex_coords[] = { {0.0f, 0.0f}, {1.0f, 0.0f}, {1.0f, 1.0f}, {0.0f, 1.0f} };
+		dynamic_vertex->Pos = transform * glm::vec4(quad_vertex.Pos, 1.0f);
+		dynamic_vertex->Normal = glm::normalize(glm::vec3(transform * glm::vec4(quad_vertex.Normal, 0.0f)));
+		dynamic_vertex->Tangent = glm::normalize(glm::vec3(transform * glm::vec4(quad_vertex.Tangent, 0.0f)));
+		dynamic_vertex->TexCoord = quad_vertex.TexCoord;
 
+		dynamic_vertex->Color = material->Color;
+		dynamic_vertex->Bumpiness = material->Bumpiness;
+
+		dynamic_vertex->TexIndex = (int)albedo_ix;
+		dynamic_vertex->NormTexIndex = (int)norm_ix;
+		dynamic_vertex->EntityID = (int)ent_id;
+	}
+
+
+	
+	// ----------------------- Drawing Methods ------------------------------------------------------------
+	void Renderer2D::DrawSprite(Timestep dt, const glm::mat4& transform, SpriteRendererComponent& sprite_component, int entity_id)
+	{
+		// -- New Batch if Needed --
+		if (s_Data->QuadIndicesDrawCount >= s_Data->MaxIndices)
+			NextBatch();
+
+		// -- Get Material & Check it fits in Batch --
+		Ref<Material> material = Renderer::GetMaterial(sprite_component.SpriteMaterialID);
+		if (!material)
+			KS_FATAL_ERROR("Tried to Render a Sprite with a null Material!");
+
+		// -- Update Sprite Timed Vertices --
+		static float accumulated_dt = 0.0f;
+		accumulated_dt += dt.GetMilliseconds();
+		if (accumulated_dt > 200.0f)
+		{
+			sprite_component.UpdateTimedVertices();
+			accumulated_dt = 0.0f;
+		}
+
+		// -- Get Texture indexes --
+		bool pbr = Renderer::IsSceneInPBRPipeline();
+		Renderer::CheckMaterialFitsInBatch(material, &NextBatch);
+
+		uint tex_ix, norm_ix, spec_ix, rough_ix, met_ix, ao_ix;
+		tex_ix = Renderer::GetTextureIndex(material->GetTexture(MATERIAL_TEXTURES::ALBEDO), false, &NextBatch);
+		norm_ix = Renderer::GetTextureIndex(material->GetTexture(MATERIAL_TEXTURES::NORMAL), true, &NextBatch);
+
+		if (pbr)
+		{
+			rough_ix = Renderer::GetTextureIndex(material->GetTexture(MATERIAL_TEXTURES::ROUGHNESS), false, &NextBatch);
+			met_ix = Renderer::GetTextureIndex(material->GetTexture(MATERIAL_TEXTURES::METALLIC), false, &NextBatch);
+			ao_ix = Renderer::GetTextureIndex(material->GetTexture(MATERIAL_TEXTURES::AMBIENT_OC), false, &NextBatch);
+		}
+		else
+			spec_ix = Renderer::GetTextureIndex(material->GetTexture(MATERIAL_TEXTURES::SPECULAR), false, &NextBatch);
+
+		// -- Setup Vertex Array & Vertex Attributes --
+		constexpr size_t quad_vertex_count = 4;
 		for (size_t i = 0; i < quad_vertex_count; ++i)
 		{
-			s_Data->QuadVBufferPtr->Pos = transform * s_Data->VerticesPositions[i];
-			s_Data->QuadVBufferPtr->TexCoord = tex_coords[i] - texture_uvoffset;
-			s_Data->QuadVBufferPtr->Color = color;
-			s_Data->QuadVBufferPtr->TexIndex = texture_index;
-			s_Data->QuadVBufferPtr->TilingFactor = texture_tiling;
-			s_Data->QuadVBufferPtr->EntityID = entity_id;
-			++s_Data->QuadVBufferPtr;
+			QuadVertex& quad_vertex = sprite_component.QuadVertices[i];
+
+			if (pbr)
+			{
+				SetBaseVertexData(s_Data->PBR_QuadVBufferPtr, quad_vertex, transform, material, tex_ix, norm_ix, entity_id);
+
+				s_Data->PBR_QuadVBufferPtr->Roughness = material->Roughness;
+				s_Data->PBR_QuadVBufferPtr->Metallic = material->Metallic;
+				s_Data->PBR_QuadVBufferPtr->AmbientOcc = material->AmbientOcclusion;
+
+				s_Data->PBR_QuadVBufferPtr->RoughTexIndex = (int)rough_ix;
+				s_Data->PBR_QuadVBufferPtr->MetalTexIndex = (int)met_ix;
+				s_Data->PBR_QuadVBufferPtr->AOTexIndex = (int)ao_ix;
+
+				++s_Data->PBR_QuadVBufferPtr;
+			}
+			else
+			{
+				SetBaseVertexData(s_Data->NonPBR_QuadVBufferPtr, quad_vertex, transform, material, tex_ix, norm_ix, entity_id);
+
+				s_Data->NonPBR_QuadVBufferPtr->Shininess = material->Smoothness * 256.0f;
+				s_Data->NonPBR_QuadVBufferPtr->Specularity = material->Specularity;
+				s_Data->NonPBR_QuadVBufferPtr->SpecTexIndex = (int)spec_ix;
+
+				++s_Data->NonPBR_QuadVBufferPtr;
+			}
 		}
 
+		// -- Update Stats (Quad = 2 Triangles = 6 Indices) --
 		s_Data->QuadIndicesDrawCount += 6;
 		++s_Data->RendererStats.QuadCount;
-	}
-
-
-	
-	// ----------------------- Public Drawing Methods -----------------------------------------------------
-	void Renderer2D::DrawSprite(const glm::mat4& transform, const SpriteRendererComponent& sprite, int entity_id)
-	{
-		if (sprite.SpriteTexture)
-			DrawQuad(transform, sprite.SpriteTexture, entity_id, sprite.Color, sprite.TextureTiling, sprite.TextureUVOffset);
-		else
-			DrawQuad(transform, sprite.Color, entity_id);
-	}
-	
-	void Renderer2D::DrawQuad(const glm::mat4& transform, const glm::vec4& color, int entity_id)
-	{
-		KS_PROFILE_FUNCTION();
-
-		// -- New Batch if Needed --
-		if (s_Data->QuadIndicesDrawCount >= s_Data->MaxIndices)
-			NextBatch();
-
-		// -- Set Vertex Array --
-		SetupVertexArray(transform, color, entity_id);
-	}
-
-
-	void Renderer2D::DrawQuad(const glm::mat4& transform, const Ref<Texture2D> texture, int entity_id, const glm::vec4& tintColor, float tiling, glm::vec2 texture_uvoffset)
-	{
-		KS_PROFILE_FUNCTION();
-
-		// -- New Batch if Needed --
-		if (s_Data->QuadIndicesDrawCount >= s_Data->MaxIndices)
-			NextBatch();
-
-		// -- Texture Index Retrieval --
-		uint texture_index = 0;
-		if (texture)
-		{
-			for (uint i = 1; i < s_Data->TextureSlotIndex; ++i)
-			{
-				if (*s_Data->TextureSlots[i] == *texture)
-				{
-					texture_index = i;
-					break;
-				}
-			}
-
-			if (texture_index == 0)
-			{
-				// -- New Batch if Needed --
-				if (s_Data->TextureSlotIndex >= s_Data->MaxTextureSlots)
-					NextBatch();
-
-				// -- Set Texture --
-				texture_index = s_Data->TextureSlotIndex;
-				s_Data->TextureSlots[s_Data->TextureSlotIndex] = texture;
-				++s_Data->TextureSlotIndex;
-			}
-		}
-
-		// -- Set Vertex Array --
-		SetupVertexArray(transform, tintColor, entity_id, (float)texture_index, tiling, texture_uvoffset);
 	}
 }

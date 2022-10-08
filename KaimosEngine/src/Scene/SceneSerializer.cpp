@@ -1,125 +1,20 @@
 #include "kspch.h"
 #include "SceneSerializer.h"
 
+#include "Core/Resources/ResourceManager.h"
+#include "Renderer/Renderer.h"
+#include "Renderer/Cameras/CameraController.h"
+
 #include "ECS/Entity.h"
 #include "ECS/Components.h"
 
 #include <yaml-cpp/yaml.h>
-
-
-// ---------------------------------------------------------------------------------------------------
-// ----------------------- YAML Additions Static Methods ---------------------------------------------
-// TODO: Make this in another place ???
-namespace YAML {
-	
-	template<>
-	struct convert<glm::vec2>
-	{
-		static Node encode(const glm::vec2& vec)
-		{
-			Node node;
-			node.push_back(vec.x);
-			node.push_back(vec.y);
-			node.SetStyle(EmitterStyle::Flow);
-			return node;
-		}
-
-		static bool decode(const Node& node, glm::vec2& vec)
-		{
-			if (!node.IsSequence() || node.size() != 2)
-				return false;
-
-			vec.x = node[0].as<float>();
-			vec.y = node[1].as<float>();
-			return true;
-		}
-	};
-
-	template<>
-	struct convert<glm::vec3>
-	{
-		static Node encode(const glm::vec3& vec)
-		{
-			Node node;
-			node.push_back(vec.x);
-			node.push_back(vec.y);
-			node.push_back(vec.z);
-			node.SetStyle(EmitterStyle::Flow);
-			return node;
-		}
-
-		static bool decode(const Node& node, glm::vec3& vec)
-		{
-			if (!node.IsSequence() || node.size() != 3)
-				return false;
-
-			vec.x = node[0].as<float>();
-			vec.y = node[1].as<float>();
-			vec.z = node[2].as<float>();
-			return true;
-		}
-	};
-
-	template<>
-	struct convert<glm::vec4>
-	{
-		static Node encode(const glm::vec4& vec)
-		{
-			Node node;
-			node.push_back(vec.x);
-			node.push_back(vec.y);
-			node.push_back(vec.z);
-			node.push_back(vec.w);
-			node.SetStyle(EmitterStyle::Flow);
-			return node;
-		}
-
-		static bool decode(const Node& node, glm::vec4& vec)
-		{
-			if (!node.IsSequence() || node.size() != 4)
-				return false;
-
-			vec.x = node[0].as<float>();
-			vec.y = node[1].as<float>();
-			vec.z = node[2].as<float>();
-			vec.w = node[3].as<float>();
-			return true;
-		}
-	};
-}
-// ---------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------
+#include "KaimosYAMLExtension.h"
 
 
 namespace Kaimos {
 
-	// ----------------------- YAML Operators Methods ----------------------------------------------------
-	YAML::Emitter& operator<<(YAML::Emitter& output, const glm::vec2& vec)
-	{
-		output << YAML::Flow;
-		output << YAML::BeginSeq << vec.x << vec.y << YAML::EndSeq;
-		return output;
-	}
-
-	YAML::Emitter& operator<<(YAML::Emitter& output, const glm::vec3& vec)
-	{
-		// Flow, instead of serializing each value separatedly (x; y; z) will put them together as [x, y, z]
-		output << YAML::Flow;
-		output << YAML::BeginSeq << vec.x << vec.y << vec.z << YAML::EndSeq;
-		return output;
-	}
-
-	YAML::Emitter& operator<<(YAML::Emitter& output, const glm::vec4& vec)
-	{
-		output << YAML::Flow;
-		output << YAML::BeginSeq << vec.x << vec.y << vec.z << vec.w << YAML::EndSeq;
-		return output;
-	}
-
-
-
 	// ----------------------- Global Static Serialization Method ----------------------------------------
-	// TODO: Move this to another place ??? In the entities/Comps rework
 	static void SerializeEntity(YAML::Emitter& output, Entity entity)
 	{
 		KS_PROFILE_FUNCTION();
@@ -133,8 +28,9 @@ namespace Kaimos {
 			output << YAML::Key << "TagComponent";
 			output << YAML::BeginMap;
 
-			std::string& tag = entity.GetComponent<TagComponent>().Tag;
-			output << YAML::Key << "Tag" << YAML::Value << tag;
+			TagComponent& tag = entity.GetComponent<TagComponent>();
+			output << YAML::Key << "Tag" << YAML::Value << tag.Tag;
+			output << YAML::Key << "DuplicationCount" << YAML::Value << tag.DuplicationCount;
 			output << YAML::EndMap;
 		}
 
@@ -160,9 +56,9 @@ namespace Kaimos {
 			
 			CameraComponent& cam_comp = entity.GetComponent<CameraComponent>();
 			Camera& camera = cam_comp.Camera;
-			output << YAML::Key << "Camera" << YAML::Value;
 
 			// -- Begin Cam Map --
+			output << YAML::Key << "Camera" << YAML::Value;
 			output << YAML::BeginMap;
 			output << YAML::Key << "ProjectionType" << YAML::Value << (int)camera.GetProjectionType();
 
@@ -179,16 +75,69 @@ namespace Kaimos {
 			output << YAML::EndMap;
 		}
 
+		if (entity.HasComponent<DirectionalLightComponent>())
+		{
+			DirectionalLightComponent& light_comp = entity.GetComponent<DirectionalLightComponent>();
+
+			output << YAML::Key << "DirectionalLightComponent";
+			output << YAML::BeginMap;
+			output << YAML::Key << "Visible" << YAML::Value << light_comp.Visible;
+			output << YAML::Key << "StoredLightMinRadius" << YAML::Value << light_comp.StoredLightMinRadius;
+			output << YAML::Key << "StoredLightMaxRadius" << YAML::Value << light_comp.StoredLightMaxRadius;
+			output << YAML::Key << "StoredLightFalloff" << YAML::Value << light_comp.StoredLightFalloff;
+
+			// -- Begin Light Map --
+			output << YAML::Key << "Light" << YAML::Value;
+			output << YAML::BeginMap;
+			output << YAML::Key << "Radiance" << YAML::Value << light_comp.Light->Radiance;
+			output << YAML::Key << "Intensity" << YAML::Value << light_comp.Light->Intensity;
+			output << YAML::Key << "SpecularStrength" << YAML::Value << light_comp.Light->SpecularStrength;
+			output << YAML::EndMap;
+			// -- End Light Map --
+
+			output << YAML::EndMap;
+		}
+
+		if (entity.HasComponent<PointLightComponent>())
+		{
+			PointLightComponent& light_comp = entity.GetComponent<PointLightComponent>();
+
+			output << YAML::Key << "PointLightComponent";
+			output << YAML::BeginMap;
+			output << YAML::Key << "Visible" << YAML::Value << light_comp.Visible;
+
+			// -- Begin Light Map --
+			output << YAML::Key << "Light" << YAML::Value;
+			output << YAML::BeginMap;
+			output << YAML::Key << "Radiance" << YAML::Value << light_comp.Light->Radiance;
+			output << YAML::Key << "Intensity" << YAML::Value << light_comp.Light->Intensity;
+			output << YAML::Key << "SpecularStrength" << YAML::Value << light_comp.Light->SpecularStrength;
+
+			output << YAML::Key << "FalloffMultiplier" << YAML::Value << light_comp.Light->FalloffMultiplier;
+			output << YAML::Key << "MinRadius" << YAML::Value << light_comp.Light->GetMinRadius();
+			output << YAML::Key << "MaxRadius" << YAML::Value << light_comp.Light->GetMaxRadius();
+			output << YAML::EndMap;
+			// -- End Light Map --
+
+			output << YAML::EndMap;
+		}
+
 		if (entity.HasComponent<SpriteRendererComponent>())
 		{
 			SpriteRendererComponent& sprite_comp = entity.GetComponent<SpriteRendererComponent>();
-
 			output << YAML::Key << "SpriteRendererComponent";
 			output << YAML::BeginMap;
-			output << YAML::Key << "Color" << YAML::Value << sprite_comp.Color;
-			output << YAML::Key << "TextureFile" << YAML::Value << sprite_comp.TextureFilepath;
-			output << YAML::Key << "TextureTiling" << YAML::Value << sprite_comp.TextureTiling;
-			output << YAML::Key << "TextureUVOffset" << YAML::Value << sprite_comp.TextureUVOffset;
+			output << YAML::Key << "Material" << YAML::Value << sprite_comp.SpriteMaterialID;
+			output << YAML::EndMap;
+		}
+
+		if (entity.HasComponent<MeshRendererComponent>())
+		{
+			MeshRendererComponent& mesh_comp = entity.GetComponent<MeshRendererComponent>();
+			output << YAML::Key << "MeshRendererComponent";
+			output << YAML::BeginMap;
+			output << YAML::Key << "Material" << YAML::Value << mesh_comp.MaterialID;
+			output << YAML::Key << "Mesh" << YAML::Value << mesh_comp.MeshID;
 			output << YAML::EndMap;
 		}
 		
@@ -203,12 +152,48 @@ namespace Kaimos {
 	void SceneSerializer::Serialize(const std::string& filepath) const
 	{
 		KS_PROFILE_FUNCTION();
+		KS_INFO("\n\n--- SERIALIZING KAIMOS SCENE ---");
 		
+		const CameraController& camera_control = m_Scene->GetEditorCamera();
+		const Camera& camera = m_Scene->GetEditorCamera().GetCamera();
+
 		YAML::Emitter output;
 		output << YAML::BeginMap;
-		output << YAML::Key << "KaimosScene" << YAML::Value << m_Scene->GetName().c_str();	// Save Scene as Key + SceneName as value
-		output << YAML::Key << "Entities" << YAML::Value << YAML::BeginSeq;					// Save Entites as a sequence (like an array)
+		output << YAML::Key << "KaimosScene" << YAML::Value << m_Scene->GetName().c_str();							// Save Scene as Key + SceneName as value
+		output << YAML::Key << "SceneColor" << YAML::Value << Renderer::GetSceneColor();							// Save Scene Color
+		output << YAML::Key << "CamUIDisplay" << YAML::Value << Renderer::GetCameraUIDisplayOption();				// Save Camera UI Display Option
+		output << YAML::Key << "PBRPipeline" << YAML::Value << Renderer::IsSceneInPBRPipeline();					// Save if scene is PBR or not
+		output << YAML::Key << "EnvironmentMapTexture" << YAML::Value << Renderer::GetEnvironmentMapFilepath();		// Save Enviro Texture
+		output << YAML::Key << "EnviroMapRes" << YAML::Value << Renderer::GetEnvironmentMapResolution();			// Save Enviro Texture Res
+		output << YAML::Key << "EnviroMapPrefRes" << YAML::Value << Renderer::GetEnviroPrefilterMapResolution();	// Save Enviro Prefiltered Texture Res
+		output << YAML::Key << "EnviroMapIrrRes" << YAML::Value << Renderer::GetEnviroIrradianceMapResolution();	// Save Enviro Irradiance Texture Res
 
+		// Save editor camera as a sequence (like an array)
+		output << YAML::Key << "EditorCamera" << YAML::Value << YAML::BeginSeq;
+		output << YAML::BeginMap;
+
+		output << YAML::Key << "CameraPos" << YAML::Value << camera_control.GetPosition();
+		output << YAML::Key << "CameraRot" << YAML::Value << camera_control.GetOrientationAngles();
+
+		output << YAML::Key << "CameraMovSpeed" << YAML::Value << camera_control.m_MoveSpeed;
+		output << YAML::Key << "CameraSpeedMulti" << YAML::Value << camera_control.GetSpeedMultiplier();
+		output << YAML::Key << "MaxSpeedMultiplier" << YAML::Value << camera_control.m_MaxSpeedMultiplier;
+		output << YAML::Key << "CameraRotSpeed" << YAML::Value << camera_control.m_RotationSpeed;
+		output << YAML::Key << "CameraRotLock" << YAML::Value << camera_control.IsRotationLocked();
+		output << YAML::Key << "CameraPanSpeed" << YAML::Value << camera_control.m_PanSpeed;
+		output << YAML::Key << "CameraAdvanceSpeed" << YAML::Value << camera_control.m_AdvanceCameraSpeed;
+		output << YAML::Key << "CameraZoom" << YAML::Value << camera_control.m_ZoomLevel;
+		output << YAML::Key << "CameraMaxZoom" << YAML::Value << camera_control.m_MaxZoomSpeed;
+		output << YAML::Key << "CameraFOV" << YAML::Value << camera.GetFOV();
+		output << YAML::Key << "CameraNPlane" << YAML::Value << camera.GetNearPlane();
+		output << YAML::Key << "CameraFPlane" << YAML::Value << camera.GetFarPlane();
+		output << YAML::EndMap;
+		output << YAML::EndSeq;
+
+		// Save Entities as a sequence (like an array)
+		output << YAML::Key << "Entities" << YAML::Value << YAML::BeginSeq;
+
+		uint entities_deserialized = 0;
 		m_Scene->m_Registry.each([&](auto entityID)
 			{
 				Entity entity = { entityID, m_Scene.get() };
@@ -216,6 +201,7 @@ namespace Kaimos {
 					return;
 				
 				SerializeEntity(output, entity);
+				++entities_deserialized;
 			});
 
 		output << YAML::EndSeq;
@@ -224,6 +210,7 @@ namespace Kaimos {
 		std::ofstream file(filepath);
 		file << output.c_str();
 		m_Scene->SetPath(filepath);
+		KS_TRACE("Finished Serializing {0} Entities in '{1}' Scene", entities_deserialized, m_Scene->GetName());
 	}
 
 
@@ -232,43 +219,114 @@ namespace Kaimos {
 	bool SceneSerializer::Deserialize(const std::string& filepath) const
 	{
 		KS_PROFILE_FUNCTION();
+		KS_INFO("\n\n--- DESERIALIZING KAIMOS SCENE ---");
+
+		// -- Fail Safe --
+		std::filesystem::path spath = filepath;
+		if (!std::filesystem::exists(spath) && filepath.find("assets") != std::string::npos)
+		{
+			KS_ERROR("Error Loading '{0}' scene file\nError: Invalid Scene File", filepath);
+			return false;
+		}
 
 		// -- File Load --
 		YAML::Node data;
 		try { data = YAML::LoadFile(filepath); }
 		catch (const YAML::ParserException& exception)
 		{
-			KS_ENGINE_ERROR("Error Loading '{0}' scene file\nError: {1}", filepath.c_str(), exception.what());
+			KS_ERROR("Error Loading '{0}' scene file\nError: {1}", filepath, exception.what());
 			return false;
 		}
 
 		if (!data["KaimosScene"])
 		{
-			KS_ENGINE_ERROR("Error Loading '{0}' scene file\nError: Wrong File, it has no 'KaimosScene' node", filepath.c_str());
+			KS_ERROR("Error Loading '{0}' scene file\nError: Wrong File, it has no 'KaimosScene' node", filepath);
 			return false;
 		}
 
 		// -- Scene Setup --
 		std::string scene_name = data["KaimosScene"].as<std::string>();
-		KS_ENGINE_TRACE("Deserializing scene '{0}'", scene_name);
+		KS_TRACE("Deserializing scene '{0}'", scene_name);
 		m_Scene->SetName(scene_name);
 		m_Scene->SetPath(filepath);
 
+		if (data["SceneColor"])
+			Renderer::SetSceneColor(data["SceneColor"].as<glm::vec3>());
+
+		if (data["CamUIDisplay"])
+			Renderer::SetCameraUIDisplayOption(data["CamUIDisplay"].as<uint>());
+
+		if (data["PBRPipeline"])
+			Renderer::SetPBRPipeline(data["PBRPipeline"].as<bool>());
+		else
+			Renderer::SetPBRPipeline(false);
+
+		if (data["EnvironmentMapTexture"])
+		{
+			std::string filepath = data["EnvironmentMapTexture"].as<std::string>();
+			if (!filepath.empty())
+			{
+				uint map_res = data["EnviroMapRes"] ? data["EnviroMapRes"].as<uint>() : 1024;
+				uint pref_res = data["EnviroMapPrefRes"] ? data["EnviroMapPrefRes"].as<uint>() : 128;
+				uint irr_res = data["EnviroMapIrrRes"] ? data["EnviroMapIrrRes"].as<uint>() : 32;
+
+				Renderer::SetEnvironmentMapFilepath(filepath, map_res, pref_res, irr_res);
+			}
+			else
+				KS_ENGINE_TRACE("Scene has no Environment Map to load");
+		}
+		else
+			Renderer::RemoveEnvironmentMap();
+
+		// -- Deserialize Editor Camera --
+		YAML::Node camera_node = data["EditorCamera"];
+		if (camera_node)
+		{
+			auto cam_values = camera_node[0];
+
+			m_Scene->GetEditorCamera().SetPosition(cam_values["CameraPos"].as<glm::vec3>());
+			m_Scene->GetEditorCamera().SetOrientation(cam_values["CameraRot"].as<glm::vec2>());
+
+			m_Scene->GetEditorCamera().SetMoveSpeed(cam_values["CameraMovSpeed"].as<float>());
+			m_Scene->GetEditorCamera().SetSpeedMultiplier(cam_values["CameraSpeedMulti"].as<float>());
+			m_Scene->GetEditorCamera().m_MaxSpeedMultiplier = cam_values["MaxSpeedMultiplier"].as<float>();
+			m_Scene->GetEditorCamera().SetRotationSpeed(cam_values["CameraRotSpeed"].as<float>());
+
+			m_Scene->GetEditorCamera().LockRotation(cam_values["CameraRotLock"].as<bool>());
+			m_Scene->GetEditorCamera().m_PanSpeed = cam_values["CameraPanSpeed"].as<float>();
+			m_Scene->GetEditorCamera().m_AdvanceCameraSpeed = cam_values["CameraAdvanceSpeed"].as<float>();
+
+			m_Scene->GetEditorCamera().SetZoomLevel(cam_values["CameraZoom"].as<float>());
+			m_Scene->GetEditorCamera().SetMaxZoomSpeed(cam_values["CameraMaxZoom"].as<float>()); //TODO: change name
+
+			m_Scene->GetEditorCamera().m_Camera.SetFOV(cam_values["CameraFOV"].as<float>());
+			m_Scene->GetEditorCamera().m_Camera.SetNearPlane(cam_values["CameraNPlane"].as<float>());
+			m_Scene->GetEditorCamera().m_Camera.SetFarPlane(cam_values["CameraFPlane"].as<float>());
+		}
+		
+
 		// -- Entities Load --
+		uint entities_deserialized = 0;
 		YAML::Node entities = data["Entities"];
 		if (entities)
 		{
 			for (auto entity : entities)
 			{
+				++entities_deserialized;
 				uint entity_id = entity["Entity"].as<uint>();
 				
 				std::string name;
+				uint duplication_count = 1;
 				auto tag_component = entity["TagComponent"];
 				if (tag_component)
+				{
 					name = tag_component["Tag"].as<std::string>();
+					duplication_count = tag_component["DuplicationCount"].as<uint>();
+				}
 
-				KS_ENGINE_TRACE("Deserialized Entity '{0}' (ID: {1})", name.c_str(), entity_id);
+				KS_TRACE("Deserialized Entity '{0}' (ID: {1})", name, entity_id);
 				Entity deserialized_entity = m_Scene->CreateEntity(name, entity_id);
+				deserialized_entity.GetComponent<TagComponent>().DuplicationCount = duplication_count;
 
 				YAML::Node transform_node = entity["TransformComponent"];
 				if (transform_node)
@@ -287,7 +345,7 @@ namespace Kaimos {
 					CameraComponent& cam_comp = deserialized_entity.AddComponent<CameraComponent>();
 					YAML::Node& camera_node = cameracomp_node["Camera"];
 
-					if (camera_node["ProjectionType"].as<int>() == (int)Kaimos::CAMERA_PROJECTION::ORTHOGRAPHIC)
+					if (camera_node["ProjectionType"].as<int>() == static_cast<int>(Kaimos::CAMERA_PROJECTION::ORTHOGRAPHIC))
 						cam_comp.Camera.SetOrthographicParameters();
 					else
 						cam_comp.Camera.SetPerspectiveParameters();
@@ -307,27 +365,87 @@ namespace Kaimos {
 						m_Scene->SetPrimaryCamera(deserialized_entity);
 				}
 
+				YAML::Node dirlightcomp_node = entity["DirectionalLightComponent"];
+				if (dirlightcomp_node)
+				{
+					DirectionalLightComponent& light_comp = deserialized_entity.AddComponent<DirectionalLightComponent>();
+					YAML::Node& light_node = dirlightcomp_node["Light"];
+
+					glm::vec4 radiance = light_node["Radiance"].as<glm::vec4>();
+					float intensity = light_node["Intensity"].as<float>();
+					float specular_strength = light_node["SpecularStrength"].as<float>();
+
+					float min_rad = dirlightcomp_node["StoredLightMinRadius"].as<float>();
+					float max_rad = dirlightcomp_node["StoredLightMaxRadius"].as<float>();
+					float falloff = dirlightcomp_node["StoredLightFalloff"].as<float>();
+
+					light_comp.Visible = dirlightcomp_node["Visible"].as<bool>();
+					light_comp.SetComponentValues(falloff, min_rad, max_rad);
+					light_comp.SetLightValues(radiance, intensity, specular_strength);
+				}
+
+				YAML::Node pointlightcomp_node = entity["PointLightComponent"];
+				if (pointlightcomp_node)
+				{
+					PointLightComponent& light_comp = deserialized_entity.AddComponent<PointLightComponent>();
+					YAML::Node& light_node = pointlightcomp_node["Light"];
+
+					glm::vec4 radiance = light_node["Radiance"].as<glm::vec4>();
+					float intensity = light_node["Intensity"].as<float>();
+					float specular_strength = light_node["SpecularStrength"].as<float>();
+					float falloff = light_node["FalloffMultiplier"].as<float>();
+					float min_rad = light_node["MinRadius"].as<float>();
+					float max_rad = light_node["MaxRadius"].as<float>();
+
+					light_comp.Visible = pointlightcomp_node["Visible"].as<bool>();
+					light_comp.SetLightValues(radiance, intensity, specular_strength);
+					light_comp.SetPointLightValues(falloff, min_rad, max_rad);
+				}
+
 				YAML::Node sprite_node = entity["SpriteRendererComponent"];
 				if (sprite_node)
 				{
+					uint mat_node = sprite_node["Material"].as<uint>();
+					uint mat_id = Renderer::GetMaterialIfExists(mat_node);					
+					if (mat_id == 0)
+					{
+						uint def_mat_id = Renderer::GetDefaultMaterialID();
+						if (def_mat_id != 0)
+							mat_id = def_mat_id;
+						else
+							mat_id = Renderer::CreateMaterial("Unnamed")->GetID();
+					}
+					
 					SpriteRendererComponent& sprite_comp = deserialized_entity.AddComponent<SpriteRendererComponent>();
-					sprite_comp.Color = sprite_node["Color"].as<glm::vec4>();
+					sprite_comp.SetMaterial(mat_id);
+				}
 
-					auto file_node = sprite_node["TextureFile"];
-					if (file_node && !file_node.as<std::string>().empty())
-						sprite_comp.SetTexture(file_node.as<std::string>());
+				YAML::Node mesh_node = entity["MeshRendererComponent"];
+				if (mesh_node)
+				{
+					uint mat_node = mesh_node["Material"].as<uint>();
+					uint mesh_id_node = mesh_node["Mesh"].as<uint>();
+					if (!Resources::ResourceManager::MeshExists(mesh_id_node))
+						mesh_id_node = 0;
 
-					auto tile_node = sprite_node["TextureTiling"];
-					if (tile_node)
-						sprite_comp.TextureTiling = tile_node.as<float>();
+					uint mat_id = Renderer::GetMaterialIfExists(mat_node);
+					if (mat_id == 0)
+					{
+						uint def_mat_id = Renderer::GetDefaultMaterialID();
+						if (def_mat_id != 0)
+							mat_id = def_mat_id;
+						else
+							mat_id = Renderer::CreateMaterial("Unnamed")->GetID();
+					}
 
-					auto offset_node = sprite_node["TextureUVOffset"];
-					if (offset_node)
-						sprite_comp.TextureUVOffset = offset_node.as<glm::vec2>();
+					MeshRendererComponent& mesh_comp = deserialized_entity.AddComponent<MeshRendererComponent>();
+					mesh_comp.SetMesh(mesh_id_node);
+					mesh_comp.SetMaterial(mat_id);
 				}
 			}
 		}
 
+		KS_TRACE("Finished Deserializing {0} Entities in '{1}' Scene", entities_deserialized, m_Scene->GetName());
 		return true;
 	}
 }

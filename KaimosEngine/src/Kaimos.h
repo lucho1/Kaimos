@@ -13,6 +13,8 @@
 #include "Core/Utils/Log/Log.h"
 #include "Core/Utils/Time/Timestep.h"
 
+#include "Core/Resources/Resource.h"
+
 #include "ImGui/ImGuiLayer.h"
 
 #include "Scene/Scene.h"
@@ -23,6 +25,7 @@
 // -- Engine Renderer --
 #include "Renderer/Renderer.h"
 #include "Renderer/Renderer2D.h"
+#include "Renderer/Renderer3D.h"
 #include "Renderer/Foundations/RenderCommand.h"
 
 #include "Renderer/Resources/Buffer.h"

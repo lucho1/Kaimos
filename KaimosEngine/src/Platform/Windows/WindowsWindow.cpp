@@ -14,24 +14,56 @@ namespace Kaimos {
 
 	float Window::s_ScreenDPIScaleFactor = 1.0f;
 	static uint8_t s_WindowCount = 0;
+	static uint s_StoredWinSize[4];
 
 	static void GLFWErrorCallback(int error, const char* desc)
 	{
-		KS_ENGINE_ERROR("GLFW Initialization Error ({0}): {1}", error, desc);
+		KS_ERROR("GLFW Initialization Error ({0}): {1}", error, desc);
 	}
 
 
 
 	// ----------------------- Public Class Methods -------------------------------------------------------
-	WindowsWindow::WindowsWindow(const WindowProps& props)
+	WindowsWindow::WindowsWindow(const std::string& window_name)
 	{
+		// -- Initialize GLFW --
 		KS_PROFILE_FUNCTION();
-		Init(props);
+		KS_TRACE("Creating Windows Window");
+		InitializeGLFW();
+		
+		// -- Get Primary Monitor Size --
+		const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+		uint width = (uint)(mode->width / 1.4f);
+		uint height = (uint)(mode->height / 1.4f);
+
+		#if KS_DIST
+			width *= 1.4f /1.05f;
+			height *= 1.4f/1.1f;
+		#endif
+
+		// -- Set Props & Initialize Window --
+		Init(WindowProps(window_name, width, height));
+
+		// -- Set Fullscreen if Dist Build --
+		//#if KS_DIST
+			//SetFullscreen(true);
+			//SetVSync(true);
+		//#endif
+	}
+
+	WindowsWindow::WindowsWindow(const WindowProps& window_props)
+	{
+		// -- Initialize GLFW & Window --
+		KS_PROFILE_FUNCTION();
+		KS_TRACE("Creating Windows Window");
+		InitializeGLFW();
+		Init(window_props);
 	}
 
 	WindowsWindow::~WindowsWindow()
 	{
 		KS_PROFILE_FUNCTION();
+		KS_TRACE("Shutting Down Windows Window");
 		Shutdown();
 	}
 
@@ -48,13 +80,13 @@ namespace Kaimos {
 	void WindowsWindow::Shutdown()
 	{
 		KS_PROFILE_FUNCTION();
-		KS_ENGINE_INFO("Destroying GLFW Window '{0}'", m_Data.Title);
+		KS_TRACE("Destroying GLFW Window '{0}'", m_Data.Title);
 		glfwDestroyWindow(m_Window);
 		--s_WindowCount;
 
 		if (s_WindowCount == 0)
 		{
-			KS_ENGINE_INFO("Terminating GLFW");
+			KS_TRACE("Terminating GLFW");
 			glfwTerminate();
 		}
 	}
@@ -62,6 +94,37 @@ namespace Kaimos {
 
 
 	// ----------------------- Setters --------------------------------------------------------------------
+	void WindowsWindow::SetFullscreen(bool fullscreen)
+	{
+		if (fullscreen == IsFullscreen())
+			return;
+
+		if (fullscreen)
+		{
+			// -- Set Values Before Fullscreen --
+			int x, y, w, h;
+			glfwGetWindowPos(m_Window, &x, &y);
+			glfwGetWindowSize(m_Window, &w, &h);
+			
+			s_StoredWinSize[0] = x;
+			s_StoredWinSize[1] = y;
+			s_StoredWinSize[2] = w;
+			s_StoredWinSize[3] = h;
+
+			// -- Set Fullscreen --
+			GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+			const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+			glfwSetWindowMonitor(m_Window, monitor, 0, 0, mode->width, mode->height, 0);
+		}
+		else
+			glfwSetWindowMonitor(m_Window, nullptr, s_StoredWinSize[0], s_StoredWinSize[1], s_StoredWinSize[2], s_StoredWinSize[3], 0);
+	}
+
+	bool WindowsWindow::IsFullscreen() const
+	{
+		return glfwGetWindowMonitor(m_Window) != nullptr;
+	}
+
 	void WindowsWindow::SetVSync(bool enabled)
 	{
 		if (enabled)
@@ -75,48 +138,59 @@ namespace Kaimos {
 
 
 	// ----------------------- Private Window Methods -----------------------------------------------------
-	void WindowsWindow::Init(const WindowProps& props)
+	void WindowsWindow::InitializeGLFW()
 	{
-		KS_PROFILE_FUNCTION();
-		m_Data.Width = props.Width;
-		m_Data.Height = props.Height;
-		m_Data.Title = props.Title;
-		KS_ENGINE_INFO("Creating Window {0} with resolution {1}x{2}px", props.Title, props.Width, props.Height);
-
 		// -- GLFW Initialization --
+		KS_PROFILE_FUNCTION();
 		if (s_WindowCount == 0)
 		{
 			KS_PROFILE_SCOPE("GLFW Init");
-			KS_ENGINE_INFO("Initializing GLFW");
+			KS_TRACE("Initializing GLFW");
 
 			int success = glfwInit();
 			KS_ENGINE_ASSERT(success, "Couldn't Initialize GLFW!");
 			glfwSetErrorCallback(GLFWErrorCallback);
+			m_GLFWInitialized = success;
 		}
+	}
+
+	void WindowsWindow::Init(const WindowProps& props)
+	{
+		KS_PROFILE_FUNCTION();
+		KS_ENGINE_ASSERT(m_GLFWInitialized, "Tried to create a Kaimos Window but GLFW is not Initialized!");
+
+		// -- Set Window Variables --
+		m_Data.Width = props.Width;
+		m_Data.Height = props.Height;
+		m_Data.Title = props.Title;
+		KS_TRACE("Created Window '{0}' with resolution {1}x{2}px", m_Data.Title, m_Data.Width, m_Data.Height);
 
 		// -- Window Creation --
 		{
 			KS_PROFILE_SCOPE("GLFW Create Window");
 
-			//GLFWmonitor* monitor = glfwGetPrimaryMonitor();
 			float x, y;
 			glfwGetMonitorContentScale(glfwGetPrimaryMonitor(), &x, &y);
+
 			if (x > 1.0f || y > 1.0f)
 			{
 				s_ScreenDPIScaleFactor = y;
 				glfwWindowHint(GLFW_SCALE_TO_MONITOR, GLFW_TRUE);
 			}
 
-			#ifdef KS_DEBUG
+			#if KS_DEBUG
 				if (Renderer::GetRendererAPI() == RendererAPI::API::OPENGL)
 					glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
 			#endif
 
-			m_Window = glfwCreateWindow((int)props.Width, (int)props.Height, m_Data.Title.c_str(), nullptr, nullptr);
+			glfwWindowHint(GLFW_AUTO_ICONIFY, GLFW_FALSE); // This flag makes the fullscreen window to not lose the focus
+			m_Window = glfwCreateWindow((int)m_Data.Width, (int)m_Data.Height, m_Data.Title.c_str(), nullptr, nullptr);
+			glfwSetWindowPos(m_Window, 50, 50);
 			++s_WindowCount;
 		}
 		
 		// -- Graphics Context Creation --
+		KS_TRACE("Initializing Kaimos Context");
 		m_Context = GraphicsContext::Create(m_Window);
 		m_Context->Init();
 		
@@ -139,13 +213,21 @@ namespace Kaimos {
 				data.Height = h;
 
 				WindowResizeEvent event(w, h);
-				data.EventCallback(event);
+				if(data.EventCallback)
+					data.EventCallback(event);
 			});
 
 		glfwSetWindowCloseCallback(m_Window, [](GLFWwindow* window)
 			{
 				WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
 				WindowCloseEvent event;
+				data.EventCallback(event);
+			});
+
+		glfwSetDropCallback(m_Window, [](GLFWwindow* window, int drop_count, const char* paths[])
+			{
+				WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
+				WindowDragDropEvent event((uint)drop_count, paths);
 				data.EventCallback(event);
 			});
 

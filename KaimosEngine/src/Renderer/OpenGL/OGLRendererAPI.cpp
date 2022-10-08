@@ -23,14 +23,14 @@ namespace Kaimos {
 
 		switch (msg_severity)
 		{
-			case GL_DEBUG_SEVERITY_HIGH:			KS_ENGINE_CRITICAL((error_message + " - High Sev. -" + msg).c_str());	return;
-			case GL_DEBUG_SEVERITY_MEDIUM:			KS_ENGINE_ERROR((error_message + " - Mid Sev. -" + msg).c_str());		return;
-			case GL_DEBUG_SEVERITY_LOW:				KS_ENGINE_WARN((error_message + " - Low Sev. -" + msg).c_str());		return;
-			case GL_DEBUG_SEVERITY_NOTIFICATION:	KS_ENGINE_TRACE((error_message + " - Notification -" + msg).c_str());	return;
+			case GL_DEBUG_SEVERITY_HIGH:			KS_CRITICAL(error_message + " - High Sev. -" + msg);	return;
+			case GL_DEBUG_SEVERITY_MEDIUM:			KS_ERROR(error_message + " - Mid Sev. -" + msg);		return;
+			case GL_DEBUG_SEVERITY_LOW:				KS_WARN(error_message + " - Low Sev. -" + msg);			return;
+			case GL_DEBUG_SEVERITY_NOTIFICATION:	KS_TRACE(error_message + " - Notification -" + msg);	return;
 		}
 
-		KS_ENGINE_CRITICAL((error_message + " - UNKNOWN SEVERITY -" + msg).c_str());
-		KS_ENGINE_ASSERT(false, "Error of Unknown Severity Level!");
+		KS_ENGINE_CRITICAL(error_message + " - UNKNOWN SEVERITY -" + msg);
+		KS_ENGINE_CRITICAL("Error of Unknown Severity Level!");
 	}
 
 
@@ -39,14 +39,17 @@ namespace Kaimos {
 	void OGLRendererAPI::Init()
 	{
 		KS_PROFILE_FUNCTION();
+		KS_TRACE("Initializing OpenGL");
 
 		#ifdef KS_DEBUG
+			KS_TRACE("Setting OpenGL Debug Environment");
 			glEnable(GL_DEBUG_OUTPUT);
 			glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 			glDebugMessageCallback(OpenGLMessageCallback, nullptr);
 			glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_NOTIFICATION, 0, NULL, GL_FALSE);
 		#endif
 
+		KS_TRACE("OpenGL Renderer Info: {0} {1} {2}", glGetString(GL_VENDOR), glGetString(GL_RENDERER), glGetString(GL_VERSION));
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -55,6 +58,17 @@ namespace Kaimos {
 
 	
 	// ----------------------- Public RendererAPI Methods -------------------------------------------------
+	void OGLRendererAPI::EnableDepth() const
+	{
+		glEnable(GL_DEPTH_TEST);
+		glDepthFunc(GL_LEQUAL);
+	}
+
+	void OGLRendererAPI::EnableCubemapFiltering() const
+	{
+		glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+	}
+
 	void OGLRendererAPI::SetClearColor(const glm::vec4& color) const
 	{
 		glClearColor(color.r, color.g, color.b, color.a);
@@ -69,7 +83,12 @@ namespace Kaimos {
 	{
 		uint count = index_count ? index_count : vertex_array->GetIndexBuffer()->GetCount();
 		glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, nullptr);
-		glBindTexture(GL_TEXTURE_2D, 0); // TODO/OJU: Should we actually do this? Take it into account on materials system/3D Renderer
+		//glBindTexture(GL_TEXTURE_2D, 0); // TODO/OJU: Should we actually do this? Take it into account on materials system/3D Renderer
+	}
+
+	void OGLRendererAPI::DrawUnindexed(const Ref<VertexArray>& vertex_array, uint count) const
+	{
+		glDrawArrays(GL_TRIANGLES, 0, count);
 	}
 
 	void OGLRendererAPI::SetViewport(uint x, uint y, uint width, uint height)

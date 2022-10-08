@@ -44,12 +44,16 @@ project "KaimosEngine"
         "%{IncludeDir.Glad}",
         "%{IncludeDir.ImGui}",
         "%{IncludeDir.glm}",
+		"%{IncludeDir.Assimp}",
         "%{IncludeDir.stb_image}",
         "%{IncludeDir.entt}",
         "%{IncludeDir.yaml}",
         "%{IncludeDir.ImGuizmo}",
         "%{IncludeDir.ImNodes}"
     }
+
+    -- Kaimos Engine Lib Directories
+    libdirs { "vendor/Assimp/lib" }
 
     -- Kaimos Engine Project Links --
     links
@@ -58,6 +62,7 @@ project "KaimosEngine"
         "Glad",
         "ImGui",
         "yaml-cpp",
+		"assimp-vc142-mt.lib",
         "opengl32.lib"
     }
 
@@ -75,6 +80,12 @@ project "KaimosEngine"
         {
             --"KS_BUILD_DLL"
         }
+
+        -- Copy dlls to outputdir
+        postbuildcommands
+		{
+			("{COPY}/vendor/Assimp/assimp-vc142-mt.dll ../bin/" .. outputdir .. "/KaimosEditor")
+		}
 
     -- Configurations --
     filter "configurations:Debug"

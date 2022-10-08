@@ -54,7 +54,9 @@ namespace Kaimos {
 		virtual ~Application();
 
 		// --- Public Application Methods ---
-		void CloseApp()							  { m_Running = false; }
+		void CloseApp() { m_Running = false; }
+		void Serialize();
+		void Deserialize();
 
 		// --- Layer Methods ---
 		void PushLayer(Layer* layer);
@@ -62,10 +64,16 @@ namespace Kaimos {
 
 		// --- Getters ---
 		inline static Application& Get()		  { return *s_Instance; }
+		inline float GetTime()				const { return m_Time; }
 		inline Window& GetWindow()			const { return *m_Window; }
 		inline ImGuiLayer* GetImGuiLayer()	const { return m_ImGuiLayer; }
+
+		inline float GetLastFrameTime()		const { return m_LastFrameMs; }
+		inline uint GetFPS()				const { return m_FPS; }
+		inline float GetTimestep()			const { return m_Timestep.GetMilliseconds(); }
 		
 		inline static const MemoryMetrics& GetMemoryMetrics() { return s_MemoryMetrics; }
+
 
 	private:
 
@@ -97,6 +105,11 @@ namespace Kaimos {
 		// --- Delta Time ---
 		Timestep m_Timestep = {};
 		float m_LastFrameTime = 0.0f;
+		float m_Time = 0.0f;
+
+		// --- Performance Info ---
+		uint m_FPS = 0;
+		float m_LastFrameMs = 0.0f;
 	};
 	
 

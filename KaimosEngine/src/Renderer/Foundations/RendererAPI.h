@@ -20,10 +20,14 @@ namespace Kaimos {
 
 
 		// --- Public RendererAPI Methods ---
+		virtual void EnableDepth() const = 0;
+		virtual void EnableCubemapFiltering() const = 0;
+
 		virtual void SetClearColor(const glm::vec4& color) const = 0;
 		virtual void Clear() const = 0;
 		
 		virtual void DrawIndexed(const Ref<VertexArray>& vertex_array, uint index_count = 0) const = 0;
+		virtual void DrawUnindexed(const Ref<VertexArray>& vertex_array, uint count) const = 0;
 		virtual void SetViewport(uint x, uint y, uint width, uint height) = 0;
 
 

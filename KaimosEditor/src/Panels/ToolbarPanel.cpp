@@ -96,7 +96,8 @@ namespace Kaimos {
 			KaimosUI::UIFunctionalities::DrawInlineSlider("Movement Speed", "###edcammovespeed", &editor_camera.m_MoveSpeed, width, 2.0f, 10.0f, 1.0f);
 			KaimosUI::UIFunctionalities::DrawInlineSlider("Rotation Speed", "###edcamrotspeed", &editor_camera.m_RotationSpeed, width, 2.0f, 5.0f, 0.1f);
 			KaimosUI::UIFunctionalities::DrawInlineSlider("Panning Speed", "###edcampanspeed", &editor_camera.m_PanSpeed, width, 2.0f, 20.0f, 1.0f);
-			KaimosUI::UIFunctionalities::DrawInlineSlider("Max Speed Multiplier", "###edcamspm", &editor_camera.m_SpeedMultiplier, width, 2.0f, 20.0f, 0.01f);
+			KaimosUI::UIFunctionalities::DrawInlineSlider("Advance Camera Speed", "###edcamadvspeed", &editor_camera.m_AdvanceCameraSpeed, width, 2.0f, 100.0f, 1.0f);
+			KaimosUI::UIFunctionalities::DrawInlineSlider("Max Speed Multiplier", "###edcamspm", &editor_camera.m_MaxSpeedMultiplier, width, 2.0f, 200.0f, 0.01f);
 			KaimosUI::UIFunctionalities::DrawInlineSlider("Max Zoom Speed", "###edcamzspeed", &editor_camera.m_MaxZoomSpeed, width, 2.0f, 300.0f, 1.0f);
 
 			// -- Camera Parameters --

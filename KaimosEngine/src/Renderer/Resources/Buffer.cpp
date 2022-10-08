@@ -14,10 +14,10 @@ namespace Kaimos {
 		switch (Renderer::GetRendererAPI())
 		{
 			case RendererAPI::API::OPENGL:		return CreateRef<OGLVertexBuffer>(vertices, size);
-			case RendererAPI::API::NONE:		KS_ENGINE_ASSERT(false, "RendererAPI is set to NONE (unsupported)!"); return nullptr;
+			case RendererAPI::API::NONE:		KS_FATAL_ERROR("RendererAPI is set to NONE (unsupported)!"); return nullptr;
 		}
 
-		KS_ENGINE_ASSERT(false, "RendererAPI is unknown, not selected or failed!");
+		KS_FATAL_ERROR("RendererAPI is unknown, not selected or failed!");
 		return nullptr;
 	}
 
@@ -26,10 +26,10 @@ namespace Kaimos {
 		switch (Renderer::GetRendererAPI())
 		{
 			case RendererAPI::API::OPENGL:		return CreateRef<OGLVertexBuffer>(size);
-			case RendererAPI::API::NONE:		KS_ENGINE_ASSERT(false, "RendererAPI is set to NONE (unsupported)!"); return nullptr;
+			case RendererAPI::API::NONE:		KS_FATAL_ERROR("RendererAPI is set to NONE (unsupported)!"); return nullptr;
 		}
 
-		KS_ENGINE_ASSERT(false, "RendererAPI is unknown, not selected or failed!");
+		KS_FATAL_ERROR("RendererAPI is unknown, not selected or failed!");
 		return nullptr;
 	}
 
@@ -41,10 +41,22 @@ namespace Kaimos {
 		switch (Renderer::GetRendererAPI())
 		{
 			case RendererAPI::API::OPENGL:		return CreateRef<OGLIndexBuffer>(vertices, count);
-			case RendererAPI::API::NONE:		KS_ENGINE_ASSERT(false, "RendererAPI is set to NONE (unsupported)!"); return nullptr;
+			case RendererAPI::API::NONE:		KS_FATAL_ERROR("RendererAPI is set to NONE (unsupported)!"); return nullptr;
 		}
 
-		KS_ENGINE_ASSERT(false, "RendererAPI is unknown, not selected or failed!");
+		KS_FATAL_ERROR("RendererAPI is unknown, not selected or failed!");
+		return nullptr;
+	}
+
+	Ref<IndexBuffer> IndexBuffer::Create(uint count)
+	{
+		switch (Renderer::GetRendererAPI())
+		{
+			case RendererAPI::API::OPENGL:		return CreateRef<OGLIndexBuffer>(count);
+			case RendererAPI::API::NONE:		KS_FATAL_ERROR("RendererAPI is set to NONE (unsupported)!"); return nullptr;
+		}
+
+		KS_FATAL_ERROR("RendererAPI is unknown, not selected or failed!");
 		return nullptr;
 	}
 
@@ -56,10 +68,10 @@ namespace Kaimos {
 		switch (Renderer::GetRendererAPI())
 		{
 			case RendererAPI::API::OPENGL:		return CreateRef<OGLVertexArray>();
-			case RendererAPI::API::NONE:		KS_ENGINE_ASSERT(false, "RendererAPI is set to NONE (unsupported)!"); return nullptr;
+			case RendererAPI::API::NONE:		KS_FATAL_ERROR("RendererAPI is set to NONE (unsupported)!"); return nullptr;
 		}
 
-		KS_ENGINE_ASSERT(false, "RendererAPI is unknown, not selected or failed!");
+		KS_FATAL_ERROR("RendererAPI is unknown, not selected or failed!");
 		return nullptr;
 	}
 }

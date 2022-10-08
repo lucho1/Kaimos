@@ -89,33 +89,35 @@ namespace Kaimos::KaimosUI {
 		// - Help Text + Hover -
 		ImGui::TextDisabled("(?)");
 		if (ImGui::IsItemHovered())
-		{
-			// - Tooltip + Text Wrap -
-			ImGui::BeginTooltip();
-			ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+			DrawTooltip(help_text);
+	}
 
-			ImGui::TextUnformatted(help_text.c_str());
+	void UIFunctionalities::DrawTooltip(const std::string& text)
+	{
+		// - Tooltip + Text Wrap -
+		ImGui::BeginTooltip();
+		ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+		ImGui::TextUnformatted(text.c_str());
 
-			ImGui::PopTextWrapPos();
-			ImGui::EndTooltip();
-		}
+		ImGui::PopTextWrapPos();
+		ImGui::EndTooltip();
 	}
 
 
-	bool UIFunctionalities::DrawDropDown(const char* label, const char* options[], uint options_size, const char* selected_option, uint& selected_index, float width, float spacing)
+	bool UIFunctionalities::DrawDropDown(const char* label, const std::vector<std::string>& options, uint options_size, std::string& selected_option, uint& selected_index, float width, float spacing)
 	{
 		// - Set Combo Settings -
 		bool ret = false;
 		SetTextCursorAndWidth(label, width, spacing);
 		std::string widget_label = "###" + std::string(label);
 
-		if (ImGui::BeginCombo(widget_label.c_str(), selected_option))
+		if (ImGui::BeginCombo(widget_label.c_str(), selected_option.c_str()))
 		{
 			// - Loop options & set selected option -
 			for (uint i = 0; i < options_size; ++i)
 			{
 				bool selected = selected_option == options[i];
-				if (ImGui::Selectable(options[i], selected))
+				if (ImGui::Selectable(options[i].c_str(), selected))
 				{
 					selected_option = options[i];
 					selected_index = i;

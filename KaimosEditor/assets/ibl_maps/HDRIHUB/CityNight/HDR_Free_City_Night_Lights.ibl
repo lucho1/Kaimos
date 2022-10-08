@@ -1,0 +1,38 @@
+[Header]
+ICOfile = "HDR_Free_City_Night_Lights_Thumb.jpg"
+Name = "HDR Free City Night Lights"
+Author = "HDRI Hub"
+Location = "Germany"
+Comment = "city, urban, night, lights, building, road"
+PREVIEWfile = "HDR_Free_City_Night_Lights_Prev.jpg"
+GEOlat = 52.6556789875030520
+GEOlong = 8.4282530844211578
+Link = "http://www.hdri-hub.com"
+Date = "2014:01:27"
+Time = "01:30:43"
+
+[Background]
+BGfile = "HDR_Free_City_Night_Lights_Bg.jpg"
+BGmap = 1
+BGu = 0.000000
+BGv = 0.000000
+BGheight = 4096
+
+[Enviroment]
+EVfile = "HDR_Free_City_Night_Lights_Env.hdr"
+EVmap = 1
+EVu = 0.000000
+EVv = 0.000000
+EVheight = 256
+EVmulti = 1.000000
+EVgamma = 2.200000
+
+[Reflection]
+REFfile = "HDR_Free_City_Night_Lights_Ref.hdr"
+REFmap = 1
+REFu = 0.000000
+REFv = 0.000000
+REFheight = 2048
+REFmulti = 1.000000
+REFgamma = 2.200000
+

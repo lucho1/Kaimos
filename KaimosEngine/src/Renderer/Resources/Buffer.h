@@ -26,7 +26,7 @@ namespace Kaimos {
 			case SHADER_DATATYPE::BOOL:		return 1;			// sizeof(bool)
 		}
 
-		KS_ENGINE_ASSERT(false, "Unknown ShaderDataType passed!");
+		KS_FATAL_ERROR("Unknown ShaderDataType passed!");
 		return 0;
 	}
 
@@ -58,8 +58,8 @@ namespace Kaimos {
 				case SHADER_DATATYPE::FLOAT2:	return 2;
 				case SHADER_DATATYPE::FLOAT3:	return 3;
 				case SHADER_DATATYPE::FLOAT4:	return 4;
-				case SHADER_DATATYPE::MAT3:		return 3 * 3;
-				case SHADER_DATATYPE::MAT4:		return 4 * 4;
+				case SHADER_DATATYPE::MAT3:		return 3;// *3;
+				case SHADER_DATATYPE::MAT4:		return 4;// *4;
 				case SHADER_DATATYPE::INT:		return 1;
 				case SHADER_DATATYPE::INT2:		return 2;
 				case SHADER_DATATYPE::INT3:		return 3;
@@ -67,7 +67,7 @@ namespace Kaimos {
 				case SHADER_DATATYPE::BOOL:		return 1;
 			}
 
-			KS_ENGINE_ASSERT(false, "The element has an unknown ShaderDataType!");
+			KS_FATAL_ERROR("The element has an unknown ShaderDataType!");
 			return 0;
 		}
 	};
@@ -154,9 +154,11 @@ namespace Kaimos {
 		virtual void Unbind() const = 0;
 
 		static Ref <IndexBuffer> Create(uint* vertices, uint count);
+		static Ref <IndexBuffer> Create(uint count);
 		
 		// -- Getters --
 		virtual uint GetCount() const = 0;
+		virtual void SetData(const void* data, uint count) = 0;
 	};
 
 
